@@ -1,1 +1,1 @@
-/* output useful things to the user, so that we can actaully play chess! */
+/* output useful things to the user, so that we can actually play chess! */
