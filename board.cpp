@@ -1,1 +1,1 @@
-/* definition of the board datatype */
+//definition of a board
