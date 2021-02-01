@@ -1,0 +1,1 @@
+/* definition of the board datatype */
