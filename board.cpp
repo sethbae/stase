@@ -1,22 +1,29 @@
 //definition of a board
-#include <bitset>
-using std::bitset;
 
-// The four sets of 
+/* I use the convention that one byte [xxxx-xxxx] stores the data at the even index in high bits,
+   the odd in low bits */
+   
+unsigned LOW_MASK = 15;
+unsigned HIGH_MASK = 240;
+
 typedef struct Board {
-    bitset<64> pieces[4];
-    bitset<32> flags;
+
+    uint_fast8_t squares[32];
+    uint_fast32_t conf;
 
     int get(int pos) {
-        return (pieces[0][pos] << 3) | (pieces[1][pos] << 2) | (pieces[2][pos] << 1) | (pieces[3][pos]);
+        uint_fast8_t byte = squares[pos/2];
+        return (pos % 2 == 0) ? (byte >> 4) : (byte & LOW_MASK);
+    }
+    
+    void set(int pos, uint_fast8_t val) {
+        if (pos % 2 == 0) {
+            squares[pos/2] = (val << 4) | (squares[pos/2] & LOW_MASK);
+        } else {
+            squares[pos/2] = (squares[pos/2] & HIGH_MASK) | val;
+        }
     }
 
-    void set(int pos, int val) {
-        pieces[0][pos] = (val >> 3) & 1;
-        pieces[1][pos] = (val >> 2) & 1;
-        pieces[2][pos] = (val >> 1) & 1;
-        pieces[3][pos] = val & 1;
-    }
 } Board;
 
 /*int main() {
