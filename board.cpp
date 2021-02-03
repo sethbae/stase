@@ -3,7 +3,7 @@
 using std::bitset;
 
 // The four sets of 
-struct Board {
+typedef struct Board {
     bitset<64> pieces[4];
     bitset<32> flags;
 
@@ -17,11 +17,11 @@ struct Board {
         pieces[2][pos] = (val >> 1) & 1;
         pieces[3][pos] = val & 1;
     }
-};
+} Board;
 
-int main() {
+/*int main() {
     Board b;
     b.set(0, 9);
     printf("%d", b.get(0));
     return 0;
-}
+}*/
