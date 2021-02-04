@@ -1,34 +1,133 @@
 //definition of a board
 
+#include <iostream>
+using std::cout;
+#include <stdint.h>
+
 /* I use the convention that one byte [xxxx-xxxx] stores the data at the even index in high bits,
    the odd in low bits */
    
-unsigned LOW_MASK = 15;
-unsigned HIGH_MASK = 240;
+// masks for bit reading
+const unsigned LO4_MASK = 15;
+const unsigned HI4_MASK = 240;
+const unsigned LO3_MASK = 7;
+const unsigned HI3_MASK = 56;
 
+// types we use for small numbers (8 or 32 bit)
+typedef uint_fast8_t Num;
+typedef uint_fast32_t Int;
+
+// type definition for a single square address
+typedef uint_fast8_t Square;
+
+// numbers used to increment either the row or the col of a square
+const Num ONE_ROW = 8;
+const Num ONE_COL = 1;
+
+// type definition for the board
 typedef struct Board {
 
-    uint_fast8_t squares[32];
-    uint_fast32_t conf;
+    Num squares[32];
+    Int conf;
 
-    int get(int pos) {
-        uint_fast8_t byte = squares[pos/2];
-        return (pos % 2 == 0) ? (byte >> 4) : (byte & LOW_MASK);
+    // read 4 bits corresponding to a square address
+    int get(Square sq) {
+        Num byte = squares[sq/2];
+        return (sq & 1) ? (byte & LO4_MASK) : (byte >> 4);
     }
     
-    void set(int pos, uint_fast8_t val) {
-        if (pos % 2 == 0) {
-            squares[pos/2] = (val << 4) | (squares[pos/2] & LOW_MASK);
+    // set a square address to the value given
+    void set(Square sq, Num val) {
+        if (sq & 1) {
+            squares[sq/2] = (squares[sq/2] & HI4_MASK) | val;            
         } else {
-            squares[pos/2] = (squares[pos/2] & HIGH_MASK) | val;
+            squares[sq/2] = (val << 4) | (squares[sq/2] & LO4_MASK);
         }
     }
 
 } Board;
 
+// make a square out of human coordinates
+inline Square sq(int row, int col) {
+    return (Square) ((row << 3) | col);
+}
+
+// increment or decrement along the row or column
+inline Square inc_row(Square s) {
+    return s + ONE_ROW;
+}
+
+inline Square dec_row(Square s) {
+    return s - ONE_ROW;
+}
+
+inline Square inc_col(Square s) {
+    return s + ONE_COL;
+}
+
+inline Square dec_col(Square s) {
+    return s - ONE_COL;
+}
+
+// read the row or column of a square
+inline Num row(Square sq) {
+    return sq >> 3;
+}
+
+inline Num col(Square sq) {
+    return sq & LO3_MASK;
+}
+
+// print out a very basic representation of the board (grid of 64 numbers)
+void pr_raw(Board b) {
+
+    for (int i = 7; i >= 0; --i) {
+        for (int j = 0; j <=7; ++j) {
+        
+            int x = b.get(sq(i, j));
+            
+            if (x < 10) {
+                cout << " " << x << " ";
+            } else {
+                cout << x << " ";
+            }
+            
+        }
+        cout << "\n";
+    }
+    
+}
+
 /*int main() {
+
+    Square s = sq(0, 0);
+    cout << (int) s << "\n";
+    s = sq(1, 0);
+    cout << (int) s << "\n";
+    s = sq(0, 1);
+    cout << (int) s << "\n";
+    s = sq(7, 7);
+    cout << (int) s << "\n";
+    s = sq(7, 6);
+    cout << (int) s << "\n";
+    s = sq(6, 7);
+    cout << (int) s << "\n";
+    
+    cout << (int) row(sq(6, 3)) << "\n";
+    cout << (int) row(sq(3, 4)) << "\n";
+    
+    
     Board b;
-    b.set(0, 9);
-    printf("%d", b.get(0));
+    
+    Square current = sq(0, 0);
+    for ( ; row(current) < 8; current = inc_row(current)) {
+        b.set(current, 6);
+    }
+    for ( ; col(current) < 8; current = inc_col(current)) {
+        b.set(current, 5);
+    }
+    
+    pr_raw(b);
+
     return 0;
 }*/
