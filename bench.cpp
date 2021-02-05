@@ -25,13 +25,21 @@ int main(void) {
     for (int i = 0; i < 64; ++i) {
         ran[i] = random();
     }
-
-    /* start benchmark and write to boards */
-    auto start = high_resolution_clock::now();
     
     for (int i = 0; i < k; ++i) {
         for (int j = 0; j < 64; ++j) {
             boards[i].set(j, ran[j]);
+        }
+    }
+    
+    /* start benchmark and write to boards */
+    auto start = high_resolution_clock::now();
+    
+    int x = 0;
+    for (int j = 0; j < k; ++j) {
+        Board b = boards[j];
+        for (int i = 0; i < 64; ++i) {
+            x += b.get(i);
         }
     }
     
@@ -46,5 +54,10 @@ int main(void) {
     double per_board = duration.count() / (double) k;
     
     cout << "Which is " << per_board << " microseconds per board\n";
+    
+    cout << "Sum: " << x << "\n";
+    
+    cout << sizeof(uint_fast8_t) << "\n";
+    cout << sizeof(Board) << "\n";
     
 }
