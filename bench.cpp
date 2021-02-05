@@ -23,7 +23,7 @@ int main(void) {
     
     // initialise ran with random data
     for (int i = 0; i < 64; ++i) {
-        ran[i] = random();
+        ran[i] = rand();
     }
 
     /* start benchmark and write to boards */
