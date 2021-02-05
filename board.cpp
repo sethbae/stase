@@ -7,11 +7,12 @@ using std::cout;
 /* I use the convention that one byte [xxxx-xxxx] stores the data at the even index in high bits,
    the odd in low bits */
    
+
 // masks for bit reading
 const unsigned LO4_MASK = 15;
 const unsigned HI4_MASK = 240;
 const unsigned LO3_MASK = 7;
-const unsigned HI3_MASK = 56;
+const unsigned HI3_MASK = 112;
 
 // types we use for small numbers (8 or 32 bit)
 typedef uint_fast8_t Num;
@@ -32,16 +33,18 @@ typedef struct Board {
 
     // read 4 bits corresponding to a square address
     int get(Square sq) {
-        Num byte = squares[sq/2];
+        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
+        Num byte = squares[ind];
         return (sq & 1) ? (byte & LO4_MASK) : (byte >> 4);
     }
     
     // set a square address to the value given
     void set(Square sq, Num val) {
+        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
         if (sq & 1) {
-            squares[sq/2] = (squares[sq/2] & HI4_MASK) | val;            
+            squares[ind] = (squares[ind] & HI4_MASK) | val;            
         } else {
-            squares[sq/2] = (val << 4) | (squares[sq/2] & LO4_MASK);
+            squares[ind] = (val << 4) | (squares[ind] & LO4_MASK);
         }
     }
 
@@ -49,7 +52,7 @@ typedef struct Board {
 
 // make a square out of human coordinates
 inline Square sq(int row, int col) {
-    return (Square) ((row << 3) | col);
+    return (Square) ((row << 4) | col);
 }
 
 // increment or decrement along the row or column
@@ -71,11 +74,11 @@ inline Square dec_col(Square s) {
 
 // read the row or column of a square
 inline Num row(Square sq) {
-    return sq >> 3;
+    return sq >> 4;
 }
 
 inline Num col(Square sq) {
-    return sq & LO3_MASK;
+    return sq & LO4_MASK;
 }
 
 // print out a very basic representation of the board (grid of 64 numbers)
@@ -123,7 +126,7 @@ void pr_raw(Board b) {
     for ( ; row(current) < 8; current = inc_row(current)) {
         b.set(current, 6);
     }
-    for ( ; col(current) < 8; current = inc_col(current)) {
+    for ( ; col(current) < 6; current = inc_col(current)) {
         b.set(current, 5);
     }
     
