@@ -10,6 +10,8 @@ We could even define precise interfaces between them.
 
 Display
 
+Human Interface (different boards/interaction controls/timing)
+
 #####################################
 
 Game logic 
