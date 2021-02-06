@@ -28,23 +28,25 @@ const Num ONE_COL = 1;
 // type definition for the board
 typedef struct Board {
 
-    Num squares[32];
+    Num squares[8][4];
     Int conf;
 
     // read 4 bits corresponding to a square address
     int get(Square sq) {
-        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
-        Num byte = squares[ind];
+//        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
+        Num byte = squares[sq >> 4][(sq & LO3_MASK) >> 1];
         return (sq & 1) ? (byte & LO4_MASK) : (byte >> 4);
     }
     
     // set a square address to the value given
     void set(Square sq, Num val) {
-        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
+        //Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
         if (sq & 1) {
-            squares[ind] = (squares[ind] & HI4_MASK) | val;            
+            squares[sq >> 4][(sq & LO3_MASK) >> 1] = 
+                (squares[sq >> 4][(sq & LO3_MASK) >> 1] & HI4_MASK) | val;            
         } else {
-            squares[ind] = (val << 4) | (squares[ind] & LO4_MASK);
+            squares[sq >> 4][(sq & LO3_MASK) >> 1] = 
+                (val << 4) | (squares[sq >> 4][(sq & LO3_MASK) >> 1] & LO4_MASK);
         }
     }
 
