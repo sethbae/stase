@@ -1,86 +1,132 @@
-//definition of a board
-
 #include <iostream>
 using std::cout;
 #include <stdint.h>
 
-/* I use the convention that one byte [xxxx-xxxx] stores the data at the even index in high bits,
-   the odd in low bits */
-   
+/***************************************************************************
+ * This file defines a board representation.
+ * 
+ * It defines a basic interface for interacting with a chess board:
+ *  
+ *   -Square: a coordinate on the board
+ *      -mksq():        makes a square out of regular coordinates (a, b)
+ *      -inc_row():     (in-/de-)crement a square to point further along a row/col
+ *          dec_row()
+ *          inc_col()
+ *          dec_col()
+ *      -reset_row():   return row or column to zero
+ *          reset_col()
+ *      -row():         return the current row or column
+ *          col()
+ *      -val_row():     query whether the square pointed to is on the board (or just off)
+ *          val_col()
+ *
+ *   -Board: 64 squares and a configuration word (move, castling, ep, half moves, whole moves)
+ *      -get(): return the current value of a square
+ *      -set(): set the value of a square
+ * 
+ *
+ *  Implementation details:
+ *  
+ *  Board:
+ *      -> 4 bits per square of board
+ *      -> the board struct stores a 2d array of bytes
+ *      -> the config word is a 32 bits
+ *      
+ *  Square:
+ *      -> 8 bits per square
+ *      -> 4 high bits store one coordinate (0-8 inc)
+ *      -> 4 low bits store another (0-8 inc)
+ *      
+ *  Note: To decide which half of a byte is addressed, we use even/oddness.
+ *          So for a 3 bit index n, n/2 is used to get the byte (i.e. n >> 1),
+ *          and then n % 2 == 0 is used to decide between high and low (i.e. n & 1).
+ *      
+ *****************************************************************************/
 
-// masks for bit reading
-const unsigned LO4_MASK = 15;
-const unsigned HI4_MASK = 240;
-const unsigned LO3_MASK = 7;
-const unsigned HI3_MASK = 112;
+const unsigned LO4 = 15;
+const unsigned HI4 = 240;
+const unsigned LO3 = 7;
+const unsigned HI3 = 112;
 
-// types we use for small numbers (8 or 32 bit)
-typedef uint_fast8_t Num;
+typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
-
-// type definition for a single square address
 typedef uint_fast8_t Square;
 
-// numbers used to increment either the row or the col of a square
-const Num ONE_ROW = 8;
-const Num ONE_COL = 1;
+struct Board {
 
-// type definition for the board
-typedef struct Board {
-
-    Num squares[8][4];
+    Byte squares[8][4];
     Int conf;
 
-    // read 4 bits corresponding to a square address
+    /* read 4 bits from given square address */
     int get(Square sq) {
-//        Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
-        Num byte = squares[sq >> 4][(sq & LO3_MASK) >> 1];
-        return (sq & 1) ? (byte & LO4_MASK) : (byte >> 4);
+        Byte b = squares[sq >> 4][(sq & LO3) >> 1]; // use high as 0-7, low/2 as 0-3
+        return (sq & 1) ? (b & LO4) : (b >> 4); // depending on parity of low, read 4 bits
     }
-    
-    // set a square address to the value given
-    void set(Square sq, Num val) {
-        //Num ind = ((sq & HI3_MASK) >> 2) | ((sq & LO3_MASK) >> 1);
+
+    /* write 4 bits to given square address */
+    void set(Square sq, Byte val) {
+        
+        Byte ind1 = sq >> 4;    // calculate correct indices as above
+        Byte ind2 = (sq & LO3) >> 1;
+        
         if (sq & 1) {
-            squares[sq >> 4][(sq & LO3_MASK) >> 1] = 
-                (squares[sq >> 4][(sq & LO3_MASK) >> 1] & HI4_MASK) | val;            
+             // if odd, write to high
+            squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | val;
         } else {
-            squares[sq >> 4][(sq & LO3_MASK) >> 1] = 
-                (val << 4) | (squares[sq >> 4][(sq & LO3_MASK) >> 1] & LO4_MASK);
+            // if even, write to low
+            squares[ind1][ind2] = (val << 4) | (squares[ind1][ind2] & LO4);
         }
+        
     }
 
-} Board;
+};
 
-// make a square out of human coordinates
-inline Square sq(int row, int col) {
+
+const Byte SHIFT_ROW = 16;
+const Byte SHIFT_COL = 1;
+
+inline Square mksq(int row, int col) {
     return (Square) ((row << 4) | col);
 }
 
-// increment or decrement along the row or column
 inline Square inc_row(Square s) {
-    return s + ONE_ROW;
+    return s + SHIFT_ROW;
 }
 
 inline Square dec_row(Square s) {
-    return s - ONE_ROW;
+    return s - SHIFT_ROW;
 }
 
 inline Square inc_col(Square s) {
-    return s + ONE_COL;
+    return s + SHIFT_COL;
 }
 
 inline Square dec_col(Square s) {
-    return s - ONE_COL;
+    return s - SHIFT_COL;
 }
 
-// read the row or column of a square
-inline Num row(Square sq) {
-    return sq >> 4;
+inline Square reset_col(Square s) {
+    return s & HI4;
 }
 
-inline Num col(Square sq) {
-    return sq & LO4_MASK;
+inline Square reset_row(Square s) {
+    return s & LO4;
+}
+
+inline Byte row(Square s) {
+    return s >> 4;
+}
+
+inline Byte col(Square s) {
+    return s & LO4;
+}
+
+inline bool val_row(Square s) {
+    return !(s & 128);
+}
+
+inline bool val_col(Square s) {
+    return !(s & 8);
 }
 
 // print out a very basic representation of the board (grid of 64 numbers)
@@ -89,7 +135,7 @@ void pr_raw(Board b) {
     for (int i = 7; i >= 0; --i) {
         for (int j = 0; j <=7; ++j) {
         
-            int x = b.get(sq(i, j));
+            int x = b.get(mksq(i, j));
             
             if (x < 10) {
                 cout << " " << x << " ";
@@ -105,31 +151,15 @@ void pr_raw(Board b) {
 
 /*int main() {
 
-    Square s = sq(0, 0);
-    cout << (int) s << "\n";
-    s = sq(1, 0);
-    cout << (int) s << "\n";
-    s = sq(0, 1);
-    cout << (int) s << "\n";
-    s = sq(7, 7);
-    cout << (int) s << "\n";
-    s = sq(7, 6);
-    cout << (int) s << "\n";
-    s = sq(6, 7);
-    cout << (int) s << "\n";
-    
-    cout << (int) row(sq(6, 3)) << "\n";
-    cout << (int) row(sq(3, 4)) << "\n";
-    
-    
     Board b;
     
-    Square current = sq(0, 0);
-    for ( ; row(current) < 8; current = inc_row(current)) {
-        b.set(current, 6);
-    }
-    for ( ; col(current) < 6; current = inc_col(current)) {
-        b.set(current, 5);
+    int i = 0;
+    for (Square s = sq(0, 0) ; row(s) < 8; s = inc_row(s)) {
+        for ( ; col(s) < 8; s = inc_col(s)) {
+            b.set(s, i);
+        }
+        ++i;
+        s = reset_col(s);
     }
     
     pr_raw(b);
