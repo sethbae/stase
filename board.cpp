@@ -3,11 +3,12 @@ using std::cout;
 #include <stdint.h>
 
 /***************************************************************************
- * This file defines a board representation.
+ * This file defines a board representation and piece type (enum).
  * 
  * It defines a basic interface for interacting with a chess board:
  *  
  *   -Square: a coordinate on the board
+ *      
  *      -mksq():        makes a square out of regular coordinates (a, b)
  *      -inc_row():     (in-/de-)crement a square to point further along a row/col
  *          dec_row()
@@ -21,9 +22,17 @@ using std::cout;
  *          val_col()
  *
  *   -Board: 64 squares and a configuration word (move, castling, ep, half moves, whole moves)
- *      -get(): return the current value of a square
- *      -set(): set the value of a square
+ *      
+ *      -b.get():       return the current piece on a square
+ *      -b.set():       set the piece of a square
  * 
+        -pr(b):         print out a human readable ascii grid chess board
+        -pr_raw(b):     print out the numeric values in a grid
+        
+ *   -Piece: an enum for each piece type (W_KING, B_QUEEN, EMPTY etc).
+ *          
+ *      -is_white():    returns true iff the piece is white
+ *      -ptoc():        returns a character depicting the piece (K, q etc)
  *
  *  Implementation details:
  *  
@@ -36,6 +45,11 @@ using std::cout;
  *      -> 8 bits per square
  *      -> 4 high bits store one coordinate (0-8 inc)
  *      -> 4 low bits store another (0-8 inc)
+ *
+ *  Piece:
+ *      -> enum of type 'Byte', although only 4 (low) bits are used
+ *      -> White pieces have the MSB set.
+ *      -> EMPTY is white, as it goes (value 15).
  *      
  *  Note: To decide which half of a byte is addressed, we use even/oddness.
  *          So for a 3 bit index n, n/2 is used to get the byte (i.e. n >> 1),
@@ -52,19 +66,37 @@ typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
 typedef uint_fast8_t Square;
 
+enum Piece : Byte {
+    B_KING = 0,
+    B_QUEEN = 1,
+    B_ROOK = 2,
+    B_KNIGHT = 3,
+    B_BISHOP = 4,
+    B_PAWN = 5,
+    
+    W_KING = 8,
+    W_QUEEN = 9,
+    W_ROOK = 10,
+    W_KNIGHT = 11,
+    W_BISHOP = 12,
+    W_PAWN = 13,
+    
+    EMPTY = 15
+};
+
 struct Board {
 
     Byte squares[8][4];
     Int conf;
 
     /* read 4 bits from given square address */
-    int get(Square sq) {
+    Piece get(Square sq) {
         Byte b = squares[sq >> 4][(sq & LO3) >> 1]; // use high as 0-7, low/2 as 0-3
-        return (sq & 1) ? (b & LO4) : (b >> 4); // depending on parity of low, read 4 bits
+        return (Piece) ((sq & 1) ? (b & LO4) : (b >> 4)); // depending on parity, read 4 bits
     }
 
     /* write 4 bits to given square address */
-    void set(Square sq, Byte val) {
+    void set(Square sq, Piece val) {
         
         Byte ind1 = sq >> 4;    // calculate correct indices as above
         Byte ind2 = (sq & LO3) >> 1;
@@ -80,7 +112,6 @@ struct Board {
     }
 
 };
-
 
 const Byte SHIFT_ROW = 16;
 const Byte SHIFT_COL = 1;
@@ -129,7 +160,108 @@ inline bool val_col(Square s) {
     return !(s & 8);
 }
 
-// print out a very basic representation of the board (grid of 64 numbers)
+
+
+inline bool is_white(Piece p) {
+    return p & 8;
+}
+
+Board empty_board() {
+    
+    Board b;
+    
+    for (Square s = mksq(0, 0) ; row(s) < 8; s = inc_row(s)) {
+        for ( ; col(s) < 8; s = inc_col(s)) {
+            b.set(s, EMPTY);
+        }
+        s = reset_col(s);
+    }
+    
+    return b;
+}
+
+Board starting_pos() {
+    
+    Board b = empty_board();
+    
+    for (Square s = mksq(1, 0); val_col(s); s = inc_col(s)) {
+        b.set(s, W_PAWN);
+    }
+    
+    for (Square s = mksq(6, 0); val_col(s); s = inc_col(s)) {
+        b.set(s, B_PAWN);
+    }
+    
+    Square s = mksq(0, 0);
+    b.set(s, W_ROOK);
+    
+    s = inc_col(s);
+    b.set(s, W_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, W_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, W_QUEEN);
+    
+    s = inc_col(s);
+    b.set(s, W_KING);
+    
+    s = inc_col(s);
+    b.set(s, W_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, W_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, W_ROOK);
+    
+    s = mksq(7, 0);
+    b.set(s, B_ROOK);
+    
+    s = inc_col(s);
+    b.set(s, B_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, B_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, B_QUEEN);
+    
+    s = inc_col(s);
+    b.set(s, B_KING);
+    
+    s = inc_col(s);
+    b.set(s, B_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, B_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, B_ROOK);
+    
+    return b;
+}
+
+char ptoc(Piece p) {
+    switch (p) {
+        case B_KING:    return 'k';
+        case B_QUEEN:   return 'q';
+        case B_ROOK:    return 'r';
+        case B_BISHOP:  return 'b';
+        case B_KNIGHT:  return 'n';
+        case B_PAWN:    return 'p';
+        case W_KING:    return 'K';
+        case W_QUEEN:   return 'Q';
+        case W_ROOK:    return 'R';
+        case W_BISHOP:  return 'B';
+        case W_KNIGHT:  return 'N';
+        case W_PAWN:    return 'P';
+        default:        return '*';
+    }
+}
+
+/* print out the literal integer values of the data at each square on the board */
 void pr_raw(Board b) {
 
     for (int i = 7; i >= 0; --i) {
@@ -149,6 +281,17 @@ void pr_raw(Board b) {
     
 }
 
+/* print out a human readable chess represenatation of the board */
+void pr(Board b) {
+    for (int i = 7; i >= 0; --i) {
+        for (int j = 0; j < 8; ++j) {
+            Piece p = b.get(mksq(i, j));
+            cout << ptoc(p) << " ";
+        }
+        cout << "\n";
+    }
+}
+
 /*int main() {
 
     Board b;
@@ -163,6 +306,8 @@ void pr_raw(Board b) {
     }
     
     pr_raw(b);
+    
+    pr(starting_pos());
 
     return 0;
 }*/
