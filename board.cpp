@@ -282,8 +282,9 @@ void pr_raw(Board b) {
 }
 
 /* print out a human readable chess represenatation of the board */
-void pr(Board b) {
+void pr(Board b, std::string indent) {
     for (int i = 7; i >= 0; --i) {
+        cout << indent;
         for (int j = 0; j < 8; ++j) {
             Piece p = b.get(mksq(i, j));
             cout << ptoc(p) << " ";
