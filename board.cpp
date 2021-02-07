@@ -1,6 +1,10 @@
 #include <iostream>
 using std::cout;
 #include <stdint.h>
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
 
 /***************************************************************************
  * This file defines a board representation and piece type (enum).
@@ -26,9 +30,10 @@ using std::cout;
  *      -b.get():       return the current piece on a square
  *      -b.set():       set the piece of a square
  * 
-        -pr(b):         print out a human readable ascii grid chess board
-        -pr_raw(b):     print out the numeric values in a grid
-        
+ *      -pr(b):         print out a human readable ascii grid chess board
+ *      -pr_raw(b):     print out the numeric values in a grid
+ *      -fen_to_board():convert a string in FEN to a board instance.
+ *      
  *   -Piece: an enum for each piece type (W_KING, B_QUEEN, EMPTY etc).
  *          
  *      -is_white():    returns true iff the piece is white
@@ -261,6 +266,24 @@ char ptoc(Piece p) {
     }
 }
 
+Piece ctop(char c) {
+    switch (c) {
+        case 'K':   return W_KING;
+        case 'Q':   return W_QUEEN;
+        case 'R':   return W_ROOK;
+        case 'B':   return W_BISHOP;
+        case 'N':   return W_KNIGHT;
+        case 'P':   return W_PAWN;
+        case 'k':   return B_KING;
+        case 'q':   return B_QUEEN;
+        case 'r':   return B_ROOK;
+        case 'b':   return B_BISHOP;
+        case 'n':   return B_KNIGHT;
+        case 'p':   return B_PAWN;
+        default:    return EMPTY;
+    }
+}
+
 /* print out the literal integer values of the data at each square on the board */
 void pr_raw(Board b) {
 
@@ -282,7 +305,7 @@ void pr_raw(Board b) {
 }
 
 /* print out a human readable chess represenatation of the board */
-void pr(Board b, std::string indent) {
+void pr_indent(Board b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
@@ -292,6 +315,66 @@ void pr(Board b, std::string indent) {
         cout << "\n";
     }
 }
+
+void pr(Board b) {
+    pr_indent(b, "");
+}
+
+/* work in progress - doesn't read the config word */
+Board fen_to_board(string fen) {
+    
+    Board b;
+    int i = 0;  // point in string
+    char c;     // char read
+    
+    /* read in pieces first */
+    unsigned row = 7, col = 0;
+    while ( i < fen.size() && (c = fen.at(i++)) != ' ') {
+        
+        Piece p;
+        
+        if (c == '/') {
+            // forward slash: move on to next row
+            col = 0;
+            --row;
+        } else if ((p = ctop(c)) != EMPTY) {
+            
+            // valid piece: output it
+            if (row < 8 && col < 8) {
+                b.set(mksq(row, col), p);
+                ++col;
+            } else {
+                // cout << "Illegal coords: " << row << " " << col << "\n";
+                return empty_board();
+            }
+            
+        } else if ('1' <= c && c <= '8') {
+            
+            // legal integer: skip forward in row, printing empty
+            unsigned end = col + (c - '0');
+            
+            while (col < end) {
+                if (col < 8) {
+                    b.set(mksq(row, col), EMPTY);
+                    ++col;
+                } else {
+                    // skip overruns col, invalid fen
+                    return empty_board();
+                }
+            }
+
+        } else {
+            // illegal character
+            // cout << "Illegal char\n";
+            return empty_board();
+        }
+        
+    }
+    
+    // if x,y != 7,7 return failure
+    return b;
+}
+
 
 /*int main() {
 
@@ -309,6 +392,20 @@ void pr(Board b, std::string indent) {
     pr_raw(b);
     
     pr(starting_pos());
-
+   
+    
+    vector<string> test_fens = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkb1r/pp1p1ppp/5n2/2p5/4p3/1N4P1/PPPPPPBP/RNBQK2R b KQkq - 1 5",
+        "r4rk1/ppB2pp1/4p1p1/2P3q1/4Pn2/P1N2n2/2B2PPP/2R2RK1 w - - 0 24",
+        "7k/1p6/p1p3p1/7p/1P2Q2P/P5P1/5r1K/5q2 w - - 4 47",
+        "2r2rk1/1p2bppp/p2pbn2/q1N1p3/2P1P3/N3BP2/PP2B1PP/2RR2K1 w - - 0 17"
+    };
+    
+    for (int i = 0; i < 5; ++i) {
+        pr(fen_to_board(test_fens[i]));
+        cout << "\n";
+    }
+    
     return 0;
 }*/
