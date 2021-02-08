@@ -79,7 +79,9 @@ typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
 typedef uint_fast8_t Square;
 
-enum Piece : Byte {
+enum Ptype {
+
+    /* defined values: so that we can translate both ways */
     B_KING = 0,
     B_QUEEN = 1,
     B_ROOK = 2,
@@ -94,8 +96,48 @@ enum Piece : Byte {
     W_BISHOP = 12,
     W_PAWN = 13,
     
-    EMPTY = 15
+    EMPTY = 14,
+    
+    /* other values which appear in the lookup tables */
+    KING,
+    QUEEN,
+    ROOK,
+    KNIGHT,
+    BISHOP,
+    PAWN,
+    
+    BLACK,
+    WHITE,
+    
+    INVALID
 };
+
+/* lookup tables for querying information about a given piece. The 4-bit piece (0-14 valid)
+   is used as an index into the relevant table */
+
+const Ptype PIECE[] = {
+            B_KING, B_QUEEN, B_ROOK, B_KNIGHT, B_BISHOP, B_PAWN,        // indexes 0-5
+            INVALID, INVALID,                                           // indexes 6, 7
+            W_KING, W_QUEEN, W_ROOK, W_KNIGHT, W_BISHOP, W_PAWN,        // indexes 8-13
+            EMPTY                                                       // index 14
+      };
+                        
+const Ptype TYPE[] = {
+            KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN,    // indexes 0-5
+            INVALID, INVALID,                           // indexes 6, 7
+            KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN,    // indexes 8-13
+            EMPTY                                       // index 14
+      };
+                       
+const Ptype COLOUR[] = {
+            BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,   // indexes 0-5
+            INVALID, INVALID,                           // indexes 6, 7
+            WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,   // indexes 8-13
+            EMPTY                                       // index 14
+      };
+
+typedef Byte Piece;
+
 
 struct Board {
 
