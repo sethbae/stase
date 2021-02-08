@@ -323,7 +323,7 @@ void pr(Board b) {
 /* work in progress - doesn't read the config word */
 Board fen_to_board(string fen) {
     
-    Board b;
+    Board b = empty_board();
     int i = 0;  // point in string
     char c;     // char read
     
@@ -351,17 +351,7 @@ Board fen_to_board(string fen) {
         } else if ('1' <= c && c <= '8') {
             
             // legal integer: skip forward in row, printing empty
-            unsigned end = col + (c - '0');
-            
-            while (col < end) {
-                if (col < 8) {
-                    b.set(mksq(row, col), EMPTY);
-                    ++col;
-                } else {
-                    // skip overruns col, invalid fen
-                    return empty_board();
-                }
-            }
+            col += (c - '0');
 
         } else {
             // illegal character
@@ -378,20 +368,6 @@ Board fen_to_board(string fen) {
 
 /*int main() {
 
-    Board b;
-    
-    int i = 0;
-    for (Square s = sq(0, 0) ; row(s) < 8; s = inc_row(s)) {
-        for ( ; col(s) < 8; s = inc_col(s)) {
-            b.set(s, i);
-        }
-        ++i;
-        s = reset_col(s);
-    }
-    
-    pr_raw(b);
-    
-    pr(starting_pos());
    
     
     vector<string> test_fens = {
