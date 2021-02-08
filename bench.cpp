@@ -125,7 +125,7 @@ void starting_pos_test() {
     cout << "Starting position test:\n";
     cout << "\tSum: " << sum << "\n";
     cout << "\tArrangement: \n\n";
-    pr(b, "\t");
+    pr_indent(b, "\t");
 
     cout << "\n";
 
