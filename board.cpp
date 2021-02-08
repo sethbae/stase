@@ -26,9 +26,9 @@ using std::cout;
  *      -b.get():       return the current piece on a square
  *      -b.set():       set the piece of a square
  * 
-        -pr(b):         print out a human readable ascii grid chess board
-        -pr_raw(b):     print out the numeric values in a grid
-        
+ *      -pr(b):         print out a human readable ascii grid chess board
+ *      -pr_raw(b):     print out the numeric values in a grid
+ *       
  *   -Piece: an enum for each piece type (W_KING, B_QUEEN, EMPTY etc).
  *          
  *      -is_white():    returns true iff the piece is white
@@ -281,7 +281,7 @@ void pr_raw(Board b) {
     
 }
 
-/* print out a human readable chess represenatation of the board */
+/* print out a human readable chess representation of the board */
 void pr(Board b, std::string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
