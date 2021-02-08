@@ -99,6 +99,7 @@ enum Piece : Byte {
 
 struct Board {
 
+    // std::array<std::array<Byte, 4>, 8> squares;
     Byte squares[8][4];
     Int conf;
 
@@ -354,7 +355,7 @@ void pr_raw(Board b) {
 }
 
 /* print out a human readable chess representation of the board */
-void pr_indent(Board b, string indent) {
+void pr_indent(Board & b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
@@ -364,7 +365,6 @@ void pr_indent(Board b, string indent) {
         cout << "\n";
     }
 }
-
 
 void pr_config(Board b) {
     cout << "Raw config: ";
@@ -387,6 +387,11 @@ void pr_config(Board b) {
     if (b.get_config(2)) cout << "Q ";
     if (b.get_config(3)) cout << "k ";
     if (b.get_config(4)) cout << "q ";
+    
+    if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+        cout << " -";
+    }
+
     cout << "\n";
 
     Int en = b.get_enpassant();
@@ -401,32 +406,25 @@ void pr(Board b) {
     pr_indent(b, "");
 }
 
-inline string get_word(stringstream * ss) {
+inline string get_word(stringstream & ss) {
     string word;
-    * ss >> word;
+    ss >> word;
     return word; 
 }
 
-inline int get_number(stringstream * ss) {
+inline int get_number(stringstream & ss) {
     int num;
-    * ss >> num;
+    ss >> num;
     return num; 
 }
 
-/* work in progress - doesn't read the config word */
-Board fen_to_board(string fen) {
-    stringstream stream(fen);
-    string setup;
-
-    stream >> setup;
-    
-    Board b = empty_board();
+void fill_board(Board & b, string & arrangement) {
     int i = 0;  // point in string
     char c;     // char read
     
     /* read in pieces first */
     unsigned row = 7, col = 0;
-    while ( i < setup.size() && (c = setup.at(i++)) != ' ') {
+    while ( i < (int) arrangement.size() && (c = arrangement.at(i++)) != ' ') {
         
         Piece p;
         
@@ -442,7 +440,8 @@ Board fen_to_board(string fen) {
                 ++col;
             } else {
                 // cout << "Illegal coords: " << row << " " << col << "\n";
-                return empty_board();
+                b = empty_board();
+                return;
             }
             
         } else if ('1' <= c && c <= '8') {
@@ -453,38 +452,171 @@ Board fen_to_board(string fen) {
         } else {
             // illegal character
             // cout << "Illegal char\n";
-            return empty_board();
+            b = empty_board();
+            return;
         }
         
     }
 
-    string turn = get_word(& stream);
-    string castle = get_word(& stream);
+    // if x,y != 7,7 return failure
+}
+
+void fill_config(Board & b, stringstream & words) {
+
+    string turn = get_word(words);
+    string castle = get_word(words);
 
     b.set_config(0, turn == "w");
 
-    b.set_config(1, castle.find('K') != -1);
-    b.set_config(2, castle.find('Q') != -1);
-    b.set_config(3, castle.find('k') != -1);
-    b.set_config(4, castle.find('q') != -1);
+    b.set_config(1, castle.find('K') != (unsigned int) -1);
+    b.set_config(2, castle.find('Q') != (unsigned int) -1);
+    b.set_config(3, castle.find('k') != (unsigned int) -1);
+    b.set_config(4, castle.find('q') != (unsigned int) -1);
 
-    string enpassant = get_word(& stream);
+    string enpassant = get_word(words);
     Byte en = enpassant == "-" ? 0 : get_col(stosq(enpassant) | 8);
     b.set_enpassant(en);
 
-    int halfmoves = get_number(& stream);
+    int halfmoves = get_number(words);
     b.set_halfmoves(halfmoves);
 
-    int fullmoves = get_number(& stream);
+    int fullmoves = get_number(words);
     b.set_fullmoves(fullmoves);
+}
 
-    // if x,y != 7,7 return failure
+/* work in progress - doesn't read the config word */
+Board fen_to_board(string fen) {
+    stringstream stream(fen);
+
+    Board b = empty_board();
+    string arrangement = get_word(stream);
+    fill_board(b, arrangement);
+
+    fill_config(b, stream);
+    
     return b;
 }
 
+string board_to_fen(Board & b) {
+    stringstream ss;
 
+    // Build arrangement string
+    for (int i = 7; i >= 0; --i) {
+        int spaces = 0;
+        for (int j = 0; j < 8; ++j) {
+            char piece = ptoc(b.get(mksq(i, j)));
+            if (piece == '*') {
+                ++spaces;
+            } else if (spaces) {
+                ss << spaces << piece;
+                spaces = 0;
+            } else {
+                ss << piece;
+            }
+        }
 
-int main() {
+        if (spaces) 
+            ss << spaces;
+
+        if (i) 
+            ss << "/";
+    }
+
+    // Append turn
+    ss << " " << (b.get_config(0) ? "w" : "b");
+
+    // Append castle rights
+    ss << " ";
+    ss << (b.get_config(1) ? "K" : "");
+    ss << (b.get_config(2) ? "Q" : "");
+    ss << (b.get_config(3) ? "k" : "");
+    ss << (b.get_config(4) ? "q" : "");
+    
+    if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+        ss << "-";
+    }
+
+    // Append enpassant
+    Int en = b.get_enpassant();
+    string enstr = sqtos(mksq(b.get_config(0) ? 5 : 2, b.get_enpassant() & 7));
+    ss << " " << (en < 8 ? "-" : enstr);
+
+    // Append half and full moves
+    ss << " " << b.get_halfmoves() << " " << b.get_fullmoves();
+
+    return ss.str();
+}
+
+void pr_board_config(Board & b, string indent) {
+    for (int i = 7; i >= 0; --i) {
+        cout << indent;
+        for (int j = 0; j < 8; ++j) {
+            Piece p = b.get(mksq(i, j));
+            cout << ptoc(p) << " ";
+        }
+
+        switch (i) {
+            case 7: {
+                cout << "\tFEN: " << board_to_fen(b);
+                break;
+            }
+
+            case 6: {
+                cout << "\tRaw config: ";
+                for (int i = 31; i >= 0; --i) {
+                    if (b.conf & (1 << i)) {
+                        cout << "1";
+                    } else {
+                        cout << "0";
+                    }
+
+                    if (i == 0 || i == 1 || i == 5 || i == 9 || i == 15) {
+                        cout << " ";
+                    }
+                }
+                break;
+            }
+
+            case 5: {
+                cout << "\tTurn: " << (b.get_config(0) ? "White" : "Black");
+                break;
+            }
+
+            case 4: {
+                cout << "\tCastle Rights: ";
+                if (b.get_config(1)) cout << "K ";
+                if (b.get_config(2)) cout << "Q ";
+                if (b.get_config(3)) cout << "k ";
+                if (b.get_config(4)) cout << "q ";
+                if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+                    cout << "-";
+                }
+                
+                break;  
+            }
+
+            case 3: {
+                Int en = b.get_enpassant();
+                string enstr = sqtos(mksq(b.get_config(0) ? 5 : 2, b.get_enpassant() & 7));
+                cout << "\tEnpassant: " << (en < 8 ? "-" : enstr);
+                break;
+            }
+
+            case 2: {
+                cout << "\tHalf moves: " << b.get_halfmoves();
+                break;
+            }
+
+            case 1: {
+                cout << "\tFull moves: " << b.get_fullmoves();
+                break;
+            }
+        }
+
+        cout << "\n";
+    }
+}
+/* int main() {
 
     vector<string> test_fens = {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -506,4 +638,4 @@ int main() {
     }
     
     return 0;
-}
+} */
