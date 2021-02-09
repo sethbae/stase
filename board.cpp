@@ -277,68 +277,6 @@ Board empty_board() {
     return b;
 }
 
-Board starting_pos() {
-    
-    Board b = empty_board();
-    
-    for (Square s = mksq(1, 0); val_col(s); s = inc_col(s)) {
-        b.set(s, W_PAWN);
-    }
-    
-    for (Square s = mksq(6, 0); val_col(s); s = inc_col(s)) {
-        b.set(s, B_PAWN);
-    }
-    
-    Square s = mksq(0, 0);
-    b.set(s, W_ROOK);
-    
-    s = inc_col(s);
-    b.set(s, W_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, W_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, W_QUEEN);
-    
-    s = inc_col(s);
-    b.set(s, W_KING);
-    
-    s = inc_col(s);
-    b.set(s, W_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, W_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, W_ROOK);
-    
-    s = mksq(7, 0);
-    b.set(s, B_ROOK);
-    
-    s = inc_col(s);
-    b.set(s, B_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, B_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, B_QUEEN);
-    
-    s = inc_col(s);
-    b.set(s, B_KING);
-    
-    s = inc_col(s);
-    b.set(s, B_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, B_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, B_ROOK);
-    
-    return b;
-}
 
 char ptoc(Piece p) {
     switch (p) {
@@ -626,10 +564,10 @@ void pr_board_config(Board & b, string indent) {
 
             case 4: {
                 cout << "\tCastle Rights: ";
-                if (b.get_config(1)) cout << "K ";
-                if (b.get_config(2)) cout << "Q ";
-                if (b.get_config(3)) cout << "k ";
-                if (b.get_config(4)) cout << "q ";
+                if (b.get_config(1)) cout << "K";
+                if (b.get_config(2)) cout << "Q";
+                if (b.get_config(3)) cout << "k";
+                if (b.get_config(4)) cout << "q";
                 if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
                     cout << "-";
                 }
@@ -658,6 +596,85 @@ void pr_board_config(Board & b, string indent) {
         cout << "\n";
     }
 }
+
+
+Board starting_pos() {
+    
+    Board b = empty_board();
+    
+    for (Square s = mksq(1, 0); val_col(s); s = inc_col(s)) {
+        b.set(s, W_PAWN);
+    }
+    
+    for (Square s = mksq(6, 0); val_col(s); s = inc_col(s)) {
+        b.set(s, B_PAWN);
+    }
+    
+    Square s = mksq(0, 0);
+    b.set(s, W_ROOK);
+    
+    s = inc_col(s);
+    b.set(s, W_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, W_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, W_QUEEN);
+    
+    s = inc_col(s);
+    b.set(s, W_KING);
+    
+    s = inc_col(s);
+    b.set(s, W_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, W_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, W_ROOK);
+    
+    s = mksq(7, 0);
+    b.set(s, B_ROOK);
+    
+    s = inc_col(s);
+    b.set(s, B_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, B_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, B_QUEEN);
+    
+    s = inc_col(s);
+    b.set(s, B_KING);
+    
+    s = inc_col(s);
+    b.set(s, B_BISHOP);
+    
+    s = inc_col(s);
+    b.set(s, B_KNIGHT);
+    
+    s = inc_col(s);
+    b.set(s, B_ROOK);
+    
+    b.set_config(0, 1);
+
+    b.set_config(1, 1);
+    b.set_config(2, 1);
+    b.set_config(3, 1);
+    b.set_config(4, 1);
+
+    b.set_enpassant(0);
+    b.set_halfmoves(0);
+    b.set_fullmoves(1);
+    
+    return b;
+}
+
+
+
+
 /* int main() {
 
     vector<string> test_fens = {

@@ -58,6 +58,8 @@ void write_test() {
     cout << "(" << per_board << " microseconds per board)\n";  
     cout << "\tSum: " << x << "\n";
     cout << "\n";
+
+    delete [] boards;
 }
 
 void read_test() {
@@ -104,6 +106,7 @@ void read_test() {
     cout << "\tSum: " << x << "\n";
     cout << "\n";
     
+    delete [] boards;
 }
 
 void size_test() {
@@ -115,7 +118,6 @@ void size_test() {
 
 }
 
-// work in progress
 void starting_pos_test() {
     Board b = starting_pos();
 
@@ -127,14 +129,15 @@ void starting_pos_test() {
     cout << "Starting position test:\n";
     cout << "\tSum: " << sum << "\n";
     cout << "\tArrangement: \n\n";
-    pr_indent(b, "\t");
+    pr_board_config(b, "\t");
 
     cout << "\n";
 
 }
 
-// work in progress
 void board_from_fen_test() {
+
+    cout << "Board from FEN test:\n\n";
 
     vector<string> test_fens = {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -145,26 +148,160 @@ void board_from_fen_test() {
     };
     
     for (int i = 0; i < 5; ++i) {
+        cout << i << ". ";
         Board b = fen_to_board(test_fens[i]);
         pr_board_config(b, "\t");
         cout << "\n";
+    }
 
-        // pr(b);
-        // cout << "FEN: " << test_fens[i] << "\n";
-        // pr_config(b);
-        // cout << "\n";
+}
+
+void fen_from_board_test() {
+
+    cout << "FEN from Board test:\n";
+
+    vector<string> test_fens = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkb1r/pp1p1ppp/5n2/2p5/4p3/1N4P1/PPPPPPBP/RNBQK2R b KQkq - 1 5",
+        "r4rk1/ppB2pp1/4p1p1/2P3q1/4Pn2/P1N2n2/2B2PPP/2R2RK1 w - - 0 24",
+        "7k/1p6/p1p3p1/7p/1P2Q2P/P5P1/5r1K/5q2 w - h6 4 47",
+        "2r2rk1/1p2bppp/p2pbn2/q1N1p3/2P1P3/N3BP2/PP2B1PP/2RR2K1 w - - 0 17",
+        "rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPPKPPP/RNBQ1BNR b kq - 1 2"
+    };
+    
+    for (int i = 0; i < (int) test_fens.size(); ++i) {
+        Board b = fen_to_board(test_fens[i]);
+
+        if (board_to_fen(b) == test_fens[i]) {
+            cout << "\t" << i + 1 << ". Passed.\n";
+        } else {
+            cout << "\t" << i + 1 << ". Failed.\n";
+        }
+
+        // cout << "\tFEN: " << test_fens[i] << "\n";
+        pr_board_config(b, "\t");
+        cout << "\n";
+
     }
 
 }
 
 void write_config_test() {
-    Board b = starting_pos();
+    int k = 10000000;
 
+    auto boards = new Board[k];
+    
+    /* start benchmark and write configs into boards */
+    auto start = high_resolution_clock::now();
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i].set_config(0, 1);
+
+        boards[i].set_config(1, 1);
+        boards[i].set_config(2, 1);
+        boards[i].set_config(3, 1);
+        boards[i].set_config(4, 1);
+
+        boards[i].set_enpassant(0);
+        boards[i].set_halfmoves(0);
+        boards[i].set_fullmoves(1);
+    }
+    
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
     cout << "Write config test:\n";
-    pr_indent(b, "\t");
-
+    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";
     cout << "\n";
+    
+    delete [] boards;
+}
 
+void write_parsed_config_test() {
+    int k = 10000000;
+
+    auto boards = new Board[k];
+    
+    /* start benchmark and write configs into boards */
+    auto start = high_resolution_clock::now();
+    
+    for (int i = 0; i < k; ++i) {
+        stringstream conf("w KQkq e6 0 3");
+        fill_config(boards[i], conf);
+    }
+    
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Write parsed config test:\n";
+    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";
+    cout << "\n";
+    
+    delete [] boards;
+}
+
+void read_config_test() {
+    int k = 10000000;
+
+    auto boards = new Board[k];
+    
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i].set_config(0, 1);
+
+        boards[i].set_config(1, 1);
+        boards[i].set_config(2, 1);
+        boards[i].set_config(3, 1);
+        boards[i].set_config(4, 1);
+
+        boards[i].set_enpassant(69);
+        boards[i].set_halfmoves(42);
+        boards[i].set_fullmoves(17);
+    }
+
+    /* start benchmark and read configs from boards */
+    auto start = high_resolution_clock::now();
+    
+    int x = 0;
+    for (int i = 0; i < k; ++i) {
+        x += boards[i].get_config(0);
+        x += boards[i].get_config(1);
+        x += boards[i].get_config(2);
+        x += boards[i].get_config(3);
+        x += boards[i].get_config(4);
+
+        x += boards[i].get_enpassant();
+        x += boards[i].get_halfmoves();
+        x += boards[i].get_fullmoves();
+    }
+
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Read config test:\n";
+    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";
+    cout << "\tSum: " << x << "\n";
+    cout << "\n";
+    
+    delete [] boards;
 }
 
 int main(void) {
@@ -173,5 +310,10 @@ int main(void) {
     read_test();
     size_test();
     starting_pos_test();
+    board_from_fen_test();
+    fen_from_board_test();
+    write_config_test();
+    write_parsed_config_test();
+    read_config_test();
     
 }
