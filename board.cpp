@@ -51,8 +51,8 @@ using std::vector;
  *          Bit 0:          Turn colour
  *          Bit 1 - 4:      Castling Rights
  *          Bit 5 - 8:      En passant
- *          Bit 9 - 14:     Half move counter
- *          Bit 15 - 31:    Full move counter
+ *          Bit 9 - 15:     Half move counter
+ *          Bit 16 - 31:    Full move counter
  *      
  *  Square:
  *      -> 8 bits per square
@@ -70,7 +70,6 @@ using std::vector;
  *      
  *****************************************************************************/
 
-// Masks
 const unsigned LO4 = 15;
 const unsigned HI4 = 240;
 const unsigned LO3 = 7;
@@ -139,6 +138,27 @@ const Ptype COLOUR[] = {
 
 typedef Byte Piece;
 
+struct Conf {
+    bool w : 1;
+    bool K : 1;
+    bool Q : 1;
+    bool k : 1;
+    bool q : 1;
+    bool ep : 1;
+    unsigned epfile : 3;
+    unsigned half_moves : 6;
+    unsigned whole_moves : 17;
+};
+
+const unsigned WHITE_MASK = 1 << 0;
+const unsigned CAS_WS_MASK = 1 << 1;
+const unsigned CAS_WL_MASK = 1 << 2;
+const unsigned CAS_BS_MASK = 1 << 3;
+const unsigned CAS_BL_MASK = 1 << 4;
+const unsigned EP_EX_MASK = 1 << 5;
+const unsigned EP_FILE_MASK = 7 << 6;
+const unsigned HALF_M_MASK = 127 << 9;
+const unsigned WHOLE_M_MASK = (~0) << 16;
 
 struct Board {
 
@@ -167,39 +187,119 @@ struct Board {
         }
         
     }
-
-    void set_config(Int bit, Int value) {
-        Int mask = ~(1 << bit);
-        conf = (conf & mask) | (value << bit);
+    
+    /* get/set turn (who to play) */
+    inline bool get_white() { return conf & WHITE_MASK; }
+    inline void set_white(bool b) {
+        if (b)
+            conf |= WHITE_MASK;
+        else 
+            conf &= ~WHITE_MASK;
     }
-
-    Byte get_config(Int bit) {
-        return (conf & (1 << bit)) != 0;
+    inline void flip_white() { conf ^= WHITE_MASK; }
+    
+    /* get/set castling rights individually */
+    inline bool get_cas_ws() { return conf & CAS_WS_MASK; }    
+    inline void set_cas_ws(bool b) {         
+        if (b)
+            conf |= CAS_WS_MASK;
+        else 
+            conf &= ~CAS_WS_MASK; 
     }
-
-    void set_enpassant(Int value) {
-        conf = (conf & ~(LO4 << 5)) | (value << 5);
+    inline bool get_cas_wl() { return conf & CAS_WL_MASK; }    
+    inline void set_cas_wl(bool b) {         
+        if (b)
+            conf |= CAS_WL_MASK;
+        else 
+            conf &= ~CAS_WL_MASK; 
     }
-
-    Byte get_enpassant() {
-        return (conf & (LO4 << 5)) >> 5;
+    inline bool get_cas_bs() { return conf & CAS_BS_MASK; }    
+    inline void set_cas_bs(bool b) {         
+        if (b)
+            conf |= CAS_BS_MASK;
+        else 
+            conf &= ~CAS_BS_MASK; 
     }
-
-    void set_halfmoves(Int value) {
-        conf = (conf & ~(63 << 9)) | (value << 9);
+    inline bool get_cas_bl() { return conf & CAS_BL_MASK; }    
+    inline void set_cas_bl(bool b) {         
+        if (b)
+            conf |= CAS_BL_MASK;
+        else 
+            conf &= ~CAS_BL_MASK; 
     }
-
-    Int get_halfmoves() {
-        return (conf & (63 << 9)) >> 9;
+    
+    /* get/set en-passant boolean */
+    inline bool get_ep_exists() { return conf & EP_EX_MASK; }
+    inline void set_ep_exists(bool b) { 
+        if (b)
+            conf |= EP_EX_MASK;
+        else
+            conf &= ~EP_EX_MASK;
     }
-
-    void set_fullmoves(Int value) {
-        conf = (conf & ~(-1 << 15)) | (value << 15);
+    
+    /* read write 3 bits representing ep file */
+    inline unsigned get_ep_file() {
+        return (conf & EP_FILE_MASK) >> 6;
     }
-
-    Int get_fullmoves() {
-        return (conf & (~0 << 15)) >> 15;
+    inline void set_ep_file(unsigned u) {
+        conf = (conf & ~EP_FILE_MASK) | (u << 6);
     }
+    // for convenience, return the actual square
+    inline Square get_ep_sq() {
+        Square mksq(int, int);
+        return mksq(get_white() ? 5 : 2, get_ep_file());
+    }
+    
+    /* read write 7 bits for the half move count */
+    inline unsigned get_halfmoves() {
+        return (conf & HALF_M_MASK) >> 9;
+    }
+    inline void set_halfmoves(unsigned u) {
+        conf = (conf & ~HALF_M_MASK) | (u << 9);
+    }    
+    
+    /* read write 16 bits for the whole move count */
+    inline unsigned get_wholemoves() {
+        return (conf & WHOLE_M_MASK) >> 16;
+    }
+    inline void set_wholemoves(unsigned u) {
+        conf = (conf & ~WHOLE_M_MASK) | (u << 16);
+    }
+    
+    
+    /******************This is an XOR version of get/set epfile, half and whole. Comparable speed
+    /* read write 3 bits representing ep file 
+    inline unsigned get_ep_file() {
+        return (conf & EP_FILE_MASK) >> 6;
+    }
+    inline void set_ep_file(unsigned u) {
+        unsigned c = conf ^ (u << 6);
+        conf ^= (c & EP_FILE_MASK);
+    }
+    // for convenience, return the actual square
+    inline Square get_ep_sq() {
+        Square mksq(int, int);
+        return mksq(get_white() ? 5 : 2, get_ep_file());
+    }*/
+
+    /* read write 7 bits for the half move count 
+    inline unsigned get_halfmoves() {
+        return (conf & HALF_M_MASK) >> 9;
+    }
+    inline void set_halfmoves(unsigned u) {
+        unsigned c = conf ^ (u << 9);
+        conf ^= (c & HALF_M_MASK);
+    }
+    
+    /* read write 16 bits for the half move count 
+    inline unsigned get_wholemoves() {
+        return (conf & WHOLE_M_MASK) >> 16;
+    }
+    inline void set_wholemoves(unsigned u) {
+        unsigned c = conf ^ (u << 16);
+        conf ^= (c & WHOLE_M_MASK);
+    } */
+
 };
 
 const Byte SHIFT_ROW = 16;
@@ -348,9 +448,13 @@ void pr_indent(Board & b, string indent) {
 }
 
 void pr_config(Board b) {
+
     cout << "Raw config: ";
+    
+    int* raw_bin = (int*) &b.conf;
+    
     for (int i = 31; i >= 0; --i) {
-        if (b.conf & (1 << i)) {
+        if (*raw_bin & (1 << i)) {
             cout << "1";
         } else {
             cout << "0";
@@ -361,26 +465,28 @@ void pr_config(Board b) {
         }
     }
     cout << "\n";
-    cout << "Turn: " << (b.get_config(0) ? "White" : "Black") << "\n";
+    cout << "Turn: " << (b.get_white() ? "White" : "Black") << "\n";
 
     cout << "Castle Rights: ";
-    if (b.get_config(1)) cout << "K ";
-    if (b.get_config(2)) cout << "Q ";
-    if (b.get_config(3)) cout << "k ";
-    if (b.get_config(4)) cout << "q ";
+    if (b.get_cas_ws()) cout << "K ";
+    if (b.get_cas_wl()) cout << "Q ";
+    if (b.get_cas_bs()) cout << "k ";
+    if (b.get_cas_bl()) cout << "q ";
     
-    if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+    if (!(b.get_cas_ws() | b.get_cas_wl() | b.get_cas_bs() | b.get_cas_bl())) {
         cout << " -";
     }
 
     cout << "\n";
 
-    Int en = b.get_enpassant();
-    string enstr = sqtos(mksq(b.get_config(0) ? 5 : 2, b.get_enpassant() & 7));
-    cout << "Enpassant: " << (en < 8 ? "-" : enstr) << "\n";
+    if (b.get_ep_exists()) {
+        cout << "Enpassant: " << sqtos(b.get_ep_sq()) << "\n";
+    } else {
+        cout << "Enpassant: -\n";
+    }
 
     cout << "Half moves: " << b.get_halfmoves() << "\n";
-    cout << "Full moves: " << b.get_fullmoves() << "\n";
+    cout << "Full moves: " << b.get_wholemoves() << "\n";
 }
 
 void pr(Board b) {
@@ -442,27 +548,51 @@ void fill_board(Board & b, string & arrangement) {
     // if x,y != 7,7 return failure
 }
 
+void raw(Board b) {
+    cout << "Raw: ";
+    
+    int* raw_bin = (int*) &b.conf;
+    
+    for (int i = 31; i >= 0; --i) {
+        if (*raw_bin & (1 << i)) {
+            cout << "1";
+        } else {
+            cout << "0";
+        }
+
+        if (i == 0 || i == 1 || i == 5 || i == 9 || i == 16) {
+            cout << " ";
+        }
+    }
+    cout << "\n";
+}
+
 void fill_config(Board & b, stringstream & words) {
 
     string turn = get_word(words);
     string castle = get_word(words);
 
-    b.set_config(0, turn == "w");
+    b.set_white(turn == "w");
 
-    b.set_config(1, castle.find('K') != (unsigned int) -1);
-    b.set_config(2, castle.find('Q') != (unsigned int) -1);
-    b.set_config(3, castle.find('k') != (unsigned int) -1);
-    b.set_config(4, castle.find('q') != (unsigned int) -1);
+    b.set_cas_ws(castle.find('K') != -1);
+    b.set_cas_wl(castle.find('Q') != -1);
+    b.set_cas_bs(castle.find('k') != -1);
+    b.set_cas_bl(castle.find('q') != -1);
 
     string enpassant = get_word(words);
-    Byte en = enpassant == "-" ? 0 : get_col(stosq(enpassant) | 8);
-    b.set_enpassant(en);
+    if (enpassant == "-") {
+        b.set_ep_exists(false);
+    } else {
+        b.set_ep_exists(true);
+        b.set_ep_file(get_col(stosq(enpassant)));
+    }
 
     int halfmoves = get_number(words);
     b.set_halfmoves(halfmoves);
-
+    
     int fullmoves = get_number(words);
-    b.set_fullmoves(fullmoves);
+    b.set_wholemoves(fullmoves);
+    
 }
 
 /* work in progress - doesn't read the config word */
@@ -504,26 +634,25 @@ string board_to_fen(Board & b) {
     }
 
     // Append turn
-    ss << " " << (b.get_config(0) ? "w" : "b");
+    ss << " " << (b.get_white() ? "w" : "b");
 
     // Append castle rights
     ss << " ";
-    ss << (b.get_config(1) ? "K" : "");
-    ss << (b.get_config(2) ? "Q" : "");
-    ss << (b.get_config(3) ? "k" : "");
-    ss << (b.get_config(4) ? "q" : "");
+    ss << (b.get_cas_ws() ? "K" : "");
+    ss << (b.get_cas_wl() ? "Q" : "");
+    ss << (b.get_cas_bs() ? "k" : "");
+    ss << (b.get_cas_bl() ? "q" : "");
     
-    if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+    if (!(b.get_cas_ws() | b.get_cas_wl() | b.get_cas_bs() | b.get_cas_bl())) {
         ss << "-";
     }
 
     // Append enpassant
-    Int en = b.get_enpassant();
-    string enstr = sqtos(mksq(b.get_config(0) ? 5 : 2, b.get_enpassant() & 7));
-    ss << " " << (en < 8 ? "-" : enstr);
+    string enstr = sqtos(b.get_ep_sq());
+    ss << " " << (!b.get_ep_exists() ? "-" : enstr);
 
     // Append half and full moves
-    ss << " " << b.get_halfmoves() << " " << b.get_fullmoves();
+    ss << " " << b.get_halfmoves() << " " << b.get_wholemoves();
 
     return ss.str();
 }
@@ -544,8 +673,9 @@ void pr_board_config(Board & b, string indent) {
 
             case 6: {
                 cout << "\tRaw config: ";
+                int* raw_bin = (int*) &b.conf;
                 for (int i = 31; i >= 0; --i) {
-                    if (b.conf & (1 << i)) {
+                    if ( *raw_bin & (1 << i)) {
                         cout << "1";
                     } else {
                         cout << "0";
@@ -559,17 +689,17 @@ void pr_board_config(Board & b, string indent) {
             }
 
             case 5: {
-                cout << "\tTurn: " << (b.get_config(0) ? "White" : "Black");
+                cout << "\tTurn: " << (b.get_white() ? "White" : "Black");
                 break;
             }
 
             case 4: {
                 cout << "\tCastle Rights: ";
-                if (b.get_config(1)) cout << "K";
-                if (b.get_config(2)) cout << "Q";
-                if (b.get_config(3)) cout << "k";
-                if (b.get_config(4)) cout << "q";
-                if (!(b.get_config(1) | b.get_config(2) | b.get_config(3) | b.get_config(4))) {
+                if (b.get_cas_ws()) cout << "K";
+                if (b.get_cas_wl()) cout << "Q";
+                if (b.get_cas_bs()) cout << "k";
+                if (b.get_cas_bl()) cout << "q";
+                if (!(b.get_cas_ws() | b.get_cas_wl() | b.get_cas_bs() | b.get_cas_wl())) {
                     cout << "-";
                 }
                 
@@ -577,9 +707,11 @@ void pr_board_config(Board & b, string indent) {
             }
 
             case 3: {
-                Int en = b.get_enpassant();
-                string enstr = sqtos(mksq(b.get_config(0) ? 5 : 2, b.get_enpassant() & 7));
-                cout << "\tEnpassant: " << (en < 8 ? "-" : enstr);
+                if (b.get_ep_exists()) {
+                    cout << "\tEnpassant: " << sqtos(b.get_ep_sq());
+                } else {
+                    cout << "\tEnpassant: -";
+                }
                 break;
             }
 
@@ -589,7 +721,7 @@ void pr_board_config(Board & b, string indent) {
             }
 
             case 1: {
-                cout << "\tFull moves: " << b.get_fullmoves();
+                cout << "\tFull moves: " << b.get_wholemoves();
                 break;
             }
         }
@@ -659,16 +791,43 @@ Board starting_pos() {
     s = inc_col(s);
     b.set(s, B_ROOK);
     
-    b.set_config(0, 1);
+    b.set_white(1);
 
-    b.set_config(1, 1);
-    b.set_config(2, 1);
-    b.set_config(3, 1);
-    b.set_config(4, 1);
+    b.set_cas_ws(1);
+    b.set_cas_wl(1);
+    b.set_cas_bs(1);
+    b.set_cas_bl(1);
 
-    b.set_enpassant(0);
+    b.set_ep_exists(0);
     b.set_halfmoves(0);
-    b.set_fullmoves(1);
+    b.set_wholemoves(1);
     
     return b;
 }
+
+
+
+
+/* int main() {
+
+    vector<string> test_fens = {
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkb1r/pp1p1ppp/5n2/2p5/4p3/1N4P1/PPPPPPBP/RNBQK2R b KQkq - 1 5",
+        "r4rk1/ppB2pp1/4p1p1/2P3q1/4Pn2/P1N2n2/2B2PPP/2R2RK1 w - - 0 24",
+        "7k/1p6/p1p3p1/7p/1P2Q2P/P5P1/5r1K/5q2 w - h6 4 47",
+        "2r2rk1/1p2bppp/p2pbn2/q1N1p3/2P1P3/N3BP2/PP2B1PP/2RR2K1 w - - 0 17"
+    };
+    
+    for (int i = 0; i < 5; ++i) {
+        Board b = fen_to_board(test_fens[i]);
+        pr(b);
+        cout << "\n";
+        cout << "FEN: " << test_fens[i] << "\n";
+        pr_config(b);
+        cout << "\n";
+
+        // cout << get_row(mksq("f3")) + 0;
+    }
+    
+    return 0;
+} */

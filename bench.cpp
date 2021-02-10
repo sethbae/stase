@@ -148,8 +148,9 @@ void board_from_fen_test() {
     };
     
     for (int i = 0; i < 5; ++i) {
-        cout << i << ". ";
+        cout << i << ".      Required:                  " << test_fens[i] << "\n";
         Board b = fen_to_board(test_fens[i]);
+        //cout << "WS: " << b.get_cas_ws() << "\n";
         pr_board_config(b, "\t");
         cout << "\n";
     }
@@ -195,16 +196,16 @@ void write_config_test() {
     auto start = high_resolution_clock::now();
     
     for (int i = 0; i < k; ++i) {
-        boards[i].set_config(0, 1);
+        boards[i].set_white(1);
 
-        boards[i].set_config(1, 1);
-        boards[i].set_config(2, 1);
-        boards[i].set_config(3, 1);
-        boards[i].set_config(4, 1);
+        boards[i].set_cas_ws(1);
+        boards[i].set_cas_wl(1);
+        boards[i].set_cas_bs(1);
+        boards[i].set_cas_bl(1);
 
-        boards[i].set_enpassant(0);
+        boards[i].set_ep_exists(0);
         boards[i].set_halfmoves(0);
-        boards[i].set_fullmoves(1);
+        boards[i].set_wholemoves(1);
     }
     
     /* end benchmark and return */
@@ -259,16 +260,16 @@ void read_config_test() {
     
     
     for (int i = 0; i < k; ++i) {
-        boards[i].set_config(0, 1);
+        boards[i].set_white(1);
 
-        boards[i].set_config(1, 1);
-        boards[i].set_config(2, 1);
-        boards[i].set_config(3, 1);
-        boards[i].set_config(4, 1);
+        boards[i].set_cas_ws(1);
+        boards[i].set_cas_wl(1);
+        boards[i].set_cas_bs(1);
+        boards[i].set_cas_bl(1);
 
-        boards[i].set_enpassant(69);
+        boards[i].set_ep_exists(0);
         boards[i].set_halfmoves(42);
-        boards[i].set_fullmoves(17);
+        boards[i].set_wholemoves(17);
     }
 
     /* start benchmark and read configs from boards */
@@ -276,15 +277,15 @@ void read_config_test() {
     
     int x = 0;
     for (int i = 0; i < k; ++i) {
-        x += boards[i].get_config(0);
-        x += boards[i].get_config(1);
-        x += boards[i].get_config(2);
-        x += boards[i].get_config(3);
-        x += boards[i].get_config(4);
+        x += boards[i].get_white();
+        x += boards[i].get_cas_ws();
+        x += boards[i].get_cas_wl();
+        x += boards[i].get_cas_bs();
+        x += boards[i].get_cas_bl();
 
-        x += boards[i].get_enpassant();
+        x += boards[i].get_ep_exists();
         x += boards[i].get_halfmoves();
-        x += boards[i].get_fullmoves();
+        x += boards[i].get_wholemoves();
     }
 
     /* end benchmark and return */
