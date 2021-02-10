@@ -1,15 +1,19 @@
 #include <iostream>
 using std::cout;
+
 #include <cstdlib>
 using std::rand;
+
 #include <chrono>
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::microseconds;
-#include <array>
 
-#include "board.cpp"
+#include <vector>
+using std::vector;
+
+#include "board/print.h"
 
 /* This is a short benchmark program to test the read and write speeds of the board representation.
    It generates a random board position and then writes it to each of [k] boards.
@@ -148,7 +152,7 @@ void board_from_fen_test() {
     };
     
     for (int i = 0; i < 5; ++i) {
-        cout << i << ".      Required:                  " << test_fens[i] << "\n";
+        cout << i << ".      Required:                    " << test_fens[i] << "\n";
         Board b = fen_to_board(test_fens[i]);
         //cout << "WS: " << b.get_cas_ws() << "\n";
         pr_board_config(b, "\t");
@@ -314,7 +318,7 @@ int main(void) {
     board_from_fen_test();
     fen_from_board_test();
     write_config_test();
-    write_parsed_config_test();
     read_config_test();
+    write_parsed_config_test();
     
 }
