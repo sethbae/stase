@@ -37,19 +37,24 @@ using std::string;
  *      
  *   -Piece: an enum for each piece type (W_KING, B_QUEEN, EMPTY etc).
  *          
+        -PIECE[p]       equals e.g. W_KING
+        -TYPE[p]        equals e.g. KING
+        -COLOUR[p]      equals e.g. WHITE
  *      -is_white():    returns true iff the piece is white
  *      -ptoc():        returns a character depicting the piece (K, q etc)
+            ctop()
  *
  *  Implementation details:
  *  
  *  Board:
  *      -> 4 bits per square of board
  *      -> the board struct stores a 2d array of bytes
- *      -> the config word is a 32 bits
- *      - Config bits:
+ *      -> the config word is 32 bits
+ *      -> Config bits:
  *          Bit 0:          Turn colour
  *          Bit 1 - 4:      Castling Rights
- *          Bit 5 - 8:      En passant
+ *          Bit 5:          En-passant exists
+ *          Bit 6-8:        En-passant file
  *          Bit 9 - 15:     Half move counter
  *          Bit 16 - 31:    Full move counter
  *      
@@ -59,9 +64,18 @@ using std::string;
  *      -> 4 low bits store another (0-8 inc)
  *
  *  Piece:
- *      -> enum of type 'Byte', although only 4 (low) bits are used
+ *      -> Each piece is a number as defined at the start of the Ptype enum. This number defines
+            an index into the three look up tables, which record:
+                TYPE:   the type and colour of a piece: White king
+                PIECE:  the piece type only; king
+                COLOUR: the colour only
+        -> Values needed in the lookup tables (e.g. WHITE) which do not in themselves define a 
+            piece, and hence aren't indexes into the tables, appear in the same enum without
+            specified values.
+        -> Any logically possible square value (e.g. empty or a chess piece) can fit in 4 bits,
+            and can therefore be written to a square.
  *      -> White pieces have the MSB set.
- *      -> EMPTY is white, as it goes (value 15).
+ *      -> EMPTY is white, as it goes (value 14).
  *      
  *  Note: To decide which half of a byte is addressed, we use even/oddness.
  *          So for a 3 bit index n, n/2 is used to get the byte (i.e. n >> 1),
@@ -73,10 +87,20 @@ const unsigned LO4 = 15;
 const unsigned HI4 = 240;
 const unsigned LO3 = 7;
 const unsigned HI3 = 112;
+const unsigned WHITE_MASK = 1 << 0;
+const unsigned CAS_WS_MASK = 1 << 1;
+const unsigned CAS_WL_MASK = 1 << 2;
+const unsigned CAS_BS_MASK = 1 << 3;
+const unsigned CAS_BL_MASK = 1 << 4;
+const unsigned EP_EX_MASK = 1 << 5;
+const unsigned EP_FILE_MASK = 7 << 6;
+const unsigned HALF_M_MASK = 127 << 9;
+const unsigned WHOLE_M_MASK = (~0) << 16;
 
 typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
 typedef uint_fast8_t Square;
+typedef Byte Piece;
 
 enum Ptype {
 
@@ -134,31 +158,6 @@ const Ptype COLOUR[] = {
             WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,   // indexes 8-13
             EMPTY                                       // index 14
       };
-
-typedef Byte Piece;
-
-struct Conf {
-    bool w : 1;
-    bool K : 1;
-    bool Q : 1;
-    bool k : 1;
-    bool q : 1;
-    bool ep : 1;
-    unsigned epfile : 3;
-    unsigned half_moves : 6;
-    unsigned whole_moves : 17;
-};
-
-const unsigned WHITE_MASK = 1 << 0;
-const unsigned CAS_WS_MASK = 1 << 1;
-const unsigned CAS_WL_MASK = 1 << 2;
-const unsigned CAS_BS_MASK = 1 << 3;
-const unsigned CAS_BL_MASK = 1 << 4;
-const unsigned EP_EX_MASK = 1 << 5;
-const unsigned EP_FILE_MASK = 7 << 6;
-const unsigned HALF_M_MASK = 127 << 9;
-const unsigned WHOLE_M_MASK = (~0) << 16;
-
 
 struct Board {
 
