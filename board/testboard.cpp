@@ -2,8 +2,11 @@
 using std::cout;
 #include <vector>
 using std::vector;
+#include <cstdlib>
+using std::rand;
 
 #include "board.h"
+#include "helper.h"
 
 /* correctness tests for all code in the board directory */
 
@@ -43,9 +46,40 @@ void piece_types() {
 
 }
 
+void setget_square() {
+
+    int succ = 0, fail = 0;
+
+    vector<Piece> pieces = {B_KING, B_QUEEN, B_ROOK, B_KNIGHT, B_BISHOP, B_PAWN,
+                            W_KING, W_QUEEN, W_ROOK, W_KNIGHT, W_BISHOP, W_PAWN};
+    Board b;
+    
+    for (int i = 0; i < 1000; ++i) {
+        
+        Piece p = pieces[rand() % pieces.size()];
+        Square s = mksq(rand() % 8, rand() % 8);
+    
+        b.set(s, p);
+        
+        if (b.get(s) == p) {
+            ++succ;
+        } else {
+            ++fail;
+        }
+        
+    }
+    
+    cout << "SET/GET SQUARE: Passed " << succ << "/" << succ+fail << " tests\n";
+    if (fail) {
+        cout << fail << " TESTS FAILED\n";
+    }
+    
+}
+
 int main(void) {
 
     piece_types();
+    setget_square();
 
-    return 1;
+    return 0;
 }

@@ -65,15 +65,15 @@ using std::string;
  *
  *  Piece:
  *      -> Each piece is a number as defined at the start of the Ptype enum. This number defines
-            an index into the three look up tables, which record:
-                TYPE:   the type and colour of a piece: White king
-                PIECE:  the piece type only; king
-                COLOUR: the colour only
-        -> Values needed in the lookup tables (e.g. WHITE) which do not in themselves define a 
-            piece, and hence aren't indexes into the tables, appear in the same enum without
-            specified values.
-        -> Any logically possible square value (e.g. empty or a chess piece) can fit in 4 bits,
-            and can therefore be written to a square.
+ *          an index into the three look up tables, which record:
+ *              TYPE:   the type and colour of a piece: White king
+ *              PIECE:  the piece type only; king
+ *              COLOUR: the colour only
+ *      -> Values needed in the lookup tables (e.g. WHITE) which do not in themselves define a 
+ *          piece, and hence aren't indexes into the tables, appear in the same enum without
+ *          specified values.
+ *      -> Any logically possible square value (e.g. empty or a chess piece) can fit in 4 bits,
+ *          and can therefore be written to a square.
  *      -> White pieces have the MSB set.
  *      -> EMPTY is white, as it goes (value 14).
  *      
@@ -144,14 +144,14 @@ const Ptype PIECE[] = {
             W_KING, W_QUEEN, W_ROOK, W_KNIGHT, W_BISHOP, W_PAWN,        // indexes 8-13
             EMPTY                                                       // index 14
       };
-                        
+
 const Ptype TYPE[] = {
             KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN,    // indexes 0-5
             INVALID, INVALID,                           // indexes 6, 7
             KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN,    // indexes 8-13
             EMPTY                                       // index 14
       };
-                       
+    
 const Ptype COLOUR[] = {
             BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,   // indexes 0-5
             INVALID, INVALID,                           // indexes 6, 7
@@ -186,6 +186,10 @@ struct Board {
         }
         
     }
+    
+    /* get/set whole config word */
+    inline void set_conf_word(Int c) { conf = c; }
+    inline Int get_conf_word() { return conf; } 
     
     /* get/set turn (who to play) */
     inline bool get_white() const { return conf & WHITE_MASK; }
@@ -255,7 +259,8 @@ struct Board {
     }
     inline void set_halfmoves(unsigned u) {
         conf = (conf & ~HALF_M_MASK) | (u << 9);
-    }    
+    }
+    inline void inc_halfmoves() { conf += 1 << 9; }
     
     /* read write 16 bits for the whole move count */
     inline unsigned get_wholemoves() const {
@@ -264,7 +269,7 @@ struct Board {
     inline void set_wholemoves(unsigned u) {
         conf = (conf & ~WHOLE_M_MASK) | (u << 16);
     }
-    
+    inline void inc_wholemoves() { conf += (1 << 16); }
     
     /******************This is an XOR version of get/set epfile, half and whole. Comparable speed
     // read write 3 bits representing ep file 
