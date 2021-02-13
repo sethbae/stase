@@ -16,7 +16,7 @@ flags (16 bits):
     - bit 3:        is_capture
 
     - bit 4-5:      promotion piece
-    - bit 6:        castle_side
+    - bit 6:        castle side
     - bit 7-9:      captured piece
  */
 
@@ -42,7 +42,7 @@ struct Move {
 
 
     int cas_side() {
-        return flags & (1 << 4) == 0;
+        return flags & (1 << 6) == 0;
     }
 
     int en_file() {
