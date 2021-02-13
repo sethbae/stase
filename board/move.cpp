@@ -6,13 +6,53 @@ using std::string;
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
-// [8 bits from] [8 bits to] [1 bit is_prom] [2 bits promotion piece] [13 bits: flags]
+/* 
+from (8 bits)
+to (8 bits)
+flags (16 bits):
+    - bit 0:        is_prom
+    - bit 1:        is_castle
+    - bit 2:        is_enpassant
+    - bit 3:        is_capture
 
+    - bit 4-5:      promotion piece
+    - bit 6:        castle_side
+    - bit 7-9:      captured piece
+ */
 
 struct Move {
     uint_fast8_t from;
     uint_fast8_t to;
     uint_fast16_t flags;    
+
+    bool is_prom() { return flags & 1; }
+    bool is_cas() { return flags & 2 != 0; }
+    bool is_en() { return flags & 4 != 0; }
+    bool is_cap() { return flags & 8 != 0; }
+
+    Piece prom() {
+        switch((flags & 6) >> 1) {
+            case 1: return BISHOP;
+            case 2: return KNIGHT;
+            case 3: return ROOK;
+            case 0:
+            default: return QUEEN;
+        }
+    }
+
+
+    int cas_side() {
+        return flags & (1 << 4) == 0;
+    }
+
+    int en_file() {
+        return get_col(to);
+    }
+
+    Piece cap_piece() {
+        return (Piece) flags & (7 << 7);
+    }
+
 };
 
 void make_move(Board & b, Move m) {
@@ -46,3 +86,7 @@ string movetosan(Board & b, Move m) {
     return ptos_alg(b.get(m.from)) + sqtos(m.to);
 }
 
+bool legal(Move m) {
+    // checks if a move is legal
+    return true;
+}
