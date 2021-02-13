@@ -3,6 +3,7 @@
 using std::string;
 #include "board.h"
 #include "helper.h"
+#include "print.h"
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
@@ -26,9 +27,9 @@ struct Move {
     uint_fast16_t flags;    
 
     bool is_prom() { return flags & 1; }
-    bool is_cas() { return flags & 2 != 0; }
-    bool is_en() { return flags & 4 != 0; }
-    bool is_cap() { return flags & 8 != 0; }
+    bool is_cas() { return (flags & 2) != 0; }
+    bool is_en() { return (flags & 4) != 0; }
+    bool is_cap() { return (flags & 8) != 0; }
 
     Piece prom() {
         switch((flags & 6) >> 1) {
@@ -42,7 +43,7 @@ struct Move {
 
 
     int cas_side() {
-        return flags & (1 << 6) == 0;
+        return (flags & (1 << 6)) == 0;
     }
 
     int en_file() {
@@ -90,3 +91,62 @@ bool legal(Move m) {
     // checks if a move is legal
     return true;
 }
+
+// Calculated by hand
+static const uint64_t file_a = 72340172838076673L;
+static const uint64_t rank_one = 255L;
+static const uint64_t diag_nxy = 72624976668147840L;
+static const uint64_t diag_xy = -9205322385119247871L;
+
+uint64_t gen_file_mask(Byte file) { return file_a << file; }
+
+uint64_t gen_row_mask(Byte row) { return rank_one << (row * 8); }
+
+uint64_t gen_nxy_mask(Square sq) {
+    uint64_t new_nxy = diag_nxy;
+    int dif_nxy = get_row(sq) + get_col(sq) - 7;
+    if (dif_nxy > 0) {
+        new_nxy = diag_nxy << (dif_nxy * 8);
+    } else if (dif_nxy < 0) {
+        new_nxy = diag_nxy >> ((-dif_nxy & 7) * 8); // The & deals with negative sign
+    }
+
+    return new_nxy;
+}
+
+uint64_t gen_xy_mask(Square sq) {
+    uint64_t new_xy = diag_xy;
+    int dif_xy = get_row(sq) - get_col(sq);
+    if (dif_xy > 0) {
+        new_xy = diag_xy << (dif_xy * 8);
+        // new_xy = diag_xy << 8;
+    } else if (dif_xy < 0) {
+        new_xy = diag_xy >> ((-dif_xy & 7) * 8); // The & deals with negative sign
+    }
+    return new_xy;
+}
+
+uint64_t gen_diags(Square sq) {
+    return gen_nxy_mask(sq) | gen_xy_mask(sq);
+}
+
+uint64_t gen_ortho(Square sq) {
+    return gen_file_mask(get_col(sq)) | gen_row_mask(get_row(sq));
+}
+
+uint64_t gen_knight_mask(Square sq) {
+    return ((gen_row_mask(get_row(sq) + 2) | gen_row_mask(get_row(sq) - 2)) &
+           (gen_file_mask(get_col(sq) + 1) | gen_file_mask(get_col(sq) - 1))) |
+           ((gen_row_mask(get_row(sq) + 1) | gen_row_mask(get_row(sq) - 1)) & 
+           (gen_file_mask(get_col(sq) + 2) | gen_file_mask(get_col(sq) - 2)));
+}
+
+/* 
+int main(void) {
+    Square pos = mksq(6, 3);
+
+    // pr_mask outputs board upside down
+    pr_mask(gen_diags(pos));
+    pr_mask(gen_knight_mask(pos));
+}
+*/
