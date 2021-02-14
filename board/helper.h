@@ -176,10 +176,10 @@ void fill_config(Board & b, stringstream & words) {
 
     b.set_white(turn == "w");
 
-    b.set_cas_ws(castle.find('K') != (unsigned int) -1);
-    b.set_cas_wl(castle.find('Q') != (unsigned int) -1);
-    b.set_cas_bs(castle.find('k') != (unsigned int) -1);
-    b.set_cas_bl(castle.find('q') != (unsigned int) -1);
+    b.set_cas_ws(castle.find('K') != string::npos);
+    b.set_cas_wl(castle.find('Q') != string::npos);
+    b.set_cas_bs(castle.find('k') != string::npos);
+    b.set_cas_bl(castle.find('q') != string::npos);
 
     string enpassant = get_word(words);
     if (enpassant == "-") {
