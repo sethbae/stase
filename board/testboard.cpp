@@ -41,11 +41,12 @@ void piece_types() {
     
     cout << "PIECE TYPES: Passed " << successful << "/" << successful + failed << " tests\n";
     if (failed > 0) {
-        cout << failed << " TESTS FAILED\n";
+        cout << "PIECE TYPES: " << failed << " TESTS FAILED\n";
     }
 
 }
 
+/* if you set to a square, do you get back what you set? */
 void setget_square() {
 
     int succ = 0, fail = 0;
@@ -71,15 +72,191 @@ void setget_square() {
     
     cout << "SET/GET SQUARE: Passed " << succ << "/" << succ+fail << " tests\n";
     if (fail) {
-        cout << fail << " TESTS FAILED\n";
+        cout << "SET/GET SQUARE: " << fail << " TESTS FAILED\n";
     }
     
+}
+
+/*do the square navigation functions work properly? */
+void square_navigation(bool print) {
+    
+    int succ = 0, fail = 0;
+    
+    Square s = mksq(0, 0);
+    
+    /* move to h1 */
+    for (int i = 0; i < 7; ++i)
+        inc_x(s);
+    
+    if (get_x(s) == 7 && get_y(s) == 0) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "1\n";
+    }
+    
+    if (sqtos(s) == "h1") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "2\n";
+    }
+    
+    
+    /* move to h8 */
+    for (int i = 0; i < 7; ++i)
+        inc_y(s);
+
+    if (get_x(s) == 7 && get_y(s) == 7) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "3\n";
+    }
+    
+    if (sqtos(s) == "h8") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "4\n";
+    }
+    
+    /* move to a8 */
+    for (int i = 0; i < 7; ++i)
+        dec_x(s);
+
+    if (get_x(s) == 0 && get_y(s) == 7) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "5\n";
+    }
+    
+    if (sqtos(s) == "a8") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "6\n";
+    }
+    
+    /* move to a1 */
+    for (int i = 0; i < 7; ++i)
+        dec_y(s);
+
+    if (get_x(s) == 0 && get_y(s) == 0) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "7\n";
+    }
+    
+    if (sqtos(s) == "a1") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "8\n";
+    }
+    
+    /* starting from e1, take a diamond to h4, d8, a5, e1 */
+    s = mksq(4, 0);
+    
+    for (int i = 0; i < 3; ++i)
+        diag_ur(s);
+    
+    if (get_x(s) == 7 && get_y(s) == 3) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "9\n";
+    }
+    
+    if (sqtos(s) == "h4") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "10\n";
+    }
+    
+    /* from h4 to d8 */
+    for (int i = 0; i < 4; ++i)
+        diag_ul(s);
+        
+    if (get_x(s) == 3 && get_y(s) == 7) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "11\n";
+    }
+    
+    if (sqtos(s) == "d8") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "12\n";
+    }
+        
+    /* from d8 to a5 */
+    for (int i = 0; i < 3; ++i)
+        diag_dl(s);
+        
+    if (get_x(s) == 0 && get_y(s) == 4) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "13\n";
+    }
+    
+    if (sqtos(s) == "a5") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "14\n";
+    }
+        
+    /* and home from a5 to e1 */
+    for (int i = 0; i < 4; ++i)
+        diag_dr(s);
+        
+    if (get_x(s) == 4 && get_y(s) == 0) {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "15\n";
+    }
+    
+    if (sqtos(s) == "e1") {
+        ++succ;
+    } else {
+        ++fail;
+        if (print)
+            cout << "16\n";
+    }
+    
+    cout << "SQUARE NAVIGATION: Passed " << succ << "/" << succ+fail << " tests\n";
+    if (fail) {
+        cout << "SQUARE NAVIGATION: " << fail << " TESTS FAILED\n";
+    }
 }
 
 int main(void) {
 
     piece_types();
     setget_square();
-
+    square_navigation(false);
     return 0;
 }
