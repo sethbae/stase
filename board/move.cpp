@@ -27,9 +27,9 @@ struct Move {
     uint_fast16_t flags;    
 
     bool is_prom() { return flags & 1; }
-    bool is_cas() { return (flags & 2) != 0; }
-    bool is_en() { return (flags & 4) != 0; }
-    bool is_cap() { return (flags & 8) != 0; }
+    bool is_cas() { return flags & 2; }
+    bool is_ep() { return flags & 4; }
+    bool is_cap() { return flags & 8; }
 
     Piece prom() {
         switch((flags & 6) >> 1) {
@@ -46,8 +46,8 @@ struct Move {
         return (flags & (1 << 6)) == 0;
     }
 
-    int en_file() {
-        return get_col(to);
+    int ep_file() {
+        return get_x(to);
     }
 
     Piece cap_piece() {
@@ -104,7 +104,7 @@ uint64_t gen_row_mask(Byte row) { return rank_one << (row * 8); }
 
 uint64_t gen_nxy_mask(Square sq) {
     uint64_t new_nxy = diag_nxy;
-    int dif_nxy = get_row(sq) + get_col(sq) - 7;
+    int dif_nxy = get_y(sq) + get_x(sq) - 7;
     if (dif_nxy > 0) {
         new_nxy = diag_nxy << (dif_nxy * 8);
     } else if (dif_nxy < 0) {
@@ -116,7 +116,7 @@ uint64_t gen_nxy_mask(Square sq) {
 
 uint64_t gen_xy_mask(Square sq) {
     uint64_t new_xy = diag_xy;
-    int dif_xy = get_row(sq) - get_col(sq);
+    int dif_xy = get_y(sq) - get_x(sq);
     if (dif_xy > 0) {
         new_xy = diag_xy << (dif_xy * 8);
         // new_xy = diag_xy << 8;
@@ -131,14 +131,14 @@ uint64_t gen_diags(Square sq) {
 }
 
 uint64_t gen_ortho(Square sq) {
-    return gen_file_mask(get_col(sq)) | gen_row_mask(get_row(sq));
+    return gen_file_mask(get_x(sq)) | gen_row_mask(get_y(sq));
 }
 
 uint64_t gen_knight_mask(Square sq) {
-    return ((gen_row_mask(get_row(sq) + 2) | gen_row_mask(get_row(sq) - 2)) &
-           (gen_file_mask(get_col(sq) + 1) | gen_file_mask(get_col(sq) - 1))) |
-           ((gen_row_mask(get_row(sq) + 1) | gen_row_mask(get_row(sq) - 1)) & 
-           (gen_file_mask(get_col(sq) + 2) | gen_file_mask(get_col(sq) - 2)));
+    return ((gen_row_mask(get_y(sq) + 2) | gen_row_mask(get_y(sq) - 2)) &
+           (gen_file_mask(get_x(sq) + 1) | gen_file_mask(get_x(sq) - 1))) |
+           ((gen_row_mask(get_y(sq) + 1) | gen_row_mask(get_y(sq) - 1)) & 
+           (gen_file_mask(get_x(sq) + 2) | gen_file_mask(get_x(sq) - 2)));
 }
 
 /* 
