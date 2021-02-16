@@ -31,7 +31,7 @@ void pr_indent(const Board & b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
-            Piece p = b.get(mksq(i, j));
+            Piece p = b.get(mksq(j, i));
             cout << ptoc(p) << " ";
         }
         cout << "\n";
@@ -108,7 +108,7 @@ void pr_board_config(const Board & b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
-            Piece p = b.get(mksq(i, j));
+            Piece p = b.get(mksq(j, i));
             cout << ptoc(p) << " ";
         }
 
