@@ -93,10 +93,12 @@ bool legal(Move m) {
 }
 
 // Calculated by hand
-static const uint64_t file_a = 72340172838076673L;
-static const uint64_t rank_one = 255L;
-static const uint64_t diag_nxy = 72624976668147840L;
-static const uint64_t diag_xy = -9205322385119247871L;
+// Least significat bit represents a1
+static const uint64_t file_a = 72340172838076673L;      // a file
+static const uint64_t rank_one = 255L;                  // first rank
+
+static const uint64_t diag_nxy = 72624976668147840L;    // a8 to h1
+static const uint64_t diag_xy = -9205322385119247871L;  // a1 to h8
 
 uint64_t gen_file_mask(Byte file) { return file_a << file; }
 
@@ -108,7 +110,7 @@ uint64_t gen_nxy_mask(Square sq) {
     if (dif_nxy > 0) {
         new_nxy = diag_nxy << (dif_nxy * 8);
     } else if (dif_nxy < 0) {
-        new_nxy = diag_nxy >> ((-dif_nxy & 7) * 8); // The & deals with negative sign
+        new_nxy = diag_nxy >> (-dif_nxy * 8);
     }
 
     return new_nxy;
@@ -121,7 +123,7 @@ uint64_t gen_xy_mask(Square sq) {
         new_xy = diag_xy << (dif_xy * 8);
         // new_xy = diag_xy << 8;
     } else if (dif_xy < 0) {
-        new_xy = diag_xy >> ((-dif_xy & 7) * 8); // The & deals with negative sign
+        new_xy = diag_xy >> (-dif_xy * 8);
     }
     return new_xy;
 }
