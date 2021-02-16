@@ -195,7 +195,7 @@ string board_to_fen(const Board & b) {
     for (int i = 7; i >= 0; --i) {
         int spaces = 0;
         for (int j = 0; j < 8; ++j) {
-            char piece = ptoc(b.get(mksq(i, j)));
+            char piece = ptoc(b.get(mksq(j, i)));
             if (piece == '*') {
                 ++spaces;
             } else if (spaces) {
