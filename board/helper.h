@@ -3,52 +3,31 @@
 
 #include "board.h"
 
-const Byte SHIFT_ROW = 16;
-const Byte SHIFT_COL = 1;
+const Byte SHIFT_X = 1;
+const Byte SHIFT_Y = 16;
+const Byte SHIFT_POSDIAG = SHIFT_X + SHIFT_Y;
+const Byte SHIFT_NEGDIAG = SHIFT_X - SHIFT_Y;
 
-inline Square mksq(int row, int col) {
-    return (Square) ((row << 4) | col);
-}
+inline Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
 
-inline Square inc_row(Square s) {
-    return s + SHIFT_ROW;
-}
+inline void inc_x(Square & s) { s += SHIFT_X; }
+inline void dec_x(Square & s) { s -= SHIFT_X; }
+inline void inc_y(Square & s) { s += SHIFT_Y; }
+inline void dec_y(Square & s) { s -= SHIFT_Y; }
+inline void diag_ur(Square & s) { s += SHIFT_POSDIAG; }
+inline void diag_ul(Square & s) { s -= SHIFT_NEGDIAG; }
+inline void diag_dr(Square & s) { s += SHIFT_NEGDIAG; }
+inline void diag_dl(Square & s) { s -= SHIFT_POSDIAG; }
 
-inline Square dec_row(Square s) {
-    return s - SHIFT_ROW;
-}
+inline void reset_x(Square & s) { s &= HI4; }
+inline void reset_y(Square & s) { s &= LO4; }
 
-inline Square inc_col(Square s) {
-    return s + SHIFT_COL;
-}
+inline int get_y(const Square & s) { return s >> 4; }
+inline int get_x(const Square & s) { return s & LO4; }
 
-inline Square dec_col(Square s) {
-    return s - SHIFT_COL;
-}
-
-inline Square reset_col(Square s) {
-    return s & HI4;
-}
-
-inline Square reset_row(Square s) {
-    return s & LO4;
-}
-
-inline Byte get_row(Square s) {
-    return s >> 4;
-}
-
-inline Byte get_col(Square s) {
-    return s & LO4;
-}
-
-inline bool val_row(Square s) {
-    return !(s & 128);
-}
-
-inline bool val_col(Square s) {
-    return !(s & 8);
-}
+inline bool val_y(const Square & s) { return !(s & 128); }
+inline bool val_x(const Square & s) { return !(s & 8); }
+inline bool val(const Square & s) { return !(s & 128) && !(s & 8); }
 
 inline Square stosq(string str) {
     return mksq(str[1] - '1', str[0] - 'a');
@@ -56,7 +35,7 @@ inline Square stosq(string str) {
 
 inline string sqtos(Square sq) {
     stringstream ss;
-    ss << (char) (get_col(sq) + 'a') << (char) (get_row(sq) + '1');
+    ss << (char) (get_x(sq) + 'a') << (char) (get_y(sq) + '1');
     return ss.str();
 }
 
@@ -68,11 +47,11 @@ Board empty_board() {
     
     Board b;
     
-    for (Square s = mksq(0, 0) ; get_row(s) < 8; s = inc_row(s)) {
-        for ( ; get_col(s) < 8; s = inc_col(s)) {
+    for (Square s = mksq(0, 0) ; get_y(s) < 8; inc_y(s)) {
+        for ( ; get_x(s) < 8; inc_x(s)) {
             b.set(s, EMPTY);
         }
-        s = reset_col(s);
+        reset_x(s);
     }
     
     return b;
@@ -145,7 +124,7 @@ void fill_board(Board & b, string & arrangement) {
             
             // valid piece: output it
             if (row < 8 && col < 8) {
-                b.set(mksq(row, col), p);
+                b.set(mksq(col, row), p);
                 ++col;
             } else {
                 // cout << "Illegal coords: " << row << " " << col << "\n";
@@ -167,7 +146,6 @@ void fill_board(Board & b, string & arrangement) {
         
     }
 
-    // if x,y != 7,7 return failure
 }
 
 void fill_config(Board & b, stringstream & words) {
@@ -187,7 +165,7 @@ void fill_config(Board & b, stringstream & words) {
         b.set_ep_exists(false);
     } else {
         b.set_ep_exists(true);
-        b.set_ep_file(get_col(stosq(enpassant)));
+        b.set_ep_file(get_x(stosq(enpassant)));
     }
 
     int halfmoves = get_number(words);
@@ -260,77 +238,7 @@ string board_to_fen(const Board & b) {
 }
 
 Board starting_pos() {
-    
-    Board b = empty_board();
-    
-    for (Square s = mksq(1, 0); val_col(s); s = inc_col(s)) {
-        b.set(s, W_PAWN);
-    }
-    
-    for (Square s = mksq(6, 0); val_col(s); s = inc_col(s)) {
-        b.set(s, B_PAWN);
-    }
-    
-    Square s = mksq(0, 0);
-    b.set(s, W_ROOK);
-    
-    s = inc_col(s);
-    b.set(s, W_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, W_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, W_QUEEN);
-    
-    s = inc_col(s);
-    b.set(s, W_KING);
-    
-    s = inc_col(s);
-    b.set(s, W_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, W_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, W_ROOK);
-    
-    s = mksq(7, 0);
-    b.set(s, B_ROOK);
-    
-    s = inc_col(s);
-    b.set(s, B_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, B_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, B_QUEEN);
-    
-    s = inc_col(s);
-    b.set(s, B_KING);
-    
-    s = inc_col(s);
-    b.set(s, B_BISHOP);
-    
-    s = inc_col(s);
-    b.set(s, B_KNIGHT);
-    
-    s = inc_col(s);
-    b.set(s, B_ROOK);
-    
-    b.set_white(1);
-
-    b.set_cas_ws(1);
-    b.set_cas_wl(1);
-    b.set_cas_bs(1);
-    b.set_cas_bl(1);
-
-    b.set_ep_exists(0);
-    b.set_halfmoves(0);
-    b.set_wholemoves(1);
-    
-    return b;
+    return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
 #endif
