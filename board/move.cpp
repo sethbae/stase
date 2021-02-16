@@ -143,12 +143,29 @@ uint64_t gen_knight_mask(Square sq) {
            (gen_file_mask(get_x(sq) + 2) | gen_file_mask(get_x(sq) - 2)));
 }
 
-/* 
-int main(void) {
-    Square pos = mksq(6, 3);
 
-    // pr_mask outputs board upside down
-    pr_mask(gen_diags(pos));
-    pr_mask(gen_knight_mask(pos));
+// Result is undefined if the move is not on a diagonal or orthogonal line, eg. a knight's move
+bool is_obstructed(const Board & b, Move m) {
+    int x_offset = get_x(m.to) > get_x(m.from) ? 1 : get_x(m.to) < get_x(m.from) ? -1 : 0;
+    int y_offset = get_y(m.to) > get_y(m.from) ? 1 : get_y(m.to) < get_y(m.from) ? -1 : 0;
+    
+    int x = get_x(m.from) + x_offset;
+    int y = get_y(m.from) + y_offset;
+
+    while (get_y(m.to) != y || get_x(m.to) != x) {
+        if (TYPE[b.get(mksq(x, y))] != EMPTY) {
+            return true;
+        }
+
+        x += x_offset;
+        y += y_offset;
+    }
+
+    return false;
 }
-*/
+
+int main(void) {
+    Board b = starting_pos();
+    pr(b);
+}
+

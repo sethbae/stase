@@ -179,6 +179,7 @@ void pr_board_config(const Board & b, string indent) {
 
 // Help me make this print right side up
 void pr_mask(uint64_t mask) {
+    
     for (int i = 0; i < 64; ++i) {
         if ((mask & 1) != 0) {
             cout << '1';
@@ -191,6 +192,12 @@ void pr_mask(uint64_t mask) {
         if (i % 8 == 7) {
             cout << "\n";
         }
+    }
+}
+
+void pr_64bit(uint64_t l) {
+    for (uint64_t i = 1; i > 0; i <<= 1) {
+        cout << ((l & i) != 0 ? '1' : '0');
     }
 }
 

@@ -30,7 +30,7 @@ inline bool val_x(const Square & s) { return !(s & 8); }
 inline bool val(const Square & s) { return !(s & 128) && !(s & 8); }
 
 inline Square stosq(string str) {
-    return mksq(str[1] - '1', str[0] - 'a');
+    return mksq(str[0] - 'a', str[1] - '1');
 }
 
 inline string sqtos(Square sq) {
