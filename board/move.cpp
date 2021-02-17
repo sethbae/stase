@@ -92,6 +92,75 @@ bool legal(Move m) {
     return true;
 }
 
+void line_search(const Board & b, const Square s, 
+                    void step(Square &), 
+                    bool valid(const Square &)) {
+    
+    Piece p = b.get(s);
+    Square temp = s;
+    bool cont = true;
+    
+    step(temp);
+    
+    while (valid(temp) && cont) {
+        Piece otherp = b.get(temp);
+        if (TYPE[otherp] == EMPTY) {
+            cout << sqtos(temp) << " ";
+        } else {
+            cont = false;
+            if (COLOUR[otherp] != COLOUR[p]) {
+                cout << sqtos(temp) << "x ";
+            }
+        }
+        step(temp);
+    }
+}
+
+void ortho(const Board & b, const Square start_sq) {
+    
+    line_search(b, start_sq, inc_x, val_x);
+    line_search(b, start_sq, dec_x, val_x);
+    line_search(b, start_sq, inc_y, val_y);
+    line_search(b, start_sq, dec_y, val_y);
+    cout << "\n";
+    
+}
+
+void diag(const Board & b, const Square start_sq) {
+    
+    line_search(b, start_sq, diag_ur, val);
+    line_search(b, start_sq, diag_dl, val);
+    line_search(b, start_sq, diag_dr, val);
+    line_search(b, start_sq, diag_ul, val);
+    cout << "\n";
+    
+}
+
+void piecemoves(Board & b, Square s) {
+
+    Piece p = b.get(s);
+
+    switch (TYPE[p]) {
+        
+        case ROOK: 
+            ortho(b, s);
+            break;
+            
+        case BISHOP: 
+            diag(b, s);
+            break;
+            
+        case QUEEN: 
+            ortho(b, s);
+            diag(b, s);
+            break;
+            
+        default: 
+            return;
+    }
+
+}
+
 // Calculated by hand
 // Least significat bit represents a1
 static const uint64_t file_a = 72340172838076673L;      // a file
@@ -152,3 +221,12 @@ int main(void) {
     pr_mask(gen_knight_mask(pos));
 }
 */
+
+/*int main(void) {
+    
+    Board b = fen_to_board("8/8/8/8/8/2Q5/8/8 w - - 0 1");
+    Square s = stosq("c3");
+    pr(b);
+    piecemoves(b, s);
+
+}*/
