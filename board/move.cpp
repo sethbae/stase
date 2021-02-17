@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include <string>
+#include <vector>
 using std::string;
 #include "board.h"
 #include "helper.h"
 #include "print.h"
+#include "bitmap.h"
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
@@ -87,65 +89,8 @@ string movetosan(Board & b, Move m) {
     return ptos_alg(b.get(m.from)) + sqtos(m.to);
 }
 
-bool legal(Move m) {
-    // checks if a move is legal
-    return true;
-}
-
-// Calculated by hand
-// Least significat bit represents a1
-static const uint64_t file_a = 72340172838076673L;      // a file
-static const uint64_t rank_one = 255L;                  // first rank
-
-static const uint64_t diag_nxy = 72624976668147840L;    // a8 to h1
-static const uint64_t diag_xy = -9205322385119247871L;  // a1 to h8
-
-uint64_t gen_file_mask(Byte file) { return file_a << file; }
-
-uint64_t gen_row_mask(Byte row) { return rank_one << (row * 8); }
-
-uint64_t gen_nxy_mask(Square sq) {
-    uint64_t new_nxy = diag_nxy;
-    int dif_nxy = get_y(sq) + get_x(sq) - 7;
-    if (dif_nxy > 0) {
-        new_nxy = diag_nxy << (dif_nxy * 8);
-    } else if (dif_nxy < 0) {
-        new_nxy = diag_nxy >> (-dif_nxy * 8);
-    }
-
-    return new_nxy;
-}
-
-uint64_t gen_xy_mask(Square sq) {
-    uint64_t new_xy = diag_xy;
-    int dif_xy = get_y(sq) - get_x(sq);
-    if (dif_xy > 0) {
-        new_xy = diag_xy << (dif_xy * 8);
-        // new_xy = diag_xy << 8;
-    } else if (dif_xy < 0) {
-        new_xy = diag_xy >> (-dif_xy * 8);
-    }
-    return new_xy;
-}
-
-uint64_t gen_diags(Square sq) {
-    return gen_nxy_mask(sq) | gen_xy_mask(sq);
-}
-
-uint64_t gen_ortho(Square sq) {
-    return gen_file_mask(get_x(sq)) | gen_row_mask(get_y(sq));
-}
-
-uint64_t gen_knight_mask(Square sq) {
-    return ((gen_row_mask(get_y(sq) + 2) | gen_row_mask(get_y(sq) - 2)) &
-           (gen_file_mask(get_x(sq) + 1) | gen_file_mask(get_x(sq) - 1))) |
-           ((gen_row_mask(get_y(sq) + 1) | gen_row_mask(get_y(sq) - 1)) & 
-           (gen_file_mask(get_x(sq) + 2) | gen_file_mask(get_x(sq) - 2)));
-}
-
-
 // Result is undefined if the move is not on a diagonal or orthogonal line, eg. a knight's move
-bool is_obstructed(const Board & b, Move m) {
+/* bool is_obstructed(const Board & b, Move m) {
     int x_offset = get_x(m.to) > get_x(m.from) ? 1 : get_x(m.to) < get_x(m.from) ? -1 : 0;
     int y_offset = get_y(m.to) > get_y(m.from) ? 1 : get_y(m.to) < get_y(m.from) ? -1 : 0;
     
@@ -162,10 +107,103 @@ bool is_obstructed(const Board & b, Move m) {
     }
 
     return false;
+} */
+
+// Produces undefined behaviour if the move is not a sliding move
+bool is_unobstructed(Move m, uint64_t vacancy) {
+    int xs = get_x(m.from), ys = get_y(m.from), xe = get_x(m.to), ye = get_y(m.to);
+
+    uint64_t v_range, h_range;          // To account for pieces going backwards...
+    if (xs > xe) {
+        h_range = gen_mcol(xe, xs);
+    } else {
+        h_range = gen_mcol(xs, xe);
+    }
+
+    if (ys > ye) {
+        v_range = gen_mrow(ye, ys);
+    } else {
+        v_range = gen_mrow(ys, ye);
+    }
+
+    // The box contains only the squares within the smallest square containing both the start and end square
+    uint64_t box = v_range & h_range;
+
+    // pos is the representation of both the start and end squares only
+    uint64_t pos = gen_pos(m.from) | gen_pos(m.to);
+
+    // The only straight line connecting both squares (needs optimisation imo)
+    uint64_t line;
+    int diffx = xe - xs;
+    int diffy = ye - ys;
+    if (diffx == 0) {               // if it's vertical
+        line = gen_file(xe);
+    } else if (diffy == 0) {        // if it's horizontal
+        line = gen_row(ye);
+    } else if (diffy == diffx) {    // if it's a positive diagonal
+        line = gen_xy(m.from);
+    } else {                        // if it's a negative diagonal
+        line = gen_nxy(m.to);
+    }
+    
+    uint64_t path = box & line & ~pos;
+    // pr_mask(box);
+
+    // The path between a sqaure and another would be unobstructed only if there is no occupied square in between them
+    return (path & vacancy) == path;
+
+}
+
+bool is_legal_example(Move m, const Board & b) {
+    uint64_t move_pattern = gen_pattern(m.from, b.get(m.from));
+    // pr_mask(move_pattern);
+    if ((move_pattern & ~gen_pos(m.from) & gen_pos(m.to)) == 0) {
+        return false;
+    }
+
+    if (b.get(m.to) != EMPTY && COLOUR[b.get(m.to)] == COLOUR[b.get(m.from)]) {
+        return false;
+    }
+
+    Ptype p = TYPE[b.get(m.from)];
+    if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, gen_vacancy_map(b))) {
+        return false;
+    }
+
+    // Other legality tests...
+
+    return true;
+}
+
+void get_legal_moves_from_pos(const Board & b, Square sq, std::vector<string> & moves) {
+    string piece = ptos_alg(b.get(sq));
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (is_legal_example({sq, mksq(i, j), 0}, b)) {
+                moves.push_back(piece + sqtos(mksq(i, j)));
+            }
+        }
+    }
+}
+
+void get_all_legal_moves(const Board & b, Ptype colour, std::vector<string> & all_moves) {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (COLOUR[b.get(mksq(i, j))] == colour) {
+                get_legal_moves_from_pos(b, mksq(i, j), all_moves);
+            }
+        }
+    }
 }
 
 int main(void) {
     Board b = starting_pos();
+    std::vector<string> all_moves;
+    get_all_legal_moves(b, WHITE, all_moves);
     pr(b);
+    cout << "\n\"Legal\" moves: ";
+    for (string s : all_moves) {
+        cout << s << " ";
+    }
 }
 

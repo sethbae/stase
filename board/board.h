@@ -96,6 +96,7 @@ const unsigned EP_EX_MASK = 1 << 5;
 const unsigned EP_FILE_MASK = 7 << 6;
 const unsigned HALF_M_MASK = 127 << 9;
 const unsigned WHOLE_M_MASK = (~0) << 16;
+const int BOARD_SIZE = 8;
 
 typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
