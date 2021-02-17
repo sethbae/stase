@@ -102,12 +102,77 @@ string movetosan(Board & b, Move m) {
             return true;
         }
 
-        x += x_offset;
-        y += y_offset;
+*/
+
+void line_search(const Board & b, const Square s, 
+                    void step(Square &), 
+                    bool valid(const Square &)) {
+    
+    Piece p = b.get(s);
+    Square temp = s;
+    bool cont = true;
+    
+    step(temp);
+    
+    while (valid(temp) && cont) {
+        Piece otherp = b.get(temp);
+        if (TYPE[otherp] == EMPTY) {
+            cout << sqtos(temp) << " ";
+        } else {
+            cont = false;
+            if (COLOUR[otherp] != COLOUR[p]) {
+                cout << sqtos(temp) << "x ";
+            }
+        }
+        step(temp);
+    }
+}
+
+void ortho(const Board & b, const Square start_sq) {
+    
+    line_search(b, start_sq, inc_x, val_x);
+    line_search(b, start_sq, dec_x, val_x);
+    line_search(b, start_sq, inc_y, val_y);
+    line_search(b, start_sq, dec_y, val_y);
+    cout << "\n";
+    
+}
+
+void diag(const Board & b, const Square start_sq) {
+    
+    line_search(b, start_sq, diag_ur, val);
+    line_search(b, start_sq, diag_dl, val);
+    line_search(b, start_sq, diag_dr, val);
+    line_search(b, start_sq, diag_ul, val);
+    cout << "\n";
+    
+}
+
+void piecemoves(Board & b, Square s) {
+
+    Piece p = b.get(s);
+
+    switch (TYPE[p]) {
+        
+        case ROOK: 
+            ortho(b, s);
+            break;
+            
+        case BISHOP: 
+            diag(b, s);
+            break;
+            
+        case QUEEN: 
+            ortho(b, s);
+            diag(b, s);
+            break;
+            
+        default: 
+            return;
     }
 
-    return false;
-} */
+}
+
 
 // Produces undefined behaviour if the move is not a sliding move
 bool is_unobstructed(Move m, uint64_t vacancy) {
@@ -196,7 +261,7 @@ void get_all_legal_moves(const Board & b, Ptype colour, std::vector<string> & al
     }
 }
 
-int main(void) {
+/* int main(void) {
     Board b = starting_pos();
     std::vector<string> all_moves;
     get_all_legal_moves(b, WHITE, all_moves);
@@ -205,5 +270,14 @@ int main(void) {
     for (string s : all_moves) {
         cout << s << " ";
     }
-}
+} */
 
+
+/*int main(void) {
+    
+    Board b = fen_to_board("8/8/8/8/8/2Q5/8/8 w - - 0 1");
+    Square s = stosq("c3");
+    pr(b);
+    piecemoves(b, s);
+
+}*/
