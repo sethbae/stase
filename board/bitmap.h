@@ -2,10 +2,10 @@
 #define BITMAP_H
 
 #include "board.h"
-#include "helper.h"
+
 /**
  * This file defines the Bitmap implementation. A Bitmap map is essentially a 64-bit number
- * that records information for any specific boolean operation you would want to preform on
+ * that records information for any specific boolean operation you would want to perform on
  * every square. For example, a vacancy bitmap would encode every vacant square with a 1
  * and every occupied square with a 0. To get the occupation map you can simply inverse all 
  * the bits. 

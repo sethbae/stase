@@ -4,7 +4,7 @@
 #include <iostream>
 using std::cout;
 
-#include "helper.h"
+#include "board.h"
 
 /* print out the literal integer values of the data at each square on the board */
 void pr_raw(const Board & b) {

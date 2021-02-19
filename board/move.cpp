@@ -2,10 +2,8 @@
 #include <string>
 #include <vector>
 using std::string;
+
 #include "board.h"
-#include "helper.h"
-#include "print.h"
-#include "bitmap.h"
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 

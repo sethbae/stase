@@ -8,6 +8,15 @@ const Byte SHIFT_Y = 16;
 const Byte SHIFT_POSDIAG = SHIFT_X + SHIFT_Y;
 const Byte SHIFT_NEGDIAG = SHIFT_X - SHIFT_Y;
 
+const Byte SHIFT_KN1 = SHIFT_X + 2*SHIFT_Y; // +1x, +2y
+const Byte SHIFT_KN2 = SHIFT_X - 2*SHIFT_Y; // +1x, -2y
+const Byte SHIFT_KN3 = 2*SHIFT_X + SHIFT_Y; // +2x, +1y
+const Byte SHIFT_KN4 = 2*SHIFT_X - SHIFT_Y; // +2x, -1y
+const Byte SHIFT_KN5 = -SHIFT_X + 2*SHIFT_Y; // -1x, +2y
+const Byte SHIFT_KN6 = -SHIFT_X - 2*SHIFT_Y; // -1x, -2y
+const Byte SHIFT_KN7 = -2*SHIFT_X + SHIFT_Y; // -2x, +1y
+const Byte SHIFT_KN8 = -2*SHIFT_X - SHIFT_Y; // -2x, -1y
+
 inline Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
 
 inline void inc_x(Square & s) { s += SHIFT_X; }
@@ -37,10 +46,6 @@ inline string sqtos(Square sq) {
     stringstream ss;
     ss << (char) (get_x(sq) + 'a') << (char) (get_y(sq) + '1');
     return ss.str();
-}
-
-inline bool is_white(Piece p) {
-    return p & 8;
 }
 
 Board empty_board() {
