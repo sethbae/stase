@@ -15,7 +15,7 @@ static const Bitmap diag_nxy = 72624976668147840L;    // a8 to h1
 static const Bitmap diag_xy = -9205322385119247871L;  // a1 to h8
 
 Bitmap gen_pos(Square sq) {
-    return 1ULL << get_x(sq) << (get_y(sq) * 8);
+    return ((Bitmap) 1) << get_x(sq) << (get_y(sq) * 8);
 }
 
 Bitmap gen_file(Byte file) { return file_a << file; }
@@ -61,7 +61,7 @@ Bitmap gen_mcol(int from, int to) {
 
 // inclusive too
 Bitmap gen_mrow(int from, int to) {
-    return (~0ULL) >> ((7 - (to - from)) * 8) << (from * 8);
+    return (~((Bitmap) 0)) >> ((7 - (to - from)) * 8) << (from * 8);
 }
 
 Bitmap gen_knights(Square sq) {
@@ -86,7 +86,7 @@ Bitmap gen_kings(Square sq) {
 
 Bitmap gen_wpawn_attack(Square sq) {
     inc_y(sq);
-    Bitmap map = 0ULL;
+    Bitmap map = (Bitmap) 0;
 
     Square temp = sq;
     if (get_x(sq) > 0) {
@@ -117,7 +117,7 @@ Bitmap gen_wpawn_move(Square sq) {
 
 Bitmap gen_bpawn_attack(Square sq) {
     dec_y(sq);
-    Bitmap map = 0ULL;
+    Bitmap map = (Bitmap) 0;
 
     Square temp = sq;
     if (get_x(sq) > 0) {
@@ -164,13 +164,13 @@ Bitmap gen_pattern(Square q, Piece p) {
 
         case W_PAWN: return gen_wpawn_move(q);
         case B_PAWN: return gen_bpawn_move(q);
-        default: return 0ULL;
+        default: return (Bitmap) 0;
     }
 }
 
 
 Bitmap gen_vacancy_map(const Board & b) {
-    Bitmap acc = 0ULL;
+    Bitmap acc = (Bitmap) 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Square pos = mksq(i, j);
