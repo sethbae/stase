@@ -3,24 +3,63 @@
 
 #include "board.h"
 #include "helper.h"
+/**
+ * This file defines the Bitmap implementation. A Bitmap map is essentially a 64-bit number
+ * that records information for any specific boolean operation you would want to preform on
+ * every square. For example, a vacancy bitmap would encode every vacant square with a 1
+ * and every occupied square with a 0. To get the occupation map you can simply inverse all 
+ * the bits. 
+ * 
+ * The least significant bit in a bitmap represents a1 while the most significant represents
+ * h8. The bits in a bit map are laid out on the board like this:
+ * 
+ *      8  |  56  57  58  59  60  61  62  63
+ *         |
+ *      7  |  48  49  50  51  52  53  54  55
+ *         |
+ *      6  |  40  41  42  43  44  45  46  47
+ *         |
+ *      5  |  32  33  34  35  36  37  38  39
+ *         |
+ *      4  |  24  25  26  27  28  29  30  31
+ *         |
+ *      3  |  16  17  18  19  20  21  22  23
+ *         |
+ *      2  |  08  09  10  11  12  13  14  15
+ *         |
+ *      1  |  00  01  02  03  04  05  06  07
+ *          ---------------------------------
+ *            a   b   c   d   e   f   g   h
+ * 
+ * You can see for example that c3 is represented by bit 18, d6 is 43, h2 is 15, etc.
+ * 
+ * Bit operations on the map simply shift the numbers left, right, up or down. There also
+ * some hard coded lines and diagonals that are used to generate masks that can then be applied
+ * on each other to create data.
+ * 
+ * 
+ */
 
 typedef uint64_t Bitmap;
 
 // Calculated by hand
-// Least significat bit represents a1
-static const Bitmap file_a = 72340172838076673L;      // a file
-static const Bitmap rank_one = 255L;                  // first rank
+static const Bitmap col_1 = 72340172838076673L;      // a file
+static const Bitmap row_1 = 255L;                  // first rank
 
 static const Bitmap diag_nxy = 72624976668147840L;    // a8 to h1
 static const Bitmap diag_xy = -9205322385119247871L;  // a1 to h8
 
+// Generates a bitmap with only one square
 Bitmap gen_pos(Square sq) {
     return ((Bitmap) 1) << get_x(sq) << (get_y(sq) * 8);
 }
 
-Bitmap gen_file(Byte file) { return file_a << file; }
+// These four functions generate a mask in any of the four
+// orientations of a straight line on the board. Namely, row, 
+// column, positive diagonal, and negative diagonal
+Bitmap gen_col(Byte col) { return col_1 << col; }
 
-Bitmap gen_row(Byte row) { return rank_one << (row * 8); }
+Bitmap gen_row(Byte row) { return row_1 << (row * 8); }
 
 Bitmap gen_nxy(Square sq) {
     Bitmap new_nxy = diag_nxy;
@@ -46,22 +85,24 @@ Bitmap gen_xy(Square sq) {
     return new_xy;
 }
 
+
+// These generate multiple rows and columns. Useful for masking out big chunks of the board at a time.
+Bitmap gen_mcol(int from, int to) {
+    return (row_1 >> (7 - (to - from)) << from) * col_1;
+}
+
+Bitmap gen_mrow(int from, int to) {
+    return (~((Bitmap) 0)) >> ((7 - (to - from)) * 8) << (from * 8);
+}
+
+// The following functions generate the basic move patterns of 
+// chess pieces from the functions defined above
 Bitmap gen_diags(Square sq) {
     return gen_nxy(sq) | gen_xy(sq);
 }
 
 Bitmap gen_ortho(Square sq) {
-    return gen_file(get_x(sq)) | gen_row(get_y(sq));
-}
-
-// inclusive
-Bitmap gen_mcol(int from, int to) {
-    return (255 >> (7 - (to - from)) << from) * file_a;
-}
-
-// inclusive too
-Bitmap gen_mrow(int from, int to) {
-    return (~((Bitmap) 0)) >> ((7 - (to - from)) * 8) << (from * 8);
+    return gen_col(get_x(sq)) | gen_row(get_y(sq));
 }
 
 Bitmap gen_knights(Square sq) {
@@ -146,6 +187,7 @@ Bitmap gen_bpawn_move(Square sq) {
 }
 
 
+// Generates the piece's movement pattern starting from a certain square
 Bitmap gen_pattern(Square q, Piece p) {
     if (p == W_KING) {
         return gen_kings(q);
@@ -168,7 +210,7 @@ Bitmap gen_pattern(Square q, Piece p) {
     }
 }
 
-
+// Generates the vacancy map of a board
 Bitmap gen_vacancy_map(const Board & b) {
     Bitmap acc = (Bitmap) 0;
     for (int i = 0; i < 8; ++i) {
@@ -178,6 +220,20 @@ Bitmap gen_vacancy_map(const Board & b) {
         }
     }
     return acc;
+}
+
+// Generates a bitmap according to a provided boolean function
+Bitmap gen_bitmap(const Board & b, bool include(Square, Piece)) {
+    Bitmap map = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square sq = mksq(i, j);
+            if (include(sq, b.get(sq))) {
+                map |= gen_pos(sq);
+            }
+        }
+    }
+    return map;
 }
 
 

@@ -89,21 +89,6 @@ string movetosan(Board & b, Move m) {
     return ptos_alg(b.get(m.from)) + sqtos(m.to);
 }
 
-// Result is undefined if the move is not on a diagonal or orthogonal line, eg. a knight's move
-/* bool is_obstructed(const Board & b, Move m) {
-    int x_offset = get_x(m.to) > get_x(m.from) ? 1 : get_x(m.to) < get_x(m.from) ? -1 : 0;
-    int y_offset = get_y(m.to) > get_y(m.from) ? 1 : get_y(m.to) < get_y(m.from) ? -1 : 0;
-    
-    int x = get_x(m.from) + x_offset;
-    int y = get_y(m.from) + y_offset;
-
-    while (get_y(m.to) != y || get_x(m.to) != x) {
-        if (TYPE[b.get(mksq(x, y))] != EMPTY) {
-            return true;
-        }
-
-*/
-
 void line_search(const Board & b, const Square s, 
                     void step(Square &), 
                     bool valid(const Square &)) {
@@ -179,6 +164,7 @@ bool is_unobstructed(Move m, uint64_t vacancy) {
     int xs = get_x(m.from), ys = get_y(m.from), xe = get_x(m.to), ye = get_y(m.to);
 
     uint64_t v_range, h_range;          // To account for pieces going backwards...
+
     if (xs > xe) {
         h_range = gen_mcol(xe, xs);
     } else {
@@ -194,6 +180,8 @@ bool is_unobstructed(Move m, uint64_t vacancy) {
     // The box contains only the squares within the smallest square containing both the start and end square
     uint64_t box = v_range & h_range;
 
+    // pr_mask(box);
+
     // pos is the representation of both the start and end squares only
     uint64_t pos = gen_pos(m.from) | gen_pos(m.to);
 
@@ -202,7 +190,7 @@ bool is_unobstructed(Move m, uint64_t vacancy) {
     int diffx = xe - xs;
     int diffy = ye - ys;
     if (diffx == 0) {               // if it's vertical
-        line = gen_file(xe);
+        line = gen_col(xe);
     } else if (diffy == 0) {        // if it's horizontal
         line = gen_row(ye);
     } else if (diffy == diffx) {    // if it's a positive diagonal
@@ -262,22 +250,34 @@ void get_all_legal_moves(const Board & b, Ptype colour, std::vector<string> & al
 }
 
 /* int main(void) {
-    Board b = starting_pos();
+    Board b = fen_to_board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
     std::vector<string> all_moves;
     get_all_legal_moves(b, WHITE, all_moves);
     pr(b);
-    cout << "\n\"Legal\" moves: ";
+    cout << "\n\"Legal\" moves: \n";
+    int counter = 0;
     for (string s : all_moves) {
         cout << s << " ";
+        if (++counter % 16 == 0) {
+            cout << "\n";
+        }
     }
 } */
 
 
-/*int main(void) {
+/* int main(void) {
     
     Board b = fen_to_board("8/8/8/8/8/2Q5/8/8 w - - 0 1");
     Square s = stosq("c3");
     pr(b);
     piecemoves(b, s);
 
-}*/
+} */
+
+int main(void) {
+    Board b = starting_pos();
+    Bitmap map = gen_bitmap(b, [] (Square sq, Piece p) {
+        return (get_x(sq) + get_y(sq))% 2 == 0;
+    });
+    pr_mask(map);
+}

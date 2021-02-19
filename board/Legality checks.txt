@@ -1,0 +1,23 @@
+
+To check if a move is legal or not, the board should preform these steps in order:
+
+0. The piece moving must be of the same colour as the current player's turn
+
+1. The move should follow the basic movement pattern of the piece (assuming an empty board)
+
+2. The destination square must be empty or occupied by a piece of different colour
+
+3. If the move is a sliding move (Queen, Bishop, Rook, or Pawn two-step) all the squares between the start and destination should be vacant
+
+4. If the piece is pinned it can only move along the line between its king and the piece producing the attack
+
+5. If the king is in check the only possible places a piece (other than the king) can move to is either a capture of the piece producing the check or to a square that blocks the attack
+
+6. The king can only move to squares that are not attacked by the enemy's pieces
+
+Special moves:
+i.    If the move is an en passant, it needs to be checked whether the king can be attacked after the fact
+ii.   The king cannot castle through attacked squares
+
+
+

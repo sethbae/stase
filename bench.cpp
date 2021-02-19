@@ -13,7 +13,7 @@ using std::chrono::microseconds;
 #include <vector>
 using std::vector;
 
-#include "board/print.h"
+#include "board/board.h"
 
 /* This is a short benchmark program to test the read and write speeds of the board representation.
    It generates a random board position and then writes it to each of [k] boards.
@@ -108,6 +108,48 @@ void read_test() {
     cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
     cout << "(" << per_board << " microseconds per board)\n";  
     cout << "\tSum: " << x << "\n";
+    cout << "\n";
+    
+    delete [] boards;
+}
+
+void legal_move_test() {
+        
+    int k = 100000;
+
+    auto boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        // boards[i] = starting_pos();
+        boards[i] = fen_to_board("8/8/8/3Q4/8/8/8/8 w - - 0 1");
+    }
+    
+    /* start benchmark and read from boards */
+
+    vector<string> moves;
+
+    auto start = high_resolution_clock::now();
+
+    int x = 0;
+    for (int j = 0; j < k; ++j) {
+        Board b = boards[j];
+        get_all_legal_moves(b, WHITE, moves);
+        x += moves.size();
+        moves.clear();
+    }
+
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Legal move test:\n";
+    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\tMoves found: " << (x / k) << "\n";
     cout << "\n";
     
     delete [] boards;
@@ -311,14 +353,16 @@ void read_config_test() {
 
 int main(void) {
 
-    write_test();
-    read_test();
-    size_test();
-    starting_pos_test();
-    board_from_fen_test();
-    fen_from_board_test();
-    write_config_test();
-    read_config_test();
-    write_parsed_config_test();
+    // write_test();
+    // read_test();
+    // size_test();
+    // starting_pos_test();
+    // board_from_fen_test();
+    // fen_from_board_test();
+    // write_config_test();
+    // read_config_test();
+    // write_parsed_config_test();
+
+    legal_move_test();
     
 }
