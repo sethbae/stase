@@ -32,10 +32,10 @@ enum Ptype {
     
     /* other values which appear in the lookup tables */
     KING,
-    QUEEN,
-    ROOK,
-    KNIGHT,
-    BISHOP,
+    QUEEN = 16, // explicit values to read promotion pieces easily (see Move::prom_piece())
+    ROOK = 17,
+    KNIGHT = 18,
+    BISHOP = 19,
     PAWN,
     
     BLACK,
@@ -105,18 +105,25 @@ struct Move {
     uint_fast16_t flags;
 
     bool is_prom() const;
+    void set_prom();
     bool is_cas() const;
+    void set_cas();
     bool is_ep() const;
+    void set_ep();
     bool is_cap() const;
+    void set_cap();
+    bool is_cas_short() const;
+    void set_cas_short();
+    
+    int get_ep_file() const;
+    
+    Piece get_prom_piece() const;
+    void set_prom_piece(unsigned);
+    Piece get_cap_piece() const;
+    void set_cap_piece(Piece p);
 
-    Piece prom() const;
-    int cas_side() const;
-    int ep_file() const;
-    Piece cap_piece() const;
 
 };
-// struct Move;
-
 
 /* helper functions for board and move */
 void make_move(Board &, Move);
@@ -154,6 +161,8 @@ std::string ptos_alg(const Piece);
 Piece ctop(const char);
 Square stosq(const std::string);
 std::string sqtos(const Square);
+Move santomove(std::string);
+std::string movetosan(Board &, Move);
 
 /* print functions (write to stdout using cout) */
 void pr(const Board &);
@@ -164,15 +173,15 @@ void pr_mask(uint64_t mask);
 void pr_64bit(uint64_t l);
 
 /* Bitmap functions */
-Bitmap gen_pos(Square sq);
-Bitmap gen_col(Byte col);
-Bitmap gen_row(Byte row);
-Bitmap gen_nxy(Square sq);
-Bitmap gen_xy(Square sq);
-Bitmap gen_mcol(int from, int to);
-Bitmap gen_mrow(int from, int to);
-Bitmap gen_pattern(Square q, Piece p);
-Bitmap gen_vacancy_map(const Board & b);
-Bitmap gen_bitmap(const Board & b, bool include(Square, Piece));
+Bitmap square_map(Square);
+Bitmap column_map(unsigned);
+Bitmap row_map(unsigned);
+Bitmap negdiag_map(Square);
+Bitmap posdiag_map(Square);
+Bitmap columns_map(unsigned from, unsigned to);
+Bitmap rows_map(unsigned from, unsigned to);
+Bitmap pattern_map(Square, Piece);
+Bitmap vacancy_map(const Board &);
+Bitmap custom_map(const Board &, bool include(Square, Piece));
 
 #endif
