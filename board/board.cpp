@@ -1,10 +1,11 @@
+#include "board.h"
+
 #include <stdint.h>
 #include <string>
 #include <sstream>
 using std::stringstream;
 using std::string;
 
-#include "board.h"
 
 /***************************************************************************
  * This file defines a board representation and piece type (enum).
@@ -121,10 +122,10 @@ const Ptype COLOUR[] = {
             EMPTY                                       // index 14
       };
       
-inline Ptype piece(const Piece p) { return PIECE[p]; }
-inline Ptype type(const Piece p) { return TYPE[p]; }
-inline Ptype colour(const Piece p) { return COLOUR[p]; }
-inline bool is_white(const Piece p) { return p & 8; }
+Ptype piece(Piece p) { return PIECE[p]; }
+Ptype type(Piece p) { return TYPE[p]; }
+Ptype colour(Piece p) { return COLOUR[p]; }
+bool is_white(Piece p) { return p & 8; }
 
 
 /* read 4 bits from given square address */
@@ -150,43 +151,43 @@ void Board::set(const Square & sq, const Piece val) {
 }
 
 /* get/set whole config word */
-inline void Board::set_conf_word(Int c) { conf = c; }
-inline Int Board::get_conf_word() const { return conf; } 
+void Board::set_conf_word(Int c) { conf = c; }
+Int Board::get_conf_word() const { return conf; } 
 
 /* get/set turn (who to play) */
-inline bool Board::get_white() const { return conf & WHITE_MASK; }
-inline void Board::set_white(bool b) {
+bool Board::get_white() const { return conf & WHITE_MASK; }
+void Board::set_white(bool b) {
     if (b)
         conf |= WHITE_MASK;
     else 
         conf &= ~WHITE_MASK;
 }
-inline void Board::flip_white() { conf ^= WHITE_MASK; }
+void Board::flip_white() { conf ^= WHITE_MASK; }
 
 /* get/set castling rights individually */
-inline bool Board::get_cas_ws() const { return conf & CAS_WS_MASK; }    
-inline void Board::set_cas_ws(bool b) {         
+bool Board::get_cas_ws() const { return conf & CAS_WS_MASK; }    
+void Board::set_cas_ws(bool b) {         
     if (b)
         conf |= CAS_WS_MASK;
     else 
         conf &= ~CAS_WS_MASK; 
 }
-inline bool Board::get_cas_wl() const { return conf & CAS_WL_MASK; }    
-inline void Board::set_cas_wl(bool b) {         
+bool Board::get_cas_wl() const { return conf & CAS_WL_MASK; }    
+void Board::set_cas_wl(bool b) {         
     if (b)
         conf |= CAS_WL_MASK;
     else 
         conf &= ~CAS_WL_MASK; 
 }
-inline bool Board::get_cas_bs() const { return conf & CAS_BS_MASK; }    
-inline void Board::set_cas_bs(bool b) {         
+bool Board::get_cas_bs() const { return conf & CAS_BS_MASK; }    
+void Board::set_cas_bs(bool b) {         
     if (b)
         conf |= CAS_BS_MASK;
     else 
         conf &= ~CAS_BS_MASK; 
 }
-inline bool Board::get_cas_bl() const { return conf & CAS_BL_MASK; }    
-inline void Board::set_cas_bl(bool b) {         
+bool Board::get_cas_bl() const { return conf & CAS_BL_MASK; }    
+void Board::set_cas_bl(bool b) {         
     if (b)
         conf |= CAS_BL_MASK;
     else 
@@ -194,8 +195,8 @@ inline void Board::set_cas_bl(bool b) {
 }
 
 /* get/set en-passant boolean */
-inline bool Board::get_ep_exists() const { return conf & EP_EX_MASK; }
-inline void Board::set_ep_exists(bool b) { 
+bool Board::get_ep_exists() const { return conf & EP_EX_MASK; }
+void Board::set_ep_exists(bool b) { 
     if (b)
         conf |= EP_EX_MASK;
     else
@@ -203,65 +204,65 @@ inline void Board::set_ep_exists(bool b) {
 }
 
 /* read write 3 bits representing ep file */
-inline unsigned Board::get_ep_file() const {
+unsigned Board::get_ep_file() const {
     return (conf & EP_FILE_MASK) >> 6;
 }
-inline void Board::set_ep_file(unsigned u) {
+void Board::set_ep_file(unsigned u) {
     conf = (conf & ~EP_FILE_MASK) | (u << 6);
 }
 
 // for convenience, return the actual square
-inline Square Board::get_ep_sq() const {
+Square Board::get_ep_sq() const {
     return (Square) (((get_white() ? 5 : 2) << 4) | get_ep_file());
 }
 
 /* read write 7 bits for the half move count */
-inline unsigned Board::get_halfmoves() const {
+unsigned Board::get_halfmoves() const {
     return (conf & HALF_M_MASK) >> 9;
 }
-inline void Board::set_halfmoves(unsigned u) {
+void Board::set_halfmoves(unsigned u) {
     conf = (conf & ~HALF_M_MASK) | (u << 9);
 }
-inline void Board::inc_halfmoves() { conf += 1 << 9; }
+void Board::inc_halfmoves() { conf += 1 << 9; }
 
 /* read write 16 bits for the whole move count */
-inline unsigned Board::get_wholemoves() const {
+unsigned Board::get_wholemoves() const {
     return (conf & WHOLE_M_MASK) >> 16;
 }
-inline void Board::set_wholemoves(unsigned u) {
+void Board::set_wholemoves(unsigned u) {
     conf = (conf & ~WHOLE_M_MASK) | (u << 16);
 }
-inline void Board::inc_wholemoves() { conf += (1 << 16); }
+void Board::inc_wholemoves() { conf += (1 << 16); }
 
 /******************This is an XOR version of get/set epfile, half and whole. Comparable speed
 // read write 3 bits representing ep file 
-inline unsigned get_ep_file() {
+unsigned get_ep_file() {
     return (conf & EP_FILE_MASK) >> 6;
 }
-inline void set_ep_file(unsigned u) {
+void set_ep_file(unsigned u) {
     unsigned c = conf ^ (u << 6);
     conf ^= (c & EP_FILE_MASK);
 }
 // for convenience, return the actual square
-inline Square get_ep_sq() {
+Square get_ep_sq() {
     Square mksq(int, int);
     return mksq(get_white() ? 5 : 2, get_ep_file());
 }
 
 // read write 7 bits for the half move count 
-inline unsigned get_halfmoves() {
+unsigned get_halfmoves() {
     return (conf & HALF_M_MASK) >> 9;
 }
-inline void set_halfmoves(unsigned u) {
+void set_halfmoves(unsigned u) {
     unsigned c = conf ^ (u << 9);
     conf ^= (c & HALF_M_MASK);
 }
 
 // read write 16 bits for the half move count 
-inline unsigned get_wholemoves() {
+unsigned get_wholemoves() {
     return (conf & WHOLE_M_MASK) >> 16;
 }
-inline void set_wholemoves(unsigned u) {
+void set_wholemoves(unsigned u) {
     unsigned c = conf ^ (u << 16);
     conf ^= (c & WHOLE_M_MASK);
 } */

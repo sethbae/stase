@@ -1,6 +1,3 @@
-#ifndef BITMAP_H
-#define BITMAP_H
-
 #include "board.h"
 
 /**
@@ -237,4 +234,3 @@ Bitmap gen_bitmap(const Board & b, bool include(Square, Piece)) {
 }
 
 
-#endif

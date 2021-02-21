@@ -1,9 +1,10 @@
+#include "board.h"
+
 #include <stdint.h>
 #include <string>
 #include <vector>
 using std::string;
 
-#include "board.h"
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
@@ -21,40 +22,40 @@ flags (16 bits):
     - bit 7-9:      captured piece
  */
 
-struct Move {
-    uint_fast8_t from;
-    uint_fast8_t to;
-    uint_fast16_t flags;    
+// struct Move {
+//     uint_fast8_t from;
+//     uint_fast8_t to;
+//     uint_fast16_t flags;    
 
-    bool is_prom() { return flags & 1; }
-    bool is_cas() { return flags & 2; }
-    bool is_ep() { return flags & 4; }
-    bool is_cap() { return flags & 8; }
+bool Move::is_prom() const { return flags & 1; }
+bool Move::is_cas() const { return flags & 2; }
+bool Move::is_ep() const { return flags & 4; }
+bool Move::is_cap() const { return flags & 8; }
 
-    Piece prom() {
-        switch((flags & 6) >> 1) {
-            case 1: return BISHOP;
-            case 2: return KNIGHT;
-            case 3: return ROOK;
-            case 0:
-            default: return QUEEN;
-        }
+Piece Move::prom() const {
+    switch((flags & 6) >> 1) {
+        case 1: return BISHOP;
+        case 2: return KNIGHT;
+        case 3: return ROOK;
+        case 0:
+        default: return QUEEN;
     }
+}
 
 
-    int cas_side() {
-        return (flags & (1 << 6)) == 0;
-    }
+int Move::cas_side() const {
+    return (flags & (1 << 6)) == 0;
+}
 
-    int ep_file() {
-        return get_x(to);
-    }
+int Move::ep_file() const {
+    return get_x(to);
+}
 
-    Piece cap_piece() {
-        return (Piece) flags & (7 << 7);
-    }
+Piece Move::cap_piece() const {
+    return (Piece) flags & (7 << 7);
+}
 
-};
+// };
 
 void make_move(Board & b, Move m) {
     // can't do castles or en-passant
@@ -65,7 +66,7 @@ void make_move(Board & b, Move m) {
 }
 
 string ptos_alg(Piece p) {
-    switch (TYPE[p]) {
+    switch (type(p)) {
         case KING: return "K";
         case QUEEN: return "Q";
         case ROOK: return "R";
@@ -99,12 +100,12 @@ void line_search(const Board & b, const Square s,
     
     while (valid(temp) && cont) {
         Piece otherp = b.get(temp);
-        if (TYPE[otherp] == EMPTY) {
-            cout << sqtos(temp) << " ";
+        if (type(otherp) == EMPTY) {
+            // cout << sqtos(temp) << " ";
         } else {
             cont = false;
-            if (COLOUR[otherp] != COLOUR[p]) {
-                cout << sqtos(temp) << "x ";
+            if (colour(otherp) != colour(p)) {
+                // cout << sqtos(temp) << "x ";
             }
         }
         step(temp);
@@ -117,7 +118,7 @@ void ortho(const Board & b, const Square start_sq) {
     line_search(b, start_sq, dec_x, val_x);
     line_search(b, start_sq, inc_y, val_y);
     line_search(b, start_sq, dec_y, val_y);
-    cout << "\n";
+    // cout << "\n";
     
 }
 
@@ -127,7 +128,7 @@ void diag(const Board & b, const Square start_sq) {
     line_search(b, start_sq, diag_dl, val);
     line_search(b, start_sq, diag_dr, val);
     line_search(b, start_sq, diag_ul, val);
-    cout << "\n";
+    // cout << "\n";
     
 }
 
@@ -135,7 +136,7 @@ void piecemoves(Board & b, Square s) {
 
     Piece p = b.get(s);
 
-    switch (TYPE[p]) {
+    switch (type(p)) {
         
         case ROOK: 
             ortho(b, s);
@@ -212,11 +213,11 @@ bool is_legal_example(Move m, const Board & b) {
         return false;
     }
 
-    if (b.get(m.to) != EMPTY && COLOUR[b.get(m.to)] == COLOUR[b.get(m.from)]) {
+    if (b.get(m.to) != EMPTY && colour(b.get(m.to)) == colour(b.get(m.from))) {
         return false;
     }
 
-    Ptype p = TYPE[b.get(m.from)];
+    Ptype p = type(b.get(m.from));
     if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, gen_vacancy_map(b))) {
         return false;
     }
@@ -237,10 +238,10 @@ void get_legal_moves_from_pos(const Board & b, Square sq, std::vector<string> & 
     }
 }
 
-void get_all_legal_moves(const Board & b, Ptype colour, std::vector<string> & all_moves) {
+void get_all_legal_moves(const Board & b, Ptype turn, std::vector<string> & all_moves) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if (COLOUR[b.get(mksq(i, j))] == colour) {
+            if (colour(b.get(mksq(i, j))) == turn) {
                 get_legal_moves_from_pos(b, mksq(i, j), all_moves);
             }
         }
@@ -272,10 +273,10 @@ void get_all_legal_moves(const Board & b, Ptype colour, std::vector<string> & al
 
 } */
 
-int main(void) {
+/* int main(void) {
     Board b = starting_pos();
     Bitmap map = gen_bitmap(b, [] (Square sq, Piece p) {
         return (get_x(sq) + get_y(sq))% 2 == 0;
     });
     pr_mask(map);
-}
+} */

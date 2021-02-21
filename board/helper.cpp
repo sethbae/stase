@@ -1,7 +1,15 @@
-#ifndef HELPER_H
-#define HELPER_H
-
 #include "board.h"
+
+#include <string>
+using std::string;
+
+#include <sstream>
+using std::stringstream;
+
+const unsigned LO4 = 15;
+const unsigned HI4 = 240;
+const unsigned LO3 = 7;
+const unsigned HI3 = 112;
 
 const Byte SHIFT_X = 1;
 const Byte SHIFT_Y = 16;
@@ -17,32 +25,32 @@ const Byte SHIFT_KN6 = -SHIFT_X - 2*SHIFT_Y; // -1x, -2y
 const Byte SHIFT_KN7 = -2*SHIFT_X + SHIFT_Y; // -2x, +1y
 const Byte SHIFT_KN8 = -2*SHIFT_X - SHIFT_Y; // -2x, -1y
 
-inline Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
+Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
 
-inline void inc_x(Square & s) { s += SHIFT_X; }
-inline void dec_x(Square & s) { s -= SHIFT_X; }
-inline void inc_y(Square & s) { s += SHIFT_Y; }
-inline void dec_y(Square & s) { s -= SHIFT_Y; }
-inline void diag_ur(Square & s) { s += SHIFT_POSDIAG; }
-inline void diag_ul(Square & s) { s -= SHIFT_NEGDIAG; }
-inline void diag_dr(Square & s) { s += SHIFT_NEGDIAG; }
-inline void diag_dl(Square & s) { s -= SHIFT_POSDIAG; }
+void inc_x(Square & s) { s += SHIFT_X; }
+void dec_x(Square & s) { s -= SHIFT_X; }
+void inc_y(Square & s) { s += SHIFT_Y; }
+void dec_y(Square & s) { s -= SHIFT_Y; }
+void diag_ur(Square & s) { s += SHIFT_POSDIAG; }
+void diag_ul(Square & s) { s -= SHIFT_NEGDIAG; }
+void diag_dr(Square & s) { s += SHIFT_NEGDIAG; }
+void diag_dl(Square & s) { s -= SHIFT_POSDIAG; }
 
-inline void reset_x(Square & s) { s &= HI4; }
-inline void reset_y(Square & s) { s &= LO4; }
+void reset_x(Square & s) { s &= HI4; }
+void reset_y(Square & s) { s &= LO4; }
 
-inline int get_y(const Square & s) { return s >> 4; }
-inline int get_x(const Square & s) { return s & LO4; }
+int get_y(const Square & s) { return s >> 4; }
+int get_x(const Square & s) { return s & LO4; }
 
-inline bool val_y(const Square & s) { return !(s & 128); }
-inline bool val_x(const Square & s) { return !(s & 8); }
-inline bool val(const Square & s) { return !(s & 128) && !(s & 8); }
+bool val_y(const Square & s) { return !(s & 128); }
+bool val_x(const Square & s) { return !(s & 8); }
+bool val(const Square & s) { return !(s & 128) && !(s & 8); }
 
-inline Square stosq(string str) {
+Square stosq(string str) {
     return mksq(str[0] - 'a', str[1] - '1');
 }
 
-inline string sqtos(Square sq) {
+string sqtos(Square sq) {
     stringstream ss;
     ss << (char) (get_x(sq) + 'a') << (char) (get_y(sq) + '1');
     return ss.str();
@@ -99,13 +107,13 @@ Piece ctop(char c) {
     }
 }
 
-inline string get_word(stringstream & ss) {
+string get_word(stringstream & ss) {
     string word;
     ss >> word;
     return word; 
 }
 
-inline int get_number(stringstream & ss) {
+int get_number(stringstream & ss) {
     int num;
     ss >> num;
     return num; 
@@ -181,7 +189,7 @@ void fill_config(Board & b, stringstream & words) {
     
 }
 
-Board fen_to_board(string fen) {
+Board fen_to_board(const string & fen) {
     stringstream stream(fen);
 
     Board b = empty_board();
@@ -246,4 +254,3 @@ Board starting_pos() {
     return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-#endif

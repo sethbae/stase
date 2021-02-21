@@ -7,6 +7,7 @@ typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
 typedef uint_fast8_t Square;
 typedef Byte Piece;
+typedef uint64_t Bitmap;
 
 /* enumeration of the types of pieces primarily, but also for other useful properties,
     such as WHITE or BLACK, and KING or QUEEN */
@@ -44,10 +45,10 @@ enum Ptype {
 };
 
 /* query information about a given piece */
-Ptype piece(const Piece);
-Ptype type(const Piece);
-Ptype colour(const Piece);
-bool is_white(const Piece);
+Ptype piece(Piece);
+Ptype type(Piece);
+Ptype colour(Piece);
+bool is_white(Piece);
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {
@@ -114,6 +115,8 @@ struct Move {
     Piece cap_piece() const;
 
 };
+// struct Move;
+
 
 /* helper functions for board and move */
 void make_move(Board &, Move);
@@ -157,5 +160,19 @@ void pr(const Board &);
 void pr_config(const Board &);
 void pr_board_config(const Board &);
 void raw(const Board &);
+void pr_mask(uint64_t mask);
+void pr_64bit(uint64_t l);
+
+/* Bitmap functions */
+Bitmap gen_pos(Square sq);
+Bitmap gen_col(Byte col);
+Bitmap gen_row(Byte row);
+Bitmap gen_nxy(Square sq);
+Bitmap gen_xy(Square sq);
+Bitmap gen_mcol(int from, int to);
+Bitmap gen_mrow(int from, int to);
+Bitmap gen_pattern(Square q, Piece p);
+Bitmap gen_vacancy_map(const Board & b);
+Bitmap gen_bitmap(const Board & b, bool include(Square, Piece));
 
 #endif

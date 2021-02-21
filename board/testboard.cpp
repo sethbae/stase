@@ -1,3 +1,5 @@
+#include "board.h"
+
 #include <iostream>
 using std::cout;
 #include <vector>
@@ -5,8 +7,6 @@ using std::vector;
 #include <cstdlib>
 using std::rand;
 
-#include "board.h"
-#include "helper.h"
 
 /* correctness tests for all code in the board directory */
 
@@ -26,13 +26,13 @@ void piece_types() {
     for (int i = 0; i < pieces.size(); ++i) {
         Piece p = pieces[i];
         
-        if (TYPE[p] == correct_types[i]) {
+        if (type(p) == correct_types[i]) {
             ++successful;
         } else {
             ++failed;
         }
         
-        if (COLOUR[p] == correct_colours[i]) {
+        if (colour(p) == correct_colours[i]) {
             ++successful;
         } else {
             ++failed;
@@ -254,7 +254,6 @@ void square_navigation(bool print) {
 }
 
 int main(void) {
-
     piece_types();
     setget_square();
     square_navigation(false);

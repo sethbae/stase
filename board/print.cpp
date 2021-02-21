@@ -1,10 +1,11 @@
-#ifndef PRINT_H
-#define PRINT_H
+#include "board.h"
 
 #include <iostream>
 using std::cout;
 
-#include "board.h"
+#include <string>
+using std::string;
+
 
 /* print out the literal integer values of the data at each square on the board */
 void pr_raw(const Board & b) {
@@ -201,5 +202,3 @@ void pr_64bit(uint64_t l) {
     }
 }
 
-
-#endif
