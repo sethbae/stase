@@ -96,7 +96,6 @@ const unsigned EP_EX_MASK = 1 << 5;
 const unsigned EP_FILE_MASK = 7 << 6;
 const unsigned HALF_M_MASK = 127 << 9;
 const unsigned WHOLE_M_MASK = (~0) << 16;
-const int BOARD_SIZE = 8;
 
 /* lookup tables for querying information about a given piece. The 4-bit piece (0-14 valid)
    is used as an index into the relevant table */
@@ -127,7 +126,6 @@ Ptype type(Piece p) { return TYPE[p]; }
 Ptype colour(Piece p) { return COLOUR[p]; }
 bool is_white(Piece p) { return p & 8; }
 
-
 /* read 4 bits from given square address */
 Piece Board::get(const Square & sq) const {
     Byte b = squares[sq >> 4][(sq & LO3) >> 1]; // use high as 0-7, low/2 as 0-3
@@ -141,10 +139,10 @@ void Board::set(const Square & sq, const Piece val) {
     Byte ind2 = (sq & LO3) >> 1;
     
     if (sq & 1) {
-         // if odd, write to high
+         // if odd, write to low
         squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | val;
     } else {
-        // if even, write to low
+        // if even, write to high
         squares[ind1][ind2] = (val << 4) | (squares[ind1][ind2] & LO4);
     }
     
