@@ -7,28 +7,8 @@ using std::cout;
 using std::string;
 
 
-/* print out the literal integer values of the data at each square on the board */
-void pr_raw(const Board & b) {
-
-    for (int i = 7; i >= 0; --i) {
-        for (int j = 0; j <=7; ++j) {
-        
-            int x = b.get(mksq(i, j));
-            
-            if (x < 10) {
-                cout << " " << x << " ";
-            } else {
-                cout << x << " ";
-            }
-            
-        }
-        cout << "\n";
-    }
-    
-}
-
 /* print out a human readable chess representation of the board */
-void pr_indent(const Board & b, string indent) {
+void pr_board(const Board & b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
@@ -39,7 +19,11 @@ void pr_indent(const Board & b, string indent) {
     }
 }
 
-void pr_config(const Board & b) {
+void pr_board(const Board & b) {
+    pr_board(b, "");
+}
+
+/*void pr_config(const Board & b) {
 
     cout << "Raw config: ";
     
@@ -79,13 +63,9 @@ void pr_config(const Board & b) {
 
     cout << "Half moves: " << b.get_halfmoves() << "\n";
     cout << "Full moves: " << b.get_wholemoves() << "\n";
-}
+}*/
 
-void pr(const Board & b) {
-    pr_indent(b, "");
-}
-
-void raw(const Board & b) {
+/*void raw(const Board & b) {
     cout << "Raw: ";
     
     int* raw_bin = (int*) &b.conf;
@@ -102,10 +82,10 @@ void raw(const Board & b) {
         }
     }
     cout << "\n";
-}
+}*/
 
 
-void pr_board_config(const Board & b, string indent) {
+void pr_board_conf(const Board & b, string indent) {
     for (int i = 7; i >= 0; --i) {
         cout << indent;
         for (int j = 0; j < 8; ++j) {
@@ -178,27 +158,31 @@ void pr_board_config(const Board & b, string indent) {
     }
 }
 
-// Help me make this print right side up
-void pr_mask(uint64_t mask) {
+/* prints the binary data of a bitmap in a chess board grid */
+void pr_bitmap(const Bitmap map) {
     
+    uint64_t mask = ( ((uint64_t) 1) << 63);
     for (int i = 0; i < 64; ++i) {
-        if ((mask & 1) != 0) {
+        
+        if (map & mask)
             cout << '1';
-        } else {
+        else
             cout << '0';
-        }
-
         mask >>= 1;
 
-        if (i % 8 == 7) {
+        if (i % 8 == 7)
             cout << "\n";
-        }
     }
 }
 
-void pr_64bit(uint64_t l) {
-    for (uint64_t i = 1; i > 0; i <<= 1) {
-        cout << ((l & i) != 0 ? '1' : '0');
-    }
+/* prints out 64 bits of binary data from MSB (left) to LSB (right) */
+void pr_bin_64(uint64_t data) {
+    
+    uint64_t mask = ( ((uint64_t) 1) << 63);
+    
+    do {
+        cout << ((data & mask) ? '1' : '0');
+    } while (mask >>= 1);
+    
 }
 

@@ -165,12 +165,11 @@ Move santomove(std::string);
 std::string movetosan(Board &, Move);
 
 /* print functions (write to stdout using cout) */
-void pr(const Board &);
-void pr_config(const Board &);
-void pr_board_config(const Board &);
-void raw(const Board &);
-void pr_mask(uint64_t mask);
-void pr_64bit(uint64_t l);
+void pr_board(const Board &);
+void pr_board(const Board &, std::string indent);
+void pr_board_conf(const Board &, std::string indent);
+void pr_bitmap(const Bitmap);
+void pr_bin_64(uint64_t);
 
 /* Bitmap functions */
 Bitmap square_map(Square);
