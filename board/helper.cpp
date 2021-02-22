@@ -1,51 +1,19 @@
 #include "board.h"
 
+#include <iostream>
+using std::cout;
+
 #include <string>
 using std::string;
 
 #include <sstream>
 using std::stringstream;
 
-const unsigned LO4 = 15;
-const unsigned HI4 = 240;
-const unsigned LO3 = 7;
-const unsigned HI3 = 112;
+/*************************************************************************************
+ CONVERSIONS        for squares, FENs, SAN, pieces
+ ************************************************************************************/
 
-const Byte SHIFT_X = 1;
-const Byte SHIFT_Y = 8;
-const Byte SHIFT_POSDIAG = SHIFT_X + SHIFT_Y;
-const Byte SHIFT_NEGDIAG = SHIFT_X - SHIFT_Y;
-
-const Byte SHIFT_KN1 = SHIFT_X + 2*SHIFT_Y; // +1x, +2y
-const Byte SHIFT_KN2 = SHIFT_X - 2*SHIFT_Y; // +1x, -2y
-const Byte SHIFT_KN3 = 2*SHIFT_X + SHIFT_Y; // +2x, +1y
-const Byte SHIFT_KN4 = 2*SHIFT_X - SHIFT_Y; // +2x, -1y
-const Byte SHIFT_KN5 = -SHIFT_X + 2*SHIFT_Y; // -1x, +2y
-const Byte SHIFT_KN6 = -SHIFT_X - 2*SHIFT_Y; // -1x, -2y
-const Byte SHIFT_KN7 = -2*SHIFT_X + SHIFT_Y; // -2x, +1y
-const Byte SHIFT_KN8 = -2*SHIFT_X - SHIFT_Y; // -2x, -1y
-
-Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
-
-void inc_x(Square & s) { s += SHIFT_X; }
-void dec_x(Square & s) { s -= SHIFT_X; }
-void inc_y(Square & s) { s += SHIFT_Y; }
-void dec_y(Square & s) { s -= SHIFT_Y; }
-void diag_ur(Square & s) { s += SHIFT_POSDIAG; }
-void diag_ul(Square & s) { s -= SHIFT_NEGDIAG; }
-void diag_dr(Square & s) { s += SHIFT_NEGDIAG; }
-void diag_dl(Square & s) { s -= SHIFT_POSDIAG; }
-
-void reset_x(Square & s) { s &= HI4; }
-void reset_y(Square & s) { s &= LO4; }
-
-int get_y(const Square & s) { return s >> 4; }
-int get_x(const Square & s) { return s & LO4; }
-
-bool val_y(const Square & s) { return !(s & 128); }
-bool val_x(const Square & s) { return !(s & 8); }
-bool val(const Square & s) { return !(s & 128) && !(s & 8); }
-
+/***** square to string and string to square        (0, 0) <----> "a1"          *****/
 Square stosq(string str) {
     return mksq(str[0] - 'a', str[1] - '1');
 }
@@ -56,20 +24,7 @@ string sqtos(Square sq) {
     return ss.str();
 }
 
-Board empty_board() {
-    
-    Board b;
-    
-    for (Square s = mksq(0, 0) ; get_y(s) < 8; inc_y(s)) {
-        for ( ; get_x(s) < 8; inc_x(s)) {
-            b.set(s, EMPTY);
-        }
-        reset_x(s);
-    }
-    
-    return b;
-}
-
+/***** piece to string or char and vice versa       W_KING <----> 'K'           *****/
 
 char ptoc(Piece p) {
     switch (p) {
@@ -107,6 +62,33 @@ Piece ctop(char c) {
     }
 }
 
+// for algebraic notation (SAN), even black pieces use capitals: B_KNIGHT <----> "N"
+string ptos_alg(Piece p) {
+    switch (type(p)) {
+        case KING: return "K";
+        case QUEEN: return "Q";
+        case ROOK: return "R";
+        case BISHOP: return "B";
+        case KNIGHT: return "N";
+        case PAWN: return "";
+        default: return "";
+    }
+}
+
+/***** Move to SAN and SAN to move (stubs) *****/
+
+Move santomove(string san) {
+    // needs to be able to find where the piece is coming from given its destination
+    Move m = {0, 0, 0};
+    return m;
+}
+
+string movetosan(Board & b, Move m) {
+    // doesn't do captures, checks, promotions or disambiguations
+    return ptos_alg(b.get(m.from)) + sqtos(m.to);
+}
+
+/***** useful for reading ints and strings from a stringstream *****/
 string get_word(stringstream & ss) {
     string word;
     ss >> word;
@@ -119,89 +101,79 @@ int get_number(stringstream & ss) {
     return num; 
 }
 
-void fill_board(Board & b, string & arrangement) {
-    int i = 0;  // point in string
-    char c;     // char read
+/***** FEN to board and board to FEN *****/
+
+Board fen_to_board(const string & fen) {
     
-    /* read in pieces first */
-    unsigned row = 7, col = 0;
-    while ( i < (int) arrangement.size() && (c = arrangement.at(i++)) != ' ') {
+    stringstream stream(fen);
+    Board b = empty_board();
+    
+    /* take the first token: the pieces on the board */
+    string piece_layout = get_word(stream);
+    unsigned i = 0;  // point in string
+    unsigned y = 7, x = 0; // coordinates on board
+    while (i < piece_layout.size()) {
         
+        // read the next character
+        char c = piece_layout.at(i++);
         Piece p;
         
         if (c == '/') {
             // forward slash: move on to next row
-            col = 0;
-            --row;
+            x = 0;
+            --y;
         } else if ((p = ctop(c)) != EMPTY) {
             
             // valid piece: output it
-            if (row < 8 && col < 8) {
-                b.set(mksq(col, row), p);
-                ++col;
+            if (y < 8 && x < 8) {
+                b.set(mksq(x, y), p);
+                ++x;
             } else {
-                // cout << "Illegal coords: " << row << " " << col << "\n";
-                b = empty_board();
-                return;
+                return empty_board();
             }
             
         } else if ('1' <= c && c <= '8') {
             
             // legal integer: skip forward in row, printing empty
-            col += (c - '0');
+            x += (c - '0');
 
         } else {
             // illegal character
-            // cout << "Illegal char\n";
-            b = empty_board();
-            return;
+            return empty_board();
         }
         
     }
-
-}
-
-void fill_config(Board & b, stringstream & words) {
-
-    string turn = get_word(words);
-    string castle = get_word(words);
-
-    b.set_white(turn == "w");
-
+    
+    /* now use the remaining words to get the config info */
+    
+    // whose turn
+    b.set_white(get_word(stream) == "w");
+    
+    // castling rights
+    string castle = get_word(stream);
     b.set_cas_ws(castle.find('K') != string::npos);
     b.set_cas_wl(castle.find('Q') != string::npos);
     b.set_cas_bs(castle.find('k') != string::npos);
     b.set_cas_bl(castle.find('q') != string::npos);
 
-    string enpassant = get_word(words);
-    if (enpassant == "-") {
+    // en passant
+    string ep = get_word(stream);
+    if (ep == "-") {
         b.set_ep_exists(false);
     } else {
         b.set_ep_exists(true);
-        b.set_ep_file(get_x(stosq(enpassant)));
+        b.set_ep_file(get_x(stosq(ep)));
     }
 
-    int halfmoves = get_number(words);
-    b.set_halfmoves(halfmoves);
-    
-    int fullmoves = get_number(words);
-    b.set_wholemoves(fullmoves);
-    
-}
-
-Board fen_to_board(const string & fen) {
-    stringstream stream(fen);
-
-    Board b = empty_board();
-    string arrangement = get_word(stream);
-    fill_board(b, arrangement);
-
-    fill_config(b, stream);
+    // half and wholemoves
+    b.set_halfmoves(get_number(stream));
+    b.set_wholemoves(get_number(stream));
     
     return b;
 }
 
 string board_to_fen(const Board & b) {
+    
     stringstream ss;
 
     // Build arrangement string
@@ -250,7 +222,151 @@ string board_to_fen(const Board & b) {
     return ss.str();
 }
 
+/***** useful functions for getting the start or empty boards without knowing the FENs *****/
+
 Board starting_pos() {
     return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
+
+Board empty_board() {
+    
+    Board b;
+    
+    for (Square s = mksq(0, 0) ; val_y(s); inc_y(s)) {
+        for ( ; val_x(s); inc_x(s)) {
+            b.set(s, EMPTY);
+        }
+        reset_x(s);
+    }
+    
+    return b;
+}
+
+/*************************************************************************************
+ PRINTING FUNCTIONS         for board, bitmap
+ ************************************************************************************/
+
+/* print out a human readable chess representation of the board */
+void pr_board(const Board & b, string indent) {
+    for (int i = 7; i >= 0; --i) {
+        cout << indent;
+        for (int j = 0; j < 8; ++j) {
+            Piece p = b.get(mksq(j, i));
+            cout << ptoc(p) << " ";
+        }
+        cout << "\n";
+    }
+}
+
+void pr_board(const Board & b) {
+    pr_board(b, "");
+}
+
+
+void pr_board_conf(const Board & b, string indent) {
+    for (int i = 7; i >= 0; --i) {
+        cout << indent;
+        for (int j = 0; j < 8; ++j) {
+            Piece p = b.get(mksq(j, i));
+            cout << ptoc(p) << " ";
+        }
+
+        switch (i) {
+            case 7: {
+                cout << "\tFEN: " << board_to_fen(b);
+                break;
+            }
+
+            case 6: {
+                cout << "\tRaw config: ";
+                int* raw_bin = (int*) &b.conf;
+                for (int i = 31; i >= 0; --i) {
+                    if ( *raw_bin & (1 << i)) {
+                        cout << "1";
+                    } else {
+                        cout << "0";
+                    }
+
+                    if (i == 0 || i == 1 || i == 5 || i == 9 || i == 15) {
+                        cout << " ";
+                    }
+                }
+                break;
+            }
+
+            case 5: {
+                cout << "\tTurn: " << (b.get_white() ? "White" : "Black");
+                break;
+            }
+
+            case 4: {
+                cout << "\tCastle Rights: ";
+                if (b.get_cas_ws()) cout << "K";
+                if (b.get_cas_wl()) cout << "Q";
+                if (b.get_cas_bs()) cout << "k";
+                if (b.get_cas_bl()) cout << "q";
+                if (!(b.get_cas_ws() | b.get_cas_wl() | b.get_cas_bs() | b.get_cas_wl())) {
+                    cout << "-";
+                }
+                
+                break;  
+            }
+
+            case 3: {
+                if (b.get_ep_exists()) {
+                    cout << "\tEnpassant: " << sqtos(b.get_ep_sq());
+                } else {
+                    cout << "\tEnpassant: -";
+                }
+                break;
+            }
+
+            case 2: {
+                cout << "\tHalf moves: " << b.get_halfmoves();
+                break;
+            }
+
+            case 1: {
+                cout << "\tFull moves: " << b.get_wholemoves();
+                break;
+            }
+        }
+
+        cout << "\n";
+    }
+}
+
+void pr_board_conf(const Board & b) {
+    pr_board_conf(b, "");
+}
+
+/* prints the binary data of a bitmap in a chess board grid */
+// I changed this a bit but it's still wrong
+void pr_bitmap(const Bitmap map) {
+    
+    uint64_t mask = ( ((uint64_t) 1) << 63);
+    for (int i = 0; i < 64; ++i) {
+        
+        if (map & mask)
+            cout << '1';
+        else
+            cout << '0';
+        mask >>= 1;
+
+        if (i % 8 == 7)
+            cout << "\n";
+    }
+}
+
+/* prints out 64 bits of binary data from MSB (left) to LSB (right) */
+void pr_bin_64(uint64_t data) {
+    
+    uint64_t mask = ( ((uint64_t) 1) << 63);
+    
+    do {
+        cout << ((data & mask) ? '1' : '0');
+    } while (mask >>= 1);
+    
+}
+
 

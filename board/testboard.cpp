@@ -259,6 +259,6 @@ int main(void) {
     // square_navigation(false);
     Board b = starting_pos();
     b.set(mksq(4, 3), W_QUEEN);
-    pr_mask(get_obstructed_move_map(b, mksq(4, 3)));
+    pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
     return 0;
 }

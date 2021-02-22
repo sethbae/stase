@@ -5,7 +5,6 @@
 #include <vector>
 using std::string;
 
-
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
 /* 
@@ -74,30 +73,7 @@ void make_move(Board & b, Move m) {
 
 }
 
-string ptos_alg(Piece p) {
-    switch (type(p)) {
-        case KING: return "K";
-        case QUEEN: return "Q";
-        case ROOK: return "R";
-        case BISHOP: return "B";
-        case KNIGHT: return "N";
-        case PAWN: return "";
-        default: return "";
-    }
-}
-
-Move santomove(string san) {
-    // needs to be able to find where the piece is coming from given its destination
-    Move m = {0, 0, 0};
-    return m;
-}
-
-string movetosan(Board & b, Move m) {
-    // doesn't do captures, checks, promotions or disambiguations
-    return ptos_alg(b.get(m.from)) + sqtos(m.to);
-}
-
-void line_search(const Board & b, const Square s, 
+void line_search(const Board & b, const Square s, Bitmap & bmap,
                     void step(Square &), 
                     bool valid(const Square &)) {
     
@@ -111,53 +87,53 @@ void line_search(const Board & b, const Square s,
         Piece otherp = b.get(temp);
         if (type(otherp) == EMPTY) {
             // cout << sqtos(temp) << " ";
+            set_square(bmap, temp);
         } else {
             cont = false;
             if (colour(otherp) != colour(p)) {
                 // cout << sqtos(temp) << "x ";
+                set_square(bmap, temp);
             }
         }
         step(temp);
     }
 }
 
-void ortho(const Board & b, const Square start_sq) {
+void ortho(const Board & b, const Square start_sq, Bitmap & bmap) {
     
-    line_search(b, start_sq, inc_x, val_x);
-    line_search(b, start_sq, dec_x, val_x);
-    line_search(b, start_sq, inc_y, val_y);
-    line_search(b, start_sq, dec_y, val_y);
-    // cout << "\n";
-    
-}
-
-void diag(const Board & b, const Square start_sq) {
-    
-    line_search(b, start_sq, diag_ur, val);
-    line_search(b, start_sq, diag_dl, val);
-    line_search(b, start_sq, diag_dr, val);
-    line_search(b, start_sq, diag_ul, val);
-    // cout << "\n";
+    line_search(b, start_sq, bmap, inc_x, val_x);
+    line_search(b, start_sq, bmap, dec_x, val_x);
+    line_search(b, start_sq, bmap, inc_y, val_y);
+    line_search(b, start_sq, bmap, dec_y, val_y);
     
 }
 
-void piecemoves(Board & b, Square s) {
+void diag(const Board & b, const Square start_sq, Bitmap & bmap) {
+    
+    line_search(b, start_sq, bmap, diag_ur, val);
+    line_search(b, start_sq, bmap, diag_dl, val);
+    line_search(b, start_sq, bmap, diag_dr, val);
+    line_search(b, start_sq, bmap, diag_ul, val);
+    
+}
+
+void piecemoves(const Board & b, const Square s, Bitmap & bmap) {
 
     Piece p = b.get(s);
 
     switch (type(p)) {
         
         case ROOK: 
-            ortho(b, s);
+            ortho(b, s, bmap);
             break;
             
         case BISHOP: 
-            diag(b, s);
+            diag(b, s, bmap);
             break;
             
         case QUEEN: 
-            ortho(b, s);
-            diag(b, s);
+            ortho(b, s, bmap);
+            diag(b, s, bmap);
             break;
             
         default: 
