@@ -37,14 +37,27 @@
  * 
  */
 
-typedef uint64_t Bitmap;
-
 // Calculated by hand
 static const Bitmap col_1 = 72340172838076673L;      // a file
 static const Bitmap row_1 = 255L;                  // first rank
 
 static const Bitmap diag_nxy = 72624976668147840L;    // a8 to h1
 static const Bitmap diag_xy = -9205322385119247871L;  // a1 to h8
+
+void set_square(Bitmap & bmap, const Square sq) {
+    uint64_t mask = ( (uint64_t) 1) << get_x(sq) << (get_y(sq)*8);
+    bmap |= mask;
+}
+
+void unset_square(Bitmap & bmap, const Square sq) {
+    uint64_t mask = ( (uint64_t) 1) << get_x(sq) << (get_y(sq)*8);
+    bmap &= ~mask;
+}
+
+bool test_square(const Bitmap & bmap, const Square sq) {
+    uint64_t mask = ( (uint64_t) 1) << get_x(sq) << (get_y(sq)*8);
+    return bmap & mask;
+}
 
 // Generates a bitmap with only one square
 Bitmap square_map(Square sq) {
