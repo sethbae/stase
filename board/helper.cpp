@@ -12,7 +12,7 @@ const unsigned LO3 = 7;
 const unsigned HI3 = 112;
 
 const Byte SHIFT_X = 1;
-const Byte SHIFT_Y = 16;
+const Byte SHIFT_Y = 8;
 const Byte SHIFT_POSDIAG = SHIFT_X + SHIFT_Y;
 const Byte SHIFT_NEGDIAG = SHIFT_X - SHIFT_Y;
 

@@ -215,6 +215,73 @@ bool is_unobstructed(Move m, Bitmap vacancy) {
 
 }
 
+Bitmap get_obstructed_move_map(const Board & b, Square pos) {
+    Bitmap vacancy = vacancy_map(b);
+    Bitmap move_pattern = pattern_map(pos, b.get(pos));
+    Bitmap obstructive_pieces = move_pattern & ~vacancy & ~square_map(pos);
+
+    Bitmap column = column_map(get_x(pos));
+    Bitmap row = row_map(get_y(pos));
+    Bitmap xy = posdiag_map(pos);
+    Bitmap nxy = negdiag_map(pos);
+
+    Bitmap column_pieces = move_pattern & column & obstructive_pieces;
+    Bitmap row_pieces =  move_pattern & row & obstructive_pieces;
+    Bitmap xy_pieces =  move_pattern & xy & obstructive_pieces;
+    Bitmap nxy_pieces =  move_pattern & nxy & obstructive_pieces;
+    
+    if (column_pieces) {
+        for (int i = 1; i + get_y(pos) < 8; ++i) {
+            if ((row << (i * 8)) & column_pieces) {
+                move_pattern &= ~(column << ((i + get_y(pos)) * 8));
+                break;
+            }
+        }
+        
+        for (int i = 1; get_y(pos) - i >= 0; ++i) {
+            if ((row >> (i * 8)) & column_pieces) {
+                move_pattern &= ~(column >> ((i + (7 - get_y(pos))) * 8));
+                break;
+            }
+        }
+    }
+
+    if (row_pieces) {
+        for (int i = 1; i + get_x(pos) < 8; ++i) {
+            if ((row << i) & row_pieces) {
+                move_pattern &= ~(row << (i + get_x(pos)));
+                break;
+            }
+        }
+        
+        for (int i = 1; get_x(pos) - i >= 0; ++i) {
+            if ((row >> i) & row_pieces) {
+                move_pattern &= ~(row >> (i + (7 - get_x(pos))));
+                break;
+            }
+        }
+    }
+
+    if (xy_pieces) {
+        for (int i = 1; i + get_x(pos) < 8 || i + get_y(pos) < 8; ++i) {
+            if ((xy << (i * 9)) & xy_pieces) {
+                move_pattern &= ~(xy << ((i + get_x(pos)) * 9));
+                break;
+            }
+        }
+        
+        for (int i = 1; get_x(pos) - i >= 0 || get_y(pos) - i >= 0; ++i) {
+            if ((xy >> (i * 9)) & xy_pieces) {
+                move_pattern &= ~(xy >> ((i + (7 - get_x(pos))) * 9));
+                break;
+            }
+        }
+
+    }
+
+    return move_pattern;
+}
+
 bool is_legal_example(Move m, const Board & b) {
     Bitmap move_pattern = pattern_map(m.from, b.get(m.from));
     // pr_mask(move_pattern);

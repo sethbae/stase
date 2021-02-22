@@ -51,6 +51,22 @@ Bitmap square_map(Square sq) {
     return ((Bitmap) 1) << get_x(sq) << (get_y(sq) * 8);
 }
 
+// Generates a square from a bitmap with only one square
+// If a map has more than one square set, the top-most then left-most square will be returned
+Square map_to_sq(Bitmap b) {
+    int y = 0;
+    for (; b > 255; b >>= 8) {
+        ++y;
+    }
+
+    int x = 0;
+    for (; b > 1; b >>= 1) {
+        ++x;
+    }
+
+    return mksq(x, y);
+}
+
 // These four functions generate a mask in any of the four
 // orientations of a straight line on the board. Namely, row, 
 // column, positive diagonal, and negative diagonal
