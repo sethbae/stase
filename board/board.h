@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include <string>
+#include <vector>
 
 typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
@@ -69,6 +70,7 @@ struct Board {
     bool get_white() const;
     void set_white(bool);
     void flip_white();
+    Ptype colour_to_move() const;
     
     /* castling rights */
     bool get_cas_ws() const;
@@ -134,6 +136,7 @@ Board starting_pos();
 
 // other functions still in move
 void piecemoves(const Board &, const Square, Bitmap &);
+void get_all_legal_moves(const Board &, std::vector<std::string> &);
 
 Square mksq(const int, const int);
 

@@ -161,6 +161,9 @@ void Board::set_white(bool b) {
         conf &= ~WHITE_MASK;
 }
 void Board::flip_white() { conf ^= WHITE_MASK; }
+Ptype Board::colour_to_move() const {
+    return (conf & WHITE_MASK) ? WHITE : BLACK;
+}
 
 /* get/set castling rights individually */
 bool Board::get_cas_ws() const { return conf & CAS_WS_MASK; }    
