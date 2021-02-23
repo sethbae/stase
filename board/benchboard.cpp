@@ -123,8 +123,9 @@ void legal_move_test() {
     auto boards = new Board[k];
     
     for (int i = 0; i < k; ++i) {
-        // boards[i] = starting_pos();
-        boards[i] = fen_to_board("8/8/8/3Q4/8/8/8/8 w - - 0 1");
+        //boards[i] = starting_pos();
+        //boards[i] = fen_to_board("8/8/8/3Q4/8/8/8/8 w - - 0 1");
+        boards[i] = fen_to_board("r1b1k2r/p1pq2p1/1pn1p1p1/3pP2p/3P4/B1P2Q2/P1P2RPP/R5K1 b kq - 1 15");
     }
     
     /* start benchmark and read from boards */
@@ -139,6 +140,59 @@ void legal_move_test() {
         get_all_legal_moves(b, moves);
         x += moves.size();
         moves.clear();
+    }
+
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Legal move test:\n";
+    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\tMoves found: " << (x / k) << "\n";
+    cout << "\n";
+    
+    delete [] boards;
+}
+
+void legal_move_test2() {
+        
+    int k = 100000;
+
+    auto boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        //boards[i] = starting_pos();
+        //boards[i] = fen_to_board("8/8/8/3Q4/8/8/8/8 w - - 0 1");
+        boards[i] = fen_to_board("r1b1k2r/p1pq2p1/1pn1p1p1/3pP2p/3P4/B1P2Q2/P1P2RPP/R5K1 b kq - 1 15");
+    }
+    
+    /* start benchmark and read from boards */
+
+    vector<string> moves;
+
+    auto start = high_resolution_clock::now();
+
+    int x = 0;
+    for (int j = 0; j < k; ++j) {
+        
+        Board b = boards[j];
+        Bitmap bmap = (Bitmap) 0;
+        
+        for (int i = 0; i < 8; ++ i) {
+            for (int j = 0; j < 8; ++j) {
+                Piece p = b.get(mksq(i, j));
+                if (colour(p) == b.colour_to_move()) {
+                    piecemoves(b, mksq(i, j), bmap);
+                    x += (unsigned) bmap;
+                }
+            }
+        }
+        
     }
 
     /* end benchmark and return */
@@ -367,5 +421,6 @@ int main(void) {
     // write_parsed_config_test();
 
     legal_move_test();
+    legal_move_test2();
     
 }

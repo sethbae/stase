@@ -5,6 +5,9 @@
 #include <vector>
 using std::string;
 
+#include <iostream>
+using std::cout;
+
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
 /* 
@@ -84,14 +87,15 @@ void line_search(const Board & b, const Square s, Bitmap & bmap,
     step(temp);
     
     while (valid(temp) && cont) {
+        //cout << sqtos(temp);
         Piece otherp = b.get(temp);
         if (type(otherp) == EMPTY) {
-            // cout << sqtos(temp) << " ";
+            //cout << "e ";
             set_square(bmap, temp);
         } else {
             cont = false;
             if (colour(otherp) != colour(p)) {
-                // cout << sqtos(temp) << "x ";
+                //cout << sqtos(temp) << "x ";
                 set_square(bmap, temp);
             }
         }
@@ -117,6 +121,100 @@ void diag(const Board & b, const Square start_sq, Bitmap & bmap) {
     
 }
 
+void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
+
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype knightcol = colour(b.get(s));
+    Square sq;
+    
+    if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 1, y - 2)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 2, y + 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 2, y - 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 1, y + 2)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 1, y - 2)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 2, y + 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+
+}
+
+void king_moves(const Board & b, const Square s, Bitmap & bmap) {
+    
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype knightcol = colour(b.get(s));
+    Square sq;
+    
+    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != knightcol)
+        set_square(bmap, sq);
+    
+}
+
+void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
+    
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype pawncolour = colour(b.get(s));
+    Square sq;
+    
+    unsigned FORWARD;
+    unsigned START_RANK;
+    Ptype capture_colour;
+    
+    if (pawncolour == WHITE) {
+        FORWARD = 1;
+        START_RANK = 1;
+        capture_colour = BLACK;
+    } else {
+        FORWARD = -1;
+        START_RANK = 6;
+        capture_colour = WHITE;
+    }
+    
+    // forward moves
+    if (val(sq = mksq(x, y + FORWARD)) && b.get(sq) == EMPTY) {
+        set_square(bmap, sq);
+        if (y == START_RANK && b.get(sq = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
+            set_square(bmap, sq);
+        }
+    }
+    
+    // regular captures
+    if (val(sq = mksq(x - 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour)
+        set_square(bmap, sq);
+    if (val(sq = mksq(x + 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour)
+        set_square(bmap, sq);
+    
+    // en-passant capture
+    if (b.get_ep_exists() && y == START_RANK + 3*FORWARD) {
+        unsigned epfile = b.get_ep_file();
+        if (epfile == x + 1 || epfile == x - 1) {
+            set_square(bmap, b.get_ep_sq());
+        }
+    }
+    
+}
+
 void piecemoves(const Board & b, const Square s, Bitmap & bmap) {
 
     Piece p = b.get(s);
@@ -134,6 +232,18 @@ void piecemoves(const Board & b, const Square s, Bitmap & bmap) {
         case QUEEN: 
             ortho(b, s, bmap);
             diag(b, s, bmap);
+            break;
+            
+        case KNIGHT:
+            knight_moves(b, s, bmap);
+            break;
+            
+        case KING:
+            king_moves(b, s, bmap);
+            break;
+            
+        case PAWN:
+            pawn_moves(b, s, bmap);
             break;
             
         default: 
@@ -290,10 +400,10 @@ void get_legal_moves_from_pos(const Board & b, Square sq, std::vector<string> & 
     }
 }
 
-void get_all_legal_moves(const Board & b, Ptype turn, std::vector<string> & all_moves) {
+void get_all_legal_moves(const Board & b, std::vector<string> & all_moves) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if (colour(b.get(mksq(i, j))) == turn) {
+            if (colour(b.get(mksq(i, j))) == b.colour_to_move()) {
                 get_legal_moves_from_pos(b, mksq(i, j), all_moves);
             }
         }
