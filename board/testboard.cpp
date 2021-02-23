@@ -23,7 +23,7 @@ void piece_types() {
     vector<Ptype> correct_colours = {BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
                                      WHITE, WHITE, WHITE, WHITE, WHITE, WHITE};
 
-    for (int i = 0; i < pieces.size(); ++i) {
+    for (unsigned i = 0; i < pieces.size(); ++i) {
         Piece p = pieces[i];
         
         if (type(p) == correct_types[i]) {
