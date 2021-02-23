@@ -254,8 +254,11 @@ void square_navigation(bool print) {
 }
 
 int main(void) {
-    piece_types();
-    setget_square();
-    square_navigation(false);
+    // piece_types();
+    // setget_square();
+    // square_navigation(false);
+    Board b = starting_pos();
+    b.set(mksq(4, 3), W_QUEEN);
+    pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
     return 0;
 }

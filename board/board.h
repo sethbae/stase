@@ -189,4 +189,7 @@ Bitmap pattern_map(Square, Piece);
 Bitmap vacancy_map(const Board &);
 Bitmap custom_map(const Board &, bool include(Square, Piece));
 
+// Experimental
+Bitmap get_obstructed_move_map(const Board &, Square);
+
 #endif
