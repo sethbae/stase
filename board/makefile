@@ -1,2 +1,26 @@
-test: board.cpp bitmap.cpp board.h helper.cpp move.cpp print.cpp testboard.cpp
-	g++ -std=c++11 -Wall -o test testboard.cpp board.cpp bitmap.cpp board.h helper.cpp move.cpp print.cpp
+FLAGS: -Wall -Wextra -Werror
+OPT: -O
+SUPEROPT: -Ofast
+
+DEPS = board.h
+OBJ = board.o move.o square.o helper.o bitmap.o
+
+%.o: %.cpp $(DEPS)
+	g++ -c -o $@ $< $(FLAGS)
+	
+scratch: $(OBJ) scratch.o
+	g++ -o $@ $^ $(FLAGS)
+
+test: $(OBJ) testboard.o
+	g++ -o $@ $^ $(FLAGS)
+	
+bench: $(OBJ) benchboard.o
+	g++ -o $@ $^ $(FLAGS)
+
+bench_opt: $(OBJ) benchboard.o
+	g++ -o $@ $^ $(FLAGS) $(OPT)
+	
+.PHONY: clean
+
+clean:
+	rm -f *.o
