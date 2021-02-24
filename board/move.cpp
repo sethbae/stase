@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+using std::vector;
 using std::string;
 
 #include <iostream>
@@ -76,9 +77,11 @@ void make_move(Board & b, Move m) {
 
 }
 
-void line_search(const Board & b, const Square s, Bitmap & bmap,
+Bitmap line_search(const Board & b, const Square s,
                     void step(Square &), 
                     bool valid(const Square &)) {
+    
+    Bitmap bmap = (Bitmap) 0;
     
     Piece p = b.get(s);
     Square temp = s;
@@ -101,27 +104,31 @@ void line_search(const Board & b, const Square s, Bitmap & bmap,
         }
         step(temp);
     }
+    
+    return bmap;
 }
 
-void ortho(const Board & b, const Square start_sq, Bitmap & bmap) {
+Bitmap ortho(const Board & b, const Square start_sq) {
     
-    line_search(b, start_sq, bmap, inc_x, val_x);
-    line_search(b, start_sq, bmap, dec_x, val_x);
-    line_search(b, start_sq, bmap, inc_y, val_y);
-    line_search(b, start_sq, bmap, dec_y, val_y);
-    
-}
-
-void diag(const Board & b, const Square start_sq, Bitmap & bmap) {
-    
-    line_search(b, start_sq, bmap, diag_ur, val);
-    line_search(b, start_sq, bmap, diag_dl, val);
-    line_search(b, start_sq, bmap, diag_dr, val);
-    line_search(b, start_sq, bmap, diag_ul, val);
+    return line_search(b, start_sq, inc_x, val_x) 
+            | line_search(b, start_sq, dec_x, val_x)
+            | line_search(b, start_sq, inc_y, val_y)
+            | line_search(b, start_sq, dec_y, val_y);
     
 }
 
-void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap diag(const Board & b, const Square start_sq) {
+    
+    return line_search(b, start_sq, diag_ur, val)
+            | line_search(b, start_sq, diag_dl, val)
+            | line_search(b, start_sq, diag_dr, val)
+            | line_search(b, start_sq, diag_ul, val);
+    
+}
+
+Bitmap knight_moves(const Board & b, const Square s) {
+
+    Bitmap bmap;
 
     unsigned x = get_x(s), y = get_y(s);
     Ptype knightcol = colour(b.get(s));
@@ -144,9 +151,13 @@ void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
     if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol)
         set_square(bmap, sq);
 
+    return bmap;
+
 }
 
-void king_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap king_moves(const Board & b, const Square s) {
+    
+    Bitmap bmap;
     
     unsigned x = get_x(s), y = get_y(s);
     Ptype kingcol = colour(b.get(s));
@@ -169,9 +180,13 @@ void king_moves(const Board & b, const Square s, Bitmap & bmap) {
     if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
     
+    return bmap;
+    
 }
 
-void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap pawn_moves(const Board & b, const Square s) {
+    
+    Bitmap bmap;
     
     unsigned x = get_x(s), y = get_y(s);
     Ptype pawncolour = colour(b.get(s));
@@ -213,232 +228,64 @@ void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
         }
     }
     
+    return bmap;
+    
 }
 
-void piecemoves2(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
 
     Piece p = b.get(s);
 
     switch (type(p)) {
         
         case ROOK: 
-            ortho(b, s, bmap);
-            break;
+            return ortho(b, s);
             
         case BISHOP: 
-            diag(b, s, bmap);
-            break;
+            return diag(b, s);
             
         case QUEEN: 
-            ortho(b, s, bmap);
-            diag(b, s, bmap);
-            break;
+            return ortho(b, s) | diag(b, s);
             
         case KNIGHT:
-            knight_moves(b, s, bmap);
-            break;
+            return knight_moves(b, s);
             
         case KING:
-            king_moves(b, s, bmap);
-            break;
+            return king_moves(b, s);
             
         case PAWN:
-            pawn_moves(b, s, bmap);
-            break;
+            return pawn_moves(b, s);
             
         default: 
-            return;
+            return (Bitmap) 0;
     }
 
 }
 
-
-// Produces undefined behaviour if the move is not a sliding move
-bool is_unobstructed(Move m, Bitmap vacancy) {
-    int xs = get_x(m.from), ys = get_y(m.from), xe = get_x(m.to), ye = get_y(m.to);
-
-    uint64_t v_range, h_range;          // To account for pieces going backwards...
-
-    if (xs > xe) {
-        h_range = columns_map(xe, xs);
-    } else {
-        h_range = columns_map(xs, xe);
-    }
-
-    if (ys > ye) {
-        v_range = rows_map(ye, ys);
-    } else {
-        v_range = rows_map(ys, ye);
-    }
-
-    // The box contains only the squares within the smallest square containing both the start and end square
-    uint64_t box = v_range & h_range;
-
-    // pr_mask(box);
-
-    // pos is the representation of both the start and end squares only
-    uint64_t pos = square_map(m.from) | square_map(m.to);
-
-    // The only straight line connecting both squares (needs optimisation imo)
-    uint64_t line;
-    int diffx = xe - xs;
-    int diffy = ye - ys;
-    if (diffx == 0) {               // if it's vertical
-        line = column_map(xe);
-    } else if (diffy == 0) {        // if it's horizontal
-        line = row_map(ye);
-    } else if (diffy == diffx) {    // if it's a positive diagonal
-        line = posdiag_map(m.from);
-    } else {                        // if it's a negative diagonal
-        line = negdiag_map(m.to);
-    }
+void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec) {
     
-    uint64_t path = box & line & ~pos;
-    // pr_mask(box);
-
-    // The path between a sqaure and another would be unobstructed only if there is no occupied square in between them
-    return (path & vacancy) == path;
-
-}
-
-Bitmap get_obstructed_move_map(const Board & b, Square pos) {
-    Bitmap vacancy = vacancy_map(b);
-    Bitmap move_pattern = pattern_map(pos, b.get(pos));
-    Bitmap obstructive_pieces = move_pattern & ~vacancy & ~square_map(pos);
-
-    Bitmap column = column_map(get_x(pos));
-    Bitmap row = row_map(get_y(pos));
-    Bitmap xy = posdiag_map(pos);
-    Bitmap nxy = negdiag_map(pos);
-
-    Bitmap column_pieces = move_pattern & column & obstructive_pieces;
-    Bitmap row_pieces =  move_pattern & row & obstructive_pieces;
-    Bitmap xy_pieces =  move_pattern & xy & obstructive_pieces;
-    Bitmap nxy_pieces =  move_pattern & nxy & obstructive_pieces;
+    Bitmap bmap = piecemoves_ignore_check(b, s);
+    Square newsq;
     
-    if (column_pieces) {
-        for (int i = 1; i + get_y(pos) < 8; ++i) {
-            if ((row << (i * 8)) & column_pieces) {
-                move_pattern &= ~(column << ((i + get_y(pos)) * 8));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_y(pos) - i >= 0; ++i) {
-            if ((row >> (i * 8)) & column_pieces) {
-                move_pattern &= ~(column >> ((i + (7 - get_y(pos))) * 8));
-                break;
-            }
-        }
-    }
-
-    if (row_pieces) {
-        for (int i = 1; i + get_x(pos) < 8; ++i) {
-            if ((row << i) & row_pieces) {
-                move_pattern &= ~(row << (i + get_x(pos)));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_x(pos) - i >= 0; ++i) {
-            if ((row >> i) & row_pieces) {
-                move_pattern &= ~(row >> (i + (7 - get_x(pos))));
-                break;
-            }
-        }
-    }
-
-    if (xy_pieces) {
-        for (int i = 1; i + get_x(pos) < 8 || i + get_y(pos) < 8; ++i) {
-            if ((xy << (i * 9)) & xy_pieces) {
-                move_pattern &= ~(xy << ((i + get_x(pos)) * 9));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_x(pos) - i >= 0 || get_y(pos) - i >= 0; ++i) {
-            if ((xy >> (i * 9)) & xy_pieces) {
-                move_pattern &= ~(xy >> ((i + (7 - get_x(pos))) * 9));
-                break;
-            }
-        }
-
-    }
-
-    return move_pattern;
-}
-
-bool is_legal_example(Move m, const Board & b) {
-    Bitmap move_pattern = pattern_map(m.from, b.get(m.from));
-    // pr_mask(move_pattern);
-    if ((move_pattern & ~square_map(m.from) & square_map(m.to)) == 0) {
-        return false;
-    }
-
-    if (b.get(m.to) != EMPTY && colour(b.get(m.to)) == colour(b.get(m.from))) {
-        return false;
-    }
-
-    Ptype p = type(b.get(m.from));
-    if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, vacancy_map(b))) {
-        return false;
-    }
-
-    // Other legality tests...
-
-    return true;
-}
-
-void get_legal_moves_from_pos(const Board & b, Square sq, std::vector<string> & moves) {
-    string piece = ptos_alg(b.get(sq));
-    for (int i = 0; i < 8; ++i) {
+    for(int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            if (is_legal_example({sq, mksq(i, j), 0}, b)) {
-                moves.push_back(piece + sqtos(mksq(i, j)));
+            newsq = mksq(i, j);
+            if (test_square(bmap, newsq)) {
+                Move m;
+                m.from = s;
+                m.to = newsq;
+                vec.push_back(m);
             }
         }
     }
-}
-
-void get_all_legal_moves(const Board & b, std::vector<string> & all_moves) {
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if (colour(b.get(mksq(i, j))) == b.colour_to_move()) {
-                get_legal_moves_from_pos(b, mksq(i, j), all_moves);
-            }
-        }
-    }
-}
-
-/* int main(void) {
-    Board b = fen_to_board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
-    std::vector<string> all_moves;
-    get_all_legal_moves(b, WHITE, all_moves);
-    pr(b);
-    cout << "\n\"Legal\" moves: \n";
-    int counter = 0;
-    for (string s : all_moves) {
-        cout << s << " ";
-        if (++counter % 16 == 0) {
-            cout << "\n";
-        }
-    }
-} */
-
-
-/* int main(void) {
     
-    Board b = fen_to_board("8/8/8/8/8/2Q5/8/8 w - - 0 1");
-    Square s = stosq("c3");
-    pr(b);
-    piecemoves(b, s);
+}
 
-} */
+Bitmap piecemoves(const Board & b, const Square) {
+    return (Bitmap) 0;
+}
 
-/* int main(void) {
-    Board b = starting_pos();
-    Bitmap map = gen_bitmap(b, [] (Square sq, Piece p) {
-        return (get_x(sq) + get_y(sq))% 2 == 0;
-    });
-    pr_mask(map);
-} */
+void piecemoves(const Board & b, const Square, vector<Move> & vec) {
+
+}
+

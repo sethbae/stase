@@ -161,7 +161,7 @@ void legal_move_test() {
 
 void legal_move_test2() {
         
-    int k = 100000;
+    int k = 1000000;
 
     auto boards = new Board[k];
     
@@ -187,8 +187,7 @@ void legal_move_test2() {
             for (int j = 0; j < 8; ++j) {
                 Piece p = b.get(mksq(i, j));
                 if (colour(p) == b.colour_to_move()) {
-                    piecemoves(b, mksq(i, j), bmap);
-                    x += (unsigned) bmap;
+                    x += (unsigned) piecemoves(b, mksq(i, j));
                 }
             }
         }
@@ -420,7 +419,7 @@ int main(void) {
     // read_config_test();
     // write_parsed_config_test();
 
-    legal_move_test();
+    //legal_move_test();
     legal_move_test2();
     
 }

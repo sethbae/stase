@@ -124,7 +124,6 @@ struct Move {
     Piece get_cap_piece() const;
     void set_cap_piece(Piece p);
 
-
 };
 
 /* helper functions for board and move */
@@ -135,12 +134,13 @@ Board empty_board();
 Board starting_pos();
 
 // other functions still in move
+Bitmap piecemoves(const Board &, const Square);
 void piecemoves(const Board &, const Square, std::vector<Move> &);
-void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
-void legal_moves(const Board &, std::vector<Move> &);
 
-void piecemoves2(const Board &, const Square, std::vector<Move> &);
-void piecemoves_ignore_check2(const Board &, const Square, std::vector<Move> &);
+Bitmap piecemoves_ignore_check(const Board &, const Square);
+void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
+
+void legal_moves(const Board &, std::vector<Move> &);
 void legal_moves2(const Board &, std::vector<Move> &);
 
 Square mksq(const int, const int);
