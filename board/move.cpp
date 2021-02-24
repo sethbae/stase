@@ -149,24 +149,24 @@ void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
 void king_moves(const Board & b, const Square s, Bitmap & bmap) {
     
     unsigned x = get_x(s), y = get_y(s);
-    Ptype knightcol = colour(b.get(s));
+    Ptype kingcol = colour(b.get(s));
     Square sq;
     
-    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
     
 }
@@ -215,7 +215,7 @@ void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
     
 }
 
-void piecemoves(const Board & b, const Square s, Bitmap & bmap) {
+void piecemoves2(const Board & b, const Square s, Bitmap & bmap) {
 
     Piece p = b.get(s);
 
