@@ -4,6 +4,8 @@
 using std::cout;
 #include <vector>
 using std::vector;
+#include <string>
+using std::string;
 #include <cstdlib>
 using std::rand;
 
@@ -253,12 +255,68 @@ void square_navigation(bool print) {
     }
 }
 
+void test_in_check() {
+
+    vector<string> test_fens = {"3k4/8/8/8/8/8/4p3/3K4 w K - 0 1",  // pawn checking
+                                "3k4/2P5/8/8/8/8/8/3K4 b K - 0 1",
+                                "3k4/3P4/8/8/8/8/3p4/3K4 w - - 0 1", // pawn not checking
+                                "3k4/3P4/8/8/8/8/3p4/3K4 b - - 0 1",
+                                "3k4/8/8/8/8/5b2/8/3K4 w K - 0 1",  // bishop checking
+                                "7k/8/5B2/8/8/8/8/3K4 b K - 0 1",
+                                "1k6/8/8/8/8/5b2/4b3/6K1 w - - 0 1", // bishop not checking
+                                "1k6/3B4/2B5/8/8/8/8/6K1 b - - 0 1",
+                                "1k6/8/4n3/8/3K4/8/8/8 w K - 0 1",  // knight checking
+                                "1k6/8/2N5/8/3K4/8/8/8 b K - 0 1",
+                                "1k6/8/3n4/8/3Kn3/8/3n4/8 w - - 0 1", // knight not checking
+                                "1k6/2N5/1N6/3N4/3K4/8/8/8 b - - 0 1",
+                                "1k1r4/8/8/8/3K4/8/8/8 w K - 0 1",  // rook checking
+                                "1k1R4/8/8/8/3K4/8/8/8 b K - 0 1",
+                                "1kr1r3/8/8/8/3K4/7r/8/8 w - - 0 1", // rook not checking
+                                "1k6/2RR4/8/8/3K4/8/8/7R b - - 0 1",
+                                "1k6/8/5q2/8/3K4/8/8/8 w K - 0 1",  // queen checking
+                                "1k6/8/3Q4/8/3K4/8/8/8 b K - 0 1",
+                                "1k4q1/8/2q5/5q2/3K4/1q6/8/8 w - - 0 1", // queen not checking
+                                "1k6/3Q4/Q7/3Q4/3K4/8/2Q5/2Q5 b - - 0 1",
+                                "1k6/8/8/8/2n5/q2r4/2B5/1KR5 w - - 0 1", // medley no check
+                                "1k6/2rQN3/B1QB4/1P6/2n5/q2r4/RP6/1K6 b - - 0 1",
+                                "1k6/2rQN3/B1QB4/1P6/2n5/q2r4/RP6/1K5q w K - 0 1", //medley check
+                                "1k6/P1rQN3/B1QB4/1P6/2n5/q2r4/RP6/1K5q w K - 0 1"
+                                };
+
+    int succ = 0, fail = 0;
+
+    for (string fen : test_fens) {
+        
+        Board b = fen_to_board(fen);
+        
+        bool check = in_check(b);
+        
+        if (check != b.get_cas_ws()) {
+            cout << "TEST FAILED:\n";
+            pr_board(b);
+            cout << "In check returned: " << (check ? "true\n" : "false\n");
+            ++fail;
+        } else {
+            ++succ;
+        }   
+        
+    }
+    
+    cout << "IN CHECK: Passed " << succ << "/" << test_fens.size() << " tests\n";
+    if (fail) {
+        cout << "IN CHECK: " << fail << " TESTS FAILED\n";
+    }
+
+}
+
 int main(void) {
-    // piece_types();
-    // setget_square();
-    // square_navigation(false);
-    Board b = starting_pos();
-    b.set(mksq(4, 3), W_QUEEN);
-    pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
+    piece_types();
+    setget_square();
+    square_navigation(false);
+    test_in_check();
+    
+    //Board b = starting_pos();
+    //b.set(mksq(4, 3), W_QUEEN);
+    //pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
     return 0;
 }

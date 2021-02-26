@@ -143,6 +143,8 @@ void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 void legal_moves(const Board &, std::vector<Move> &);
 void legal_moves2(const Board &, std::vector<Move> &);
 
+bool in_check(const Board &);
+
 Square mksq(const int, const int);
 
 /* helper functions for transforming a square */

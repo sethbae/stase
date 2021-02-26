@@ -9,6 +9,8 @@ using std::string;
 #include <iostream>
 using std::cout;
 
+
+
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
 /* 
@@ -79,7 +81,7 @@ void make_move(Board & b, Move m) {
 
 Bitmap line_search(const Board & b, const Square s,
                     void step(Square &), 
-                    bool valid(const Square &)) {
+                    bool (* valid)(const Square &)) {
     
     Bitmap bmap = (Bitmap) 0;
     
@@ -89,7 +91,7 @@ Bitmap line_search(const Board & b, const Square s,
     
     step(temp);
     
-    while (valid(temp) && cont) {
+    while ((*valid)(temp) && cont) {
         //cout << sqtos(temp);
         Piece otherp = b.get(temp);
         if (type(otherp) == EMPTY) {
@@ -287,5 +289,123 @@ Bitmap piecemoves(const Board & b, const Square) {
 
 void piecemoves(const Board & b, const Square, vector<Move> & vec) {
 
+}
+
+bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p2,
+                        void step(Square &),
+                        bool valid(const Square &)) {
+                                
+    step(sq);
+    
+    while (valid(sq)) {
+
+        Piece otherp = b.get(sq);
+        
+        if (type(otherp) != EMPTY) {
+            
+            if (otherp == p1 || otherp == p2) {
+                return true;
+            } else {
+                return false;
+            }
+            
+        }
+        step(sq);
+    }
+    
+    return false;                        
+                        
+}
+
+/* returns true iff the player to move is in check */
+bool in_check(const Board & b) {
+
+    bool white = b.get_white();
+    Piece king = (white ? W_KING : B_KING);
+    Square ksq;
+    unsigned king_x, king_y;
+    
+    // find king square
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (b.get(mksq(i, j)) == king) {
+                ksq = mksq(i, j);
+                king_x = i;
+                king_y = j;
+            }
+        }
+    }
+    
+    // check pawns
+    if (white) {
+        
+        if (king_x > 0 && king_y < 7 && b.get(mksq(king_x - 1, king_y + 1)) == B_PAWN) {
+            return true;
+        }
+        if (king_x < 7 && king_y < 7 && b.get(mksq(king_x + 1, king_y + 1)) == B_PAWN) {
+           return true;
+        }
+        
+    } else {
+        
+        if (king_x > 0 && king_y > 0 && b.get(mksq(king_x - 1, king_y - 1)) == W_PAWN) {
+            return true;
+        }
+        if (king_x < 7 && king_y > 0 && b.get(mksq(king_x + 1, king_y - 1)) == W_PAWN) {
+           return true;
+        }
+    
+    }
+    
+    // check knight
+    Piece enemy_knight = white ? B_KNIGHT : W_KNIGHT;
+    Square sq;
+    if (val(sq = mksq(king_x + 1, king_y + 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 1, king_y - 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 2, king_y + 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 2, king_y - 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y + 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y - 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 2, king_y + 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 2, king_y - 1)) && b.get(sq) == enemy_knight)
+        return true;
+        
+    // search out from king
+    
+    Piece queen, bishop, rook;
+    if (white) {
+        queen = B_QUEEN;
+        rook = B_ROOK;
+        bishop = B_BISHOP;
+    } else {
+        queen = W_QUEEN;
+        rook = W_ROOK;
+        bishop = W_BISHOP;
+    }
+    
+    // diagonal: bishop or queen
+    if (line_search_check(b, ksq, bishop, queen, diag_ur, val)
+         || line_search_check(b, ksq, bishop, queen, diag_dr, val)
+         || line_search_check(b, ksq, bishop, queen, diag_ul, val)
+         || line_search_check(b, ksq, bishop, queen, diag_dl, val)) {
+        return true;    
+    }
+            
+    // orthogonal: rook or queen
+    if (line_search_check(b, ksq, queen, rook, inc_x, val_x)
+         || line_search_check(b, ksq, queen, rook, dec_x, val_x)
+         || line_search_check(b, ksq, queen, rook, inc_y, val_y)
+         || line_search_check(b, ksq, queen, rook, dec_y, val_y)) {
+        return true;
+    }
+    
+    return false;
 }
 
