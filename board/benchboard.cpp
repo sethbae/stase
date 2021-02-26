@@ -461,12 +461,13 @@ void piecemoves_bench(const Piece target_piece, int density) {
         Board b = boards[j];
         Bitmap bmap = (Bitmap) 0;
         
-        for (int x = 0; x < 8; ++x) {
-            for (int y = 0; y < 8; ++y) {
-                Piece p = b.get(mksq(x, y));
+        for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
+            for ( ; val_x(s); inc_x(s)) {
+                Piece p = b.get(s);
                 if (p == target_piece)
-                    sum += (unsigned) piecemoves_ignore_check(b, mksq(x, y));
+                    sum += (unsigned) piecemoves_ignore_check(b, s);
             }
+            reset_x(s);
         }
         
     }
@@ -588,7 +589,69 @@ void legal_moves_puzzles() {
     
 }
 
+void board_iteration_bench(bool use_mksq) {
+
+    int k = 10000000;
+
+    Board *boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i] = random_board(W_PAWN, 5, 5);
+    }
+    
+    auto start = high_resolution_clock::now();
+    
+    int sum = 0;
+    
+    if (use_mksq) {
+
+        for (int j = 0; j < k; ++j) {
+            
+            Board b = boards[j];
+            Bitmap bmap = (Bitmap) 0;
+            
+            for (int x = 0; x < 8; ++x) {
+                for (int y = 0; y < 8; ++y) {
+                    sum += (unsigned) b.get(mksq(x, y));
+                }
+            }
+            
+        }
+    } else {
+
+        for (int j = 0; j < k; ++j) {
+            
+            Board b = boards[j];
+            Bitmap bmap = (Bitmap) 0;
+            
+            for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
+                for ( ; val_x(s); inc_x(s)) {
+                    sum += (unsigned) b.get(s);
+                }
+                reset_x(s);
+            }
+            
+        }
+    }
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+    
+    delete [] boards;
+
+}
+
 /*
+    Passing function by value
     Queen:  2.5862, 2.5595 micros       piecemoves_bench(piece, 5, 5);
     Rook:   1.6306, 1.6089 
     Bishop: 1.3708, 1.3902
@@ -597,6 +660,17 @@ void legal_moves_puzzles() {
     Pawn:   0.6719, 0.6754
     
     Puzzles: 2.1818, 2.1015 micros
+    
+    Passing function by pointer
+    Queen:  2.4390, 2.4452
+    Rook:   1.6444, 1.6386
+    Bishop: 1.3828, 1.3942
+    
+    Passing function by reference
+    Queen:  2.5701, 2.5866
+    Rook:   1.6208, 1.6280
+    Bishop: 1.3542, 1.3613
+    
 */
 
 int main(void) {
@@ -614,9 +688,11 @@ int main(void) {
     //legal_move_test();
     //legal_move_test2();
     
-    //piecemoves_bench(W_PAWN, 5);
+    //piecemoves_bench(W_QUEEN, 5);
     
-    legal_moves_puzzles();
+    board_iteration_bench(true);
+    
+    //legal_moves_puzzles();
     
     //pr_board(random_board(W_QUEEN, 5, 5));
     
