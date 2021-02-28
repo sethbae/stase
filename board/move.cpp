@@ -3,10 +3,13 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+using std::vector;
 using std::string;
 
 #include <iostream>
 using std::cout;
+
+
 
 /* defines a move data type and defines functions to make moves, and return legal moves etc */
 
@@ -76,9 +79,11 @@ void make_move(Board & b, Move m) {
 
 }
 
-void line_search(const Board & b, const Square s, Bitmap & bmap,
+Bitmap line_search(const Board & b, const Square s,
                     void step(Square &), 
-                    bool valid(const Square &)) {
+                    bool (* valid)(const Square &)) {
+    
+    Bitmap bmap = (Bitmap) 0;
     
     Piece p = b.get(s);
     Square temp = s;
@@ -86,7 +91,7 @@ void line_search(const Board & b, const Square s, Bitmap & bmap,
     
     step(temp);
     
-    while (valid(temp) && cont) {
+    while ((*valid)(temp) && cont) {
         //cout << sqtos(temp);
         Piece otherp = b.get(temp);
         if (type(otherp) == EMPTY) {
@@ -101,27 +106,31 @@ void line_search(const Board & b, const Square s, Bitmap & bmap,
         }
         step(temp);
     }
+    
+    return bmap;
 }
 
-void ortho(const Board & b, const Square start_sq, Bitmap & bmap) {
+Bitmap ortho(const Board & b, const Square start_sq) {
     
-    line_search(b, start_sq, bmap, inc_x, val_x);
-    line_search(b, start_sq, bmap, dec_x, val_x);
-    line_search(b, start_sq, bmap, inc_y, val_y);
-    line_search(b, start_sq, bmap, dec_y, val_y);
-    
-}
-
-void diag(const Board & b, const Square start_sq, Bitmap & bmap) {
-    
-    line_search(b, start_sq, bmap, diag_ur, val);
-    line_search(b, start_sq, bmap, diag_dl, val);
-    line_search(b, start_sq, bmap, diag_dr, val);
-    line_search(b, start_sq, bmap, diag_ul, val);
+    return line_search(b, start_sq, inc_x, val_x) 
+            | line_search(b, start_sq, dec_x, val_x)
+            | line_search(b, start_sq, inc_y, val_y)
+            | line_search(b, start_sq, dec_y, val_y);
     
 }
 
-void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap diag(const Board & b, const Square start_sq) {
+    
+    return line_search(b, start_sq, diag_ur, val)
+            | line_search(b, start_sq, diag_dl, val)
+            | line_search(b, start_sq, diag_dr, val)
+            | line_search(b, start_sq, diag_ul, val);
+    
+}
+
+Bitmap knight_moves(const Board & b, const Square s) {
+
+    Bitmap bmap;
 
     unsigned x = get_x(s), y = get_y(s);
     Ptype knightcol = colour(b.get(s));
@@ -144,34 +153,42 @@ void knight_moves(const Board & b, const Square s, Bitmap & bmap) {
     if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol)
         set_square(bmap, sq);
 
+    return bmap;
+
 }
 
-void king_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap king_moves(const Board & b, const Square s) {
+    
+    Bitmap bmap;
     
     unsigned x = get_x(s), y = get_y(s);
-    Ptype knightcol = colour(b.get(s));
+    Ptype kingcol = colour(b.get(s));
     Square sq;
     
-    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
-    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != knightcol)
+    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
+    
+    return bmap;
     
 }
 
-void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap pawn_moves(const Board & b, const Square s) {
+    
+    Bitmap bmap;
     
     unsigned x = get_x(s), y = get_y(s);
     Ptype pawncolour = colour(b.get(s));
@@ -213,134 +230,182 @@ void pawn_moves(const Board & b, const Square s, Bitmap & bmap) {
         }
     }
     
+    return bmap;
+    
 }
 
-void piecemoves(const Board & b, const Square s, Bitmap & bmap) {
+Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
 
     Piece p = b.get(s);
 
     switch (type(p)) {
         
         case ROOK: 
-            ortho(b, s, bmap);
-            break;
+            return ortho(b, s);
             
         case BISHOP: 
-            diag(b, s, bmap);
-            break;
+            return diag(b, s);
             
         case QUEEN: 
-            ortho(b, s, bmap);
-            diag(b, s, bmap);
-            break;
+            return ortho(b, s) | diag(b, s);
             
         case KNIGHT:
-            knight_moves(b, s, bmap);
-            break;
+            return knight_moves(b, s);
             
         case KING:
-            king_moves(b, s, bmap);
-            break;
+            return king_moves(b, s);
             
         case PAWN:
-            pawn_moves(b, s, bmap);
-            break;
+            return pawn_moves(b, s);
             
         default: 
-            return;
+            return (Bitmap) 0;
     }
 
 }
 
-
-// Produces undefined behaviour if the move is not a sliding move
-bool is_unobstructed(Move m, Bitmap vacancy) {
-    int xs = get_x(m.from), ys = get_y(m.from), xe = get_x(m.to), ye = get_y(m.to);
-
-    uint64_t v_range, h_range;          // To account for pieces going backwards...
-
-    if (xs > xe) {
-        h_range = columns_map(xe, xs);
-    } else {
-        h_range = columns_map(xs, xe);
-    }
-
-    if (ys > ye) {
-        v_range = rows_map(ye, ys);
-    } else {
-        v_range = rows_map(ys, ye);
-    }
-
-    // The box contains only the squares within the smallest square containing both the start and end square
-    uint64_t box = v_range & h_range;
-
-    // pos is the representation of both the start and end squares only
-    uint64_t pos = square_map(m.from) | square_map(m.to);
-
-    // The only straight line connecting both squares (needs optimisation imo)
-    uint64_t line;
-    int diffx = xe - xs;
-    int diffy = ye - ys;
-    if (diffx == 0) {               // if it's vertical
-        line = column_map(xe);
-    } else if (diffy == 0) {        // if it's horizontal
-        line = row_map(ye);
-    } else if (diffy == diffx) {    // if it's a positive diagonal
-        line = posdiag_map(m.from);
-    } else {                        // if it's a negative diagonal
-        line = negdiag_map(m.to);
-    }
+void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec) {
     
-    uint64_t path = box & line & ~pos;
-    // pr_mask(box);
-
-    // The path between a sqaure and another would be unobstructed only if there is no occupied square in between them
-    return (path & vacancy) == path;
-
-}
-
-Bitmap attack_map(const Board & b) {
-    // Bitmap movable_pieces = custom_map(b, [] (Square s, Piece p, Ptype c) { return colour(p) == c; });
-    // Bitmap enemy_pieces = custom_map(b, [] (Square s, Piece p, Ptype c) {return colour(p) != c;});
-    Bitmap attack_map = 0;
-    for (int i = 0; i < 8; ++i) {
+    Bitmap bmap = piecemoves_ignore_check(b, s);
+    Square newsq;
+    
+    for(int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Square pos = mksq(i, j);
-            piecemoves(b, pos, attack_map);
-
+            newsq = mksq(i, j);
+            if (test_square(bmap, newsq)) {
+                Move m;
+                m.from = s;
+                m.to = newsq;
+                vec.push_back(m);
+            }
         }
     }
-
-    return attack_map;
+    
 }
 
-bool is_legal_example(Move m, const Board & b, Bitmap movable_pieces, Bitmap enemy_pieces, Bitmap vacancy) {
-    Bitmap move_pattern = pattern_map(m.from, b.get(m.from));
+Bitmap piecemoves(const Board & b, const Square) {
+    return (Bitmap) 0;
+}
 
+void piecemoves(const Board & b, const Square, vector<Move> & vec) {
 
-    // Checks for basic piece movement
-    if ((move_pattern & ~square_map(m.from) & square_map(m.to)) == 0) {
-        return false;
+}
+
+bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p2,
+                        void step(Square &),
+                        bool valid(const Square &)) {
+                                
+    step(sq);
+    
+    while (valid(sq)) {
+
+        Piece otherp = b.get(sq);
+        
+        if (type(otherp) != EMPTY) {
+            
+            if (otherp == p1 || otherp == p2) {
+                return true;
+            } else {
+                return false;
+            }
+            
+        }
+        step(sq);
     }
+    
+    return false;                        
+                        
+}
 
-    // Checks the captures are of the right colour
-    if (b.get(m.to) != EMPTY && colour(b.get(m.to)) == colour(b.get(m.from))) {
-        return false;
+/* returns true iff the player to move is in check */
+bool in_check(const Board & b) {
+
+    bool white = b.get_white();
+    Piece king = (white ? W_KING : B_KING);
+    Square ksq;
+    unsigned king_x, king_y;
+    
+    // find king square
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (b.get(mksq(i, j)) == king) {
+                ksq = mksq(i, j);
+                king_x = i;
+                king_y = j;
+            }
+        }
     }
-
-    // Checks for obstructions
-    Ptype p = type(b.get(m.from));
-    if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, vacancy)) {
-        return false;
+    
+    // check pawns
+    if (white) {
+        
+        if (king_x > 0 && king_y < 7 && b.get(mksq(king_x - 1, king_y + 1)) == B_PAWN) {
+            return true;
+        }
+        if (king_x < 7 && king_y < 7 && b.get(mksq(king_x + 1, king_y + 1)) == B_PAWN) {
+           return true;
+        }
+        
+    } else {
+        
+        if (king_x > 0 && king_y > 0 && b.get(mksq(king_x - 1, king_y - 1)) == W_PAWN) {
+            return true;
+        }
+        if (king_x < 7 && king_y > 0 && b.get(mksq(king_x + 1, king_y - 1)) == W_PAWN) {
+           return true;
+        }
+    
     }
-
-    // Checks if the location the king is moving to is attacked by enemy pieces
-    /* if (p == KING && ((attack_map(b, vacancy, enemy_pieces, movable_pieces) & square_map(m.to)) != 0)) {
-        return false;
-    } */
-
-    // Other legality tests...
-
-    return true;
+    
+    // check knight
+    Piece enemy_knight = white ? B_KNIGHT : W_KNIGHT;
+    Square sq;
+    if (val(sq = mksq(king_x + 1, king_y + 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 1, king_y - 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 2, king_y + 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x + 2, king_y - 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y + 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y - 2)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 2, king_y + 1)) && b.get(sq) == enemy_knight)
+        return true;
+    if (val(sq = mksq(king_x - 2, king_y - 1)) && b.get(sq) == enemy_knight)
+        return true;
+        
+    // search out from king
+    
+    Piece queen, bishop, rook;
+    if (white) {
+        queen = B_QUEEN;
+        rook = B_ROOK;
+        bishop = B_BISHOP;
+    } else {
+        queen = W_QUEEN;
+        rook = W_ROOK;
+        bishop = W_BISHOP;
+    }
+    
+    // diagonal: bishop or queen
+    if (line_search_check(b, ksq, bishop, queen, diag_ur, val)
+         || line_search_check(b, ksq, bishop, queen, diag_dr, val)
+         || line_search_check(b, ksq, bishop, queen, diag_ul, val)
+         || line_search_check(b, ksq, bishop, queen, diag_dl, val)) {
+        return true;    
+    }
+            
+    // orthogonal: rook or queen
+    if (line_search_check(b, ksq, queen, rook, inc_x, val_x)
+         || line_search_check(b, ksq, queen, rook, dec_x, val_x)
+         || line_search_check(b, ksq, queen, rook, inc_y, val_y)
+         || line_search_check(b, ksq, queen, rook, dec_y, val_y)) {
+        return true;
+    }
+    
+    return false;
 }
 

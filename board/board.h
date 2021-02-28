@@ -124,7 +124,6 @@ struct Move {
     Piece get_cap_piece() const;
     void set_cap_piece(Piece p);
 
-
 };
 
 /* helper functions for board and move */
@@ -135,7 +134,16 @@ Board empty_board();
 Board starting_pos();
 
 // other functions still in move
-void piecemoves(const Board &, const Square, Bitmap &);
+Bitmap piecemoves(const Board &, const Square);
+void piecemoves(const Board &, const Square, std::vector<Move> &);
+
+Bitmap piecemoves_ignore_check(const Board &, const Square);
+void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
+
+void legal_moves(const Board &, std::vector<Move> &);
+void legal_moves2(const Board &, std::vector<Move> &);
+
+bool in_check(const Board &);
 
 Square mksq(const int, const int);
 
@@ -180,21 +188,12 @@ void set_square(Bitmap &, const Square);
 void unset_square(Bitmap &, const Square);
 bool test_square(const Bitmap &, const Square);
 
-Bitmap square_map(Square);
-Bitmap column_map(unsigned);
-Bitmap row_map(unsigned);
-Bitmap negdiag_map(Square);
-Bitmap posdiag_map(Square);
-Bitmap columns_map(unsigned from, unsigned to);
-Bitmap rows_map(unsigned from, unsigned to);
 Bitmap pattern_map(Square, Piece);
 Bitmap vacancy_map(const Board &);
-Bitmap bpawn_attack_map(Square);
-Bitmap wpawn_attack_map(Square);
-Bitmap custom_map(const Board &, bool include(Square, Piece, Ptype));
-
-// Experimental
-Bitmap get_obstructed_move_map(const Board &, Square, Bitmap, Bitmap);
+Bitmap occupied_map(const Board &);
+Bitmap friendly_map(const Board &);
+Bitmap enemy_map(const Board &);
 Bitmap attack_map(const Board &);
+Bitmap custom_map(const Board &, bool include(Square, Piece));
 
 #endif

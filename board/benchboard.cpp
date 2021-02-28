@@ -16,6 +16,14 @@ using std::vector;
 #include <string>
 using std::string;
 
+#include <fstream>
+using std::ifstream;
+using std::ios;
+
+#include <ctime>
+using std::time;
+
+
 #include "board.h"
 
 /* This is a short benchmark program to test the read and write speeds of the board representation.
@@ -116,7 +124,7 @@ void read_test() {
     delete [] boards;
 }
 
-void legal_move_test() {
+/*void legal_move_test() {
         
     int k = 100000;
 
@@ -130,7 +138,7 @@ void legal_move_test() {
         boards[i] = b;
     }
     
-    /* start benchmark and read from boards */
+    // start benchmark and read from boards
 
     auto start = high_resolution_clock::now();
 
@@ -151,7 +159,7 @@ void legal_move_test() {
         }
     }
 
-    /* end benchmark and return */
+    // end benchmark and return
     auto stop = high_resolution_clock::now();
     
     auto duration = duration_cast<microseconds>(stop - start);
@@ -166,11 +174,11 @@ void legal_move_test() {
     cout << "\n";
     
     delete [] boards;
-}
+}*/
 
 void legal_move_test2() {
         
-    int k = 100000;
+    int k = 1000000;
 
     auto boards = new Board[k];
     
@@ -196,8 +204,7 @@ void legal_move_test2() {
             for (int j = 0; j < 8; ++j) {
                 Piece p = b.get(mksq(i, j));
                 if (colour(p) == b.colour_to_move()) {
-                    piecemoves(b, mksq(i, j), bmap);
-                    x += (unsigned) bmap;
+                    x += (unsigned) piecemoves(b, mksq(i, j));
                 }
             }
         }
@@ -415,7 +422,265 @@ void read_config_test() {
     cout << "\n";
     
     delete [] boards;
+
 }
+
+/* generates a random board with some number of the desired piece and some number of pawns,
+    all dotted around on any square at all. Warning, they may overwrite each other, so the
+    actual numbers may vary. Pawns won't overwrite the desired piece, however.
+   If you ask for pawns, it will randomly dot a different piece around. */
+Board random_board(const Piece p, int num_of_piece, int num_of_other_pieces) {
+
+    Board b = empty_board();
+    
+    for (int i = 0; i < num_of_other_pieces; ++i) {
+        Square sq = mksq(rand() % 8, rand() % 8);
+        
+        if (type(p) != PAWN) {
+            b.set(sq, (rand() % 2) ? W_PAWN : B_PAWN);
+        } else {
+            b.set(sq, (rand() % 2) ? W_QUEEN : B_QUEEN);
+        }
+    }
+
+    for (int i = 0; i < num_of_piece; ++i) {
+        Square sq = mksq(rand() % 8, rand() % 8);
+        b.set(sq, p);
+    }
+
+    return b;
+
+}
+
+void piecemoves_bench(const Piece target_piece, int density) {
+
+    int k = 10000000;
+
+    Board *boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i] = random_board(target_piece, density, density);
+    }
+    
+    auto start = high_resolution_clock::now();
+
+    int sum = 0;
+    for (int j = 0; j < k; ++j) {
+        
+        Board b = boards[j];
+        Bitmap bmap = (Bitmap) 0;
+        
+        for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
+            for ( ; val_x(s); inc_x(s)) {
+                Piece p = b.get(s);
+                if (p == target_piece)
+                    sum += (unsigned) piecemoves_ignore_check(b, s);
+            }
+            reset_x(s);
+        }
+        
+    }
+
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+    
+    delete [] boards;
+
+}
+
+/******************************************************************
+ * This will read in puzzles from the lichess database, in FEN,
+ * provided that you download and unzip it to the same directory.
+ * It reads puzzles sequentially from a randomly selected offset,
+ * which uses the current time as a seed, so will differ between
+ * executions.
+ * 
+ * Be warned this may make it hard to reproduce bugs/errors if you
+ * do not see or store the FEN somewhere.
+ *
+ * The puzzle database is available here: 
+ *       https://database.lichess.org/#puzzles
+ ******************************************************************/   
+
+/* fill the given vector with [num] randomly selected puzzles 
+    these puzzles will always differ since they are selected using a random seed */
+bool read_fens(unsigned num, vector<string> & vec) {
+       
+    ifstream file;
+    
+    file.open("../puzzles/lichess_db_puzzle.csv", ios::in);
+    if (!file) {
+        cout << "WARNING: could not read puzzle csv\n";
+        return false;
+    }
+    
+    string s;
+    
+    // initialise the seed with current time
+    srand(time(nullptr));
+    
+    // and skip a random number of puzzles (different every time)
+    unsigned x = rand() % 10000;
+    while (x--)
+        getline(file, s);
+    
+    // before reading the required number of puzzles
+    for (; getline(file, s) && num > 0; --num) {
+        
+        // FEN is second field of CSV
+        s = s.substr(s.find_first_of(',') + 1);
+        s = s.substr(0, s.find_first_of(','));
+        vec.push_back(s);
+        
+    } 
+
+    return true;
+
+}
+
+void legal_moves_puzzles() {
+
+    int k = 500000;
+
+    vector<string> fens;
+    
+    read_fens(k, fens);
+    
+    Board *boards = new Board[k];
+    
+    int i = 0;
+    for (string s : fens)
+        boards[i++] = fen_to_board(s);
+    
+    auto start = high_resolution_clock::now();
+    
+    int sum = 0;
+    for (int j = 0; j < k; ++j) {
+        
+        Board b = boards[j];
+        Bitmap bmap = (Bitmap) 0;
+        
+        for (int x = 0; x < 8; ++x) {
+            for (int y = 0; y < 8; ++y) {
+                Piece p = b.get(mksq(x, y));
+                if (colour(p) == b.colour_to_move()) {
+                    sum += (unsigned) piecemoves_ignore_check(b, mksq(x, y));
+                }
+            }
+        }
+        
+    }
+    
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+    
+    delete [] boards;
+    
+}
+
+void board_iteration_bench(bool use_mksq) {
+
+    int k = 10000000;
+
+    Board *boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i] = random_board(W_PAWN, 5, 5);
+    }
+    
+    auto start = high_resolution_clock::now();
+    
+    int sum = 0;
+    
+    if (use_mksq) {
+
+        for (int j = 0; j < k; ++j) {
+            
+            Board b = boards[j];
+            Bitmap bmap = (Bitmap) 0;
+            
+            for (int x = 0; x < 8; ++x) {
+                for (int y = 0; y < 8; ++y) {
+                    sum += (unsigned) b.get(mksq(x, y));
+                }
+            }
+            
+        }
+    } else {
+
+        for (int j = 0; j < k; ++j) {
+            
+            Board b = boards[j];
+            Bitmap bmap = (Bitmap) 0;
+            
+            for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
+                for ( ; val_x(s); inc_x(s)) {
+                    sum += (unsigned) b.get(s);
+                }
+                reset_x(s);
+            }
+            
+        }
+    }
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+    
+    delete [] boards;
+
+}
+
+/*
+    Passing function by value
+    Queen:  2.5862, 2.5595 micros       piecemoves_bench(piece, 5, 5);
+    Rook:   1.6306, 1.6089 
+    Bishop: 1.3708, 1.3902
+    Knight: 0.9504, 0.9442
+    King:   0.9694, 0.9851
+    Pawn:   0.6719, 0.6754
+    
+    Puzzles: 2.1818, 2.1015 micros
+    
+    Passing function by pointer
+    Queen:  2.4390, 2.4452
+    Rook:   1.6444, 1.6386
+    Bishop: 1.3828, 1.3942
+    
+    Passing function by reference
+    Queen:  2.5701, 2.5866
+    Rook:   1.6208, 1.6280
+    Bishop: 1.3542, 1.3613
+    
+*/
 
 int main(void) {
 
@@ -429,9 +694,15 @@ int main(void) {
     // read_config_test();
     // write_parsed_config_test();
 
-    legal_move_test();
-    legal_move_test2();
-
-
+    //legal_move_test();
+    //legal_move_test2();
+    
+    //piecemoves_bench(W_QUEEN, 5);
+    
+    board_iteration_bench(true);
+    
+    //legal_moves_puzzles();
+    
+    //pr_board(random_board(W_QUEEN, 5, 5));
     
 }
