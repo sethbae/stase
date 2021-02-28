@@ -136,7 +136,6 @@ Board starting_pos();
 
 // other functions still in move
 void piecemoves(const Board &, const Square, Bitmap &);
-void get_all_legal_moves(const Board &, std::vector<std::string> &);
 
 Square mksq(const int, const int);
 
@@ -190,9 +189,12 @@ Bitmap columns_map(unsigned from, unsigned to);
 Bitmap rows_map(unsigned from, unsigned to);
 Bitmap pattern_map(Square, Piece);
 Bitmap vacancy_map(const Board &);
-Bitmap custom_map(const Board &, bool include(Square, Piece));
+Bitmap bpawn_attack_map(Square);
+Bitmap wpawn_attack_map(Square);
+Bitmap custom_map(const Board &, bool include(Square, Piece, Ptype));
 
 // Experimental
-Bitmap get_obstructed_move_map(const Board &, Square);
+Bitmap get_obstructed_move_map(const Board &, Square, Bitmap, Bitmap);
+Bitmap attack_map(const Board &);
 
 #endif

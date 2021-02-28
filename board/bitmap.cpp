@@ -248,13 +248,15 @@ Bitmap vacancy_map(const Board & b) {
     return acc;
 }
 
+
+
 // Generates a bitmap according to a provided boolean function
-Bitmap custom_map(const Board & b, bool include(Square, Piece)) {
+Bitmap custom_map(const Board & b, bool include(Square, Piece, Ptype)) {
     Bitmap map = 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Square sq = mksq(i, j);
-            if (include(sq, b.get(sq))) {
+            if (include(sq, b.get(sq), b.colour_to_move())) {
                 map |= square_map(sq);
             }
         }

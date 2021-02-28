@@ -274,8 +274,6 @@ bool is_unobstructed(Move m, Bitmap vacancy) {
     // The box contains only the squares within the smallest square containing both the start and end square
     uint64_t box = v_range & h_range;
 
-    // pr_mask(box);
-
     // pos is the representation of both the start and end squares only
     uint64_t pos = square_map(m.from) | square_map(m.to);
 
@@ -301,144 +299,48 @@ bool is_unobstructed(Move m, Bitmap vacancy) {
 
 }
 
-Bitmap get_obstructed_move_map(const Board & b, Square pos) {
-    Bitmap vacancy = vacancy_map(b);
-    Bitmap move_pattern = pattern_map(pos, b.get(pos));
-    Bitmap obstructive_pieces = move_pattern & ~vacancy & ~square_map(pos);
+Bitmap attack_map(const Board & b) {
+    // Bitmap movable_pieces = custom_map(b, [] (Square s, Piece p, Ptype c) { return colour(p) == c; });
+    // Bitmap enemy_pieces = custom_map(b, [] (Square s, Piece p, Ptype c) {return colour(p) != c;});
+    Bitmap attack_map = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            piecemoves(b, pos, attack_map);
 
-    Bitmap column = column_map(get_x(pos));
-    Bitmap row = row_map(get_y(pos));
-    Bitmap xy = posdiag_map(pos);
-    Bitmap nxy = negdiag_map(pos);
-
-    Bitmap column_pieces = move_pattern & column & obstructive_pieces;
-    Bitmap row_pieces =  move_pattern & row & obstructive_pieces;
-    Bitmap xy_pieces =  move_pattern & xy & obstructive_pieces;
-    Bitmap nxy_pieces =  move_pattern & nxy & obstructive_pieces;
-    
-    if (column_pieces) {
-        for (int i = 1; i + get_y(pos) < 8; ++i) {
-            if ((row << (i * 8)) & column_pieces) {
-                move_pattern &= ~(column << ((i + get_y(pos)) * 8));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_y(pos) - i >= 0; ++i) {
-            if ((row >> (i * 8)) & column_pieces) {
-                move_pattern &= ~(column >> ((i + (7 - get_y(pos))) * 8));
-                break;
-            }
         }
     }
 
-    if (row_pieces) {
-        for (int i = 1; i + get_x(pos) < 8; ++i) {
-            if ((row << i) & row_pieces) {
-                move_pattern &= ~(row << (i + get_x(pos)));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_x(pos) - i >= 0; ++i) {
-            if ((row >> i) & row_pieces) {
-                move_pattern &= ~(row >> (i + (7 - get_x(pos))));
-                break;
-            }
-        }
-    }
-
-    if (xy_pieces) {
-        for (int i = 1; i + get_x(pos) < 8 || i + get_y(pos) < 8; ++i) {
-            if ((xy << (i * 9)) & xy_pieces) {
-                move_pattern &= ~(xy << ((i + get_x(pos)) * 9));
-                break;
-            }
-        }
-        
-        for (int i = 1; get_x(pos) - i >= 0 || get_y(pos) - i >= 0; ++i) {
-            if ((xy >> (i * 9)) & xy_pieces) {
-                move_pattern &= ~(xy >> ((i + (7 - get_x(pos))) * 9));
-                break;
-            }
-        }
-
-    }
-
-    return move_pattern;
+    return attack_map;
 }
 
-bool is_legal_example(Move m, const Board & b) {
+bool is_legal_example(Move m, const Board & b, Bitmap movable_pieces, Bitmap enemy_pieces, Bitmap vacancy) {
     Bitmap move_pattern = pattern_map(m.from, b.get(m.from));
-    // pr_mask(move_pattern);
+
+
+    // Checks for basic piece movement
     if ((move_pattern & ~square_map(m.from) & square_map(m.to)) == 0) {
         return false;
     }
 
+    // Checks the captures are of the right colour
     if (b.get(m.to) != EMPTY && colour(b.get(m.to)) == colour(b.get(m.from))) {
         return false;
     }
 
+    // Checks for obstructions
     Ptype p = type(b.get(m.from));
-    if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, vacancy_map(b))) {
+    if ((p == QUEEN || p == ROOK || p == BISHOP) && !is_unobstructed(m, vacancy)) {
         return false;
     }
+
+    // Checks if the location the king is moving to is attacked by enemy pieces
+    /* if (p == KING && ((attack_map(b, vacancy, enemy_pieces, movable_pieces) & square_map(m.to)) != 0)) {
+        return false;
+    } */
 
     // Other legality tests...
 
     return true;
 }
 
-void get_legal_moves_from_pos(const Board & b, Square sq, std::vector<string> & moves) {
-    string piece = ptos_alg(b.get(sq));
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if (is_legal_example({sq, mksq(i, j), 0}, b)) {
-                moves.push_back(piece + sqtos(mksq(i, j)));
-            }
-        }
-    }
-}
-
-void get_all_legal_moves(const Board & b, std::vector<string> & all_moves) {
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if (colour(b.get(mksq(i, j))) == b.colour_to_move()) {
-                get_legal_moves_from_pos(b, mksq(i, j), all_moves);
-            }
-        }
-    }
-}
-
-/* int main(void) {
-    Board b = fen_to_board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
-    std::vector<string> all_moves;
-    get_all_legal_moves(b, WHITE, all_moves);
-    pr(b);
-    cout << "\n\"Legal\" moves: \n";
-    int counter = 0;
-    for (string s : all_moves) {
-        cout << s << " ";
-        if (++counter % 16 == 0) {
-            cout << "\n";
-        }
-    }
-} */
-
-
-/* int main(void) {
-    
-    Board b = fen_to_board("8/8/8/8/8/2Q5/8/8 w - - 0 1");
-    Square s = stosq("c3");
-    pr(b);
-    piecemoves(b, s);
-
-} */
-
-/* int main(void) {
-    Board b = starting_pos();
-    Bitmap map = gen_bitmap(b, [] (Square sq, Piece p) {
-        return (get_x(sq) + get_y(sq))% 2 == 0;
-    });
-    pr_mask(map);
-} */

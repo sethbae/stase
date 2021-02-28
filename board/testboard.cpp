@@ -4,6 +4,8 @@
 using std::cout;
 #include <vector>
 using std::vector;
+#include <string>
+using std::string;
 #include <cstdlib>
 using std::rand;
 
@@ -257,8 +259,13 @@ int main(void) {
     // piece_types();
     // setget_square();
     // square_navigation(false);
-    Board b = starting_pos();
-    b.set(mksq(4, 3), W_QUEEN);
-    pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
+    Board b = fen_to_board("r7/8/8/8/8/1K6/8/8 w - - 0 1");
+    
+    
+
+    cout << "\n";
+    pr_board(b, "");
+    cout << "\n";
+
     return 0;
 }

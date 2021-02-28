@@ -121,25 +121,34 @@ void legal_move_test() {
     int k = 100000;
 
     auto boards = new Board[k];
+
+    Board b = fen_to_board("r1b1k2r/p1pq2p1/1pn1p1p1/3pP2p/3P4/B1P2Q2/P1P2RPP/R5K1 b kq - 1 15");
     
     for (int i = 0; i < k; ++i) {
         //boards[i] = starting_pos();
         //boards[i] = fen_to_board("8/8/8/3Q4/8/8/8/8 w - - 0 1");
-        boards[i] = fen_to_board("r1b1k2r/p1pq2p1/1pn1p1p1/3pP2p/3P4/B1P2Q2/P1P2RPP/R5K1 b kq - 1 15");
+        boards[i] = b;
     }
     
     /* start benchmark and read from boards */
 
-    vector<string> moves;
-
     auto start = high_resolution_clock::now();
 
-    int x = 0;
+    Bitmap vacancy = vacancy_map(b);
+    Bitmap enemy_pieces = custom_map(b, [] (Square, Piece p, Ptype t) { return colour(p) != t; });
+
+    int sum = 0;
     for (int j = 0; j < k; ++j) {
-        Board b = boards[j];
-        get_all_legal_moves(b, moves);
-        x += moves.size();
-        moves.clear();
+        // Board b = boards[j];
+        // get_all_legal_moves(b, moves);
+        // x += moves.size();
+        // moves.clear();
+
+        for (int x = 0; x < 8; ++x) {
+            for (int y = 0; y < 8; ++y) {
+                sum += get_obstructed_move_map(b, mksq(x, y), vacancy, enemy_pieces);
+            }
+        }
     }
 
     /* end benchmark and return */
@@ -153,7 +162,7 @@ void legal_move_test() {
     cout << "Legal move test:\n";
     cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
     cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\tMoves found: " << (x / k) << "\n";
+    cout << "\tMoves found: " << (sum / k) << "\n";
     cout << "\n";
     
     delete [] boards;
@@ -422,5 +431,7 @@ int main(void) {
 
     legal_move_test();
     legal_move_test2();
+
+
     
 }
