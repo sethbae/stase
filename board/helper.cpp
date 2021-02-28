@@ -238,6 +238,8 @@ Board empty_board() {
         }
         reset_x(s);
     }
+
+    b.conf = 0;
     
     return b;
 }

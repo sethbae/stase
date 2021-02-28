@@ -188,12 +188,14 @@ void set_square(Bitmap &, const Square);
 void unset_square(Bitmap &, const Square);
 bool test_square(const Bitmap &, const Square);
 
+Bitmap knight_map(Square);
+Bitmap king_map(Square);
 Bitmap pattern_map(Square, Piece);
 Bitmap vacancy_map(const Board &);
-Bitmap occupied_map(const Board &);
+Bitmap occupancy_map(const Board &);
 Bitmap friendly_map(const Board &);
 Bitmap enemy_map(const Board &);
-Bitmap attack_map(const Board &);
-Bitmap custom_map(const Board &, bool include(Square, Piece));
+Bitmap attack_map(const Board &, Ptype);
+// Bitmap custom_map(const Board &, bool include(Square, Piece));
 
 #endif

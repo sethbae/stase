@@ -1,4 +1,6 @@
 #include "board.h"
+#include <iostream>
+using std::cout;
 
 /**
  * This file defines the Bitmap implementation. A Bitmap map is essentially a 64-bit number
@@ -215,9 +217,6 @@ Bitmap bpawn_move_map(Square sq) {
 
 // Generates the piece's movement pattern starting from a certain square
 Bitmap pattern_map(Square q, Piece p) {
-    if (p == W_KING) {
-        return king_map(q);
-    }
     switch (p) {
         case B_QUEEN:
         case W_QUEEN: return diag_map(q) | ortho_map(q);
@@ -242,22 +241,84 @@ Bitmap vacancy_map(const Board & b) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Square pos = mksq(i, j);
-            acc = b.get(pos) == EMPTY ? acc | square_map(pos) : acc;
+            if (b.get(pos) == EMPTY) {
+                set_square(acc, pos);
+            }
+            // acc = b.get(pos) == EMPTY ? acc | square_map(pos) : acc;
         }
     }
     return acc;
 }
 
 
+Bitmap occupancy_map(const Board & b) {
+    Bitmap acc = (Bitmap) 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            if (b.get(pos) != EMPTY) {
+                set_square(acc, pos);
+            }
+        }
+    }
+    return acc;
+}
+
+
+Bitmap friendly_map(const Board & b) {
+    Bitmap acc = (Bitmap) 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            if (colour(b.get(pos)) == b.colour_to_move()) {
+                set_square(acc, pos);
+            }
+        }
+    }
+    return acc;
+}
+
+
+Bitmap enemy_map(const Board & b) {
+    Bitmap acc = (Bitmap) 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            if (colour(b.get(pos)) != b.colour_to_move()) {
+                set_square(acc, pos);
+            }
+        }
+    }
+    return acc;
+}
+
+
+Bitmap attack_map(const Board & b, Ptype c) {
+    Bitmap acc = (Bitmap) 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            if (colour(b.get(pos)) == c) {
+                // Bitmap map = piecemoves_ignore_check(b, pos);
+                // cout << "x = " << i << ", y = " << j << "\n";
+                // pr_bitmap(map);
+                // cout << "\n";
+                acc |= piecemoves_ignore_check(b, pos);
+            }
+        }
+    }
+    return acc;
+}
+
 
 // Generates a bitmap according to a provided boolean function
-Bitmap custom_map(const Board & b, bool include(Square, Piece, Ptype)) {
+Bitmap custom_map(const Board & b, bool include(const Board &, Square)) {
     Bitmap map = 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Square sq = mksq(i, j);
-            if (include(sq, b.get(sq), b.colour_to_move())) {
-                map |= square_map(sq);
+            if (include(b, sq)) {
+                set_square(map, sq);
             }
         }
     }

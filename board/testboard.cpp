@@ -315,8 +315,7 @@ int main(void) {
     square_navigation(false);
     test_in_check();
     
-    //Board b = starting_pos();
-    //b.set(mksq(4, 3), W_QUEEN);
-    //pr_bitmap(get_obstructed_move_map(b, mksq(4, 3)));
+
+
     return 0;
 }

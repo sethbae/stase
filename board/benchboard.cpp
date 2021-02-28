@@ -659,6 +659,48 @@ void board_iteration_bench(bool use_mksq) {
 
 }
 
+void attack_map_generation() {
+    // Board b = fen_to_board("r1br2k1/1p3ppp/p1nqpb2/3nN3/3P1P2/1B2B3/PPN3PP/R2Q1RK1 w Qq - 0 1");
+    Board b = starting_pos();
+
+    int k = 100000;
+
+    Board * boards = new Board[k];
+    
+    for (int i = 0; i < k; ++i) {
+        boards[i] = b;
+    }
+    
+    auto start = high_resolution_clock::now();
+    
+    int sum = 0;
+
+    for (int j = 0; j < k; ++j) {
+        sum += attack_map(boards[j], WHITE);
+    }
+            
+    
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+
+    
+    // pr_bitmap(attack_map(b, WHITE));
+    // pr_bitmap(1ULL);
+
+    delete [] boards;
+}
+
 /*
     Passing function by value
     Queen:  2.5862, 2.5595 micros       piecemoves_bench(piece, 5, 5);
@@ -684,6 +726,8 @@ void board_iteration_bench(bool use_mksq) {
 
 int main(void) {
 
+    attack_map_generation();
+
     // write_test();
     // read_test();
     // size_test();
@@ -699,7 +743,7 @@ int main(void) {
     
     //piecemoves_bench(W_QUEEN, 5);
     
-    board_iteration_bench(true);
+    // board_iteration_bench(true);
     
     //legal_moves_puzzles();
     

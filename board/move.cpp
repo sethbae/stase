@@ -130,7 +130,7 @@ Bitmap diag(const Board & b, const Square start_sq) {
 
 Bitmap knight_moves(const Board & b, const Square s) {
 
-    Bitmap bmap;
+    Bitmap bmap = 0;
 
     unsigned x = get_x(s), y = get_y(s);
     Ptype knightcol = colour(b.get(s));
@@ -159,7 +159,7 @@ Bitmap knight_moves(const Board & b, const Square s) {
 
 Bitmap king_moves(const Board & b, const Square s) {
     
-    Bitmap bmap;
+    Bitmap bmap = 0;
     
     unsigned x = get_x(s), y = get_y(s);
     Ptype kingcol = colour(b.get(s));
@@ -188,7 +188,7 @@ Bitmap king_moves(const Board & b, const Square s) {
 
 Bitmap pawn_moves(const Board & b, const Square s) {
     
-    Bitmap bmap;
+    Bitmap bmap = 0;
     
     unsigned x = get_x(s), y = get_y(s);
     Ptype pawncolour = colour(b.get(s));
@@ -252,8 +252,12 @@ Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
         case KNIGHT:
             return knight_moves(b, s);
             
-        case KING:
+        case KING: {
             return king_moves(b, s);
+            // Bitmap map = king_map(s);
+            // unset_square(map, s);
+            // return map;
+        }
             
         case PAWN:
             return pawn_moves(b, s);
