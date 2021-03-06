@@ -153,84 +153,41 @@ Bitmap king_map(Square sq) {
     return columns_map(min_x, max_x) & rows_map(min_y, max_y);
 }
 
-Bitmap wpawn_attack_map(Square sq) {
-    inc_y(sq);
-    Bitmap map = (Bitmap) 0;
+Bitmap pawn_attack_map(Square sq, Ptype colour) {
+    int step = colour == WHITE ? 1 : -1;
+    sq = mksq(get_x(sq), get_y(sq) + step);
 
-    Square temp = sq;
-    if (get_x(sq) > 0) {
-        dec_x(temp);
-        map |= square_map(temp);
-    }
+    Bitmap map = 0;
 
-    temp = sq;
-    if (get_x(sq) < 7) {
-        inc_x(temp);
-        map |= square_map(temp);
-    }
-
-    return map;
-
-}
-
-Bitmap wpawn_move_map(Square sq) {
-    inc_y(sq);
-    Bitmap map = square_map(sq);
-
-    inc_y(sq);
-    map |= square_map(sq);
+    set_square(map, mksq(get_x(sq) + 1, get_y(sq)));
+    set_square(map, mksq(get_x(sq) - 1, get_y(sq)));
 
     return map;
 }
 
+Bitmap pawn_move_map(Square sq, Ptype colour) {
+    int step = colour == WHITE ? 1 : -1;
 
-Bitmap bpawn_attack_map(Square sq) {
-    dec_y(sq);
-    Bitmap map = (Bitmap) 0;
+    Bitmap map = 0;
 
-    Square temp = sq;
-    if (get_x(sq) > 0) {
-        dec_x(temp);
-        map |= square_map(temp);
-    }
+    set_square(map, mksq(get_x(sq), get_y(sq) + step));
 
-    temp = sq;
-    if (get_x(sq) < 7) {
-        inc_x(temp);
-        map |= square_map(temp);
+    if (get_y(sq) == 1 || get_y(sq) == 6) {
+        set_square(map, mksq(get_x(sq), get_y(sq) + (step * 2)));
     }
 
     return map;
-
 }
-
-Bitmap bpawn_move_map(Square sq) {
-    dec_y(sq);
-    Bitmap map = square_map(sq);
-
-    dec_y(sq);
-    map |= square_map(sq);
-
-    return map;
-}
-
 
 // Generates the piece's movement pattern starting from a certain square
 Bitmap pattern_map(Square q, Piece p) {
-    switch (p) {
-        case B_QUEEN:
-        case W_QUEEN: return diag_map(q) | ortho_map(q);
-        case B_BISHOP:
-        case W_BISHOP: return diag_map(q);
-        case B_ROOK:
-        case W_ROOK: return ortho_map(q);
-        case B_KNIGHT:
-        case W_KNIGHT: return knight_map(q);
-        case B_KING:
-        case W_KING: return king_map(q);
-
-        case W_PAWN: return wpawn_move_map(q);
-        case B_PAWN: return bpawn_move_map(q);
+    switch (type(p)) {
+        case QUEEN: return diag_map(q) | ortho_map(q);
+        case BISHOP: return diag_map(q);
+        case ROOK: return ortho_map(q);
+        case KNIGHT: return knight_map(q);
+        case KING: return king_map(q);
+        case PAWN: return pawn_move_map(q, colour(p));
         default: return (Bitmap) 0;
     }
 }
@@ -293,17 +250,89 @@ Bitmap enemy_map(const Board & b) {
 }
 
 
+Bitmap attack_search(const Board & b, const Square s,
+                    void step(Square &), 
+                    bool (* valid)(const Square &), int depth) {
+    
+    Bitmap bmap = (Bitmap) 0;
+    
+    Piece p = b.get(s);
+    Square temp = s;
+    int level = 1;
+
+    step(temp);
+    
+    while ((*valid)(temp)) {
+        //cout << sqtos(temp);
+        Piece otherp = b.get(temp);
+        set_square(bmap, temp);
+        if (type(otherp) != EMPTY && (level += 1) > depth) {
+            return bmap;
+        }
+        step(temp);
+    }
+    
+    return bmap;
+}
+
+Bitmap ortho_attack(const Board & b, const Square start_sq, int depth = 1) {
+    
+    return attack_search(b, start_sq, inc_x, val_x, depth) 
+            | attack_search(b, start_sq, dec_x, val_x, depth)
+            | attack_search(b, start_sq, inc_y, val_y, depth)
+            | attack_search(b, start_sq, dec_y, val_y, depth);
+    
+}
+
+Bitmap diag_attack(const Board & b, const Square start_sq, int depth = 1) {
+    
+    return attack_search(b, start_sq, diag_ur, val, depth)
+            | attack_search(b, start_sq, diag_dl, val, depth)
+            | attack_search(b, start_sq, diag_dr, val, depth)
+            | attack_search(b, start_sq, diag_ul, val, depth);
+    
+}
+
+Bitmap attack_moves(const Board & b, const Square s) {
+    
+    Piece p = b.get(s);
+
+    switch (type(p)) {
+        
+        case ROOK: 
+            return ortho_attack(b, s);
+            
+        case BISHOP: 
+            return diag_attack(b, s);
+            
+        case QUEEN: 
+            return ortho_attack(b, s) | diag_attack(b, s);
+            
+        case KNIGHT:
+            return knight_map(s);
+            
+        case KING:
+            return king_map(s);
+            
+        case PAWN:
+            return pawn_attack_map(s, colour(p));
+            
+        default: 
+            return (Bitmap) 0;
+    }
+
+}
+
+
+// **********************************************************
+
 Bitmap attack_map(const Board & b, Ptype c) {
     Bitmap acc = (Bitmap) 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Square pos = mksq(i, j);
             if (colour(b.get(pos)) == c) {
-                // Bitmap map = piecemoves_ignore_check(b, pos);
-                // cout << "x = " << i << ", y = " << j << "\n";
-                // pr_bitmap(map);
-                // cout << "\n";
-                acc |= piecemoves_ignore_check(b, pos);
+                acc |= attack_moves(b, pos);
             }
         }
     }
@@ -326,3 +355,6 @@ Bitmap custom_map(const Board & b, bool include(const Board &, Square)) {
 }
 
 
+void temporary_bench() {
+
+}
