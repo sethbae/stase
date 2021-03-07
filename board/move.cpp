@@ -413,3 +413,30 @@ bool in_check(const Board & b) {
     return false;
 }
 
+
+
+bool in_check_attack_map(const Board & b, Ptype c) {
+
+    Bitmap king_pos = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            Piece p = b.get(pos);
+            if (type(p) == KING && colour(p) == c) {
+                set_square(king_pos, pos);
+                goto end_loop;
+            }
+        }
+    }
+    end_loop:
+
+    Ptype enemy = c == WHITE ? BLACK : WHITE;
+    Bitmap attack = attack_map(b, enemy);
+
+    // Both the king position and the attack map can be maintained and updated every move, which can make this function O(1)
+    return king_pos & attack != 0;
+}
+
+bool in_check(const Gamestate & g) {
+    return (g.kings & g.foccupy & g.eoccupy) != 0;
+}

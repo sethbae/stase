@@ -126,6 +126,39 @@ struct Move {
 
 };
 
+struct Gamestate
+{
+
+    // The enclosed board
+    Board board;
+
+    // Attack and occupation maps for each of the adversaries
+    Bitmap fattack;
+    Bitmap eattack;
+    Bitmap foccupy;
+    Bitmap eoccupy;
+
+    // Overall vacancy and occupation maps
+    Bitmap vacancy;
+    Bitmap occupancy;
+
+    // Locations of all pieces of a certain type (can be ANDed with occupation to isolate pieces of desired colour)
+    Bitmap kings;
+    Bitmap pawns;
+    Bitmap queens;
+    Bitmap knights;
+    Bitmap bishops;
+    Bitmap rooks;
+
+    Move last_move;
+    Piece last_capture;
+
+    Gamestate();
+    Gamestate(const Board &);
+    void recalculate_all();
+};
+
+
 /* helper functions for board and move */
 void make_move(Board &, Move);
 Board fen_to_board(const std::string & fen);
@@ -144,6 +177,7 @@ void legal_moves(const Board &, std::vector<Move> &);
 void legal_moves2(const Board &, std::vector<Move> &);
 
 bool in_check(const Board &);
+bool in_check(const Gamestate &);
 
 Square mksq(const int, const int);
 
@@ -196,6 +230,7 @@ Bitmap occupancy_map(const Board &);
 Bitmap friendly_map(const Board &);
 Bitmap enemy_map(const Board &);
 Bitmap attack_map(const Board &, Ptype);
+Bitmap custom_map(const Board &, bool include(const Board &, Square));
 // Bitmap custom_map(const Board &, bool include(Square, Piece));
 
 #endif

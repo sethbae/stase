@@ -354,7 +354,3 @@ Bitmap custom_map(const Board & b, bool include(const Board &, Square)) {
     return map;
 }
 
-
-void temporary_bench() {
-
-}
