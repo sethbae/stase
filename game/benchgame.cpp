@@ -113,3 +113,9 @@ void calculating_check_with_gamestate() {
     delete [] states;
 }
 
+int main(void) {
+
+    gamestate_recalculation();
+
+}
+

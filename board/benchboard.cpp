@@ -725,12 +725,8 @@ void attack_map_generation() {
 */
 
 int main(void) {
-    
-    calculating_check_with_gamestate();
-    gamestate_recalculation();
 
-
-    // attack_map_generation();
+    attack_map_generation();
 
     // write_test();
     // read_test();
