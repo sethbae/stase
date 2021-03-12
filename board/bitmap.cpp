@@ -154,13 +154,21 @@ Bitmap king_map(Square sq) {
 }
 
 Bitmap pawn_attack_map(Square sq, Ptype colour) {
-    int step = colour == WHITE ? 1 : -1;
-    sq = mksq(get_x(sq), get_y(sq) + step);
-
     Bitmap map = 0;
 
-    set_square(map, mksq(get_x(sq) + 1, get_y(sq)));
-    set_square(map, mksq(get_x(sq) - 1, get_y(sq)));
+    int step = colour == WHITE ? 1 : -1;
+    int y = get_y(sq) + step;
+    int x = get_x(sq);
+
+    Square temp = mksq(x + 1, y);
+    if (val_x(temp)) {
+        set_square(map, temp);
+    }
+
+    temp = mksq(x - 1, y);
+    if (val_x(temp)) {
+        set_square(map, temp);
+    }
 
     return map;
 }
@@ -324,8 +332,6 @@ Bitmap attack_moves(const Board & b, const Square s) {
 }
 
 
-// **********************************************************
-
 Bitmap attack_map(const Board & b, Ptype c) {
     Bitmap acc = (Bitmap) 0;
     for (int i = 0; i < 8; ++i) {
@@ -333,6 +339,20 @@ Bitmap attack_map(const Board & b, Ptype c) {
             Square pos = mksq(i, j);
             if (colour(b.get(pos)) == c) {
                 acc |= attack_moves(b, pos);
+            }
+        }
+    }
+    return acc;
+}
+
+
+Bitmap piece_map(const Board & b, Ptype piece) {
+    Bitmap acc = (Bitmap) 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Square pos = mksq(i, j);
+            if (type(b.get(pos)) == piece) {
+                set_square(acc, pos);
             }
         }
     }

@@ -3,7 +3,7 @@ OPT: -O
 SUPEROPT: -Ofast
 
 DEPS = board.h
-OBJ = board.o move.o square.o helper.o bitmap.o
+OBJ = board.o move.o square.o helper.o bitmap.o gamestate.o
 
 %.o: %.cpp $(DEPS)
 	g++ -c -o $@ $< $(FLAGS)
