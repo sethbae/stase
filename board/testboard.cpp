@@ -359,10 +359,10 @@ int main(void) {
     // setget_square();
     // square_navigation(false);
     // test_in_check();
-    // gamestate_generation();
+    gamestate_generation();
     
-    Board b = starting_pos();
-    pr_bitmap(attack_map(b, WHITE));
+    // Board b = starting_pos();
+    // pr_bitmap(attack_map(b, WHITE));
     
 
 

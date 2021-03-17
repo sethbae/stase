@@ -254,9 +254,6 @@ Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
             
         case KING: {
             return king_moves(b, s);
-            // Bitmap map = king_map(s);
-            // unset_square(map, s);
-            // return map;
         }
             
         case PAWN:
