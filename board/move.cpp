@@ -436,7 +436,3 @@ bool in_check_attack_map(const Board & b, Ptype c) {
     // Both the king position and the attack map can be maintained and updated every move, which can make this function O(1)
     return king_pos & attack != 0;
 }
-
-bool in_check(const Gamestate & g) {
-    return (g.kings & g.foccupy & g.eoccupy) != 0;
-}
