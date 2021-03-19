@@ -1,4 +1,4 @@
-#include "board.h"
+#include "game.h"
 
 /**
  *  This is the Gamestate object which is used to reduce calculations by storing some Bitmaps and other flags about the game.
