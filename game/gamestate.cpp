@@ -19,20 +19,41 @@ void Gamestate::recalculate_all() {
     Ptype fcolour = board.colour_to_move();
     Ptype ecolour = fcolour == WHITE ? BLACK : WHITE;
 
-    // These take about 4.2 microseconds
-    vacancy = vacancy_map(board);
-    occupancy = ~vacancy;
-    foccupy = friendly_map(board);
-    eoccupy = occupancy & ~foccupy;
+    vacancy = occupancy = foccupy = eoccupy = 0;
+    kings = queens = bishops = knights = rooks = pawns = 0;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+
+            Square pos = mksq(i, j);
+            Piece p = board.get(pos);
+
+            if (type(p) != EMPTY) {
+                if (colour(p) == WHITE) {
+                    set_square(foccupy, pos);
+                }
+
+                set_square(occupancy, pos);
+
+                switch (type(p)) {
+
+                    case KING: set_square(kings, pos); break;
+                    case QUEEN: set_square(queens, pos); break;
+                    case BISHOP: set_square(bishops, pos); break;
+                    case KNIGHT: set_square(knights, pos); break;
+                    case ROOK: set_square(rooks, pos); break;
+                    case PAWN: set_square(pawns, pos); break;
+                    
+                    default: break;
+                }
+            }
+
+        }
+    }
+
+    vacancy = ~occupancy;
+    eoccupy = ~foccupy & occupancy;
+
     fattack = attack_map(board, fcolour);
     eattack = attack_map(board, ecolour);
-
-    // Locations of all pieces of a certain type (can be ANDed with occupation to isolate pieces of desired colour)
-    // These take about 5 microseconds to calculate
-    kings = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == KING; });
-    pawns = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == PAWN; });
-    queens = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == QUEEN; });
-    knights = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == KNIGHT; });
-    bishops = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == BISHOP; });
-    rooks = custom_map(board, [] (const Board & b, Square s) { return type(b.get(s)) == ROOK; });
 }

@@ -738,15 +738,15 @@ int main(void) {
     // read_config_test();
     // write_parsed_config_test();
 
-    //legal_move_test();
-    //legal_move_test2();
+    // legal_move_test();
+    // legal_move_test2();
     
-    //piecemoves_bench(W_QUEEN, 5);
+    // piecemoves_bench(W_QUEEN, 5);
     
     // board_iteration_bench(true);
     
-    //legal_moves_puzzles();
+    // legal_moves_puzzles();
     
-    //pr_board(random_board(W_QUEEN, 5, 5));
+    // pr_board(random_board(W_QUEEN, 5, 5));
     
 }

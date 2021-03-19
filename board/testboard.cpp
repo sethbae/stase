@@ -309,11 +309,60 @@ void test_in_check() {
 
 }
 
+void gamestate_generation() {
+    Board b = starting_pos();
+    Gamestate g(b);
+
+    cout << "Board:\n";
+    pr_board(b);
+
+    cout << "\nFriendly attack:\n";
+    pr_bitmap(g.fattack);
+
+    cout << "\nEnemy attack:\n";
+    pr_bitmap(g.eattack);
+
+    cout << "\nFriendly pieces:\n";
+    pr_bitmap(g.foccupy);
+
+    cout << "\nEnemy pieces:\n";
+    pr_bitmap(g.eoccupy);
+
+    cout << "\nOccupany:\n";
+    pr_bitmap(g.occupancy);
+
+    cout << "\nVacancy:\n";
+    pr_bitmap(g.vacancy);
+
+    cout << "\nKings:\n";
+    pr_bitmap(g.kings);
+
+    cout << "\nQueens:\n";
+    pr_bitmap(g.queens);
+
+    cout << "\nBishops:\n";
+    pr_bitmap(g.bishops);
+
+    cout << "\nKnights:\n";
+    pr_bitmap(g.knights);
+
+    cout << "\nRooks:\n";
+    pr_bitmap(g.rooks);
+
+    cout << "\nPawns:\n";
+    pr_bitmap(g.pawns);
+
+}
+
 int main(void) {
-    piece_types();
-    setget_square();
-    square_navigation(false);
-    test_in_check();
+    // piece_types();
+    // setget_square();
+    // square_navigation(false);
+    // test_in_check();
+    gamestate_generation();
+    
+    // Board b = starting_pos();
+    // pr_bitmap(attack_map(b, WHITE));
     
 
 
