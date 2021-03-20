@@ -54,10 +54,18 @@ void Move::set_cas_short() { flags |= CAS_SHORT_FLAG; }
 int Move::get_ep_file() const { return get_x(to); }
 
 /* get/set promotion piece */
-Piece Move::get_prom_piece() const { 
-    return QUEEN + ((flags & PROM_PIECE_MASK) >> PROM_PIECE_OFFSET);
+Byte Move::get_prom_shift() const { 
+    return (flags & PROM_PIECE_MASK) >> PROM_PIECE_OFFSET;
 }
-void Move::set_prom_piece(unsigned u) {
+
+// return the actual piece, given the colour it should be
+Piece Move::get_prom_piece(Ptype col) const {
+    Piece p = (col == WHITE) ? W_QUEEN : B_QUEEN;
+    return p + get_prom_shift();
+}
+
+void Move::set_prom_piece(Ptype p) {
+    unsigned u = p - (unsigned) QUEEN;
     flags &= ~PROM_PIECE_MASK;
     flags |= (u << PROM_PIECE_OFFSET);
 }
@@ -72,11 +80,70 @@ void Move::set_cap_piece(Piece p) {
 }
 
 void make_move(Board & b, Move m) {
-    // can't do castles or en-passant
+
+}
+
+void make_move_hard(Board & b, Move m) {
+    
+    // castling
+    if (type(b.get(m.from)) == KING) {
+        int delta = get_x(m.from) - get_x(m.to);
+        if (delta == 2 || delta == -2) {
+            
+            // white short
+            if (m.to == mksq(6, 0)) {
+                b.set(mksq(7, 0), EMPTY);
+                b.set(mksq(5, 0), W_ROOK);
+            }
+            
+            // white long
+            else if (m.to == mksq(2, 0)) {
+                b.set(mksq(0, 0), EMPTY);
+                b.set(mksq(3, 0), W_ROOK);
+            }
+            
+            // black short
+            else if (m.to == mksq(6, 7)) {
+                b.set(mksq(7, 7), EMPTY);
+                b.set(mksq(5, 7), B_ROOK);
+            }
+            
+            // black long
+            else {
+                b.set(mksq(0, 7), EMPTY);
+                b.set(mksq(3, 7), B_ROOK);
+            }
+        }
+    }
+    
+    // en-passant
+    if (type(b.get(m.from)) == PAWN && get_x(m.from) != get_x(m.to)) {
+        if (b.get(m.to) == EMPTY) {
+            
+            // white
+            if (get_y(m.to) == 5) {
+                b.set(mksq(get_x(m.to), 4), EMPTY);
+            }
+            
+            // black   
+            else {
+                b.set(mksq(get_x(m.to), 3), EMPTY);
+            }            
+        }
+    }
+       
+    // move piece
     Piece p = b.get(m.from);
     b.set(m.to, p);
     b.set(m.from, EMPTY);
 
+    // promotion
+    if (type(b.get(m.to)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0)) {
+        Piece p = m.get_prom_piece(colour(b.get(m.to)));
+        b.set(m.to, p);
+    }
+    
+    return;
 }
 
 Bitmap line_search(const Board & b, const Square s,

@@ -119,8 +119,9 @@ struct Move {
     
     int get_ep_file() const;
     
-    Piece get_prom_piece() const;
-    void set_prom_piece(unsigned);
+    Byte get_prom_shift() const;
+    Piece get_prom_piece(Ptype) const;
+    void set_prom_piece(Ptype);
     Piece get_cap_piece() const;
     void set_cap_piece(Piece p);
 
@@ -129,6 +130,7 @@ struct Move {
 
 /* helper functions for board and move */
 void make_move(Board &, Move);
+void make_move_hard(Board &, Move);
 Board fen_to_board(const std::string & fen);
 std::string board_to_fen(const Board &);
 Board empty_board();
