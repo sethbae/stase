@@ -108,14 +108,23 @@ struct Move {
 
     bool is_prom() const;
     void set_prom();
+    void unset_prom();
+    
     bool is_cas() const;
     void set_cas();
+    void unset_cas();
+        
     bool is_ep() const;
     void set_ep();
+    void unset_ep();
+        
     bool is_cap() const;
     void set_cap();
+    void unset_cap();
+        
     bool is_cas_short() const;
     void set_cas_short();
+    void unset_cas_short();
     
     int get_ep_file() const;
     

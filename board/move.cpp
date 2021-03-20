@@ -41,14 +41,23 @@ const unsigned CAP_PIECE_MASK = 15 << CAP_PIECE_OFFSET;
 /* get/set promotion, castle flags etc */
 bool Move::is_prom() const { return flags & PROM_FLAG; }
 void Move::set_prom() { flags |= PROM_FLAG; }
+void Move::unset_prom() { flags &= ~PROM_FLAG; }
+
 bool Move::is_cas() const { return flags & CAS_FLAG; }
 void Move::set_cas() { flags |= CAS_FLAG; }
+void Move::unset_cas() { flags &= ~CAS_FLAG; }
+
 bool Move::is_ep() const { return flags & EP_FLAG; }
 void Move::set_ep() { flags |= EP_FLAG; }
+void Move::unset_ep() { flags &= ~EP_FLAG; }
+
 bool Move::is_cap() const { return flags & CAP_FLAG; }
 void Move::set_cap() { flags |= CAP_FLAG; }
+void Move::unset_cap() { flags &= ~CAP_FLAG; }
+
 bool Move::is_cas_short() const { return flags & CAS_SHORT_FLAG; }
 void Move::set_cas_short() { flags |= CAS_SHORT_FLAG; }
+void Move::unset_cas_short() { flags &= ~CAS_SHORT_FLAG; }
 
 // convenience: get the ep-file
 int Move::get_ep_file() const { return get_x(to); }
@@ -83,6 +92,10 @@ Move empty_move() {
     Move m = {0, 0, 0};
     return m;
 }
+
+/*************************************************************************
+ *  Make move functions
+ ************************************************************************/
 
 void make_move(Board & b, Move m) {
     
@@ -200,6 +213,10 @@ void make_move_hard(Board & b, Move m) {
     return;
 }
 
+/*************************************************************************
+ *  BITMAP piece move functions
+ ************************************************************************/
+
 Bitmap line_search(const Board & b, const Square s,
                     void step(Square &), 
                     bool (* valid)(const Square &)) {
@@ -232,7 +249,7 @@ Bitmap line_search(const Board & b, const Square s,
 }
 
 Bitmap ortho(const Board & b, const Square start_sq) {
-    
+   
     return line_search(b, start_sq, inc_x, val_x) 
             | line_search(b, start_sq, dec_x, val_x)
             | line_search(b, start_sq, inc_y, val_y)
@@ -278,6 +295,7 @@ Bitmap knight_moves(const Board & b, const Square s) {
 
 }
 
+// TODO: add castling
 Bitmap king_moves(const Board & b, const Square s) {
     
     Bitmap bmap = 0;
@@ -395,7 +413,7 @@ void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec
         for (int j = 0; j < 8; ++j) {
             newsq = mksq(i, j);
             if (test_square(bmap, newsq)) {
-                Move m;
+                Move m = empty_move();
                 m.from = s;
                 m.to = newsq;
                 vec.push_back(m);
@@ -412,6 +430,355 @@ Bitmap piecemoves(const Board & b, const Square) {
 void piecemoves(const Board & b, const Square, vector<Move> & vec) {
 
 }
+
+/*************************************************************************
+ *  VECTOR piece move functions
+ ************************************************************************/
+
+void line_search(const Board & b, const Square s,
+                    void step(Square &), 
+                    bool (* valid)(const Square &),
+                    vector<Move> & moves) {
+        
+    Piece p = b.get(s);
+    Square temp = s;
+    bool cont = true;
+    Move m = empty_move();
+    m.from = s;
+    
+    step(temp);
+    
+    while ((*valid)(temp) && cont) {
+        //cout << sqtos(temp);
+        Piece otherp = b.get(temp);
+        if (type(otherp) == EMPTY) {
+            //cout << "e ";
+            m.to = temp;
+            moves.push_back(m);
+        } else {
+            cont = false;
+            if (colour(otherp) != colour(p)) {
+                //cout << sqtos(temp) << "x ";
+                m.to = temp;
+                m.set_cap();
+                m.set_cap_piece(otherp);
+                moves.push_back(m);
+            }
+        }
+        step(temp);
+    }
+    
+    return;
+}
+
+Bitmap ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
+   
+    return line_search(b, start_sq, inc_x, val_x, moves) 
+            | line_search(b, start_sq, dec_x, val_x, moves)
+            | line_search(b, start_sq, inc_y, val_y, moves)
+            | line_search(b, start_sq, dec_y, val_y, moves);
+    
+}
+
+Bitmap diag(const Board & b, const Square start_sq, vector<Move> & moves) {
+    
+    return line_search(b, start_sq, diag_ur, val, moves)
+            | line_search(b, start_sq, diag_dl, val, moves)
+            | line_search(b, start_sq, diag_dr, val, moves)
+            | line_search(b, start_sq, diag_ul, val, moves);
+    
+}
+
+Bitmap knight_moves(const Board & b, const Square s, vector<Move> & moves) {
+
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype knightcol = colour(b.get(s));
+    Square sq;
+    
+    Move m = empty_move();
+    m.from = s;
+    
+    if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x + 1, y - 2)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x + 2, y + 1)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x + 2, y - 1)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 1, y + 2)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 1, y - 2)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 2, y + 1)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+
+    return;
+
+}
+
+// TODO: add castling
+void king_moves(const Board & b, const Square s, vector<Move> & moves) {
+    
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype kingcol = colour(b.get(s));
+    Square sq;
+    Move m = empty_move();
+    m.from = s;
+    
+    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol) {
+        m.to = sq;
+        if (type(b.get(sq)) != EMPTY) {
+            m.set_cap();
+            m.set_cap_piece(b.get(sq));
+        }
+        moves.push_back(m);
+        m.unset_cap();
+    }
+    
+    return;
+    
+}
+
+void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
+       
+    unsigned x = get_x(s), y = get_y(s);
+    Ptype pawncolour = colour(b.get(s));
+    Square sq;
+    
+    Move m = empty_move();
+    m.from = s;
+    
+    unsigned FORWARD;
+    unsigned START_RANK;
+    Ptype capture_colour;
+    
+    if (pawncolour == WHITE) {
+        FORWARD = 1;
+        START_RANK = 1;
+        capture_colour = BLACK;
+    } else {
+        FORWARD = -1;
+        START_RANK = 6;
+        capture_colour = WHITE;
+    }
+    
+    // forward moves
+    if (val(sq = mksq(x, y + FORWARD)) && b.get(sq) == EMPTY) {
+        m.to = sq;
+        moves.push_back(m);
+        if (y == START_RANK && b.get(sq = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
+            m.to = sq;
+            moves.push_back(m);
+        }
+    }
+    
+    // regular captures
+    if (val(sq = mksq(x - 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour) {
+        m.to = sq;
+        m.set_cap();
+        m.set_cap_piece(b.get(sq));
+        moves.push_back(m);
+    }
+    if (val(sq = mksq(x + 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour) {
+        m.to = sq;
+        m.set_cap();
+        m.set_cap_piece(b.get(sq));
+        moves.push_back(m);   
+    }
+    
+    // en-passant capture
+    if (b.get_ep_exists() && y == START_RANK + 3*FORWARD) {
+        unsigned epfile = b.get_ep_file();
+        if (epfile == x + 1 || epfile == x - 1) {
+            m.to = b.get_ep_square();
+            m.set_cap();
+            m.set_cap_piece((pawncolour == WHITE) ? B_PAWN : W_PAWN);
+            m.set_ep();
+            moves.push_back(m);
+        }
+    }
+    
+    return;
+    
+}
+
+void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & moves) {
+
+    Piece p = b.get(s);
+
+    switch (type(p)) {
+        
+        case ROOK: 
+            ortho(b, s, moves);
+            break;
+            
+        case BISHOP: 
+            diag(b, s, moves);
+            break;
+            
+        case QUEEN: 
+            ortho(b, s, moves); 
+            diag(b, s, moves);
+            break;
+            
+        case KNIGHT:
+            knight_moves(b, s, moves);
+            break;
+            
+        case KING: {
+            king_moves(b, s, moves);
+            break;
+        }
+            
+        case PAWN:
+            pawn_moves(b, s, moves);
+            break;
+            
+        default: 
+            return;
+    }
+
+}
+
+/*************************************************************************
+ *  In check functions
+ ************************************************************************/
 
 bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p2,
                         void step(Square &),
@@ -531,8 +898,6 @@ bool in_check_hard(const Board & b) {
     return false;
 }
 
-
-
 bool in_check_attack_map(const Board & b, Ptype c) {
 
     Bitmap king_pos = 0;
@@ -554,3 +919,12 @@ bool in_check_attack_map(const Board & b, Ptype c) {
     // Both the king position and the attack map can be maintained and updated every move, which can make this function O(1)
     return king_pos & attack != 0;
 }
+
+/*************************************************************************
+ *  Legal move functions
+ ************************************************************************/
+
+void legal_moves(const Board & b, vector<Move> & moves) {
+
+}
+
