@@ -1,30 +1,27 @@
-FLAGS: -std=c++11 -Wall -Wextra -Werror -Wpedantic
-
+FLAGS = -std=c++11 -Wall -Wextra -Werror -Wpedantic
+OPT_FLAGS =
 DEPS = board.h
-OBJ = board.o move.o square.o helper.o bitmap.o gamestate.o
+OBJ = board.o move.o square.o helper.o bitmap.o
 
 ifneq ($(OPT),none)
-	FLAGS += -O
+	OPT_FLAGS = -O
 endif
 
 ifeq ($(OPT),max)
-	FLAGS += -Ofast
+	OPT_FLAGS = -Ofast
 endif
 
 %.o: %.cpp $(DEPS)
-	g++ -c -o $@ $< $(FLAGS)
+	g++ -c -o $@ $< $(FLAGS) $(OPT_FLAGS)
 	
 scratch: $(OBJ) scratch.o
-	g++ -o $@ $^ $(FLAGS)
+	g++ -o $@ $^ $(FLAGS) $(OPT_FLAGS)
 
 test: $(OBJ) testboard.o
-	g++ -o $@ $^ $(FLAGS)
+	g++ -o $@ $^ $(FLAGS) $(OPT_FLAGS)
 	
 bench: $(OBJ) benchboard.o
-	g++ -o $@ $^ $(FLAGS)
-
-bench_opt: $(OBJ) benchboard.o
-	g++ -o $@ $^ $(FLAGS) $(OPT)
+	g++ -o $@ $^ $(FLAGS) $(OPT_FLAGS)
 	
 main: $(OBJ)
 	
