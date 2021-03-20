@@ -51,54 +51,6 @@ Ptype type(Piece);
 Ptype colour(Piece);
 bool is_white(Piece);
 
-/* a chess board! with full game state, such as castling rights, etc */
-struct Board {
-    
-    /* board and configuration word */
-    Byte squares[8][4];
-    Int conf;
-    
-    /* get/set squares */
-    Piece get(const Square &) const;
-    void set(const Square &, const Piece);
-
-    /* get/set the entire config word */
-    void set_conf_word(Int);
-    Int get_conf_word() const;
-    
-    /* whose turn it is */
-    bool get_white() const;
-    void set_white(bool);
-    void flip_white();
-    Ptype colour_to_move() const;
-    
-    /* castling rights */
-    bool get_cas_ws() const;
-    void set_cas_ws(bool);
-    bool get_cas_wl() const;
-    void set_cas_wl(bool);
-    bool get_cas_bs() const;
-    void set_cas_bs(bool);
-    bool get_cas_bl() const;
-    void set_cas_bl(bool);
-    
-    /* en-passant */
-    bool get_ep_exists() const;
-    void set_ep_exists(bool);
-    unsigned get_ep_file() const;
-    void set_ep_file(unsigned);
-    Square get_ep_sq() const;
-    
-    /* half and whole moves */
-    unsigned get_halfmoves() const;
-    void set_halfmoves(unsigned);
-    void inc_halfmoves();
-    unsigned get_wholemoves() const;
-    void set_wholemoves(unsigned);
-    void inc_wholemoves();
-    
-};
-
 /* A move structure, which stores some flags etc and get/set methods */
 struct Move {
     
@@ -136,6 +88,61 @@ struct Move {
 
 };
 
+/* a chess board! with full game state, such as castling rights, etc */
+struct Board {
+    
+    /* board and configuration word */
+    Byte squares[8][4];
+    Int conf;
+    
+    /* get/set squares */
+    Piece get(const Square &) const;
+    void set(const Square &, const Piece);
+    
+    /* change the position of the pieces, without affecting config */
+    void mutate(const Move);
+    void mutate_hard(const Move); // does not assume move flags are correctly set
+    
+    /* create and return a new board, the succeeding position (config updated) */
+    Board successor(const Move);
+    Board successor_hard(const Move);
+
+    /* get/set the entire config word */
+    void set_conf_word(Int);
+    Int get_conf_word() const;
+    
+    /* whose turn it is */
+    bool get_white() const;
+    void set_white(bool);
+    void flip_white();
+    Ptype colour_to_move() const;
+    
+    /* castling rights */
+    bool get_cas_ws() const;
+    void set_cas_ws(bool);
+    bool get_cas_wl() const;
+    void set_cas_wl(bool);
+    bool get_cas_bs() const;
+    void set_cas_bs(bool);
+    bool get_cas_bl() const;
+    void set_cas_bl(bool);
+    
+    /* en-passant */
+    bool get_ep_exists() const;
+    void set_ep_exists(bool);
+    unsigned get_ep_file() const;
+    void set_ep_file(unsigned);
+    Square get_ep_sq() const;
+    
+    /* half and whole moves */
+    unsigned get_halfmoves() const;
+    void set_halfmoves(unsigned);
+    void inc_halfmoves();
+    unsigned get_wholemoves() const;
+    void set_wholemoves(unsigned);
+    void inc_wholemoves();
+    
+};
 
 /* helper functions for board and move */
 Move empty_move();

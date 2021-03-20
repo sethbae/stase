@@ -94,135 +94,6 @@ Move empty_move() {
 }
 
 /*************************************************************************
- *  Make move functions
- ************************************************************************/
-
-void make_move(Board & b, Move m) {
-    
-    Ptype col = colour(b.get(m.from));
-    
-    b.flip_white();
-    b.set_ep_exists(false);
-    // TODO: update castling rights, things like this
-    
-    // castling
-    if (m.is_cas()) {
-   
-        if (col == WHITE) {
-            if (m.is_cas_short()) {
-                b.set(mksq(7, 0), EMPTY);   // white short
-                b.set(mksq(5, 0), W_ROOK);
-            } else {
-                b.set(mksq(0, 0), EMPTY);   // white long
-                b.set(mksq(3, 0), W_ROOK);
-            }
-        }
-        
-        else {
-            if (m.is_cas_short()) {
-                b.set(mksq(7, 7), EMPTY);   // white short
-                b.set(mksq(5, 7), B_ROOK);
-            } else {
-                b.set(mksq(0, 7), EMPTY);   // white long
-                b.set(mksq(3, 7), B_ROOK);  
-            }
-        }
-            
-    }
-    
-    // en-passant
-    if (m.is_ep()) {
-        if (col == WHITE) {
-            b.set(mksq(m.get_ep_file(), 4), EMPTY);
-        } else {
-            b.set(mksq(m.get_ep_file(), 3), EMPTY);
-        }
-    }
-       
-    // move piece
-    Piece p = b.get(m.from);
-    b.set(m.to, p);
-    b.set(m.from, EMPTY);
-
-    // promotion
-    if (m.is_prom()) {
-        Piece p = m.get_prom_piece(col);
-        b.set(m.to, p);
-    }
-    
-    // TODO: if pawn moves two squares, set ep exists
-    
-    return;
-}
-
-// version of make move which doesn't assume the move is correctly configured
-void make_move_hard(Board & b, Move m) {
-    
-    // TODO: same note as above in make_move (castling rights, ep etc)
-    b.flip_white();
-    
-    // castling
-    if (type(b.get(m.from)) == KING) {
-        int delta = get_x(m.from) - get_x(m.to);
-        if (delta == 2 || delta == -2) {
-            
-            // white short
-            if (m.to == mksq(6, 0)) {
-                b.set(mksq(7, 0), EMPTY);
-                b.set(mksq(5, 0), W_ROOK);
-            }
-            
-            // white long
-            else if (m.to == mksq(2, 0)) {
-                b.set(mksq(0, 0), EMPTY);
-                b.set(mksq(3, 0), W_ROOK);
-            }
-            
-            // black short
-            else if (m.to == mksq(6, 7)) {
-                b.set(mksq(7, 7), EMPTY);
-                b.set(mksq(5, 7), B_ROOK);
-            }
-            
-            // black long
-            else {
-                b.set(mksq(0, 7), EMPTY);
-                b.set(mksq(3, 7), B_ROOK);
-            }
-        }
-    }
-    
-    // en-passant
-    if (type(b.get(m.from)) == PAWN && get_x(m.from) != get_x(m.to)) {
-        if (b.get(m.to) == EMPTY) {
-            
-            // white
-            if (get_y(m.to) == 5) {
-                b.set(mksq(get_x(m.to), 4), EMPTY);
-            }
-            
-            // black   
-            else {
-                b.set(mksq(get_x(m.to), 3), EMPTY);
-            }            
-        }
-    }
-       
-    // move piece
-    Piece p = b.get(m.from);
-    b.set(m.to, p);
-    b.set(m.from, EMPTY);
-
-    // promotion
-    if (type(b.get(m.to)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0)) {
-        Piece p = m.get_prom_piece(colour(b.get(m.to)));
-        b.set(m.to, p);
-    }
-    
-    return;
-}
-
-/*************************************************************************
  *  BITMAP piece move functions
  ************************************************************************/
 
@@ -945,17 +816,15 @@ void legal_moves(const Board & b, vector<Move> & moves) {
     }
     
     // for each, check whether it leaves us in check
-    Board otherb;
     
     auto itr = moves.begin();
     Move m;
     
     while (itr != moves.end()) {
         m = *(itr++);
-        otherb = b;
-        make_move_hard(otherb, m);
-        otherb.flip_white(); // so that we are still checking the same side for being in check
-        if (in_check_hard(otherb)) {
+        Board local = b;
+        local.mutate_hard(m);
+        if (in_check_hard(local)) {
             moves.erase(itr);
         }
     }

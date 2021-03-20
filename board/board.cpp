@@ -235,6 +235,137 @@ void Board::set_wholemoves(unsigned u) {
 }
 void Board::inc_wholemoves() { conf += (1 << 16); }
 
+/* change the position of the pieces, without affecting config */
+void Board::mutate(const Move m) {
+    
+    Ptype col = colour_to_move();
+    
+    // castling
+    if (m.is_cas()) {   
+   
+        if (col == WHITE) {
+            if (m.is_cas_short()) {
+                set(mksq(7, 0), EMPTY);   // white short
+                set(mksq(5, 0), W_ROOK);
+            } else {
+                set(mksq(0, 0), EMPTY);   // white long
+                set(mksq(3, 0), W_ROOK);
+            }
+        }
+        
+        else {
+            if (m.is_cas_short()) {
+                set(mksq(7, 7), EMPTY);   // white short
+                set(mksq(5, 7), B_ROOK);
+            } else {
+                set(mksq(0, 7), EMPTY);   // white long
+                set(mksq(3, 7), B_ROOK);  
+            }
+        }
+            
+    }
+    
+    // en-passant
+    if (m.is_ep()) {
+        if (col == WHITE) {
+            set(mksq(m.get_ep_file(), 4), EMPTY);
+        } else {
+            set(mksq(m.get_ep_file(), 3), EMPTY);
+        }
+    }
+       
+    // move piece
+    Piece p = get(m.from);
+    set(m.to, p);
+    set(m.from, EMPTY);
+
+    // promotion
+    if (m.is_prom()) {
+        Piece p = m.get_prom_piece(col);
+        set(m.to, p);
+    }
+    
+    return;
+}
+
+void Board::mutate_hard(const Move m) {
+       
+    // castling
+    if (type(get(m.from)) == KING) {
+        int delta = get_x(m.from) - get_x(m.to);
+        if (delta == 2 || delta == -2) {
+            
+            // white short
+            if (m.to == mksq(6, 0)) {
+                set(mksq(7, 0), EMPTY);
+                set(mksq(5, 0), W_ROOK);
+            }
+            
+            // white long
+            else if (m.to == mksq(2, 0)) {
+                set(mksq(0, 0), EMPTY);
+                set(mksq(3, 0), W_ROOK);
+            }
+            
+            // black short
+            else if (m.to == mksq(6, 7)) {
+                set(mksq(7, 7), EMPTY);
+                set(mksq(5, 7), B_ROOK);
+            }
+            
+            // black long
+            else {
+                set(mksq(0, 7), EMPTY);
+                set(mksq(3, 7), B_ROOK);
+            }
+        }
+    }
+    
+    // en-passant
+    if (type(get(m.from)) == PAWN && get_x(m.from) != get_x(m.to)) {
+        if (get(m.to) == EMPTY) {
+            
+            // white
+            if (get_y(m.to) == 5) {
+                set(mksq(get_x(m.to), 4), EMPTY);
+            }
+            
+            // black   
+            else {
+                set(mksq(get_x(m.to), 3), EMPTY);
+            }            
+        }
+    }
+       
+    // move piece
+    Piece p = get(m.from);
+    set(m.to, p);
+    set(m.from, EMPTY);
+
+    // promotion
+    if (type(get(m.to)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0)) {
+        Piece p = m.get_prom_piece(colour(get(m.to)));
+        set(m.to, p);
+    }
+    
+    return;
+}
+
+/* create and return a new board, the succeeding position (config updated) */
+Board Board::successor(const Move m) {
+    // TODO stub
+    Move m2 = m;
+    m2.set_cas();
+    return starting_pos();
+}
+
+Board Board::successor_hard(const Move m) {
+    // TODO stub
+    Move m2 = m;
+    m2.set_cas();
+    return starting_pos();
+}
+
 /******************This is an XOR version of get/set epfile, half and whole. Comparable speed
 // read write 3 bits representing ep file 
 unsigned get_ep_file() {
