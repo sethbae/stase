@@ -264,7 +264,7 @@ Bitmap attack_search(const Board & b, const Square s,
     
     Bitmap bmap = (Bitmap) 0;
     
-    Piece p = b.get(s);
+    //Piece p = b.get(s);
     Square temp = s;
     int level = 1;
 

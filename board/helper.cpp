@@ -79,6 +79,7 @@ string ptos_alg(Piece p) {
 
 Move santomove(string san) {
     // needs to be able to find where the piece is coming from given its destination
+    san = "";
     Move m = {0, 0, 0};
     return m;
 }

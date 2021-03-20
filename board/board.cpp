@@ -95,7 +95,7 @@ const unsigned CAS_BL_MASK = 1 << 4;
 const unsigned EP_EX_MASK = 1 << 5;
 const unsigned EP_FILE_MASK = 7 << 6;
 const unsigned HALF_M_MASK = 127 << 9;
-const unsigned WHOLE_M_MASK = (~0) << 16;
+const unsigned WHOLE_M_MASK = (unsigned)(~0) << 16;
 
 /* lookup tables for querying information about a given piece. The 4-bit piece (0-14 valid)
    is used as an index into the relevant table */
