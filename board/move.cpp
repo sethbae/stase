@@ -101,6 +101,10 @@ void make_move(Board & b, Move m) {
     
     Ptype col = colour(b.get(m.from));
     
+    b.flip_white();
+    b.set_ep_exists(false);
+    // TODO: update castling rights, things like this
+    
     // castling
     if (m.is_cas()) {
    
@@ -146,11 +150,16 @@ void make_move(Board & b, Move m) {
         b.set(m.to, p);
     }
     
+    // TODO: if pawn moves two squares, set ep exists
+    
     return;
 }
 
 // version of make move which doesn't assume the move is correctly configured
 void make_move_hard(Board & b, Move m) {
+    
+    // TODO: same note as above in make_move (castling rights, ep etc)
+    b.flip_white();
     
     // castling
     if (type(b.get(m.from)) == KING) {
@@ -404,7 +413,7 @@ Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
 
 }
 
-void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec) {
+/*void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec) {
     
     Bitmap bmap = piecemoves_ignore_check(b, s);
     Square newsq;
@@ -421,15 +430,12 @@ void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec
         }
     }
     
-}
+}*/
 
-Bitmap piecemoves(const Board & b, const Square) {
+// TODO
+/*Bitmap piecemoves(const Board & b, const Square) {
     return (Bitmap) 0;
-}
-
-void piecemoves(const Board & b, const Square, vector<Move> & vec) {
-
-}
+}*/
 
 /*************************************************************************
  *  VECTOR piece move functions
@@ -471,25 +477,25 @@ void line_search(const Board & b, const Square s,
     return;
 }
 
-Bitmap ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
+void ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
    
-    return line_search(b, start_sq, inc_x, val_x, moves) 
-            | line_search(b, start_sq, dec_x, val_x, moves)
-            | line_search(b, start_sq, inc_y, val_y, moves)
-            | line_search(b, start_sq, dec_y, val_y, moves);
+    line_search(b, start_sq, inc_x, val_x, moves); 
+    line_search(b, start_sq, dec_x, val_x, moves);
+    line_search(b, start_sq, inc_y, val_y, moves);
+    line_search(b, start_sq, dec_y, val_y, moves);
     
 }
 
-Bitmap diag(const Board & b, const Square start_sq, vector<Move> & moves) {
+void diag(const Board & b, const Square start_sq, vector<Move> & moves) {
     
-    return line_search(b, start_sq, diag_ur, val, moves)
-            | line_search(b, start_sq, diag_dl, val, moves)
-            | line_search(b, start_sq, diag_dr, val, moves)
-            | line_search(b, start_sq, diag_ul, val, moves);
+    line_search(b, start_sq, diag_ur, val, moves);
+    line_search(b, start_sq, diag_dl, val, moves);
+    line_search(b, start_sq, diag_dr, val, moves);
+    line_search(b, start_sq, diag_ul, val, moves);
     
 }
 
-Bitmap knight_moves(const Board & b, const Square s, vector<Move> & moves) {
+void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 
     unsigned x = get_x(s), y = get_y(s);
     Ptype knightcol = colour(b.get(s));
@@ -726,7 +732,7 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
     if (b.get_ep_exists() && y == START_RANK + 3*FORWARD) {
         unsigned epfile = b.get_ep_file();
         if (epfile == x + 1 || epfile == x - 1) {
-            m.to = b.get_ep_square();
+            m.to = b.get_ep_sq();
             m.set_cap();
             m.set_cap_piece((pawncolour == WHITE) ? B_PAWN : W_PAWN);
             m.set_ep();
@@ -811,8 +817,8 @@ bool in_check_hard(const Board & b) {
 
     bool white = b.get_white();
     Piece king = (white ? W_KING : B_KING);
-    Square ksq;
-    unsigned king_x, king_y;
+    Square ksq = 0;
+    unsigned king_x = 0, king_y = 0;
     
     // find king square
     for (int i = 0; i < 8; ++i) {
@@ -917,7 +923,7 @@ bool in_check_attack_map(const Board & b, Ptype c) {
     Bitmap attack = attack_map(b, enemy);
 
     // Both the king position and the attack map can be maintained and updated every move, which can make this function O(1)
-    return king_pos & attack != 0;
+    return king_pos & attack;
 }
 
 /*************************************************************************
@@ -925,6 +931,40 @@ bool in_check_attack_map(const Board & b, Ptype c) {
  ************************************************************************/
 
 void legal_moves(const Board & b, vector<Move> & moves) {
+    
+    Ptype col = b.get_white() ? WHITE : BLACK;
+    
+    // get moves for every piece on the board
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            Square sq = mksq(x, y);
+            if (colour(b.get(sq)) == col) {
+                piecemoves_ignore_check(b, sq, moves);
+            }   
+        }
+    }
+    
+    // for each, check whether it leaves us in check
+    Board otherb;
+    
+    auto itr = moves.begin();
+    Move m;
+    
+    while (itr != moves.end()) {
+        m = *(itr++);
+        otherb = b;
+        make_move_hard(otherb, m);
+        otherb.flip_white(); // so that we are still checking the same side for being in check
+        if (in_check_hard(otherb)) {
+            moves.erase(itr);
+        }
+    }
+    
+    
+    return;
+}
 
+Bitmap legal_moves() {
+    return (Bitmap) 0;
 }
 
