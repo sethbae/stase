@@ -144,8 +144,8 @@ void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 void legal_moves(const Board &, std::vector<Move> &);
 void legal_moves2(const Board &, std::vector<Move> &);
 
-bool in_check(const Board &);
-bool in_check(const Gamestate &);
+bool in_check_hard(const Board &);
+bool in_check_attack_map(const Board &, Ptype);
 
 Square mksq(const int, const int);
 

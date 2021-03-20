@@ -319,7 +319,7 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
 }
 
 /* returns true iff the player to move is in check */
-bool in_check(const Board & b) {
+bool in_check_hard(const Board & b) {
 
     bool white = b.get_white();
     Piece king = (white ? W_KING : B_KING);
@@ -427,7 +427,7 @@ bool in_check_attack_map(const Board & b, Ptype c) {
     }
     end_loop:
 
-    Ptype enemy = c == WHITE ? BLACK : WHITE;
+    Ptype enemy = (c == WHITE) ? BLACK : WHITE;
     Bitmap attack = attack_map(b, enemy);
 
     // Both the king position and the attack map can be maintained and updated every move, which can make this function O(1)

@@ -724,9 +724,81 @@ void attack_map_generation() {
     
 */
 
+void compare_check() {
+
+    const int k = 1000000;
+
+    vector<string> fens;
+    read_fens(k, fens);
+    
+    Board* boards = new Board[fens.size()];
+    
+    for (int i = 0; i < fens.size(); ++i)
+        boards[i] = fen_to_board(fens[i]);
+        
+    int sum = 0;
+    int count = 0;
+           
+    // first bench - using in check hard
+           
+    auto start = high_resolution_clock::now();
+    
+    /***********************************************/   
+    while (count < k) {
+        for (int i = 0; i < fens.size() && count < k; ++i) {
+            sum += (int) in_check_hard(boards[i]);
+            ++count;
+        }
+    }
+    /***********************************************/
+    
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(stop - start);
+    double millis = duration.count() / 1000.0;
+    double per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+    
+    // second bench - using attack map
+    
+    sum = 0;
+    count = 0;
+    
+    start = high_resolution_clock::now();
+    
+    /***********************************************/
+    while (count < k) {
+        for (int i = 0; i < fens.size() && count < k; ++i) {
+            sum += (int) in_check_attack_map(boards[i], BLACK);
+            ++count;
+        }
+    }
+    /***********************************************/
+    
+    /* end benchmark and return */
+    stop = high_resolution_clock::now();
+    
+    duration = duration_cast<microseconds>(stop - start);
+    millis = duration.count() / 1000.0;
+    per_board = duration.count() / (double) k;
+    
+    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
+    cout << "(" << per_board << " microseconds per board)\n";  
+    cout << "\t(Sum: " << sum << ")\n";
+    cout << "\n";
+
+}
+
 int main(void) {
 
-    attack_map_generation();
+    //attack_map_generation();
+
+    compare_check();
 
     // write_test();
     // read_test();
