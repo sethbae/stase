@@ -129,8 +129,9 @@ struct Move {
 
 
 /* helper functions for board and move */
+Move empty_move();
 void make_move(Board &, Move);
-void make_move_hard(Board &, Move);
+void make_move_hard(Board &, Move); // does not assume flags are correct
 Board fen_to_board(const std::string & fen);
 std::string board_to_fen(const Board &);
 Board empty_board();

@@ -79,10 +79,64 @@ void Move::set_cap_piece(Piece p) {
     flags |= (p << CAP_PIECE_OFFSET);
 }
 
-void make_move(Board & b, Move m) {
-
+Move empty_move() {
+    Move m = {0, 0, 0};
+    return m;
 }
 
+void make_move(Board & b, Move m) {
+    
+    Ptype col = colour(b.get(m.from));
+    
+    // castling
+    if (m.is_cas()) {
+   
+        if (col == WHITE) {
+            if (m.is_cas_short()) {
+                b.set(mksq(7, 0), EMPTY);   // white short
+                b.set(mksq(5, 0), W_ROOK);
+            } else {
+                b.set(mksq(0, 0), EMPTY);   // white long
+                b.set(mksq(3, 0), W_ROOK);
+            }
+        }
+        
+        else {
+            if (m.is_cas_short()) {
+                b.set(mksq(7, 7), EMPTY);   // white short
+                b.set(mksq(5, 7), B_ROOK);
+            } else {
+                b.set(mksq(0, 7), EMPTY);   // white long
+                b.set(mksq(3, 7), B_ROOK);  
+            }
+        }
+            
+    }
+    
+    // en-passant
+    if (m.is_ep()) {
+        if (col == WHITE) {
+            b.set(mksq(m.get_ep_file(), 4), EMPTY);
+        } else {
+            b.set(mksq(m.get_ep_file(), 3), EMPTY);
+        }
+    }
+       
+    // move piece
+    Piece p = b.get(m.from);
+    b.set(m.to, p);
+    b.set(m.from, EMPTY);
+
+    // promotion
+    if (m.is_prom()) {
+        Piece p = m.get_prom_piece(col);
+        b.set(m.to, p);
+    }
+    
+    return;
+}
+
+// version of make move which doesn't assume the move is correctly configured
 void make_move_hard(Board & b, Move m) {
     
     // castling
