@@ -284,30 +284,6 @@ Bitmap piecemoves_ignore_check(const Board & b, const Square s) {
 
 }
 
-/*void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & vec) {
-    
-    Bitmap bmap = piecemoves_ignore_check(b, s);
-    Square newsq;
-    
-    for(int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            newsq = mksq(i, j);
-            if (test_square(bmap, newsq)) {
-                Move m = empty_move();
-                m.from = s;
-                m.to = newsq;
-                vec.push_back(m);
-            }
-        }
-    }
-    
-}*/
-
-// TODO
-/*Bitmap piecemoves(const Board & b, const Square) {
-    return (Bitmap) 0;
-}*/
-
 /*************************************************************************
  *  VECTOR piece move functions
  ************************************************************************/
@@ -577,12 +553,30 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     // forward moves
     if (val(sq = mksq(x, y + FORWARD)) && b.get(sq) == EMPTY) {
+        
         m.to = sq;
+        
+        // final rank: promotion
+        if (get_y(sq) == 0 || get_y(sq) == 7) {
+            m.set_prom();
+            m.set_prom_piece(QUEEN);
+            Move m2 = m;
+            m2.set_prom_piece(ROOK);
+            moves.push_back(m2);
+            m2.set_prom_piece(BISHOP);
+            moves.push_back(m2);
+            m2.set_prom_piece(KNIGHT);
+            moves.push_back(m2);
+        }
+        
         moves.push_back(m);
+        
+        // starting rank: double move
         if (y == START_RANK && b.get(sq = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
             m.to = sq;
             moves.push_back(m);
-        }
+        } 
+        
     }
     
     // regular captures
@@ -590,12 +584,36 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
         m.to = sq;
         m.set_cap();
         m.set_cap_piece(b.get(sq));
+        // final rank: promotion
+        if (get_y(sq) == 0 || get_y(sq) == 7) {
+            m.set_prom();
+            m.set_prom_piece(QUEEN);
+            Move m2 = m;
+            m2.set_prom_piece(ROOK);
+            moves.push_back(m2);
+            m2.set_prom_piece(BISHOP);
+            moves.push_back(m2);
+            m2.set_prom_piece(KNIGHT);
+            moves.push_back(m2);
+        }
         moves.push_back(m);
     }
     if (val(sq = mksq(x + 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour) {
         m.to = sq;
         m.set_cap();
         m.set_cap_piece(b.get(sq));
+        // final rank: promotion
+        if (get_y(sq) == 0 || get_y(sq) == 7) {
+            m.set_prom();
+            m.set_prom_piece(QUEEN);
+            Move m2 = m;
+            m2.set_prom_piece(ROOK);
+            moves.push_back(m2);
+            m2.set_prom_piece(BISHOP);
+            moves.push_back(m2);
+            m2.set_prom_piece(KNIGHT);
+            moves.push_back(m2);
+        }
         moves.push_back(m);   
     }
     
@@ -684,10 +702,10 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
 }
 
 /* returns true iff the player to move is in check */
-bool in_check_hard(const Board & b) {
-
-    bool white = b.get_white();
-    Piece king = (white ? W_KING : B_KING);
+bool in_check_hard(const Board & b, Ptype col) {
+    
+    bool white = (col == WHITE);
+    Piece king = (white) ? W_KING : B_KING;
     Square ksq = 0;
     unsigned king_x = 0, king_y = 0;
     
@@ -742,9 +760,28 @@ bool in_check_hard(const Board & b) {
         return true;
     if (val(sq = mksq(king_x - 2, king_y - 1)) && b.get(sq) == enemy_knight)
         return true;
+
+    // check king (daft but thorough - stops legal_moves letting kings move next to each other)
+    Piece enemy_king = white ? B_KING : W_KING;
+    if (val(sq = mksq(king_x + 1, king_y + 1))  && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x + 1, king_y))      && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x + 1, king_y - 1))  && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x,     king_y + 1))  && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x,     king_y - 1))  && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y + 1))  && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y))      && b.get(sq) == enemy_king)
+        return true;
+    if (val(sq = mksq(king_x - 1, king_y - 1))  && b.get(sq) == enemy_king)
+        return true;
         
     // search out from king
-    
+
     Piece queen, bishop, rook;
     if (white) {
         queen = B_QUEEN;
@@ -775,6 +812,10 @@ bool in_check_hard(const Board & b) {
     return false;
 }
 
+bool in_check_hard(const Board & b) {
+    return in_check_hard(b, b.colour_to_move());
+}
+
 bool in_check_attack_map(const Board & b, Ptype c) {
 
     Bitmap king_pos = 0;
@@ -801,6 +842,18 @@ bool in_check_attack_map(const Board & b, Ptype c) {
  *  Legal move functions
  ************************************************************************/
 
+void legal_piecemoves(const Board & b, const Square s, vector<Move> & moves) {
+    // TODO stub
+    b.get(s); moves.size();
+    return;
+}
+
+Bitmap legal_piecemoves(const Board & b, const Square s) {
+    // TODO stub
+    b.get(s);
+    return (Bitmap) 0;
+}
+
 void legal_moves(const Board & b, vector<Move> & moves) {
     
     Ptype col = b.get_white() ? WHITE : BLACK;
@@ -821,19 +874,24 @@ void legal_moves(const Board & b, vector<Move> & moves) {
     Move m;
     
     while (itr != moves.end()) {
-        m = *(itr++);
+        m = *itr;
+        //cout << movetosan(b, m) << " ";
         Board local = b;
         local.mutate_hard(m);
         if (in_check_hard(local)) {
-            moves.erase(itr);
+            itr = moves.erase(itr);
+        } else {
+            itr++;
         }
+        
     }
-    
     
     return;
 }
 
-Bitmap legal_moves() {
-    return (Bitmap) 0;
+vector<Move> legal_moves(const Board & b) {
+    vector<Move> moves;
+    legal_moves(b, moves);
+    return moves;
 }
 

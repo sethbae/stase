@@ -366,7 +366,7 @@ Board Board::successor_hard(const Move m) {
     return starting_pos();
 }
 
-/******************This is an XOR version of get/set epfile, half and whole. Comparable speed
+/******************This is an XOR version of get/set epfile, half and whole. Comparable speed.
 // read write 3 bits representing ep file 
 unsigned get_ep_file() {
     return (conf & EP_FILE_MASK) >> 6;

@@ -146,25 +146,23 @@ struct Board {
 
 /* helper functions for board and move */
 Move empty_move();
-void make_move(Board &, Move);
-void make_move_hard(Board &, Move); // does not assume flags are correct
 Board fen_to_board(const std::string & fen);
 std::string board_to_fen(const Board &);
 Board empty_board();
 Board starting_pos();
 
-// other functions still in move
+/* get moves for a piece or position */
 Bitmap piecemoves(const Board &, const Square);
-void piecemoves(const Board &, const Square, std::vector<Move> &);
-
 Bitmap piecemoves_ignore_check(const Board &, const Square);
+void piecemoves(const Board &, const Square, std::vector<Move> &);
 void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
-
-void legal_moves(const Board &, std::vector<Move> &);
-void legal_moves2(const Board &, std::vector<Move> &);
-
 bool in_check_hard(const Board &);
+bool in_check_hard(const Board &, Ptype); // (colour specified)
 bool in_check_attack_map(const Board &, Ptype);
+void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
+Bitmap legal_piecemoves(const Board &, const Square);
+void legal_moves(const Board &, std::vector<Move> &);
+std::vector<Move> legal_moves(const Board &);
 
 Square mksq(const int, const int);
 
@@ -193,8 +191,8 @@ std::string ptos_alg(const Piece);
 Piece ctop(const char);
 Square stosq(const std::string);
 std::string sqtos(const Square);
-Move santomove(std::string);
-std::string movetosan(Board &, Move);
+Move santomove(const std::string);
+std::string movetosan(const Board &, const Move);
 
 /* print functions (write to stdout using cout) */
 void pr_board(const Board &);
