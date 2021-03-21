@@ -75,18 +75,59 @@ string ptos_alg(Piece p) {
     }
 }
 
-/***** Move to SAN and SAN to move (stubs) *****/
+/***** Move to SAN and SAN to move *****/
 
-Move santomove(string san) {
-    // needs to be able to find where the piece is coming from given its destination
-    san = "";
+Move santomove(const string san) {
+    // TODO needs to be able to find where the piece is coming from given its destination
+    san.size();
     Move m = {0, 0, 0};
     return m;
 }
 
-string movetosan(Board & b, Move m) {
-    // doesn't do captures, checks, promotions or disambiguations
-    return ptos_alg(b.get(m.from)) + sqtos(m.to);
+/* accepts a move and the board it belongs to; whether or not the move has already been made */
+string movetosan(const Board & b, const Move m) {
+    // TODO doesn't do disambiguations
+    
+    string s = "";
+    bool move_made = (b.get(m.from) == EMPTY);
+    
+    Ptype col;
+    if (move_made)
+        col = colour(b.get(m.to));
+    else
+        col = colour(b.get(m.from));
+    
+    // add character for piece type
+    Square piece_loc = m.from;
+    if (move_made && !m.is_prom())
+        piece_loc = m.to;
+    
+    s += ptos_alg(b.get(piece_loc));
+    
+    // for captures add x
+    if (m.is_cap()) {
+        if (type(b.get(piece_loc)) == PAWN || m.is_prom()) {
+            s += (char) (get_x(m.from) + 'a');
+        }
+        s += "x";
+    }
+        
+    // add destination
+    s += sqtos(m.to);
+    
+    // for promotions, add =Q
+    if (m.is_prom()) {
+        s += "=";
+        s += ptos_alg(m.get_prom_piece(col));
+    }
+    
+    // add + for check
+    Ptype opposite_colour = (col == WHITE) ? BLACK : WHITE;
+    if (in_check_hard(b, opposite_colour)) {
+        s += "+";
+    }
+    
+    return s;
 }
 
 /***** useful for reading ints and strings from a stringstream *****/
