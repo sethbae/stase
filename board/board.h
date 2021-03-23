@@ -104,8 +104,8 @@ struct Board {
     void mutate_hard(const Move); // does not assume move flags are correctly set
     
     /* create and return a new board, the succeeding position (config updated) */
-    Board successor(const Move);
-    Board successor_hard(const Move);
+    Board successor(const Move) const;
+    Board successor_hard(const Move) const;
 
     /* get/set the entire config word */
     void set_conf_word(Int);
