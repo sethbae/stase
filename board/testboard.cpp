@@ -2,6 +2,7 @@
 
 #include <iostream>
 using std::cout;
+using std::cin;
 #include <vector>
 using std::vector;
 #include <string>
@@ -289,7 +290,7 @@ void test_in_check() {
         
         Board b = fen_to_board(fen);
         
-        bool check = in_check(b);
+        bool check = in_check_hard(b);
         
         if (check != b.get_cas_ws()) {
             cout << "TEST FAILED:\n";
@@ -309,7 +310,68 @@ void test_in_check() {
 
 }
 
-void gamestate_generation() {
+void test_castling() {
+    
+    // TODO stub
+
+    //"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"r3k2r/8/8/8/8/8/8/R3KN1R w KQkq - 0 1"
+    //"r3k2r/8/8/8/8/8/8/R2bK2R w KQkq - 0 1"
+    //"r3kN1r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"rq2k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"rq2k2r/b7/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    
+
+    return;
+}
+
+void manual_gameplay() {
+    
+    Board b = starting_pos();
+    vector<Move> moves;
+    
+    while (true) {
+    
+        pr_board_conf(b); cout << "\n";
+        
+        moves.clear();
+        legal_moves(b, moves);
+        
+        for (Move m : moves) {
+            cout << movetosan(b, m) << " ";
+        }
+        cout << "\n\n";
+        
+        Move player_move = empty_move();
+        bool valid_move = false;
+        
+        while (!valid_move) {
+            
+            cout << ">> ";
+            
+            string userIn;
+            cin >> userIn;
+            
+            for (Move m : moves) {
+                if (movetosan(b, m) == userIn) {
+                    player_move = m;
+                    valid_move = true;
+                    break;
+                }
+            }
+            
+            if (!valid_move) {
+                cout << "Invalid\n";
+            }
+        }
+        
+        b = b.successor(player_move);
+        
+    }
+    
+}
+
+/*void gamestate_generation() {
     Board b = starting_pos();
     Gamestate g(b);
 
@@ -352,19 +414,19 @@ void gamestate_generation() {
     cout << "\nPawns:\n";
     pr_bitmap(g.pawns);
 
-}
+}*/
 
 int main(void) {
     // piece_types();
     // setget_square();
     // square_navigation(false);
     // test_in_check();
-    gamestate_generation();
+    // gamestate_generation();
     
     // Board b = starting_pos();
     // pr_bitmap(attack_map(b, WHITE));
     
-
+    manual_gameplay();
 
     return 0;
 }
