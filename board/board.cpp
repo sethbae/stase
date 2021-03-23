@@ -352,14 +352,84 @@ void Board::mutate_hard(const Move m) {
 }
 
 /* create and return a new board, the succeeding position (config updated) */
-Board Board::successor(const Move m) {
-    // TODO stub
-    Move m2 = m;
-    m2.set_cas();
-    return starting_pos();
+Board Board::successor(const Move m) const {
+    
+    // beware the difference: to refer to the board before pieces move, use [this]
+    //  i.e. get() not b.get(). Using b.get() will refer to the board after pieces move.
+    
+    // create new board and mutate it by the move
+    Board b = *this;
+    b.mutate(m);
+    
+    // if white and there are castling rights to lose
+    if (get_white() && (get_cas_ws() || get_cas_wl())) {
+        
+        // castling rights (from king move)
+        if (m.is_cas() || get(m.from) == W_KING) {
+            b.set_cas_ws(false);
+            b.set_cas_wl(false);
+        }
+        
+        // castling rights from rook move
+        if (get(m.from) == W_ROOK) {
+            if (m.from == mksq(7, 0)) {
+                b.set_cas_ws(false);
+            } else if (m.from == mksq(0, 0)) {
+                b.set_cas_wl(false);
+            }
+        }
+    
+    }
+    
+    // if black and there are castling rights to lose
+    if (!get_white() && (get_cas_bs() || get_cas_bl())) {
+        
+        // castling rights (from king move)
+        if (m.is_cas() || get(m.from) == B_KING) {
+            b.set_cas_bs(false);
+            b.set_cas_bl(false);
+        }
+        
+        // castling rights from rook move
+        if (get(m.from) == B_ROOK) {
+            if (m.from == mksq(7, 7)) {
+                b.set_cas_bs(false);
+            } else if (m.from == mksq(0, 7)) {
+                b.set_cas_bl(false);
+            }
+        }
+    
+    }
+    
+    // en-passant
+    if (type(get(m.from)) == PAWN) {
+        if ((get_white() && get_y(m.to) - get_y(m.from) == 2)
+                || (!get_white() && get_y(m.to) - get_y(m.from) == -2)) {
+            b.set_ep_exists(true);
+            b.set_ep_file(get_x(m.from));
+        }
+    } else {
+        b.set_ep_exists(false);
+    }
+    
+    // half moves
+    if (m.is_cap() || type(get(m.from)) == PAWN) {
+        b.set_halfmoves(0);
+    } else {
+        b.inc_halfmoves();
+    }
+    
+    // whole moves
+    if (!get_white())
+        b.inc_wholemoves();
+    
+    // turn
+    b.flip_white();
+    
+    return b;
 }
 
-Board Board::successor_hard(const Move m) {
+Board Board::successor_hard(const Move m) const {
     // TODO stub
     Move m2 = m;
     m2.set_cas();
