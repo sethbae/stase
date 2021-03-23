@@ -309,6 +309,21 @@ void test_in_check() {
 
 }
 
+void test_castling() {
+    
+    // TODO stub
+
+    //"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"r3k2r/8/8/8/8/8/8/R3KN1R w KQkq - 0 1"
+    //"r3k2r/8/8/8/8/8/8/R2bK2R w KQkq - 0 1"
+    //"r3kN1r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"rq2k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    //"rq2k2r/b7/8/8/8/8/8/R3K2R w KQkq - 0 1"
+    
+
+    return;
+}
+
 void gamestate_generation() {
     Board b = starting_pos();
     Gamestate g(b);

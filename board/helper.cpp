@@ -97,28 +97,34 @@ string movetosan(const Board & b, const Move m) {
     else
         col = colour(b.get(m.from));
     
-    // add character for piece type
-    Square piece_loc = m.from;
-    if (move_made && !m.is_prom())
-        piece_loc = m.to;
+    if (!m.is_cas()) {
     
-    s += ptos_alg(b.get(piece_loc));
-    
-    // for captures add x
-    if (m.is_cap()) {
-        if (type(b.get(piece_loc)) == PAWN || m.is_prom()) {
-            s += (char) (get_x(m.from) + 'a');
-        }
-        s += "x";
-    }
+        // add character for piece type
+        Square piece_loc = m.from;
+        if (move_made && !m.is_prom())
+            piece_loc = m.to;
         
-    // add destination
-    s += sqtos(m.to);
+        s += ptos_alg(b.get(piece_loc));
+        
+        // for captures add x
+        if (m.is_cap()) {
+            if (type(b.get(piece_loc)) == PAWN || m.is_prom()) {
+                s += (char) (get_x(m.from) + 'a');
+            }
+            s += "x";
+        }
+            
+        // add destination
+        s += sqtos(m.to);
+        
+        // for promotions, add =Q
+        if (m.is_prom()) {
+            s += "=";
+            s += ptos_alg(m.get_prom_piece(col));
+        }
     
-    // for promotions, add =Q
-    if (m.is_prom()) {
-        s += "=";
-        s += ptos_alg(m.get_prom_piece(col));
+    } else {
+        s = m.is_cas_short() ? "O-O" : "O-O-O";
     }
     
     // add + for check

@@ -435,7 +435,94 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 
 }
 
-// TODO: add castling
+// checks the kings castling squares are empty and check-free: nothing more
+bool castle_checks(Board b, const Ptype col, const bool kingside) {
+    
+    Square s1, s2, s3; // intermediate squares
+    Square k = (col == WHITE) ? mksq(4, 0) : mksq(4, 7); // king starting square
+        
+    if (col == WHITE && kingside) {
+        
+        s1 = mksq(5, 0);
+        s2 = mksq(6, 0);
+        
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY) {
+            
+            b.set(k, EMPTY);
+            b.set(s1, W_KING);
+            
+            if (!in_check_hard(b, WHITE)) {
+                b.set(s1, EMPTY);
+                b.set(s2, W_KING);
+                
+                return !in_check_hard(b, WHITE);
+            }
+            
+        }           
+        
+    } else if (col == WHITE && !kingside) {
+        
+        s1 = mksq(3, 0);
+        s2 = mksq(2, 0);
+        s3 = mksq(1, 0);
+        
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY) {
+            
+            b.set(k, EMPTY);
+            b.set(s1, W_KING);
+            
+            if (!in_check_hard(b, WHITE)) {
+                b.set(s1, EMPTY);
+                b.set(s2, W_KING);
+                
+                return !in_check_hard(b, WHITE);
+            }
+            
+        }   
+                
+    } else if (col == BLACK && kingside) {
+        
+        s1 = mksq(5, 7);
+        s2 = mksq(6, 7);
+        
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY) {
+            
+            b.set(k, EMPTY);
+            b.set(s1, B_KING);
+            
+            if (!in_check_hard(b, BLACK)) {
+                b.set(s1, EMPTY);
+                b.set(s2, B_KING);
+                
+                return !in_check_hard(b, BLACK);
+            }
+            
+        }
+                  
+    } else { // BLACK and !kingside
+        
+        s1 = mksq(3, 7);
+        s2 = mksq(2, 7);
+        s3 = mksq(1, 7);
+        
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY) {
+            
+            b.set(k, EMPTY);
+            b.set(s1, B_KING);
+            
+            if (!in_check_hard(b, BLACK)) {
+                b.set(s1, EMPTY);
+                b.set(s2, B_KING);
+                
+                return !in_check_hard(b, BLACK);
+            }
+            
+        } 
+    }
+    
+    return false;
+}
+
 void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     unsigned x = get_x(s), y = get_y(s);
@@ -444,6 +531,49 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     Move m = empty_move();
     m.from = s;
     
+    // check castle for white
+    if (kingcol == WHITE && !in_check_hard(b, WHITE)) {
+        
+        Move c = empty_move();
+        c.from = s;
+        
+        if (castle_checks(b, WHITE, true)) {
+            c.to = mksq(6, 0);
+            c.set_cas();
+            c.set_cas_short();
+            moves.push_back(c);
+        }
+        
+        if (castle_checks(b, WHITE, false)) {
+            c.to = mksq(2, 0);
+            c.set_cas();
+            c.unset_cas_short();
+            moves.push_back(c);
+        }
+    
+    // and for black
+    } else if (kingcol == BLACK && !in_check_hard(b, BLACK)) {
+        
+        Move c = empty_move();
+        c.from = s;
+        
+        if (castle_checks(b, BLACK, true)) {
+            c.to = mksq(6, 7);
+            c.set_cas();
+            c.set_cas_short();
+            moves.push_back(c);
+        }
+        
+        if (castle_checks(b, BLACK, false)) {
+            c.to = mksq(2, 7);
+            c.set_cas();
+            c.unset_cas_short();
+            moves.push_back(c);
+        }
+        
+    }
+    
+    // check all adjacent squares
     if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
         if (type(b.get(sq)) != EMPTY) {
@@ -701,7 +831,7 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
                         
 }
 
-/* returns true iff the player to move is in check */
+/* returns true iff the player of the given colour is in check */
 bool in_check_hard(const Board & b, Ptype col) {
     
     bool white = (col == WHITE);
