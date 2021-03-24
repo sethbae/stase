@@ -6,6 +6,9 @@ using std::cout;
 #include <string>
 using std::string;
 
+#include <vector>
+using std::vector;
+
 #include <sstream>
 using std::stringstream;
 
@@ -268,6 +271,15 @@ string board_to_fen(const Board & b) {
     ss << " " << b.get_halfmoves() << " " << b.get_wholemoves();
 
     return ss.str();
+}
+
+// read PGN into a vector of the moves (still just as strings)
+vector<string> readpgn(const string & s) {
+    // TODO stub
+    vector<string> v;
+    v.push_back(s);
+    return v;
+    
 }
 
 /***** useful functions for getting the start or empty boards without knowing the FENs *****/
