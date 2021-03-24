@@ -146,10 +146,12 @@ struct Board {
 
 /* helper functions for board and move */
 Move empty_move();
-Board fen_to_board(const std::string & fen);
-std::string board_to_fen(const Board &);
 Board empty_board();
 Board starting_pos();
+Board fen_to_board(const std::string & fen);
+std::string board_to_fen(const Board &);
+std::vector<std::string> readpgn(const std::string &);
+
 
 /* get moves for a piece or position */
 Bitmap piecemoves(const Board &, const Square);
