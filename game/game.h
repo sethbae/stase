@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "board.h"
+#include "../board/board.h"
 
 struct Gamestate
 {
@@ -33,6 +33,11 @@ struct Gamestate
     Gamestate();
     Gamestate(const Board &);
     void recalculate_all();
+    void recalculate_attacks();
+    void recalculate_positions();
+    void update(Move m);
 };
+
+bool in_check(Gamestate &);
 
 #endif

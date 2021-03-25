@@ -38,6 +38,8 @@ const unsigned PROM_PIECE_MASK = 3 << PROM_PIECE_OFFSET;
 const unsigned CAP_PIECE_OFFSET = 6;
 const unsigned CAP_PIECE_MASK = 15 << CAP_PIECE_OFFSET;
 
+const int knight_dirs[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
+
 /* get/set promotion, castle flags etc */
 bool Move::is_prom() const { return flags & PROM_FLAG; }
 void Move::set_prom() { flags |= PROM_FLAG; }
@@ -153,6 +155,12 @@ Bitmap knight_moves(const Board & b, const Square s) {
     unsigned x = get_x(s), y = get_y(s);
     Ptype knightcol = colour(b.get(s));
     Square sq;
+
+    // for (int i = 0; i < 8; ++i) {
+    //     if (val(sq = mksq(x + knight_dirs[i][0], y + knight_dirs[i][1])) && colour(b.get(sq)) != knightcol) {
+    //         set_square(bmap, sq);
+    //     }
+    // }
     
     if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol)
         set_square(bmap, sq);
@@ -180,10 +188,19 @@ Bitmap king_moves(const Board & b, const Square s) {
     
     Bitmap bmap = 0;
     
-    unsigned x = get_x(s), y = get_y(s);
     Ptype kingcol = colour(b.get(s));
     Square sq;
-    
+
+    // int adj[] = {-1, 0, 1};
+    // for (int i = 0; i < 3; ++i) {
+    //     for (int j = 0; j < 3; ++j) {
+    //         if (val(sq = mksq(adj[i], adj[j])) && colour(b.get(sq)) != kingcol){
+    //             set_square(bmap, sq);
+    //         }
+    //     }
+    // }
+
+    unsigned x = get_x(s), y = get_y(s);
     if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol)
         set_square(bmap, sq);
     if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol)
@@ -350,6 +367,18 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     Move m = empty_move();
     m.from = s;
+
+    // for (int i = 0; i < 8; ++i) {
+    //     if (val(sq = mksq(x + knight_dirs[i][0], y + knight_dirs[i][1])) && colour(b.get(sq)) != knightcol) {
+    //         m.to = sq;
+    //         if (type(b.get(sq)) != EMPTY) {
+    //             m.set_cap();
+    //             m.set_cap_piece(b.get(sq));
+    //         }
+    //         moves.push_back(m);
+    //         m.unset_cap();
+    //     }
+    // }
     
     if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
@@ -525,7 +554,6 @@ bool castle_checks(Board b, const Ptype col, const bool kingside) {
 
 void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
-    unsigned x = get_x(s), y = get_y(s);
     Ptype kingcol = colour(b.get(s));
     Square sq;
     Move m = empty_move();
@@ -574,6 +602,25 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     }
     
     // check all adjacent squares
+
+    // int adj[] = {-1, 0, 1};
+    // for (int i = 0; i < 3; ++i) {
+    //     for (int j = 0; j < 3; ++j) {
+    //         if (val(sq = mksq(adj[i], adj[j])) && colour(b.get(sq)) != kingcol) {
+    //             m.to = sq;
+    //             if (type(b.get(sq)) != EMPTY) {
+    //                 m.set_cap();
+    //                 m.set_cap_piece(b.get(sq));
+    //             }
+    //             moves.push_back(m);
+    //             m.unset_cap();
+    //         }
+    //     }
+    // }
+
+
+
+    unsigned x = get_x(s), y = get_y(s);
     if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
         if (type(b.get(sq)) != EMPTY) {
@@ -815,14 +862,8 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
 
         Piece otherp = b.get(sq);
         
-        if (type(otherp) != EMPTY) {
-            
-            if (otherp == p1 || otherp == p2) {
-                return true;
-            } else {
-                return false;
-            }
-            
+        if (type(otherp) != EMPTY) {  
+            return otherp == p1 || otherp == p2;
         }
         step(sq);
     }
@@ -874,6 +915,14 @@ bool in_check_hard(const Board & b, Ptype col) {
     // check knight
     Piece enemy_knight = white ? B_KNIGHT : W_KNIGHT;
     Square sq;
+
+    // for (int i = 0; i < 8; ++i) {
+    //     if (val(sq = mksq(king_x + knight_dirs[i][0], king_y + knight_dirs[i][1])) && b.get(sq) == enemy_knight) {
+    //         return true;
+    //     }
+    // }
+
+
     if (val(sq = mksq(king_x + 1, king_y + 2)) && b.get(sq) == enemy_knight)
         return true;
     if (val(sq = mksq(king_x + 1, king_y - 2)) && b.get(sq) == enemy_knight)
@@ -893,6 +942,17 @@ bool in_check_hard(const Board & b, Ptype col) {
 
     // check king (daft but thorough - stops legal_moves letting kings move next to each other)
     Piece enemy_king = white ? B_KING : W_KING;
+
+    // int adj[] = {-1, 0, 1};
+    // for (int i = 0; i < 3; ++i) {
+    //     for (int j = 0; j < 3; ++j) {
+    //         if (val(sq = mksq(king_x + adj[i], king_y + adj[j]))  && b.get(sq) == enemy_king){
+    //             return true;
+    //         }
+    //     }
+    // }
+
+
     if (val(sq = mksq(king_x + 1, king_y + 1))  && b.get(sq) == enemy_king)
         return true;
     if (val(sq = mksq(king_x + 1, king_y))      && b.get(sq) == enemy_king)

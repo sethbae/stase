@@ -416,17 +416,17 @@ void manual_gameplay() {
 
 }*/
 
-int main(void) {
+int main2(void) {
     // piece_types();
     // setget_square();
     // square_navigation(false);
-    // test_in_check();
+    test_in_check();
     // gamestate_generation();
     
     // Board b = starting_pos();
     // pr_bitmap(attack_map(b, WHITE));
     
-    manual_gameplay();
+    // manual_gameplay();
 
     return 0;
 }

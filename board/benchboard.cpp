@@ -198,13 +198,12 @@ void legal_move_test2() {
     for (int j = 0; j < k; ++j) {
         
         Board b = boards[j];
-        Bitmap bmap = (Bitmap) 0;
         
         for (int i = 0; i < 8; ++ i) {
             for (int j = 0; j < 8; ++j) {
                 Piece p = b.get(mksq(i, j));
                 if (colour(p) == b.colour_to_move()) {
-                    x += (unsigned) piecemoves(b, mksq(i, j));
+                    // x += (unsigned) piecemoves(b, mksq(i, j));
                 }
             }
         }
@@ -468,7 +467,6 @@ void piecemoves_bench(const Piece target_piece, int density) {
     for (int j = 0; j < k; ++j) {
         
         Board b = boards[j];
-        Bitmap bmap = (Bitmap) 0;
         
         for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
             for ( ; val_x(s); inc_x(s)) {
@@ -568,7 +566,6 @@ void legal_moves_puzzles() {
     for (int j = 0; j < k; ++j) {
         
         Board b = boards[j];
-        Bitmap bmap = (Bitmap) 0;
         
         for (int x = 0; x < 8; ++x) {
             for (int y = 0; y < 8; ++y) {
@@ -617,7 +614,7 @@ void board_iteration_bench(bool use_mksq) {
         for (int j = 0; j < k; ++j) {
             
             Board b = boards[j];
-            Bitmap bmap = (Bitmap) 0;
+
             
             for (int x = 0; x < 8; ++x) {
                 for (int y = 0; y < 8; ++y) {
@@ -631,7 +628,7 @@ void board_iteration_bench(bool use_mksq) {
         for (int j = 0; j < k; ++j) {
             
             Board b = boards[j];
-            Bitmap bmap = (Bitmap) 0;
+
             
             for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
                 for ( ; val_x(s); inc_x(s)) {
@@ -733,7 +730,7 @@ void compare_check() {
     
     Board* boards = new Board[fens.size()];
     
-    for (int i = 0; i < fens.size(); ++i)
+    for (int i = 0; i < (int) fens.size(); ++i)
         boards[i] = fen_to_board(fens[i]);
         
     int sum = 0;
@@ -745,7 +742,7 @@ void compare_check() {
     
     /***********************************************/   
     while (count < k) {
-        for (int i = 0; i < fens.size() && count < k; ++i) {
+        for (int i = 0; i < (int) (int) fens.size() && count < k; ++i) {
             sum += (int) in_check_hard(boards[i]);
             ++count;
         }
@@ -773,7 +770,7 @@ void compare_check() {
     
     /***********************************************/
     while (count < k) {
-        for (int i = 0; i < fens.size() && count < k; ++i) {
+        for (int i = 0; i < (int) fens.size() && count < k; ++i) {
             sum += (int) in_check_attack_map(boards[i], BLACK);
             ++count;
         }
@@ -794,11 +791,11 @@ void compare_check() {
 
 }
 
-int main(void) {
+int main4(void) {
 
-    //attack_map_generation();
+    // attack_map_generation();
 
-    compare_check();
+    // compare_check();
 
     // write_test();
     // read_test();
@@ -809,6 +806,8 @@ int main(void) {
     // write_config_test();
     // read_config_test();
     // write_parsed_config_test();
+
+    legal_moves_puzzles();
 
     // legal_move_test();
     // legal_move_test2();
@@ -821,4 +820,5 @@ int main(void) {
     
     // pr_board(random_board(W_QUEEN, 5, 5));
     
+    return 0;
 }

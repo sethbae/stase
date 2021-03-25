@@ -23,7 +23,7 @@ using std::ios;
 #include <ctime>
 using std::time;
 
-#include "board.h"
+#include "game.h"
 
 void gamestate_recalculation() {
     Board b = fen_to_board("r1br2k1/1p3ppp/p1nqpb2/3nN3/3P1P2/1B2B3/PPN3PP/R2Q1RK1 w Qq - 0 1");
@@ -88,7 +88,7 @@ void calculating_check_with_gamestate() {
     int sum = 0;
 
     for (int j = 0; j < k; ++j) {
-        sum += in_check(states[j]);
+        // sum += in_check(states[j]);
     }
             
     
