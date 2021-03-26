@@ -407,10 +407,10 @@ Board Board::successor(const Move m) const {
                 || (!get_white() && get_y(m.to) - get_y(m.from) == -2)) {
             b.set_ep_exists(true);
             b.set_ep_file(get_x(m.from));
-        }
-    } else {
+        } else
+            b.set_ep_exists(false);
+    } else
         b.set_ep_exists(false);
-    }
     
     // half moves
     if (m.is_cap() || type(get(m.from)) == PAWN) {
