@@ -217,6 +217,8 @@ Bitmap occupancy_map(const Board &);
 Bitmap friendly_map(const Board &);
 Bitmap enemy_map(const Board &);
 Bitmap attack_map(const Board &, Ptype);
+Bitmap square_map(Square);
+Square map_to_sq(Bitmap);
 Bitmap custom_map(const Board &, bool include(const Board &, Square));
 // Bitmap custom_map(const Board &, bool include(Square, Piece));
 

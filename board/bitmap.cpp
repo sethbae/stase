@@ -334,11 +334,12 @@ Bitmap attack_moves(const Board & b, const Square s) {
 
 Bitmap attack_map(const Board & b, Ptype c) {
     Bitmap acc = (Bitmap) 0;
+    Piece p;    
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Square pos = mksq(i, j);
-            if (colour(b.get(pos)) == c) {
-                acc |= attack_moves(b, pos);
+            if (colour(p = b.get(mksq(i, j))) == c) {
+                // acc |= attack_moves(b, pos);
+                acc |= i + j;
             }
         }
     }
@@ -348,10 +349,10 @@ Bitmap attack_map(const Board & b, Ptype c) {
 
 Bitmap piece_map(const Board & b, Ptype piece) {
     Bitmap acc = (Bitmap) 0;
+    Square pos;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Square pos = mksq(i, j);
-            if (type(b.get(pos)) == piece) {
+            if (type(b.get(pos = mksq(i, j))) == piece) {
                 set_square(acc, pos);
             }
         }
@@ -363,10 +364,10 @@ Bitmap piece_map(const Board & b, Ptype piece) {
 // Generates a bitmap according to a provided boolean function
 Bitmap custom_map(const Board & b, bool include(const Board &, Square)) {
     Bitmap map = 0;
+    Square sq;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Square sq = mksq(i, j);
-            if (include(b, sq)) {
+            if (include(b, sq = mksq(i, j))) {
                 set_square(map, sq);
             }
         }

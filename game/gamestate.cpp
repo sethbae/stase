@@ -14,12 +14,23 @@ Gamestate::Gamestate(const Board & b) : board(b) {
     recalculate_all();
 }
 
+Bitmap g_attack_map(const Gamestate & g, bool friendly) {
+    Bitmap attack = 0;
+    Bitmap map = friendly ? g.foccupy : g.eoccupy;
+    for (Bitmap pos = 1; pos != 0; pos <<= 1) {
+        if (pos & map) {
+            attack |= pos; // TODO: implement better attack_map
+        }
+    }
+    return attack;
+}
+
 void Gamestate::recalculate_attacks() {
     Ptype fcolour = board.colour_to_move();
     Ptype ecolour = fcolour == WHITE ? BLACK : WHITE;
 
-    fattack = attack_map(board, fcolour);
-    eattack = attack_map(board, ecolour);
+    fattack = g_attack_map(* this, fcolour);
+    eattack = g_attack_map(* this, ecolour);
 }
 
 void Gamestate::recalculate_positions() {
@@ -29,34 +40,70 @@ void Gamestate::recalculate_positions() {
     vacancy = occupancy = foccupy = eoccupy = 0;
     kings = queens = bishops = knights = rooks = pawns = 0;
 
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
+    int x = 0, y = 0;
+    for (Bitmap i = 1; i != 0; i <<= 1) {
 
-            Square pos = mksq(i, j);
-            Piece p = board.get(pos);
+        Square pos = mksq(x++, y);
 
-            if (type(p) != EMPTY) {
-                if (colour(p) == WHITE) {
-                    set_square(foccupy, pos);
-                }
-
-                set_square(occupancy, pos);
-
-                switch (type(p)) {
-
-                    case KING: set_square(kings, pos); break;
-                    case QUEEN: set_square(queens, pos); break;
-                    case BISHOP: set_square(bishops, pos); break;
-                    case KNIGHT: set_square(knights, pos); break;
-                    case ROOK: set_square(rooks, pos); break;
-                    case PAWN: set_square(pawns, pos); break;
-                    
-                    default: break;
-                }
-            }
-
+        if (x == 8) {
+            x = 0;
+            ++y;
         }
+
+        Piece p = board.get(pos);
+
+        if (type(p) != EMPTY) {
+            continue;
+        }
+
+        if (colour(p) == WHITE) {
+            foccupy |= i;
+        }
+
+        occupancy |= i;
+
+        switch (type(p)) {
+
+            case KING: kings |= i; break;
+            case QUEEN: queens |= i; break;
+            case BISHOP: bishops |= i; break;
+            case KNIGHT: knights |= i; break;
+            case ROOK: rooks |= i; break;
+            case PAWN: pawns |= i; break;
+            
+            default: break;
+        }
+
     }
+
+    // for (int i = 0; i < 8; ++i) {
+    //     for (int j = 0; j < 8; ++j) {
+
+    //         Square pos = mksq(i, j);
+    //         Piece p = board.get(pos);
+
+    //         if (type(p) != EMPTY) {
+    //             if (colour(p) == WHITE) {
+    //                 set_square(foccupy, pos);
+    //             }
+
+    //             set_square(occupancy, pos);
+
+    //             switch (type(p)) {
+
+    //                 case KING: set_square(kings, pos); break;
+    //                 case QUEEN: set_square(queens, pos); break;
+    //                 case BISHOP: set_square(bishops, pos); break;
+    //                 case KNIGHT: set_square(knights, pos); break;
+    //                 case ROOK: set_square(rooks, pos); break;
+    //                 case PAWN: set_square(pawns, pos); break;
+                    
+    //                 default: break;
+    //             }
+    //         }
+
+    //     }
+    // }
 
     vacancy = ~occupancy;
     eoccupy = ~foccupy & occupancy;
@@ -65,7 +112,7 @@ void Gamestate::recalculate_positions() {
 // With Ofast it takes about 5 microseconds
 void Gamestate::recalculate_all() {
     recalculate_positions();
-    recalculate_attacks();
+    // recalculate_attacks();
 }
 
 Bitmap invalid = -1;
