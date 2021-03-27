@@ -28,7 +28,7 @@ void print_results(int succ, int fail, string test_name) {
 }
 
 /* tests whether or not the pieces have correct types and colours associated with them */
-void piece_types() {
+bool piece_types() {
 
     int successful = 0;
     int failed = 0;
@@ -59,10 +59,11 @@ void piece_types() {
     
     print_results(successful, failed, "PIECE_TYPES");
 
+    return failed == 0;
 }
 
 /* if you set to a square, do you get back what you set? */
-void setget_square() {
+bool setget_square() {
 
     int succ = 0, fail = 0;
 
@@ -86,13 +87,14 @@ void setget_square() {
     }
     
     print_results(succ, fail, "SET/GET SQUARE");
-    
+    return fail == 0;
 }
 
 /*do the square navigation functions work properly? */
-void square_navigation(bool print) {
+bool square_navigation() {
     
     int succ = 0, fail = 0;
+    bool print = false;
     
     Square s = mksq(0, 0);
     
@@ -260,9 +262,10 @@ void square_navigation(bool print) {
     }
     
         print_results(succ, fail, "SQUARE NAVIGATION");
+        return fail == 0;
 }
 
-void rw_fens() {
+bool rw_fens() {
     
     vector<string> test_fens = {"3k4/8/8/8/8/8/4p3/3K4 w K - 0 1",  // pawn checking
                                 "3k4/2P5/8/8/8/8/8/3K4 b K - 0 1",
@@ -301,9 +304,10 @@ void rw_fens() {
     }
     
     print_results(succ, fail, "RW_FEN");
+    return fail == 0;
 }
 
-void test_in_check() {
+bool test_in_check() {
 
     vector<string> test_fens = {"3k4/8/8/8/8/8/4p3/3K4 w K - 0 1",  // pawn checking
                                 "3k4/2P5/8/8/8/8/8/3K4 b K - 0 1",
@@ -350,15 +354,12 @@ void test_in_check() {
         
     }
     
-        print_results(succ, fail, "IN CHECK");
-
+    print_results(succ, fail, "IN CHECK");
+    return fail == 0;
+    
 }
 
-void rw_fens() {
-
-}
-
-void test_castling() {
+bool test_castling() {
     
     // TODO stub
 
@@ -370,10 +371,10 @@ void test_castling() {
     //"rq2k2r/b7/8/8/8/8/8/R3K2R w KQkq - 0 1"
     
 
-    return;
+    return false;
 }
 
-void test_mutate_hard() {
+bool test_mutate_hard() {
 
     Board b;
     Move m;
@@ -583,9 +584,10 @@ void test_mutate_hard() {
 
     
     print_results(succ, fail, "MUTATE HARD");
+    return fail == 0;
 }
 
-void test_mutate() {
+bool test_mutate() {
 
     Board b;
     Move m;
@@ -815,12 +817,12 @@ void test_mutate() {
 
     
     print_results(succ, fail, "MUTATE");
-    
+    return fail == 0;
 }
 
 
-void test_legal_moves() {
-
+bool test_legal_moves() {
+    return false;
 }
 
 void manual_gameplay() {
@@ -915,12 +917,21 @@ void manual_gameplay() {
 }*/
 
 int main(void) {
-    piece_types();
-    setget_square();
-    square_navigation(false);
-    test_in_check();
-    test_mutate_hard();
-    test_mutate();
+
+    vector<bool (*)(void)> tests = {
+        &piece_types,
+        &setget_square,
+        &square_navigation,
+        &rw_fens,
+        &test_in_check,
+        &test_mutate_hard,
+        &test_mutate
+    };
+
+    for (auto test : tests) {
+        if (!(*test)())
+            exit(1);
+    }
 
     //gamestate_generation();
     
