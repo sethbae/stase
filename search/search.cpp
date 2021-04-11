@@ -1,4 +1,12 @@
-/*Search 
-- from a given position, what is the best line of play? 
-- when should I get more candidates to look at? 
-- pruning*/
+#include "game/game.h"
+
+#include <vector>
+using std::vector;
+
+vector<Move> depth_limited_search(const Gamestate & start, int depth) {
+
+    vector<Move> v;
+    
+    return v;
+
+}
