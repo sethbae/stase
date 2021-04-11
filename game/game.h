@@ -44,4 +44,6 @@ typedef float Eval;
 
 Eval heur(const Gamestate &);
 
+std::vector<Move> cands(const Gamestate &);
+
 #endif
