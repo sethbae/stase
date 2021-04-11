@@ -1,7 +1,7 @@
 FLAGS = -std=c++11 -Wall -Wextra -Werror -Wpedantic
 OPT_FLAGS =
 DEPS = board.h
-OBJ = *.o
+OBJ = board.o move.o square.o helper.o bitmap.o
 
 ifneq ($(OPT),none)
 	OPT_FLAGS = -O
