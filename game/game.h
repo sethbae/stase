@@ -40,4 +40,8 @@ struct Gamestate
 
 bool in_check(Gamestate &);
 
+typedef float Eval;
+
+Eval heur(const Gamestate &);
+
 #endif
