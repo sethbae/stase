@@ -4,9 +4,11 @@
 #include <vector>
 using std::vector;
 
+// return caandidate moves for a board; as a minimal working example,
+// return all legal moves
 vector<Move> cands(const Gamestate & gs) {
     
     vector<Move> v;
-    return v;
+    return legalmoves_hard(gs.board, v);
 
 }
