@@ -1,4 +1,4 @@
-#include "board/board.h"
+#include "../board/board.h"
 #include "game.h"
 
 #include <vector>
@@ -9,6 +9,7 @@ using std::vector;
 vector<Move> cands(const Gamestate & gs) {
     
     vector<Move> v;
-    return legalmoves_hard(gs.board, v);
+    legal_moves(gs.board, v);
+    return v;
 
 }
