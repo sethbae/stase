@@ -16,9 +16,10 @@ struct SearchNode {
 };
 
 
-std::vector<Move> depth_limited_search(const Gamestate &, int);
-
+std::vector<SearchNode*> depth_limited_search(const Gamestate &, int);
 
 int subtree_size(SearchNode *);
+
+void readable_printout(std::vector<SearchNode*> &);
 
 #endif
