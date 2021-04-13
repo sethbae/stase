@@ -565,14 +565,14 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
         Move c = empty_move();
         c.from = s;
         
-        if (castle_checks(b, WHITE, true)) {
+        if (b.get_cas_ws() && castle_checks(b, WHITE, true)) {
             c.to = mksq(6, 0);
             c.set_cas();
             c.set_cas_short();
             moves.push_back(c);
         }
         
-        if (castle_checks(b, WHITE, false)) {
+        if (b.get_cas_wl() && castle_checks(b, WHITE, false)) {
             c.to = mksq(2, 0);
             c.set_cas();
             c.unset_cas_short();
@@ -585,14 +585,14 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
         Move c = empty_move();
         c.from = s;
         
-        if (castle_checks(b, BLACK, true)) {
+        if (b.get_cas_bs() && castle_checks(b, BLACK, true)) {
             c.to = mksq(6, 7);
             c.set_cas();
             c.set_cas_short();
             moves.push_back(c);
         }
         
-        if (castle_checks(b, BLACK, false)) {
+        if (b.get_cas_bl() && castle_checks(b, BLACK, false)) {
             c.to = mksq(2, 7);
             c.set_cas();
             c.unset_cas_short();
