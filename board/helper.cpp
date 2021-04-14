@@ -94,6 +94,11 @@ Move santomove(const string san) {
 string movetosan(const Board & b, const Move m) {
     // TODO doesn't do disambiguations
     
+    if (m.from == empty_move().from && m.to == empty_move().to)
+        return "empty move";
+    if (m.from == m.to)
+        return "invalid move";
+    
     string s = "";
     bool move_made = (b.get(m.from) == EMPTY);
     
