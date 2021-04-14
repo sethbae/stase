@@ -307,7 +307,11 @@ Board empty_board() {
     return b;
 }
 
-void wr_board(const Board & b, string indent, ostream & output) {
+/*************************************************************************************
+ WRITING FUNCTIONS         for board, bitmap                write to output stream
+ ************************************************************************************/
+
+void wr_board(const Board & b, const string & indent, ostream & output) {
 
     for (int y = 7; y >= 0; --y) {
         output << indent;
@@ -317,7 +321,8 @@ void wr_board(const Board & b, string indent, ostream & output) {
         }
         output << "\n";
     }
-
+    
+    output << "\n";
     return;
 
 }
@@ -326,131 +331,157 @@ void wr_board(const Board & b, ostream & output) {
     wr_board(b, "", output);
 }
 
-/*************************************************************************************
- PRINTING FUNCTIONS         for board, bitmap
- ************************************************************************************/
-
-/* print out a human readable chess representation of the board */
-void pr_board(const Board & b, string indent) {
-    for (int i = 7; i >= 0; --i) {
-        cout << indent;
-        for (int j = 0; j < 8; ++j) {
-            Piece p = b.get(mksq(j, i));
-            cout << ptoc(p) << " ";
+void wr_board_conf(const Board & b, const string & indent, ostream & output) {
+    
+    for (int y = 7; y >= 0; --y) {
+    
+        // print the actual board layout
+        output << indent;
+        for (int x = 0; x < 8; ++x) {
+            Piece p = b.get(mksq(x, y));
+            output << ptoc(p) << " ";
         }
-        cout << "\n";
-    }
-}
-
-void pr_board(const Board & b) {
-    pr_board(b, "");
-}
-
-
-void pr_board_conf(const Board & b, string indent) {
-    for (int i = 7; i >= 0; --i) {
-        cout << indent;
-        for (int j = 0; j < 8; ++j) {
-            Piece p = b.get(mksq(j, i));
-            cout << ptoc(p) << " ";
-        }
-
-        switch (i) {
+        
+        // depending on rank, print varying pieces of config information
+        switch (y) {
+            
+            // print the FEN
             case 7: {
-                cout << "\tFEN: " << board_to_fen(b);
+                output << "\tFEN: " << board_to_fen(b);
                 break;
             }
-
+            
+            // raw (binary) config string
             case 6: {
-                cout << "\tRaw config: ";
+                output << "\tRaw config: ";
                 int* raw_bin = (int*) &b.conf;
                 for (int i = 31; i >= 0; --i) {
                     if ( *raw_bin & (1 << i)) {
-                        cout << "1";
+                        output << "1";
                     } else {
-                        cout << "0";
+                        output << "0";
                     }
 
                     if (i == 0 || i == 1 || i == 5 || i == 9 || i == 15) {
-                        cout << " ";
+                        output << " ";
                     }
                 }
                 break;
             }
 
+            // whose turn it is
             case 5: {
-                cout << "\tTurn: " << (b.get_white() ? "White" : "Black");
+                output << "\tTurn: " << (b.get_white() ? "White" : "Black");
                 break;
             }
 
+            // castling rights
             case 4: {
-                cout << "\tCastle Rights: ";
-                if (b.get_cas_ws()) cout << "K";
-                if (b.get_cas_wl()) cout << "Q";
-                if (b.get_cas_bs()) cout << "k";
-                if (b.get_cas_bl()) cout << "q";
+                output << "\tCastle Rights: ";
+                if (b.get_cas_ws()) output << "K";
+                if (b.get_cas_wl()) output << "Q";
+                if (b.get_cas_bs()) output << "k";
+                if (b.get_cas_bl()) output << "q";
                 if (!(b.get_cas_ws() | b.get_cas_wl() | b.get_cas_bs() | b.get_cas_wl())) {
-                    cout << "-";
+                    output << "-";
                 }
                 
                 break;  
             }
 
+            // en passant
             case 3: {
                 if (b.get_ep_exists()) {
-                    cout << "\tEnpassant: " << sqtos(b.get_ep_sq());
+                    output << "\tEnpassant: " << sqtos(b.get_ep_sq());
                 } else {
-                    cout << "\tEnpassant: -";
+                    output << "\tEnpassant: -";
                 }
                 break;
             }
 
+            // half move count
             case 2: {
-                cout << "\tHalf moves: " << b.get_halfmoves();
+                output << "\tHalf moves: " << b.get_halfmoves();
                 break;
             }
 
+            // whole move count
             case 1: {
-                cout << "\tFull moves: " << b.get_wholemoves();
+                output << "\tFull moves: " << b.get_wholemoves();
                 break;
             }
         }
 
-        cout << "\n";
+        output << "\n";
     }
 }
 
-void pr_board_conf(const Board & b) {
-    pr_board_conf(b, "");
+void wr_board_conf(const Board & b, ostream & output) {
+    wr_board_conf(b, "", output);
 }
 
 /* prints the binary data of a bitmap in a chess board grid */
 // I changed this a bit but it's still wrong
-void pr_bitmap(const Bitmap map) {
+void wr_bitmap(const Bitmap map, ostream & output) {
     
     uint64_t mask = ( ((uint64_t) 1) << 63);
     for (int i = 0; i < 64; ++i) {
         
         if (map & mask)
-            cout << '1';
+            output << '1';
         else
-            cout << '0';
+            output << '0';
         mask >>= 1;
 
         if (i % 8 == 7)
-            cout << "\n";
+            output << "\n";
     }
 }
 
 /* prints out 64 bits of binary data from MSB (left) to LSB (right) */
-void pr_bin_64(uint64_t data) {
+void wr_bin_64(uint64_t data, ostream & output) {
     
     uint64_t mask = ( ((uint64_t) 1) << 63);
     
     do {
-        cout << ((data & mask) ? '1' : '0');
+        output << ((data & mask) ? '1' : '0');
     } while (mask >>= 1);
     
+}
+
+/*************************************************************************************
+ PRINTING FUNCTIONS         for board, bitmap
+ ************************************************************************************/
+
+// these now delegate to writing functions above
+
+/* print out a human readable chess representation of the board */
+void pr_board(const Board & b, const string & indent) {
+    wr_board(b, indent, cout);
+}
+
+void pr_board(const Board & b) {
+    wr_board(b, "", cout);
+}
+
+
+void pr_board_conf(const Board & b, const string & indent) {
+    wr_board_conf(b, indent, cout);
+}
+
+void pr_board_conf(const Board & b) {
+    wr_board_conf(b, "", cout);
+}
+
+/* prints the binary data of a bitmap in a chess board grid */
+// I changed this a bit but it's still wrong
+void pr_bitmap(const Bitmap map) {
+    wr_bitmap(map, cout);
+}
+
+/* prints out 64 bits of binary data from MSB (left) to LSB (right) */
+void pr_bin_64(uint64_t data) {
+    wr_bin_64(data, cout);
 }
 
 
