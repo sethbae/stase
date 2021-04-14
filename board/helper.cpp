@@ -2,6 +2,8 @@
 
 #include <iostream>
 using std::cout;
+#include <ostream>
+using std::ostream;
 
 #include <string>
 using std::string;
@@ -11,6 +13,7 @@ using std::vector;
 
 #include <sstream>
 using std::stringstream;
+
 
 /*************************************************************************************
  CONVERSIONS        for squares, FENs, SAN, pieces
@@ -302,6 +305,25 @@ Board empty_board() {
     b.conf = 0;
     
     return b;
+}
+
+void wr_board(const Board & b, string indent, ostream & output) {
+
+    for (int y = 7; y >= 0; --y) {
+        output << indent;
+        for (int x = 0; x < 8; ++x) {
+            Piece p = b.get(mksq(x, y));
+            output << ptoc(p) << " ";
+        }
+        output << "\n";
+    }
+
+    return;
+
+}
+
+void wr_board(const Board & b, ostream & output) {
+    wr_board(b, "", output);
 }
 
 /*************************************************************************************

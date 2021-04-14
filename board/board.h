@@ -196,6 +196,13 @@ std::string sqtos(const Square);
 Move santomove(const std::string);
 std::string movetosan(const Board &, const Move);
 
+/* write functions (write to ostream) */
+void wr_board(const Board &);
+void wr_board(const Board &, std::string indent, std::ostream &);
+void wr_board_conf(const Board &);
+void wr_board_conf(const Board &, std::string indent);
+void wr_bitmap(const Bitmap);
+void wr_bin_64(uint64_t);
 /* print functions (write to stdout using cout) */
 void pr_board(const Board &);
 void pr_board(const Board &, std::string indent);
