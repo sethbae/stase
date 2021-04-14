@@ -20,7 +20,7 @@ std::vector<SearchNode*> depth_limited_search(const Gamestate &, int);
 
 int subtree_size(SearchNode *);
 
-void readable_printout(std::vector<SearchNode*> &);
+void readable_printout(std::vector<SearchNode*> &, std::ostream &);
 
 void write_to_file(SearchNode*, std::ostream &);
 

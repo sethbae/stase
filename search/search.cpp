@@ -66,6 +66,8 @@ vector<SearchNode*> minimax(SearchNode* node) {
     
     }
     
+    node->score = best_score;
+    
     best_line.push_back(node);
     return best_line;
 
@@ -145,26 +147,26 @@ int subtree_size(SearchNode *node) {
     
 }
 
-void readable_printout(vector<SearchNode*> & nodes) {
+void readable_printout(vector<SearchNode*> & nodes, ostream & output) {
     
     auto itr = nodes.rbegin();
     
-    pr_board((*itr)->gs->board);
-    cout << "\nBest line: ";
+    wr_board_conf((*itr)->gs->board, output);
+    output << "\nBest line: ";
     itr++;
     
     while (itr != nodes.rend()) {
     
         SearchNode *node = *itr;
         
-        cout << movetosan(node->gs->board, node->move) << " ";
+        output << movetosan(node->gs->board, node->move) << " ";
         //pr_board(node->gs->board);
         
         itr++;
     
     }
     
-    cout << "\n";
+    output << "\n";
     
 }
 
@@ -180,7 +182,6 @@ void write_to_file(SearchNode *node, ostream & output) {
     // score
     // children title
     // list of children and names
-    // blank line
     
     // some hashtags
     output << "######################\n";
@@ -192,8 +193,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     // board with conf
     wr_board_conf(node->gs->board, output);
     
-    // blank line
-    output << "\n";
+    output << "\nScore: " << node->score << "\n\n";
     
     // children title
     if (node->num_children == 0) {
@@ -205,12 +205,11 @@ void write_to_file(SearchNode *node, ostream & output) {
         for (int i = 0; i < node->num_children; ++i) {
             output << "Child " << i << ": " << node->children[i]
                     << " (" << movetosan(node->children[i]->gs->board, node->children[i]->move)
-                    << ")\n";
+                    << ") (" << node->children[i]->score << ")\n";
         }
     
     }
     
-    // blank line
     output << "\n";
     
     

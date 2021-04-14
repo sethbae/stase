@@ -21,6 +21,14 @@ int main(void) {
     
     ofstream file;
     file.open("test", std::ios::out);
+    
+    file << "This file contains engine analysis of the following position\n";
+    
+    readable_printout(nodes, file);
+    
+    file << "NB score is inherited from best successors, computed only for leaves\n";
+    file << "\nHere are the nodes:\n";
+    
     write_to_file(nodes[nodes.size() - 1], file);
     file.close();
     
