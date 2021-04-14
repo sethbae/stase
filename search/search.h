@@ -22,4 +22,6 @@ int subtree_size(SearchNode *);
 
 void readable_printout(std::vector<SearchNode*> &);
 
+void write_to_file(SearchNode*, std::ostream &);
+
 #endif

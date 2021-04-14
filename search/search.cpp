@@ -6,6 +6,10 @@ using std::vector;
 #include <iostream>
 using std::cout;
 #include <functional>
+#include <fstream>
+using std::ofstream;
+#include <ostream>
+using std::ostream;
 
 // allocate a new SearchNode with the given gamestate, but modified by the move.
 // Original gamestate is unmodified.
@@ -162,6 +166,61 @@ void readable_printout(vector<SearchNode*> & nodes) {
     
     cout << "\n";
     
+}
+
+// write the contents of a search tree to file (or stdout)
+// warning: can produce arbitrarily large ouptut
+// usees a pre-order tree walk
+void write_to_file(SearchNode *node, ostream & output) {
+
+    // Format is:
+    // some hashtags ########
+    // SearchNode title line (with "created by" move)
+    // board with conf
+    // score
+    // children title
+    // list of children and names
+    // blank line
+    
+    // some hashtags
+    output << "######################\n";
+    
+    // SearchNode title line
+    output << "SearchNode at " << node 
+                << " (created by " << movetosan(node->gs->board, node->move) << ")\n";
+    
+    // board with conf
+    wr_board_conf(node->gs->board, output);
+    
+    // blank line
+    output << "\n";
+    
+    // children title
+    if (node->num_children == 0) {
+        output << "Has no children.\n";
+    } else {
+        output << "Children:\n";
+        
+        // list of children and names
+        for (int i = 0; i < node->num_children; ++i) {
+            output << "Child " << i << ": " << node->children[i]
+                    << " (" << movetosan(node->children[i]->gs->board, node->children[i]->move)
+                    << ")\n";
+        }
+    
+    }
+    
+    // blank line
+    output << "\n";
+    
+    
+    // recurse for each child
+    for (int i = 0; i < node->num_children; ++i) {
+        write_to_file(node->children[i], output);
+    }
+    
+    return;
+
 }
 
 

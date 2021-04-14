@@ -2,6 +2,8 @@
 using std::cout;
 #include <vector>
 using std::vector;
+#include <fstream>
+using std::ofstream;
 
 #include "board/board.h"
 #include "game/game.h"
@@ -15,9 +17,14 @@ int main(void) {
     
     vector<SearchNode*> nodes;
     
-    nodes = depth_limited_search(gs, 5);
+    nodes = depth_limited_search(gs, 3);
     
-    readable_printout(nodes);
+    ofstream file;
+    file.open("test", std::ios::out);
+    write_to_file(nodes[nodes.size() - 1], file);
+    file.close();
+    
+    // readable_printout(nodes);
     
     /*for (SearchNode* node : nodes) {
         
