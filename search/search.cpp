@@ -168,6 +168,8 @@ void readable_printout(vector<SearchNode*> & nodes, ostream & output) {
     
     output << "\n";
     
+    output << "Evaluation: " << nodes[nodes.size()-1]->score << "\n";
+    
 }
 
 // write the contents of a search tree to file (or stdout)
