@@ -42,6 +42,26 @@ bool in_check(Gamestate &);
 
 typedef int_fast16_t Eval;
 
+Eval zero();
+
+Eval mate_in(Ptype colour, unsigned);
+Eval white_mates_in(unsigned);
+Eval black_mates_in(unsigned);
+
+Eval white_has_been_mated();
+Eval black_has_been_mated();
+
+float human_eval(const Eval);
+int int_eval(const Eval);
+
+bool is_mate(const Eval);
+bool white_is_mated(const Eval);
+bool black_is_mated(const Eval);
+
+int signedMateDistance(const Eval);
+int absMateDistance(const Eval);
+
+float evalScore(const Eval);
 
 
 Eval heur(const Gamestate &);
