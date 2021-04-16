@@ -98,7 +98,7 @@ vector<SearchNode*> depth_limited_search(const Gamestate & start, int depth) {
                 current->num_children = lmoves.size();
                 
                 // populate children array
-                for (int i = 0; i < lmoves.size(); ++i) {
+                for (int i = 0; i < (signed)lmoves.size(); ++i) {
                     current->children[i] = new_node(*(current->gs), lmoves[i]);
                     // adding each new child to the new open list
                     next_openlist.push_back(current->children[i]);
