@@ -33,30 +33,16 @@ int main(void) {
     //gs.board = fen_to_board("4k3/4q3/8/8/1B6/8/8/4K3 w - - 0 1");
     gs.board = fen_to_board("3r1rk1/2pn1pp1/p1p2b1p/1p2pP2/4P3/1P1P2QP/PBq1NRP1/3R2K1 w - - 0 18");
     
-    vector<SearchNode*> nodes;
+    //vector<SearchNode*> nodes;
     
-    nodes = depth_limited_search(gs, 5);
-    
+    //nodes = depth_limited_search(gs, 5);
     //write_to_file("test", nodes);
+    //readable_printout(nodes, cout);
     
-    readable_printout(nodes, cout);
+    Eval test = eval_from_float(2.334);
+    cout << "eval" << test << "\n";
+    cout << "float" << human_eval(test) << "\n";
     
-    /*for (SearchNode* node : nodes) {
-        
-        pr_board_conf(node->gs->board);   
-        
-    }
-    
-    Board b = fen_to_board("8/4Bk2/8/8/8/8/8/4K3 w - - 0 1");
-    vector<Move> moves;
-    
-    legal_moves(b, moves);
-    
-    for (Move m : moves) {
-        cout << movetosan(b, m) << " ";
-    }
-    cout << "\n";
-    */
     return 0;
 
 }

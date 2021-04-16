@@ -34,8 +34,10 @@ void Gamestate::recalculate_attacks() {
 }
 
 void Gamestate::recalculate_positions() {
-    Ptype fcolour = board.colour_to_move();
-    Ptype ecolour = fcolour == WHITE ? BLACK : WHITE;
+    
+    // TODO: commented out to avoid unused variable warnings
+    // Ptype fcolour = board.colour_to_move();
+    // Ptype ecolour = fcolour == WHITE ? BLACK : WHITE;    
 
     vacancy = occupancy = foccupy = eoccupy = 0;
     kings = queens = bishops = knights = rooks = pawns = 0;
@@ -153,5 +155,5 @@ void Gamestate::update(Move m) {
 }
 
 bool in_check(Gamestate & g) {
-    return g.kings & g.foccupy & g.eattack != 0;
+    return g.kings & g.foccupy & g.eattack;
 }

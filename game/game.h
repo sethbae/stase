@@ -40,7 +40,7 @@ struct Gamestate
 
 bool in_check(Gamestate &);
 
-typedef int_fast16_t Eval;
+typedef int16_t Eval;
 
 Eval zero();
 
@@ -53,15 +53,14 @@ Eval black_has_been_mated();
 
 float human_eval(const Eval);
 int int_eval(const Eval);
+Eval eval_from_float(float);
 
 bool is_mate(const Eval);
 bool white_is_mated(const Eval);
 bool black_is_mated(const Eval);
 
-int signedMateDistance(const Eval);
-int absMateDistance(const Eval);
-
-float evalScore(const Eval);
+int signed_mate_distance(const Eval);
+int abs_mate_distance(const Eval);
 
 
 Eval heur(const Gamestate &);
