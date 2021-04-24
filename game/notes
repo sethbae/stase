@@ -1,0 +1,53 @@
+Candidates
+
+have a list of tactical "hooks"
+
+for each hook:
+    if hook applies, spit out move
+    
+return as candidates (all moves returned by hooks)
+    
+
+    
+class Hook:
+    
+    predicate: do I apply(piece, board, or other)
+    
+    moves: what moves are related to this tactic: (pieces, board, move)
+    
+    
+    
+for every square:
+    calculate this balance
+    
+for every piece:
+    is it safe?
+    
+
+    
+    
+    
+is_attacked(piece)
+
+is_safe(piece)
+
+
+(maintained information) + (move actually played) => new cache for next position
+
+
+Heuristic Evaluation
+
+for each metric:
+    who does it favour?
+    times metric * weight
+    
+weighted average of all metrics
+
+(material balance * weight) + (weighted avg)
+
+Weights array...
+
+class Metric:
+
+    score(board)
+
