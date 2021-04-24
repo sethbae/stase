@@ -2,6 +2,19 @@
 #include "game.h"
 #include "../board/board.h"
 
+typedef int Metric(const Board &);
+
+const Metric metrics[] = {
+    
+    
+
+};
+
+const int weights[] = {
+
+
+};
+
 // returns a positive integer representing the value of the piece
 int piece_value(const Piece p) {
     
@@ -36,3 +49,28 @@ Eval heur(const Gamestate & gs) {
     return count;
 
 }
+
+int piece_activity(const Board & b) {
+    return 0;
+}
+
+int centre_control(const Board & b) {
+    return 0;
+}
+
+int weak_pawns(const Board & b) {
+    return 0;
+}
+
+int space(const Board & b) {
+    return 0;
+}
+
+int king_safety(const Board & b) {
+    return 0;
+}
+
+int development(const Board & b) {
+    return 0;
+}
+
