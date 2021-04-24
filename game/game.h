@@ -62,6 +62,8 @@ bool black_is_mated(const Eval);
 int signed_mate_distance(const Eval);
 int abs_mate_distance(const Eval);
 
+std::string etos(const Eval, unsigned digits);
+std::string etos(const Eval);
 
 Eval heur(const Gamestate &);
 
