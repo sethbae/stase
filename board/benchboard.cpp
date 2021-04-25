@@ -548,7 +548,7 @@ bool read_fens(unsigned num, vector<string> & vec) {
 
 void legal_moves_puzzles() {
 
-    int k = 500000;
+    int k = 2000000;
 
     vector<string> fens;
     
@@ -791,7 +791,7 @@ void compare_check() {
 
 }
 
-int main4(void) {
+int main(void) {
 
     // attack_map_generation();
 
