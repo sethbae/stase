@@ -5,6 +5,7 @@ using std::cout;
 using std::stringstream;
 #include <string>
 using std::string;
+#include <iomanip>
 
 const Eval BLACK_GIVES_MATE = -32768; // 0x8000 - 16 bits with MSB set
 const Eval WHITE_GIVES_MATE = 0x7FFF; // 16 bits with all but MSB set
