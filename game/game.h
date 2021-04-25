@@ -40,6 +40,8 @@ struct Gamestate
 
 bool in_check(Gamestate &);
 
+
+// evaluation type and helper/conversion methods
 typedef int16_t Eval;
 
 Eval zero();
@@ -65,8 +67,15 @@ int abs_mate_distance(const Eval);
 std::string etos(const Eval, unsigned digits);
 std::string etos(const Eval);
 
+// heuristic evaluation
 Eval heur(const Gamestate &);
 
+// candidate moves
 std::vector<Move> cands(const Gamestate &);
+
+// control functions
+unsigned alpha_control(const Board &, const Square);
+unsigned beta_control(const Board &, const Square);
+unsigned gamma_control(const Board &, const Square);
 
 #endif
