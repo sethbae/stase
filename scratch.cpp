@@ -28,33 +28,47 @@ void record_tree_in_file(const std::string & filename, vector<SearchNode*> & nod
 
 int main(void) {
     
+    
     /*
     Gamestate gs;
     //gs.board = starting_pos();
     //gs.board = fen_to_board("4k3/4q3/8/8/1B6/8/8/4K3 w - - 0 1");
-    gs.board = fen_to_board("3r1rk1/2pn1pp1/p1p2b1p/1p2pP2/4P3/1P1P2QP/PBq1NRP1/3R2K1 w - - 0 18");
+    gs.board = fen_to_board("1rr4k/pb3pp1/1p1p1q2/4P3/3P1n2/P2B1N2/1P1Q1PPP/R4RK1 b - - 0 20");
+    gs.board = fen_to_board("2k5/4qpp1/p3n3/3pP2r/2P3Q1/P7/3B3P/4R1K1 w - - 2 32");
+    
+    pr_board(gs.board);
     
     vector<SearchNode*> nodes;
     
-    nodes = depth_limited_search(gs, 6);
+    nodes = depth_limited_search(gs, 5);
     //write_to_file("test", nodes);
-    readable_printout(nodes, cout);
     
-    Eval test = eval_from_float(2.334);
-    cout << "eval" << test << "\n";
-    cout << "float" << human_eval(test) << "\n";
+    readable_printout(nodes, cout);
     */
     
-    Board b = fen_to_board("8/4r3/8/4R3/4R3/4Q3/8/8 w - - 0 1");
+    
+    Board b = fen_to_board("5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35");
 
-    Square s = stosq("e4");
-    
     pr_board(b);
-    cout << "\n";
+
     
-    cout << "Alpha: " << alpha_control(b, s) << "\n";
-    cout << "Beta: " << beta_control(b, s) << "\n";
-    cout << "Gamma: " << gamma_control(b, s) << "\n";
+    cout << "\n";
+       
+    
+    cout << "Alpha\n";
+    cout << piece_activity_alpha(b) << "\n\n";
+    
+    cout << "Beta\n";
+    cout << piece_activity_beta(b) << "\n\n";
+    
+    cout << "Gamma\n";
+    cout << piece_activity_gamma(b) << "\n\n";
+    
+    
+    cout << "Centre control: " << centre_control(b) << "\n";
+
+    display_control_counts(b);
+    
     
     return 0;
 

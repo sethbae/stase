@@ -2,6 +2,9 @@
 #include "game.h"
 #include "../board/board.h"
 
+#include <iostream>
+using std::cout;
+
 /*
  * Metrics measure concretely some element of the board and score it as in favour of white
  * or black. They should not anticipate pieces moving: tactics should play out elsewhere.
@@ -24,11 +27,11 @@ typedef float Metric(const Board &);
  *
  * REMEMBER TO UPDATE THE NUMBER OF METRICS USED (constant defined below)
  */
-Metric piece_activity;
+Metric piece_activity_alpha;
 Metric centre_control;
 Metric pawn_struct;
 const Metric* METRICS[] = {
-    &piece_activity,
+    &piece_activity_alpha,
     &centre_control,
     &pawn_struct
 };
@@ -56,6 +59,16 @@ const int WEIGHTS[] = {
  */
 const unsigned METRICS_IN_USE = 3;
 
+
+// the central 16 squares
+const Square CENTRAL_SQUARES[] = {
+    stosq("c6"), stosq("d6"), stosq("e6"), stosq("f6"),
+    stosq("c5"), stosq("d5"), stosq("e5"), stosq("f5"),
+    stosq("c4"), stosq("d4"), stosq("e4"), stosq("f4"),
+    stosq("c3"), stosq("d3"), stosq("e3"), stosq("f3")
+};
+const unsigned NUM_CENTRAL_SQUARES = 16; // perhaps unnecessary
+
 // returns a positive integer representing the value of the piece
 int piece_value(const Piece p) {
     
@@ -71,6 +84,7 @@ int piece_value(const Piece p) {
 
 Eval heur(const Gamestate & gs) {
     
+    /*
     int ev = 0;
     
     for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
@@ -79,6 +93,9 @@ Eval heur(const Gamestate & gs) {
     }
     
     return (Eval) ev;
+    */
+    int material_balance(const Gamestate &);
+    return material_balance(gs);
 }
 
 // returns an evaluation of the given board
@@ -104,14 +121,103 @@ int material_balance(const Gamestate & gs) {
 }
 
 
-float piece_activity(const Board & b) {
-    b.get(mksq(0, 0));
-    return 0;
+float piece_activity_alpha(const Board & b) {
+    
+    int w_control = 0;
+    int b_control = 0;
+    
+    Square sq;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            
+            sq = mksq(x, y);
+            Piece p = b.get(sq);
+            
+            if (colour(p) == WHITE) {
+                w_control += alpha_control(b, sq);
+            } else if (colour(p) == BLACK) {
+                b_control += alpha_control(b, sq);
+            }
+        }
+    }
+    
+    cout << "White: " << w_control << "\n";
+    cout << "Black: " << b_control << "\n";
+    
+    float w_proportion = ((float)w_control / (float)(b_control + w_control));
+    
+    return -1.0 + 2*w_proportion;
+    
 }
 
+float piece_activity_beta(const Board & b) {
+    
+    int w_control = 0;
+    int b_control = 0;
+    
+    Square sq;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            
+            sq = mksq(x, y);
+            Piece p = b.get(sq);
+            
+            if (colour(p) == WHITE) {
+                w_control += beta_control(b, sq);
+            } else if (colour(p) == BLACK) {
+                b_control += beta_control(b, sq);
+            }
+        }
+    }
+    
+    cout << "White: " << w_control << "\n";
+    cout << "Black: " << b_control << "\n";
+    
+    float w_proportion = ((float)w_control / (float)(b_control + w_control));
+    
+    return -1.0 + 2*w_proportion;
+    
+}
+
+float piece_activity_gamma(const Board & b) {
+    
+    int w_control = 0;
+    int b_control = 0;
+    
+    Square sq;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            
+            sq = mksq(x, y);
+            Piece p = b.get(sq);
+            
+            if (colour(p) == WHITE) {
+                w_control += gamma_control(b, sq);
+            } else if (colour(p) == BLACK) {
+                b_control += gamma_control(b, sq);
+            }
+        }
+    }
+    
+    cout << "White: " << w_control << "\n";
+    cout << "Black: " << b_control << "\n";
+    
+    float w_proportion = ((float)w_control / (float)(b_control + w_control));
+    
+    return -1.0 + 2*w_proportion;
+    
+}
+
+// make the central squares count even more!
 float centre_control(const Board & b) {
-    b.get(mksq(0, 0));
-    return 0;
+    
+    int count = 0;
+    
+    for (unsigned i = 0; i < NUM_CENTRAL_SQUARES; ++i) {
+        count += control_count(b, CENTRAL_SQUARES[i]);
+    }
+    
+    return ((float) count) / 50.0;
 }
 
 float pawn_struct(const Board & b) {

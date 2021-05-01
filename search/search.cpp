@@ -90,7 +90,7 @@ vector<SearchNode*> depth_limited_search(const Gamestate & start, int depth) {
             // get legal moves
             vector<Move> lmoves = cands(*current->gs);
             //legal_moves(current->gs->board, lmoves);
-                    
+            
             if (lmoves.size() > 0) {
             
                 // initialise children array

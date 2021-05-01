@@ -73,9 +73,18 @@ Eval heur(const Gamestate &);
 // candidate moves
 std::vector<Move> cands(const Gamestate &);
 
+float piece_activity_alpha(const Board &);
+float piece_activity_beta(const Board &);
+float piece_activity_gamma(const Board &);
+
+float centre_control(const Board &);
+
 // control functions
 unsigned alpha_control(const Board &, const Square);
 unsigned beta_control(const Board &, const Square);
 unsigned gamma_control(const Board &, const Square);
+
+int control_count(const Board &, const Square);
+void display_control_counts(const Board &);
 
 #endif
