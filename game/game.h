@@ -3,6 +3,50 @@
 
 #include "../board/board.h"
 
+enum MoveType {
+    ORTHO = 0,
+    DIAG = 1,
+    KNIGHT_MOVE = 2,
+    PAWN_MOVE = 3,
+    KING_MOVE = 4,
+    INVALID_MOVE = 5
+};
+
+// lookup tables for the step function which moves in each direction
+typedef void StepFunc(Square &);
+extern const StepFunc *STEP_FUNCS[8];
+
+// constants for iterating over the directions
+const unsigned ORTHO_START = 0;
+const unsigned ORTHO_STOP  = 4;
+const unsigned DIAG_START  = 4;
+const unsigned DIAG_STOP   = 8;
+
+// and a lookup table (indexed by numeric value of Ptype enumeration) for which of
+// the above movesets to use.
+const bool PIECE_MOVE_TYPES[][6] = {
+    { false, false, false, false, true, false },    // KING
+    { true, true, false, false, false, false },     // QUEEN
+    { true, false, false, false, false, false },    // ROOK
+    { false, false, true, false, false, false },    // KNIGHT
+    { false, true, false, false, false, false },    // BISHOP
+    { false, false, false, true, false, false },    // PAWN
+    { false, false, false, false, false, false },   // ---------invalid-----------
+    { false, false, false, false, false, false },   // ---------invalid-----------
+    { false, false, false, false, true, false },    // KING
+    { true, true, false, false, false, false },     // QUEEN
+    { true, false, false, false, false, false },    // ROOK
+    { false, false, true, false, false, false },    // KNIGHT
+    { false, true, false, false, false, false },    // BISHOP
+    { false, false, false, true, false, false },    // PAWN
+    { false, false, false, false, false, false }    // ---------invalid-----------
+};
+
+// returns true if the given piece can move in the given way, false otherwise
+inline bool can_move(Piece piece, MoveType dir) {
+    return PIECE_MOVE_TYPES[piece][dir];
+}
+
 struct Gamestate
 {
 
@@ -69,6 +113,7 @@ std::string etos(const Eval);
 
 // heuristic evaluation
 Eval heur(const Gamestate &);
+Eval heur_with_description(const Gamestate &);
 
 // candidate moves
 std::vector<Move> cands(const Gamestate &);
@@ -78,6 +123,7 @@ float piece_activity_beta(const Board &);
 float piece_activity_gamma(const Board &);
 
 float centre_control(const Board &);
+float open_line_control(const Board &);
 
 // control functions
 unsigned alpha_control(const Board &, const Square);

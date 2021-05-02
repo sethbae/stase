@@ -61,6 +61,7 @@ bool black_is_mated(const Eval eval) {
 // convert the Eval to a float representing a more traditional human evaluation
 float human_eval(const Eval eval) {
 
+    /*
     // if it represents a mate, return some semi-meaningful float
     // TODO: infinity? NaN?
     if (white_is_mated(eval))
@@ -73,7 +74,9 @@ float human_eval(const Eval eval) {
 
     // map this onto the desired range of possible evaluations
     return MIN_EVAL + (proportional_rating * (MAX_EVAL - MIN_EVAL));
+    */
     
+    return ((float) eval) / 1000.0;
 }
 
 int int_eval(const Eval eval) {

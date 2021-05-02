@@ -4,6 +4,17 @@
 #include <iostream>
 using std::cout;
 
+const StepFunc *STEP_FUNCS[] = {
+    &inc_x,
+    &dec_x,
+    &inc_y,
+    &dec_y,
+    &diag_ur,
+    &diag_ul,
+    &diag_dr,
+    &diag_dl
+};
+
 /*
 
    This file implements various notions of control which may be useful in multiple
@@ -21,60 +32,6 @@ using std::cout;
    The 'covers' method is defined for all piece types.
  
  */
-
-enum MoveType {
-    ORTHO = 0,
-    DIAG = 1,
-    KNIGHT_MOVE = 2,
-    PAWN_MOVE = 3,
-    KING_MOVE = 4,
-    INVALID_MOVE = 5
-};
-
-
-// constants for iterating over the directions
-const unsigned ORTHO_START = 0;
-const unsigned ORTHO_STOP  = 4;
-const unsigned DIAG_START  = 4;
-const unsigned DIAG_STOP   = 8;
-
-// lookup tables for the step function which moves in each direction
-typedef void StepFunc(Square &);
-const StepFunc *STEP_FUNCS[] = {
-    &inc_x,
-    &dec_x,
-    &inc_y,
-    &dec_y,
-    &diag_ur,
-    &diag_ul,
-    &diag_dr,
-    &diag_dl
-};
-
-// and a lookup table (indexed by numeric value of Ptype enumeration) for which of
-// the above movesets to use.
-const bool PIECE_MOVE_TYPES[][6] = {
-    { false, false, false, false, true, false },    // KING
-    { true, true, false, false, false, false },     // QUEEN
-    { true, false, false, false, false, false },    // ROOK
-    { false, false, true, false, false, false },    // KNIGHT
-    { false, true, false, false, false, false },    // BISHOP
-    { false, false, false, true, false, false },    // PAWN
-    { false, false, false, false, false, false },   // ---------invalid-----------
-    { false, false, false, false, false, false },   // ---------invalid-----------
-    { false, false, false, false, true, false },    // KING
-    { true, true, false, false, false, false },     // QUEEN
-    { true, false, false, false, false, false },    // ROOK
-    { false, false, true, false, false, false },    // KNIGHT
-    { false, true, false, false, false, false },    // BISHOP
-    { false, false, false, true, false, false },    // PAWN
-    { false, false, false, false, false, false }    // ---------invalid-----------
-};
-
-// returns true if the given piece can move in the given way, false otherwise
-bool can_move(Piece piece, MoveType dir) {
-    return PIECE_MOVE_TYPES[piece][dir];
-}
 
 // performs a linear search on the board according to the given step and val functions.
 // returns the alpha count of the walk

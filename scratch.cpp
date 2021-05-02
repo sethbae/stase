@@ -49,6 +49,7 @@ int main(void) {
     
     Board b = fen_to_board("5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35");
 
+/*
     pr_board(b);
 
     
@@ -65,10 +66,16 @@ int main(void) {
     cout << piece_activity_gamma(b) << "\n\n";
     
     
-    cout << "Centre control: " << centre_control(b) << "\n";
+    cout << "Centre control: " << centre_control(b) << "\n\n";
+    
+    cout << "Open line control: " << open_line_control(b) << "\n\n";
 
     display_control_counts(b);
     
+    cout << "\nOverall evaluation: " << human_eval(heur(b)) << "\n";
+    */
+    
+    heur_with_description(b);
     
     return 0;
 
