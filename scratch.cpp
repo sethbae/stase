@@ -47,8 +47,9 @@ int main(void) {
     */
     
     
-    Board b = fen_to_board("5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35");
-
+    // Board b = fen_to_board("5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35");
+    // Board b = fen_to_board("rn3rk1/pp4pp/3bq3/3p1p2/3Pn3/1Q3N2/PP2BPPP/R1B1R1K1 w - - 2 15");
+    Board b = fen_to_board("r1bq1rk1/1p1p1ppp/p1nbpn2/8/4P3/2NPBNP1/PP3PBP/2RQ1RK1 w q - 0 1");
 /*
     pr_board(b);
 
