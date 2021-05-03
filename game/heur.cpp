@@ -332,9 +332,9 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     int signum = 0;     // -1 -> black does, 0 -> nobody does, 1 -> white does
     
     // walk up to the pawn
-    while (val(s) && (b.get(s) != PAWN)) {
+    while (val(s) && (type(b.get(s)) != PAWN)) {
         ++squares_before_pawn;  // counting squares
-        
+
         Piece p = b.get(s);
         if (can_move(p, dir)) { // and control
             control += (colour(p) == WHITE) ? 1 : -1;
@@ -350,6 +350,7 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     score += signum * squares_before_pawn;
     
     // and now check who controls the other section
+    control = 0;
     (*step)(s);
     while (val(s)) {
         Piece p = b.get(s);
@@ -426,7 +427,7 @@ float open_line_control(const Board & b) {
     };
     
     unsigned RANK_VALUES[] = {
-  // y =0  1  2  3  4  5  6  7
+    // y =0  1   2   3   4   5   6   7
         15, 15, 10, 10, 10, 10, 15, 15
     };
     
@@ -447,8 +448,8 @@ float open_line_control(const Board & b) {
             score += half_line_walk(b, sq, inc_y, ORTHO) * FILE_VALUES[x];
     }
     
-    int file_score = score;
-    cout << "File score: " << score << "\n";
+    // int file_score = score;
+    // cout << "File score: " << score << "\n";
     
     // ranks
     for (unsigned y = 0; y < 8; ++y) {
@@ -460,8 +461,8 @@ float open_line_control(const Board & b) {
             score += half_line_walk(b, sq, inc_x, ORTHO) * RANK_VALUES[y];
     }
     
-    int rank_score = score;
-    cout << "Rank score: " << score - file_score << "\n";
+    // int rank_score = score;
+    // cout << "Rank score: " << score - file_score << "\n";
     
     // diagonals
     sq = stosq("a2");
@@ -506,7 +507,7 @@ float open_line_control(const Board & b) {
     if (num_pawns == 1)
         score += half_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[5];
         
-    cout << "Diag score: " << score - rank_score << "\n";
+    // cout << "Diag score: " << score - rank_score << "\n";
         
     return ((float)score) / 300.0;
         
