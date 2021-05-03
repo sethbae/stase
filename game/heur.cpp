@@ -34,7 +34,7 @@ Metric piece_activity_beta;
 Metric piece_activity_gamma;
 Metric open_line_control;
 Metric centre_control;
-Metric pawn_struct;
+Metric defended_pawns;
 
 const Metric* METRICS[] = {
     &piece_activity_alpha,
@@ -42,7 +42,7 @@ const Metric* METRICS[] = {
     &piece_activity_gamma,
     &open_line_control,
     &centre_control,
-    // &pawn_struct
+    &defended_pawns
 };
 
 const string HEUR_NAMES[] = {
@@ -50,7 +50,8 @@ const string HEUR_NAMES[] = {
     "Beta activity     ", 
     "Gamma activity    ", 
     "Open line control ",
-    "Centre control    "
+    "Centre control    ",
+    "Defended pawns    "
 };
 
 /*
@@ -71,13 +72,13 @@ const int WEIGHTS[] = {
     600,    // gamma
     1000,   // open line
     1500,   // centre control
-    // 1000    // pawn_struct
+    500,    // defended pawns
 };
 
 /*
  * Specifies how many metrics to use. Very unsafe - there is no bounds checking used.
  */
-const unsigned METRICS_IN_USE = 5;
+const unsigned METRICS_IN_USE = 6;
 
 
 // the central 16 squares
@@ -513,9 +514,83 @@ float open_line_control(const Board & b) {
         
 }
 
-float pawn_struct(const Board & b) {
-    b.get(mksq(0, 0));
-    return 0;
+// evaluates the solidity of each side's pawn structure.
+//  - how many pawns are defended by other pawns
+//  - how many pawns are doubled
+//  - how many pawns are isolated
+
+unsigned supporting_pawns(const Board & b, Square s) {
+    
+    unsigned x = get_x(s);
+    unsigned y = get_y(s);
+    unsigned count = 0;
+    Square temp;
+    
+    if (colour(b.get(s)) == WHITE) {
+        
+        if (val(temp = mksq(x - 1, y - 1)) && b.get(temp) == W_PAWN)
+            ++count;
+        if (val(temp = mksq(x + 1, y - 1)) && b.get(temp) == W_PAWN)
+            ++count;
+        
+    } else {
+    
+        if (val(temp = mksq(x - 1, y + 1)) && b.get(temp) == B_PAWN)
+            ++count;
+        if (val(temp = mksq(x + 1, y + 1)) && b.get(temp) == B_PAWN)
+            ++count;
+        
+    } 
+    
+    return count;
+    
+}
+
+/*
+    Assesses how well defended pawns are. You score a point for every time a pawn defends
+    another, and lose a point every time a pawn is undefended (unless it hasn't yet moved)
+*/
+float defended_pawns(const Board & b) {
+    
+    Square sq;
+    int score = 0;
+    
+    // for each file
+    for (int x = 0; x < 8; ++x) {
+        
+        unsigned supporters;
+        
+        // find white pawn in this file
+        sq = mksq(x, 1);
+        while (val(sq) && b.get(sq) != W_PAWN)
+            inc_y(sq);
+            
+        if (val(sq)) {
+            // count pawns supporting this pawn
+            supporters = supporting_pawns(b, sq);
+            if (supporters)
+                score += supporters;    // if there are some, score points
+            else if (get_y(sq) > 1)
+                --score;                // if it has moved and is unsupported, lose points
+        }
+        
+        // find black pawn in this file
+        sq = mksq(x, 6);
+        while (val(sq) && b.get(sq) != B_PAWN)
+            dec_y(sq);
+        
+        if (val(sq)) {
+            supporters = supporting_pawns(b, sq);
+            if (supporters)
+                score -= supporters;    // same as above, but counting the other way
+            else if (get_y(sq) < 6)
+                ++score;
+        }
+        
+    }
+    
+    return ((float)score) / 5.0;
+    
 }
 
 /*
