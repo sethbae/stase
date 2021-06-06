@@ -1,7 +1,7 @@
 FLAGS = -std=c++11 -Wall -Wextra -Werror -Wpedantic
 OPT_FLAGS =
-DEPS = board.h game.h
-OBJ = ../**/*.o
+DEPS = board.h game.h puzzle.h
+OBJ = ../board/board.o ../board/move.o ../board/square.o ../board/helper.o ../board/bitmap.o ../game/gamestate.o ../game/heur.o ../game/cands.o ../game/eval.o ../game/piece.o ../puzzle/puzzle.o
 
 ifneq ($(OPT),none)
 	OPT_FLAGS = -O
@@ -20,7 +20,7 @@ scratch: $(OBJ) scratch.o
 test: $(OBJ) testgame.o
 	g++ -o $@ $^ $(FLAGS) $(OPT_FLAGS)
 	
-bench: $(OBJ)
+bench: $(OBJ) benchgame.o
 	g++ -o $@ $^ $(FLAGS) $(OPT_FLAGS)
 	
 main: $(OBJ)
