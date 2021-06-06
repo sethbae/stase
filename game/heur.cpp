@@ -278,11 +278,33 @@ float centre_control(const Board & b) {
     int count = 0;
     
     for (unsigned i = 0; i < NUM_INNER_CENTRAL; ++i) {
-        count += 2*control_count(b, INNER_CENTRAL[i]);
+        
+        int control = control_count(b, INNER_CENTRAL[i]);
+        if (control > 0) {
+            count += 2;
+        } else if (control < 0) {
+            count -= 2;
+        }
+    
+        // count += 2*control_count(b, INNER_CENTRAL[i]);
+        
+        //cout << "Score for " << sqtos(INNER_CENTRAL[i]) << ": " 
+        //    << control_count(b, INNER_CENTRAL[i]) << "\n";
     }
     
     for (unsigned i = 0; i < NUM_OUTER_CENTRAL; ++i) {
-        count += control_count(b, OUTER_CENTRAL[i]);
+        
+        int control = control_count(b, OUTER_CENTRAL[i]);
+        if (control > 0) {
+            count += 1;
+        } else if (control < 0) {
+            count -= 1;
+        }
+    
+        // count += 2*control_count(b, OUTER_CENTRAL[i]);
+    
+        //cout << "Score for " << sqtos(OUTER_CENTRAL[i]) << ": " 
+        //    << control_count(b, OUTER_CENTRAL[i]) << "\n";
     }
     
     // my thought with normalising over 20 was that 12 + 2x4 = 20, so that represents having 
