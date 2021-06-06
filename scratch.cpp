@@ -26,7 +26,7 @@ void record_tree_in_file(const std::string & filename, vector<SearchNode*> & nod
 
 }
 
-int main(void) {
+int main(int argc, char** argv) {
     
     
     /*
@@ -49,7 +49,12 @@ int main(void) {
     
     // Board b = fen_to_board("5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35");
     // Board b = fen_to_board("rn3rk1/pp4pp/3bq3/3p1p2/3Pn3/1Q3N2/PP2BPPP/R1B1R1K1 w - - 2 15");
-    Board b = fen_to_board("rn2kbnr/pp2pppp/1qp5/3p1b2/3P1B2/1P3N2/P1P1PPPP/RN1QKB1R w KQkq - 1 5");
+    if (argc <= 0) {
+        cout << "No board to analyse\n";
+        exit(0);
+    }
+    std::string str(argv[1]);
+    Board b = fen_to_board(str);
 /*
     pr_board(b);
 
