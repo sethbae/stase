@@ -32,7 +32,7 @@ bool read_fens(unsigned num, vector<string> & vec) {
        
     ifstream file;
     
-    file.open("lichess_db_puzzle.csv", ios::in);
+    file.open("/home/seth/Documents/stase/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
@@ -57,6 +57,32 @@ bool read_fens(unsigned num, vector<string> & vec) {
         vec.push_back(s);
         
     } 
+
+    return true;
+
+}
+
+bool read_all_fens(vector<string> & vec) {
+
+    ifstream file;
+    
+    file.open("/home/seth/Documents/stase/puzzle/lichess_db_puzzle.csv", ios::in);
+    if (!file) {
+        cout << "WARNING: could not read puzzle csv\n";
+        return false;
+    }
+    
+    string s;
+    
+    // before reading the required number of puzzles
+    while (getline(file, s)) {
+        
+        // FEN is second field of CSV
+        s = s.substr(s.find_first_of(',') + 1);
+        s = s.substr(0, s.find_first_of(','));
+        vec.push_back(s);
+        
+    }
 
     return true;
 
