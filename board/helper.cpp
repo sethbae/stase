@@ -46,7 +46,7 @@ char ptoc(Piece p) {
         case W_BISHOP:  return 'B';
         case W_KNIGHT:  return 'N';
         case W_PAWN:    return 'P';
-        default:        return '*';
+        default:        return '.';
     }
 }
 
