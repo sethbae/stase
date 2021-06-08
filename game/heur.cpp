@@ -35,6 +35,7 @@ Metric piece_activity_gamma;
 Metric open_line_control;
 Metric centre_control;
 Metric defended_pawns;
+Metric development;
 
 const Metric* METRICS[] = {
     &piece_activity_alpha,
@@ -42,7 +43,8 @@ const Metric* METRICS[] = {
     &piece_activity_gamma,
     &open_line_control,
     &centre_control,
-    &defended_pawns
+    &defended_pawns,
+    &development
 };
 
 const string HEUR_NAMES[] = {
@@ -51,7 +53,8 @@ const string HEUR_NAMES[] = {
     "Gamma activity    ", 
     "Open line control ",
     "Centre control    ",
-    "Defended pawns    "
+    "Defended pawns    ",
+    "Development       "
 };
 
 /*
@@ -73,12 +76,13 @@ const int WEIGHTS[] = {
     1000,   // open line
     1500,   // centre control
     500,    // defended pawns
+    500,    // development
 };
 
 /*
  * Specifies how many metrics to use. Very unsafe - there is no bounds checking used.
  */
-const unsigned METRICS_IN_USE = 6;
+const unsigned METRICS_IN_USE = 7;
 
 
 // the central 16 squares
@@ -615,16 +619,56 @@ float defended_pawns(const Board & b) {
     
 }
 
-/*
-float space(const Board & b) {
-    return 0;
-}
-
 float king_safety(const Board & b) {
-    return 0;
+    
+    
+    // pawns in front of king
+    
+    // control of squares in front of king
+    
+    // prominent diagonals + files
+    
+    // attacking pieces vs defending pieces
+    
+    b.get(mksq(0, 0));
+    return 0.0f;
+
 }
 
 float development(const Board & b) {
+
+    int count = 0;
+    
+    const Piece BACK_RANK[] = {
+        ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
+    };
+    
+    for (Square sq = stosq("a8"); val(sq); inc_x(sq)) {
+        if (type(b.get(sq)) == BACK_RANK[get_x(sq)]) {
+            ++count;
+        }
+    }
+
+    for (Square sq = stosq("a1"); val(sq); inc_x(sq)) {
+        if (type(b.get(sq)) == BACK_RANK[get_x(sq)]) {
+            --count;
+        }
+    }
+    
+    return ((float)count) / 4.0f;
+
+}
+
+/*
+float space(const Board & b) {              // forget for now
+    return 0;
+}
+
+float king_safety(const Board & b) {        // can do
+    return 0;
+}
+
+float development(const Board & b) {        // can do
     return 0;
 }
 */
