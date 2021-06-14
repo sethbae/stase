@@ -4,6 +4,8 @@
 
 #include <iostream>
 using std::cout;
+#include <iomanip>
+using std::setw;
 #include <string>
 using std::string;
 
@@ -36,6 +38,9 @@ Metric open_line_control;
 Metric centre_control;
 Metric defended_pawns;
 Metric development;
+Metric isolated_pawns;
+Metric central_pawns;
+Metric far_advanced_pawns;
 
 const Metric* METRICS[] = {
     &piece_activity_alpha,
@@ -44,17 +49,23 @@ const Metric* METRICS[] = {
     &open_line_control,
     &centre_control,
     &defended_pawns,
-    &development
+    &development,
+    &isolated_pawns,
+    &central_pawns,
+    &far_advanced_pawns
 };
 
 const string HEUR_NAMES[] = {
-    "Alpha activity    ",
-    "Beta activity     ", 
-    "Gamma activity    ", 
-    "Open line control ",
-    "Centre control    ",
-    "Defended pawns    ",
-    "Development       "
+    "Alpha activity",
+    "Beta activity", 
+    "Gamma activity", 
+    "Open line control",
+    "Centre control",
+    "Defended pawns",
+    "Development",
+    "Isolanis",
+    "Central pawns",
+    "Far advanced pawns"
 };
 
 /*
@@ -77,12 +88,15 @@ const int WEIGHTS[] = {
     1500,   // centre control
     500,    // defended pawns
     500,    // development
+    400,    // isolanis
+    400,    // central pawns
+    400,    // far advanced pawns
 };
 
 /*
  * Specifies how many metrics to use. Very unsafe - there is no bounds checking used.
  */
-const unsigned METRICS_IN_USE = 7;
+const unsigned METRICS_IN_USE = 10;
 
 
 // the central 16 squares
@@ -162,13 +176,15 @@ Eval heur(const Gamestate & gs) {
 
 Eval heur_with_description(const Gamestate & gs) {
 
+    cout << std::left << std::setprecision(3);
+
     cout << "Evaluating position:\n";
     pr_board(gs.board);
     
     cout << "Contributions for each metric (millipawns):\n";
     
     int mat_bal = material_balance(gs.board);
-    cout << "Material balance  : " << mat_bal << "\n";
+    cout << setw(20) << "Material balance" << ": " << std::right << setw(26) << mat_bal << "\n";
 
     int ev = 0;
     for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
@@ -176,9 +192,12 @@ Eval heur_with_description(const Gamestate & gs) {
         int weighted_score = score * WEIGHTS[i];
         ev += weighted_score;
         
-        cout << HEUR_NAMES[i] << ": " << score 
-                << " * " << WEIGHTS[i] 
-                << " = " << weighted_score
+        cout << std::left << setw(20) << HEUR_NAMES[i] << ": " 
+                << std::right << setw(8) << score 
+                << " * " 
+                << setw(6) << WEIGHTS[i] 
+                << " = " 
+                << setw(6) << weighted_score
                 << "\n";
     }
     
@@ -577,6 +596,12 @@ unsigned supporting_pawns(const Board & b, Square s) {
     another, and lose a point every time a pawn is undefended (unless it hasn't yet moved)
 */
 float defended_pawns(const Board & b) {
+
+    /*
+    TODO: this way underrates two pawns on d4 and c4, for example. Might need to check
+    how defended/attacked the pawns are. Example: 
+        r2q1rk1/pb1nbppp/1p1Bpn2/2p5/2PPN3/3B1N2/PPQ2PPP/R4RK1 b - - 1 11
+    */
     
     Square sq;
     int score = 0;
@@ -596,8 +621,7 @@ float defended_pawns(const Board & b) {
             supporters = supporting_pawns(b, sq);
             if (supporters)
                 score += supporters;    // if there are some, score points
-            else if (get_y(sq) > 1)
-                --score;                // if it has moved and is unsupported, lose points
+
         }
         
         // find black pawn in this file
@@ -609,14 +633,129 @@ float defended_pawns(const Board & b) {
             supporters = supporting_pawns(b, sq);
             if (supporters)
                 score -= supporters;    // same as above, but counting the other way
-            else if (get_y(sq) < 6)
-                ++score;
         }
         
     }
     
     return ((float)score) / 5.0;
     
+}
+
+float isolated_pawns(const Board & b) {
+    
+    int score = 0;
+    
+    // TODO this is unlikely to be efficient
+    
+    // true indicates that black/white has a pawn in that file
+    bool wpawns[8] = { false, false, false, false, false, false, false, false };
+    bool bpawns[8] = { false, false, false, false, false, false, false, false };
+    
+    // compute the above arrays
+    for (unsigned x = 0; x < 8; ++x) {
+        for (unsigned y = 0; y < 7; ++y) {
+            if (b.get(mksq(x, y)) == W_PAWN) {
+                wpawns[x] = true;
+            } else if (b.get(mksq(x, y)) == B_PAWN) {
+                bpawns[x] = true;
+            }   
+        }
+    }
+       
+    // find files which are isolated for white (decrementing)
+    if (wpawns[0] && !wpawns[1]) {
+        --score;
+    }
+    for (unsigned x = 1; x < 7; ++x) {
+        if (!wpawns[x - 1] && wpawns[x] && !wpawns[x + 1]) {
+            --score;
+        }
+    }
+    if (!wpawns[6] && wpawns[7]) {
+        --score;
+    }
+    
+    // find files which are isolated for black (incrementing)
+    if (bpawns[0] && !bpawns[1]) {
+        ++score;
+    }
+    for (unsigned x = 1; x < 7; ++x) {
+        if (!bpawns[x - 1] && bpawns[x] && !bpawns[x + 1]) {
+            ++score;
+        }
+    }
+    if (!bpawns[6] && bpawns[7]) {
+        ++score;
+    }
+    
+    return ((float) score) / 3.0f;
+    
+}
+
+float central_pawns(const Board & b) {
+    
+   int score = 0;
+    
+    // true indicates that black/white has a pawn in that file
+    bool wpawns[8] = { false, false, false, false, false, false, false, false };
+    bool bpawns[8] = { false, false, false, false, false, false, false, false };
+    
+    // compute the above arrays
+    for (unsigned x = 0; x < 8; ++x) {
+        for (unsigned y = 0; y < 7; ++y) {
+            if (b.get(mksq(x, y)) == W_PAWN) {
+                wpawns[x] = true;
+            } else if (b.get(mksq(x, y)) == B_PAWN) {
+                bpawns[x] = true;
+            }   
+        }
+    }
+    
+    if (wpawns[2])
+        score += 1;
+    if (wpawns[3])
+        score += 2;
+    if (wpawns[4])
+        score += 2;
+    if (wpawns[5])
+        score += 1;
+        
+    if (bpawns[2])
+        score -= 1;
+    if (bpawns[3])
+        score -= 2;
+    if (bpawns[2])
+        score -= 2;
+    if (bpawns[3])
+        score -= 1;
+        
+    return ((float) score) / 5.0f;
+    
+}
+
+float far_advanced_pawns(const Board & b) {
+    
+    int score = 0;
+    
+    int value[8] = { 0, 4, 2, 1, 1, 2, 4, 0 };
+
+    for (unsigned y = 6; y > 0; --y) {
+        for (unsigned x = 0; x < 8; ++x) {
+            
+            Piece p = b.get(mksq(x, y));
+            
+            if (y > 3 && p == W_PAWN) {
+                score += value[y];
+            }
+            if (y <= 3 && p == B_PAWN) {
+                score -= value[y];
+            }
+            
+        }
+    }
+    
+    return ((float) score) / 10.0f;
+   
 }
 
 float king_safety(const Board & b) {
