@@ -597,12 +597,6 @@ unsigned supporting_pawns(const Board & b, Square s) {
 */
 float defended_pawns(const Board & b) {
 
-    /*
-    TODO: this way underrates two pawns on d4 and c4, for example. Might need to check
-    how defended/attacked the pawns are. Example: 
-        r2q1rk1/pb1nbppp/1p1Bpn2/2p5/2PPN3/3B1N2/PPQ2PPP/R4RK1 b - - 1 11
-    */
-    
     Square sq;
     int score = 0;
     
@@ -724,9 +718,9 @@ float central_pawns(const Board & b) {
         score -= 1;
     if (bpawns[3])
         score -= 2;
-    if (bpawns[2])
+    if (bpawns[4])
         score -= 2;
-    if (bpawns[3])
+    if (bpawns[5])
         score -= 1;
         
     return ((float) score) / 5.0f;
