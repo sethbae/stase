@@ -559,11 +559,8 @@ float open_line_control(const Board & b) {
         
 }
 
-// evaluates the solidity of each side's pawn structure.
-//  - how many pawns are defended by other pawns
-//  - how many pawns are doubled
-//  - how many pawns are isolated
-
+// returns the number of pawns which directly defend the given pawn (square),
+// relying on the colour of the piece on the square given
 unsigned supporting_pawns(const Board & b, Square s) {
     
     unsigned x = get_x(s);
@@ -754,6 +751,7 @@ float far_advanced_pawns(const Board & b) {
 
 float king_safety(const Board & b) {
     
+    // TODO
     
     // pawns in front of king
     
@@ -794,14 +792,6 @@ float development(const Board & b) {
 
 /*
 float space(const Board & b) {              // forget for now
-    return 0;
-}
-
-float king_safety(const Board & b) {        // can do
-    return 0;
-}
-
-float development(const Board & b) {        // can do
     return 0;
 }
 */
