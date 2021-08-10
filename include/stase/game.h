@@ -1,7 +1,7 @@
-#ifndef STASE_BOARD_H
-#define STASE_BOARD_H
+#ifndef STASE_GAME_H
+#define STASE_GAME_H
 
-#include "../board/board.h"
+#include "board.h"
 
 enum MoveType {
     ORTHO = 0,
@@ -133,4 +133,4 @@ unsigned gamma_control(const Board &, const Square);
 int control_count(const Board &, const Square);
 void display_control_counts(const Board &);
 
-#endif //STASE_BOARD_H
+#endif //STASE_GAME_H

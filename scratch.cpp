@@ -5,9 +5,9 @@ using std::vector;
 #include <fstream>
 using std::ofstream;
 
-#include "board/board.h"
-#include "game/game.h"
-#include "search/search.h"
+#include "include/stase/board.h"
+#include "include/stase/game.h"
+#include "include/stase/search.h"
 
 void record_tree_in_file(const std::string & filename, vector<SearchNode*> & nodes) {
 

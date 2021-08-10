@@ -1,5 +1,5 @@
-#ifndef STASE_BOARD_H
-#define STASE_BOARD_H
+#ifndef STASE_SEARCH_H
+#define STASE_SEARCH_H
 
 #include "board.h"
 #include "game.h"
@@ -24,4 +24,4 @@ void readable_printout(std::vector<SearchNode*> &, std::ostream &);
 
 void write_to_file(SearchNode*, std::ostream &);
 
-#endif //STASE_BOARD_H
+#endif //STASE_SEARCH_H
