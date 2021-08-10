@@ -1,5 +1,5 @@
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef STASE_BOARD_H
+#define STASE_BOARD_H
 
 #include <string>
 #include <vector>
@@ -21,16 +21,16 @@ enum Ptype {
     B_KNIGHT = 3,
     B_BISHOP = 4,
     B_PAWN = 5,
-    
+
     W_KING = 8,
     W_QUEEN = 9,
     W_ROOK = 10,
     W_KNIGHT = 11,
     W_BISHOP = 12,
     W_PAWN = 13,
-    
+
     EMPTY = 14,
-    
+
     /* other values which appear in the lookup tables */
     KING,
     QUEEN = 16, // explicit values to read promotion pieces easily (see Move::prom_piece())
@@ -38,10 +38,10 @@ enum Ptype {
     KNIGHT = 18,
     BISHOP = 19,
     PAWN,
-    
+
     BLACK,
     WHITE,
-    
+
     INVALID
 };
 
@@ -53,7 +53,7 @@ bool is_white(Piece);
 
 /* A move structure, which stores some flags etc and get/set methods */
 struct Move {
-    
+
     Square from;
     Square to;
     uint_fast16_t flags;
@@ -61,25 +61,25 @@ struct Move {
     bool is_prom() const;
     void set_prom();
     void unset_prom();
-    
+
     bool is_cas() const;
     void set_cas();
     void unset_cas();
-        
+
     bool is_ep() const;
     void set_ep();
     void unset_ep();
-        
+
     bool is_cap() const;
     void set_cap();
     void unset_cap();
-        
+
     bool is_cas_short() const;
     void set_cas_short();
     void unset_cas_short();
-    
+
     int get_ep_file() const;
-    
+
     Byte get_prom_shift() const;
     Piece get_prom_piece(Ptype) const;
     void set_prom_piece(Ptype);
@@ -90,19 +90,19 @@ struct Move {
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {
-    
+
     /* board and configuration word */
     Byte squares[8][4];
     Int conf;
-    
+
     /* get/set squares */
     Piece get(const Square &) const;
     void set(const Square &, const Piece);
-    
+
     /* change the position of the pieces, without affecting config */
     void mutate(const Move);
     void mutate_hard(const Move); // does not assume move flags are correctly set
-    
+
     /* create and return a new board, the succeeding position (config updated) */
     Board successor(const Move) const;
     Board successor_hard(const Move) const;
@@ -110,13 +110,13 @@ struct Board {
     /* get/set the entire config word */
     void set_conf_word(Int);
     Int get_conf_word() const;
-    
+
     /* whose turn it is */
     bool get_white() const;
     void set_white(bool);
     void flip_white();
     Ptype colour_to_move() const;
-    
+
     /* castling rights */
     bool get_cas_ws() const;
     void set_cas_ws(bool);
@@ -126,14 +126,14 @@ struct Board {
     void set_cas_bs(bool);
     bool get_cas_bl() const;
     void set_cas_bl(bool);
-    
+
     /* en-passant */
     bool get_ep_exists() const;
     void set_ep_exists(bool);
     unsigned get_ep_file() const;
     void set_ep_file(unsigned);
     Square get_ep_sq() const;
-    
+
     /* half and whole moves */
     unsigned get_halfmoves() const;
     void set_halfmoves(unsigned);
@@ -141,7 +141,7 @@ struct Board {
     unsigned get_wholemoves() const;
     void set_wholemoves(unsigned);
     void inc_wholemoves();
-    
+
 };
 
 /* helper functions for board and move */
@@ -229,4 +229,4 @@ Square map_to_sq(Bitmap);
 Bitmap custom_map(const Board &, bool include(const Board &, Square));
 // Bitmap custom_map(const Board &, bool include(Square, Piece));
 
-#endif
+#endif //STASE_BOARD_H

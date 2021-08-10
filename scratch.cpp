@@ -27,8 +27,7 @@ void record_tree_in_file(const std::string & filename, vector<SearchNode*> & nod
 }
 
 int main(int argc, char** argv) {
-    
-    
+
     /*
     Gamestate gs;
     //gs.board = starting_pos();

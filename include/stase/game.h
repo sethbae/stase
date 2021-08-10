@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef STASE_BOARD_H
+#define STASE_BOARD_H
 
 #include "../board/board.h"
 
@@ -25,21 +25,21 @@ const unsigned DIAG_STOP   = 8;
 // and a lookup table (indexed by numeric value of Ptype enumeration) for which of
 // the above movesets to use.
 const bool PIECE_MOVE_TYPES[][6] = {
-    { false, false, false, false, true, false },    // KING
-    { true, true, false, false, false, false },     // QUEEN
-    { true, false, false, false, false, false },    // ROOK
-    { false, false, true, false, false, false },    // KNIGHT
-    { false, true, false, false, false, false },    // BISHOP
-    { false, false, false, true, false, false },    // PAWN
-    { false, false, false, false, false, false },   // ---------invalid-----------
-    { false, false, false, false, false, false },   // ---------invalid-----------
-    { false, false, false, false, true, false },    // KING
-    { true, true, false, false, false, false },     // QUEEN
-    { true, false, false, false, false, false },    // ROOK
-    { false, false, true, false, false, false },    // KNIGHT
-    { false, true, false, false, false, false },    // BISHOP
-    { false, false, false, true, false, false },    // PAWN
-    { false, false, false, false, false, false }    // ---------invalid-----------
+        { false, false, false, false, true, false },    // KING
+        { true, true, false, false, false, false },     // QUEEN
+        { true, false, false, false, false, false },    // ROOK
+        { false, false, true, false, false, false },    // KNIGHT
+        { false, true, false, false, false, false },    // BISHOP
+        { false, false, false, true, false, false },    // PAWN
+        { false, false, false, false, false, false },   // ---------invalid-----------
+        { false, false, false, false, false, false },   // ---------invalid-----------
+        { false, false, false, false, true, false },    // KING
+        { true, true, false, false, false, false },     // QUEEN
+        { true, false, false, false, false, false },    // ROOK
+        { false, false, true, false, false, false },    // KNIGHT
+        { false, true, false, false, false, false },    // BISHOP
+        { false, false, false, true, false, false },    // PAWN
+        { false, false, false, false, false, false }    // ---------invalid-----------
 };
 
 // returns true if the given piece can move in the given way, false otherwise
@@ -48,7 +48,7 @@ inline bool can_move(Piece piece, MoveType dir) {
 }
 
 struct Gamestate
-{
+        {
 
     // The enclosed board
     Board board;
@@ -80,7 +80,7 @@ struct Gamestate
     void recalculate_attacks();
     void recalculate_positions();
     void update(Move m);
-};
+        };
 
 bool in_check(Gamestate &);
 
@@ -133,4 +133,4 @@ unsigned gamma_control(const Board &, const Square);
 int control_count(const Board &, const Square);
 void display_control_counts(const Board &);
 
-#endif
+#endif //STASE_BOARD_H

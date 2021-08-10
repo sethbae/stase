@@ -1,18 +1,18 @@
-#ifndef SEARCH_H
-#define SEARCH_H
+#ifndef STASE_BOARD_H
+#define STASE_BOARD_H
 
-#include "../board/board.h"
-#include "../game/game.h"
+#include "board.h"
+#include "game.h"
 
 
 struct SearchNode {
-    
+
     const Gamestate *gs;
     Eval score;
     Move move;
     unsigned short num_children;
     struct SearchNode **children;
-    
+
 };
 
 
@@ -24,4 +24,4 @@ void readable_printout(std::vector<SearchNode*> &, std::ostream &);
 
 void write_to_file(SearchNode*, std::ostream &);
 
-#endif
+#endif //STASE_BOARD_H
