@@ -792,7 +792,7 @@ void compare_check() {
 
 }
 
-int benchboard(void) {
+int bench_board(void) {
 
     // attack_map_generation();
 

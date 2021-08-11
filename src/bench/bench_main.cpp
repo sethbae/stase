@@ -2,9 +2,9 @@
 
 int main() {
 
-    benchboard();
+    bench_board();
 
-    benchgame();
+    bench_game();
 
     return 0;
 }

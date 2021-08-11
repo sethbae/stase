@@ -151,7 +151,7 @@ void heuristic_evaluation() {
     
 }
 
-int benchgame(void) {
+int bench_game(void) {
 
     heuristic_evaluation();
 
