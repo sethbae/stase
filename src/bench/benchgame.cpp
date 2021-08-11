@@ -24,7 +24,7 @@ using std::ios;
 using std::time;
 
 #include "game.h"
-#include "../puzzle/puzzle.h"
+#include "puzzle.h"
 
 void gamestate_recalculation() {
     Board b = fen_to_board("r1br2k1/1p3ppp/p1nqpb2/3nN3/3P1P2/1B2B3/PPN3PP/R2Q1RK1 w Qq - 0 1");
@@ -151,7 +151,7 @@ void heuristic_evaluation() {
     
 }
 
-int main(void) {
+int benchgame(void) {
 
     heuristic_evaluation();
 

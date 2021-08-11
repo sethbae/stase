@@ -25,6 +25,7 @@ using std::time;
 
 
 #include "board.h"
+#include "puzzle.h"
 
 /* This is a short benchmark program to test the read and write speeds of the board representation.
    It generates a random board position and then writes it to each of [k] boards.
@@ -512,39 +513,39 @@ void piecemoves_bench(const Piece target_piece, int density) {
 
 /* fill the given vector with [num] randomly selected puzzles 
     these puzzles will always differ since they are selected using a random seed */
-bool read_fens(unsigned num, vector<string> & vec) {
-       
-    ifstream file;
-    
-    file.open("../puzzles/lichess_db_puzzle.csv", ios::in);
-    if (!file) {
-        cout << "WARNING: could not read puzzle csv\n";
-        return false;
-    }
-    
-    string s;
-    
-    // initialise the seed with current time
-    srand(time(nullptr));
-    
-    // and skip a random number of puzzles (different every time)
-    unsigned x = rand() % 10000;
-    while (x--)
-        getline(file, s);
-    
-    // before reading the required number of puzzles
-    for (; getline(file, s) && num > 0; --num) {
-        
-        // FEN is second field of CSV
-        s = s.substr(s.find_first_of(',') + 1);
-        s = s.substr(0, s.find_first_of(','));
-        vec.push_back(s);
-        
-    } 
-
-    return true;
-
-}
+//bool read_fens(unsigned num, vector<string> & vec) {
+//
+//    ifstream file;
+//
+//    file.open("../puzzles/lichess_db_puzzle.csv", ios::in);
+//    if (!file) {
+//        cout << "WARNING: could not read puzzle csv\n";
+//        return false;
+//    }
+//
+//    string s;
+//
+//    // initialise the seed with current time
+//    srand(time(nullptr));
+//
+//    // and skip a random number of puzzles (different every time)
+//    unsigned x = rand() % 10000;
+//    while (x--)
+//        getline(file, s);
+//
+//    // before reading the required number of puzzles
+//    for (; getline(file, s) && num > 0; --num) {
+//
+//        // FEN is second field of CSV
+//        s = s.substr(s.find_first_of(',') + 1);
+//        s = s.substr(0, s.find_first_of(','));
+//        vec.push_back(s);
+//
+//    }
+//
+//    return true;
+//
+//}
 
 void legal_moves_puzzles() {
 
@@ -791,7 +792,7 @@ void compare_check() {
 
 }
 
-int main(void) {
+int benchboard(void) {
 
     // attack_map_generation();
 

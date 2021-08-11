@@ -1,4 +1,4 @@
-#include "../board/board.h"
+#include "board.h"
 #include "game.h"
 
 #include <vector>

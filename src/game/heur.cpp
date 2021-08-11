@@ -1,6 +1,6 @@
 
 #include "game.h"
-#include "../board/board.h"
+#include "board.h"
 
 #include <iostream>
 using std::cout;
