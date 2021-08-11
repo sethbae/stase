@@ -824,52 +824,6 @@ bool test_legal_moves() {
     return false;
 }
 
-void manual_gameplay() {
-    
-    Board b = starting_pos();
-    vector<Move> moves;
-    
-    while (true) {
-    
-        pr_board_conf(b); cout << "\n";
-        
-        moves.clear();
-        legal_moves(b, moves);
-        
-        for (Move m : moves) {
-            cout << movetosan(b, m) << " ";
-        }
-        cout << "\n\n";
-        
-        Move player_move = empty_move();
-        bool valid_move = false;
-        
-        while (!valid_move) {
-            
-            cout << ">> ";
-            
-            string userIn;
-            cin >> userIn;
-            
-            for (Move m : moves) {
-                if (movetosan(b, m) == userIn) {
-                    player_move = m;
-                    valid_move = true;
-                    break;
-                }
-            }
-            
-            if (!valid_move) {
-                cout << "Invalid\n";
-            }
-        }
-        
-        b = b.successor(player_move);
-        
-    }
-    
-}
-
 /*void gamestate_generation() {
     Board b = starting_pos();
     Gamestate g(b);

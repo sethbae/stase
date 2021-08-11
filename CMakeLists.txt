@@ -22,6 +22,9 @@ set(SOURCE_FILES
         src/search/search.cpp
         )
 
+set(STASE_SOURCE_FILES
+        src/main.cpp)
+
 set(SCRATCH_SOURCE_FILES
         scratch.cpp)
 
@@ -39,7 +42,9 @@ set(TEST_SOURCE_FILES
 
 include_directories(include/stase)
 
-add_executable(stase ${SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
+add_executable(stase ${SOURCE_FILES} ${STASE_SOURCE_FILES} ${SOURCES})
+
+add_executable(scratch ${SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
 
 add_executable(bench ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
 
