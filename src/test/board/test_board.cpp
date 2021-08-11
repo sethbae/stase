@@ -294,7 +294,7 @@ bool rw_fens() {
                                 };
     int succ = 0, fail = 0;
     
-    for (string s : test_fens) {
+    for (const string & s : test_fens) {
         
         if (board_to_fen(fen_to_board(s)) == s)
             ++succ;
@@ -815,7 +815,6 @@ bool test_mutate() {
     else
         ++fail;
 
-    
     print_results(succ, fail, "MUTATE");
     return fail == 0;
 }
@@ -916,7 +915,7 @@ void manual_gameplay() {
 
 }*/
 
-int main(void) {
+int test_board(void) {
 
     vector<bool (*)(void)> tests = {
         &piece_types,
@@ -932,7 +931,6 @@ int main(void) {
         if (!(*test)())
             exit(1);
     }
-
 
     return 0;
 }

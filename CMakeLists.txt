@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.13)  # CMake version check
-project(stase)               # Create project "simple_example"
-set(CMAKE_CXX_STANDARD 14)            # Enable c++14 standard
+cmake_minimum_required(VERSION 3.13)
+project(stase)
+set(CMAKE_CXX_STANDARD 14)
 
-# Add main.cpp file of project root directory as source file
 set(SOURCE_FILES
         src/board/bitmap.cpp
         src/board/board.cpp
@@ -28,13 +27,20 @@ set(SCRATCH_SOURCE_FILES
 
 set(BENCH_SOURCE_FILES
         src/bench/bench.h
-        src/bench/benchgame.cpp
-        src/bench/benchboard.cpp
+        src/bench/bench_game.cpp
+        src/bench/bench_board.cpp
         src/bench/bench_main.cpp)
+
+set(TEST_SOURCE_FILES
+        src/test/test.h
+        src/test/test_main.cpp
+        src/test/board/test_board.cpp
+        src/test/game/test_game.cpp)
 
 include_directories(include/stase)
 
-# Add executable target with source files listed in SOURCE_FILES variable
 add_executable(stase ${SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
 
 add_executable(bench ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
+
+add_executable(test ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES})

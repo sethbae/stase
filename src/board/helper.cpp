@@ -224,7 +224,7 @@ Board fen_to_board(const string & fen) {
         b.set_ep_file(get_x(stosq(ep)));
     }
 
-    // half and wholemoves
+    // half and whole moves
     b.set_halfmoves(get_number(stream));
     b.set_wholemoves(get_number(stream));
     
@@ -236,11 +236,11 @@ string board_to_fen(const Board & b) {
     stringstream ss;
 
     // Build arrangement string
-    for (int i = 7; i >= 0; --i) {
+    for (int y = 7; y >= 0; --y) {
         int spaces = 0;
-        for (int j = 0; j < 8; ++j) {
-            char piece = ptoc(b.get(mksq(j, i)));
-            if (piece == '*') {
+        for (int x = 0; x < 8; ++x) {
+            char piece = ptoc(b.get(mksq(x, y)));
+            if (piece == '.') {
                 ++spaces;
             } else if (spaces) {
                 ss << spaces << piece;
@@ -253,7 +253,7 @@ string board_to_fen(const Board & b) {
         if (spaces) 
             ss << spaces;
 
-        if (i) 
+        if (y)
             ss << "/";
     }
 
