@@ -91,6 +91,11 @@ Metric far_advanced_pawns_metric;
 
 Metric development_metric;
 
-Metric king_safety_metric;
+/*
+ * King safety metrics
+ */
+Metric pawns_defend_king_metric;
+Metric control_near_king_metric;
+Metric king_exposure_metric;
 
 #endif //STASE_HEUR_H

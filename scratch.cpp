@@ -42,19 +42,19 @@ void analyse_position(const std::string & fen_str) {
 
 int main(int argc, char** argv) {
 
-//    std::string fen_str;
-//    if (argc <= 1) {
-//        cout << "No board to analyse - using previous example instead\n";
-//        fen_str = "5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35";
-//    } else {
-//        fen_str = std::string(argv[1]);
-//    }
-//
-//    Board b = fen_to_board(fen_str);
-//
-//    heur_with_description(b);
-//
-//    analyse_position(fen_str);
+    std::string fen_str;
+    if (argc <= 1) {
+        cout << "No board to analyse - using previous example instead\n";
+        fen_str = "5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35";
+    } else {
+        fen_str = std::string(argv[1]);
+    }
+
+    Board b = fen_to_board(fen_str);
+
+    heur_with_description(b);
+
+    analyse_position(fen_str);
 
     return 0;
 

@@ -26,7 +26,9 @@ Metric* const METRICS[] = {
     &isolated_pawns_metric,
     &central_pawns_metric,
     &far_advanced_pawns_metric,
-    &king_safety_metric,
+    &pawns_defend_king_metric,
+    &control_near_king_metric,
+    &king_exposure_metric,
 };
 const string METRIC_NAMES[] = {
     "Alpha activity",
@@ -39,7 +41,9 @@ const string METRIC_NAMES[] = {
     "Isolanis",
     "Central pawns",
     "Far advanced pawns",
-    "King safety metric"
+    "Pawns defend king",
+    "Control near king",
+    "King exposure",
 };
 /*
  * The weights here are mapped by index, according to the comments and the ordering
@@ -57,9 +61,11 @@ const int WEIGHTS[] = {
     400,    // isolanis
     400,    // central pawns
     400,    // far advanced pawns
-    1000,   // king safety
+    750,    // pawns defending king
+    750,    // control near king
+    750,    // king exposure
 };
-const unsigned METRICS_IN_USE = 10;
+const unsigned METRICS_IN_USE = 13;
 
 
 // the central 16 squares
