@@ -36,7 +36,7 @@ set(BENCH_SOURCE_FILES
         src/bench/bench.h
         src/bench/bench_game.cpp
         src/bench/bench_board.cpp
-        src/bench/bench_main.cpp src/game/heur/pawns.cpp)
+        src/bench/bench_main.cpp)
 
 set(TEST_SOURCE_FILES
         src/test/test.h

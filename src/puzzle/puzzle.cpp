@@ -32,7 +32,7 @@ bool read_fens(unsigned num, vector<string> & vec) {
        
     ifstream file;
     
-    file.open("/home/seth/Documents/stase/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
@@ -66,9 +66,9 @@ bool read_all_fens(vector<string> & vec) {
 
     ifstream file;
     
-    file.open("/home/seth/Documents/stase/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
-        cout << "WARNING: could not read puzzle csv\n";
+        cout << "WARNING: could not read puzzle csv2\n";
         // TODO if not present, prompt and download!
         return false;
     }
@@ -88,16 +88,3 @@ bool read_all_fens(vector<string> & vec) {
     return true;
 
 }
-
-/*int main(void) {
-    
-    unsigned n = 10;
-    vector<string> v;
-    
-    read_fens(n, v);
-    
-    for (string s : v)
-        cout << s << "\n";
-    
-    return 0;
-}*/
