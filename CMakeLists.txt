@@ -11,16 +11,16 @@ set(SOURCE_FILES
 
         src/display/display.cpp
 
-        src/game/cands.cpp
+        src/game/cands/cands.cpp
         src/game/eval.cpp
         src/game/gamestate.cpp
-        src/game/heur.cpp
+        src/game/heur/heur.cpp
         src/game/piece.cpp
 
         src/puzzle/puzzle.cpp
 
         src/search/search.cpp
-        )
+        src/game/heur/heur.h src/game/heur/piece_activity.cpp src/game/heur/control.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)

@@ -112,8 +112,8 @@ std::string etos(const Eval, unsigned digits);
 std::string etos(const Eval);
 
 // heuristic evaluation
-Eval heur(const Gamestate &);
-Eval heur_with_description(const Gamestate &);
+int heur(const Gamestate &);
+int heur_with_description(const Gamestate &);
 
 // candidate moves
 std::vector<Move> cands(const Gamestate &);

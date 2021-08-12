@@ -59,7 +59,7 @@ bool black_is_mated(const Eval eval) {
 }
 
 // convert the Eval to a float representing a more traditional human evaluation
-float human_eval(const Eval eval) {
+float human_eval(const int eval) {
 
     /*
     // if it represents a mate, return some semi-meaningful float
@@ -76,7 +76,7 @@ float human_eval(const Eval eval) {
     return MIN_EVAL + (proportional_rating * (MAX_EVAL - MIN_EVAL));
     */
     
-    return ((float) eval) / 1000.0;
+    return ((float) eval) / 1000.0f;
 }
 
 int int_eval(const Eval eval) {
