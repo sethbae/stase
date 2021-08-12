@@ -3,7 +3,7 @@
 #include "heur.h"
 
 
-float piece_activity_alpha(const Board & b) {
+float piece_activity_alpha_metric(const Board & b) {
 
     int w_control = 0;
     int b_control = 0;
@@ -28,11 +28,11 @@ float piece_activity_alpha(const Board & b) {
     if (w_control + b_control > 0)
         w_proportion = ((float)w_control / (float)(b_control + w_control));
 
-    return -1.0 + 2*w_proportion;
+    return -1.0f + 2*w_proportion;
 
 }
 
-float piece_activity_beta(const Board & b) {
+float piece_activity_beta_metric(const Board & b) {
 
     int w_control = 0;
     int b_control = 0;
@@ -57,11 +57,11 @@ float piece_activity_beta(const Board & b) {
     if (w_control + b_control > 0)
         w_proportion = ((float)w_control / (float)(b_control + w_control));
 
-    return -1.0 + 2*w_proportion;
+    return -1.0f + 2*w_proportion;
 
 }
 
-float piece_activity_gamma(const Board & b) {
+float piece_activity_gamma_metric(const Board & b) {
 
     int w_control = 0;
     int b_control = 0;
@@ -86,6 +86,6 @@ float piece_activity_gamma(const Board & b) {
     if (w_control + b_control > 0)
         w_proportion = ((float)w_control / (float)(b_control + w_control));
 
-    return -1.0 + 2*w_proportion;
+    return -1.0f + 2*w_proportion;
 
 }

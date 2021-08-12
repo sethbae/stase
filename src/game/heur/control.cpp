@@ -111,7 +111,7 @@ unsigned count_pawns(const Board & b, Square s, StepFunc *step) {
  * Returns a measure of who controls the open lines and diagonals. This checks ranks,
  * files and major diagonals.
  */
-float open_line_control(const Board & b) {
+float open_line_control_metric(const Board & b) {
 
     /*
 
@@ -235,7 +235,7 @@ float open_line_control(const Board & b) {
 /*
  * Returns a measure of who controls the central squares.
  */
-float centre_control(const Board & b) {
+float centre_control_metric(const Board & b) {
 
     int count = 0;
 

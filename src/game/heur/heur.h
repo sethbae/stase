@@ -1,6 +1,8 @@
 #ifndef STASE_HEUR_H
 #define STASE_HEUR_H
 
+#include "game.h"
+
 /*
  * Metrics measure concretely some element of the board and score it as in favour of white
  * or black. They should not anticipate pieces moving: tactics should play out elsewhere.
@@ -50,7 +52,7 @@ extern const unsigned NUM_OUTER_CENTRAL_SQUARES;
 /*
  * Returns a positive integer representing the value of the piece in millipawns
  */
-int piece_value(const Piece p) {
+inline int piece_value(const Piece p) {
 
     switch (type(p)) {
         case PAWN: return 1000;
@@ -69,21 +71,26 @@ unsigned count_pawns(const Board &, Square, StepFunc*);
 /*
  * Piece activity (also declared in game.h, but repeated here for clarity).
  */
-Metric piece_activity_alpha;
-Metric piece_activity_beta;
-Metric piece_activity_gamma;
+Metric piece_activity_alpha_metric;
+Metric piece_activity_beta_metric;
+Metric piece_activity_gamma_metric;
 
 /*
  * File and centre control metrics (again, redeclared for clarity).
  */
-Metric open_line_control;
-Metric centre_control;
+Metric open_line_control_metric;
+Metric centre_control_metric;
 
+/*
+ * Metrics related to pawn structure
+ */
+Metric defended_pawns_metric;
+Metric isolated_pawns_metric;
+Metric central_pawns_metric;
+Metric far_advanced_pawns_metric;
 
-Metric defended_pawns;
-Metric development;
-Metric isolated_pawns;
-Metric central_pawns;
-Metric far_advanced_pawns;
+Metric development_metric;
+
+Metric king_safety_metric;
 
 #endif //STASE_HEUR_H

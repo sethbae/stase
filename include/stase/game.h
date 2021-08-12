@@ -97,7 +97,7 @@ Eval black_mates_in(unsigned);
 Eval white_has_been_mated();
 Eval black_has_been_mated();
 
-float human_eval(const Eval);
+float human_eval(const int);
 int int_eval(const Eval);
 Eval eval_from_float(float);
 
@@ -121,9 +121,6 @@ std::vector<Move> cands(const Gamestate &);
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);
 float piece_activity_gamma(const Board &);
-
-float centre_control(const Board &);
-float open_line_control(const Board &);
 
 // control functions
 unsigned alpha_control(const Board &, const Square);
