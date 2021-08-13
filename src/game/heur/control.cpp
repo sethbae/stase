@@ -42,7 +42,7 @@ int open_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
 int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
 
     int score = 0;      // the overall score which we'll return
-    unsigned squares_before_pawn = 0;
+    int squares_before_pawn = 0;
     int control = 0;    // who controls this run of squares
     int signum = 0;     // -1 -> black does, 0 -> nobody does, 1 -> white does
 
@@ -91,9 +91,9 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
  * Counts the number of pawns reachable from the given square according to the step func,
  * ie the number which are on a certain rank or file.
  */
-unsigned count_pawns(const Board & b, Square s, StepFunc *step) {
+int count_pawns(const Board & b, Square s, StepFunc *step) {
 
-    unsigned sum = 0;
+    int sum = 0;
 
     while (val(s)) {
 
@@ -138,19 +138,19 @@ float open_line_control_metric(const Board & b) {
 
     int score = 0;
     Square sq;
-    unsigned num_pawns;
+    int num_pawns;
 
-    unsigned FILE_VALUES[] = {
+    int FILE_VALUES[] = {
             // a  b  c  d  e  f  g  h
             10, 12, 15, 15, 15, 15, 12, 10
     };
 
-    unsigned RANK_VALUES[] = {
+    int RANK_VALUES[] = {
             // y =0  1   2   3   4   5   6   7
             15, 15, 10, 10, 10, 10, 15, 15
     };
 
-    unsigned DIAG_VALUES[] = {
+    int DIAG_VALUES[] = {
             //  a2  a1  b1
             10, 20, 10,   // positive 3 diagonals
             //  b8  a8  a7
@@ -158,7 +158,7 @@ float open_line_control_metric(const Board & b) {
     };
 
     // files
-    for (unsigned x = 0; x < 8; ++x) {
+    for (int x = 0; x < 8; ++x) {
         sq = mksq(x, 0);
         num_pawns = count_pawns(b, sq, inc_y);
         if (num_pawns == 0)
@@ -171,7 +171,7 @@ float open_line_control_metric(const Board & b) {
     // cout << "File score: " << score << "\n";
 
     // ranks
-    for (unsigned y = 0; y < 8; ++y) {
+    for (int y = 0; y < 8; ++y) {
         sq = mksq(0, y);
         num_pawns = count_pawns(b, sq, inc_x);
         if (num_pawns == 0)
@@ -239,7 +239,7 @@ float centre_control_metric(const Board & b) {
 
     int count = 0;
 
-    for (unsigned i = 0; i < NUM_INNER_CENTRAL_SQUARES; ++i) {
+    for (int i = 0; i < NUM_INNER_CENTRAL_SQUARES; ++i) {
 
         int control = control_count(b, INNER_CENTRAL_SQUARES[i]);
         if (control > 0) {
@@ -250,7 +250,7 @@ float centre_control_metric(const Board & b) {
 
     }
 
-    for (unsigned i = 0; i < NUM_OUTER_CENTRAL_SQUARES; ++i) {
+    for (int i = 0; i < NUM_OUTER_CENTRAL_SQUARES; ++i) {
 
         int control = control_count(b, OUTER_CENTRAL_SQUARES[i]);
         if (control > 0) {

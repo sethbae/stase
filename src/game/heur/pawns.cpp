@@ -4,11 +4,11 @@
 
 // returns the number of pawns which directly defend the given pawn (square),
 // relying on the colour of the piece on the square given
-unsigned supporting_pawns(const Board & b, Square s) {
+int supporting_pawns(const Board & b, Square s) {
 
-    unsigned x = get_x(s);
-    unsigned y = get_y(s);
-    unsigned count = 0;
+    int x = get_x(s);
+    int y = get_y(s);
+    int count = 0;
     Square temp;
 
     if (colour(b.get(s)) == WHITE) {
@@ -43,7 +43,7 @@ float defended_pawns_metric(const Board & b) {
     // for each file
     for (int x = 0; x < 8; ++x) {
 
-        unsigned supporters;
+        int supporters;
 
         // find white pawn in this file
         sq = mksq(x, 1);
@@ -86,8 +86,8 @@ float isolated_pawns_metric(const Board & b) {
     bool bpawns[8] = { false, false, false, false, false, false, false, false };
 
     // compute the above arrays
-    for (unsigned x = 0; x < 8; ++x) {
-        for (unsigned y = 0; y < 7; ++y) {
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 7; ++y) {
             if (b.get(mksq(x, y)) == W_PAWN) {
                 wpawns[x] = true;
             } else if (b.get(mksq(x, y)) == B_PAWN) {
@@ -100,7 +100,7 @@ float isolated_pawns_metric(const Board & b) {
     if (wpawns[0] && !wpawns[1]) {
         --score;
     }
-    for (unsigned x = 1; x < 7; ++x) {
+    for (int x = 1; x < 7; ++x) {
         if (!wpawns[x - 1] && wpawns[x] && !wpawns[x + 1]) {
             --score;
         }
@@ -113,7 +113,7 @@ float isolated_pawns_metric(const Board & b) {
     if (bpawns[0] && !bpawns[1]) {
         ++score;
     }
-    for (unsigned x = 1; x < 7; ++x) {
+    for (int x = 1; x < 7; ++x) {
         if (!bpawns[x - 1] && bpawns[x] && !bpawns[x + 1]) {
             ++score;
         }
@@ -135,8 +135,8 @@ float central_pawns_metric(const Board & b) {
     bool bpawns[8] = { false, false, false, false, false, false, false, false };
 
     // compute the above arrays
-    for (unsigned x = 0; x < 8; ++x) {
-        for (unsigned y = 0; y < 7; ++y) {
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 7; ++y) {
             if (b.get(mksq(x, y)) == W_PAWN) {
                 wpawns[x] = true;
             } else if (b.get(mksq(x, y)) == B_PAWN) {
@@ -173,8 +173,8 @@ float far_advanced_pawns_metric(const Board & b) {
 
     int value[8] = { 0, 4, 2, 1, 1, 2, 4, 0 };
 
-    for (unsigned y = 6; y > 0; --y) {
-        for (unsigned x = 0; x < 8; ++x) {
+    for (int y = 6; y > 0; --y) {
+        for (int x = 0; x < 8; ++x) {
 
             Piece p = b.get(mksq(x, y));
 

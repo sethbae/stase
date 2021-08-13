@@ -6,7 +6,7 @@ using std::cout;
 #include "heur.h"
 
 /*
- * returns a score of how well the pawns defend the king on the given square.
+ * Returns a score of how well the pawns defend the king on the given square.
  * no checking on king beyond colour
  */
 int pk_count(const Board & b, const Square s) {
@@ -15,11 +15,11 @@ int pk_count(const Board & b, const Square s) {
     //          rethink needed
     //      (8/5ppk/p2q3p/1p6/1P4N1/P4Q1P/4R1K1/1r6 b - - 7 34)
 
-    unsigned score = 0;
-    unsigned x = get_x(s);
-    unsigned y = get_y(s);
+    int score = 0;
+    int x = get_x(s);
+    int y = get_y(s);
     Ptype king_col = colour(b.get(s));
-    unsigned delta = (king_col == WHITE) ? 1 : -1;
+    int delta = (king_col == WHITE) ? 1 : -1;
 
     // check for unusual king locations and return 0
     if (king_col == WHITE) {
@@ -110,7 +110,7 @@ float pawns_defend_king_metric(const Board & b) {
 float control_near_king_metric(const Board & b) {
 
     int score = 0;
-    unsigned wx = 0, wy = 0, bx = 0, by = 0;
+    int wx = 0, wy = 0, bx = 0, by = 0;
 
     // find kings
     for (int x = 0; x < 8; ++x) {
@@ -164,7 +164,7 @@ float control_near_king_metric(const Board & b) {
         score -= gamma_control(b, sq);
 
     if (score > 15) { score = 15; }
-    if (score < -15) { score = -15; }
+    else if (score < -15) { score = -15; }
 
     return ((float) score) / 15.0f;
 

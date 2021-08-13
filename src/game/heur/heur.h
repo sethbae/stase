@@ -66,7 +66,7 @@ inline int piece_value(const Piece p) {
 
 int open_line_walk(const Board &, Square s, StepFunc*, MoveType);
 int half_line_walk(const Board &, Square, StepFunc*, MoveType);
-unsigned count_pawns(const Board &, Square, StepFunc*);
+int count_pawns(const Board &, Square, StepFunc*);
 
 /*
  * Piece activity (also declared in game.h, but repeated here for clarity).

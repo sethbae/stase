@@ -3,12 +3,9 @@
 /**
  *  This is the Gamestate object which is used to reduce calculations by storing some Bitmaps and other flags about the game.
  *  Each of those attributes should be updated or re-calculated every move.
- * 
  */
 
-Gamestate::Gamestate() {
-
-}
+Gamestate::Gamestate() {}
 
 Gamestate::Gamestate(const Board & b) : board(b) {
     recalculate_all();

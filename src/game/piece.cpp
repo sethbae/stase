@@ -4,7 +4,7 @@
 #include <iostream>
 using std::cout;
 
-const StepFunc *STEP_FUNCS[] = {
+StepFunc *STEP_FUNCS[] = {
     &inc_x,
     &dec_x,
     &inc_y,
@@ -33,11 +33,13 @@ const StepFunc *STEP_FUNCS[] = {
  
  */
 
-// performs a linear search on the board according to the given step and val functions.
-// returns the alpha count of the walk
-inline unsigned alpha_walk(const Board & b, const Square s, StepFunc *step) {
+/*
+ * Performs a linear search on the board according to the given step and val functions.
+ * returns the alpha count of the walk
+ */
+inline int alpha_walk(const Board & b, const Square s, StepFunc *step) {
     
-    unsigned sum = 0;
+    int sum = 0;
     Square temp = s;
     bool cont = true;
     
@@ -58,29 +60,31 @@ inline unsigned alpha_walk(const Board & b, const Square s, StepFunc *step) {
     return sum;
 }
 
-// computes and returns the number of squares which the given piece 'alpha controls'
-unsigned alpha_control(const Board & b, const Square s) {
+/*
+ * computes and returns the number of squares which the given piece 'alpha controls'
+ */
+int alpha_control(const Board & b, const Square s) {
     
-    unsigned sum = 0;
+    int sum = 0;
     
     Piece p = b.get(s);
     
     if (can_move(p, ORTHO)) {
-        for (unsigned dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
+        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += alpha_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
     if (can_move(p, DIAG)) {
-        for (unsigned dir = DIAG_START; dir < DIAG_STOP; ++dir) {
+        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += alpha_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
     if (can_move(p, KNIGHT_MOVE)) {
     
-        unsigned x = get_x(s);
-        unsigned y = get_y(s);
+        int x = get_x(s);
+        int y = get_y(s);
         Square sq;
         
         if (val(sq = mksq(x + 1, y + 2)) && b.get(sq) == EMPTY)
@@ -107,9 +111,9 @@ unsigned alpha_control(const Board & b, const Square s) {
 
 // performs a linear search on the board according to the given step and val functions.
 // returns the beta count of the walk
-inline unsigned beta_walk(const Board & b, const Square s, StepFunc *step) {
+inline int beta_walk(const Board & b, const Square s, StepFunc *step) {
     
-    unsigned sum = 0;
+    int sum = 0;
     Square temp = s;
     bool cont = true;
     
@@ -132,46 +136,46 @@ inline unsigned beta_walk(const Board & b, const Square s, StepFunc *step) {
 }
 
 // computes and returns the number of squares which the given piece 'beta controls'
-unsigned beta_control(const Board & b, const Square s) {
+int beta_control(const Board & b, const Square s) {
     
-    unsigned sum = 0;
+    int sum = 0;
     
     Piece p = b.get(s);
     
     if (can_move(p, ORTHO)) {
-        for (unsigned dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
+        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += beta_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
     if (can_move(p, DIAG)) {
-        for (unsigned dir = DIAG_START; dir < DIAG_STOP; ++dir) {
+        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += beta_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
     if (can_move(p, KNIGHT_MOVE)) {
     
-        unsigned x = get_x(s);
-        unsigned y = get_y(s);
-        Square sq;
+        int x = get_x(s);
+        int y = get_y(s);
         
-        if (val(sq = mksq(x + 1, y + 2)))
+        if (val(mksq(x + 1, y + 2)))
             ++sum;
-        if (val(sq = mksq(x + 1, y - 2)))
+        if (val(mksq(x + 1, y - 2)))
             ++sum;
-        if (val(sq = mksq(x + 2, y + 1)))
+        if (val(mksq(x + 2, y + 1)))
             ++sum;
-        if (val(sq = mksq(x + 2, y - 1)))
+        if (val(mksq(x + 2, y - 1)))
             ++sum;
-        if (val(sq = mksq(x - 1, y + 2)))
+        if (val(mksq(x - 1, y + 2)))
             ++sum;
-        if (val(sq = mksq(x - 1, y - 2)))
+        if (val(mksq(x - 1, y - 2)))
             ++sum;
-        if (val(sq = mksq(x - 2, y + 1)))
+        if (val(mksq(x - 2, y + 1)))
             ++sum;
-        if (val(sq = mksq(x - 2, y - 1)))
+        if (val(mksq(x - 2, y - 1)))
             ++sum;
+        
     }
     
     return sum;
@@ -180,9 +184,9 @@ unsigned beta_control(const Board & b, const Square s) {
 
 // performs a linear search on the board according to the given step and val functions.
 // returns the gamma count of the walk
-inline unsigned gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) {
+inline int gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) {
     
-    unsigned sum = 0;
+    int sum = 0;
     Square temp = s;
     bool cont = true;
     
@@ -205,45 +209,44 @@ inline unsigned gamma_walk(const Board & b, const Square s, StepFunc *step, Move
 }
 
 // computes and returns the number of squares which the given piece 'gamma controls'
-unsigned gamma_control(const Board & b, const Square s) {
+int gamma_control(const Board & b, const Square s) {
     
-    unsigned sum = 0;
+    int sum = 0;
     
     Piece p = b.get(s);
     
     if (can_move(p, ORTHO)) {
-        for (unsigned dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
+        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += gamma_walk(b, s, STEP_FUNCS[dir], ORTHO);
         }
     }
     
     if (can_move(p, DIAG)) {
-        for (unsigned dir = DIAG_START; dir < DIAG_STOP; ++dir) {
+        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += gamma_walk(b, s, STEP_FUNCS[dir], DIAG);
         }
     }
     
     if (can_move(p, KNIGHT_MOVE)) {
     
-        unsigned x = get_x(s);
-        unsigned y = get_y(s);
-        Square sq;
-        
-        if (val(sq = mksq(x + 1, y + 2)))
+        int x = get_x(s);
+        int y = get_y(s);
+
+        if (val(mksq(x + 1, y + 2)))
             ++sum;
-        if (val(sq = mksq(x + 1, y - 2)))
+        if (val(mksq(x + 1, y - 2)))
             ++sum;
-        if (val(sq = mksq(x + 2, y + 1)))
+        if (val(mksq(x + 2, y + 1)))
             ++sum;
-        if (val(sq = mksq(x + 2, y - 1)))
+        if (val(mksq(x + 2, y - 1)))
             ++sum;
-        if (val(sq = mksq(x - 1, y + 2)))
+        if (val(mksq(x - 1, y + 2)))
             ++sum;
-        if (val(sq = mksq(x - 1, y - 2)))
+        if (val(mksq(x - 1, y - 2)))
             ++sum;
-        if (val(sq = mksq(x - 2, y + 1)))
+        if (val(mksq(x - 2, y + 1)))
             ++sum;
-        if (val(sq = mksq(x - 2, y - 1)))
+        if (val(mksq(x - 2, y - 1)))
             ++sum;
     }
     
@@ -263,7 +266,7 @@ unsigned gamma_control(const Board & b, const Square s) {
 */
 int control_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) {
 
-    unsigned sum = 0;
+    int sum = 0;
     Square temp = s;
     bool cont = true;
     
@@ -298,18 +301,18 @@ int control_count(const Board & b, const Square s) {
     int count = 0;
 
     // orthogonal movement
-    for (unsigned dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
+    for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
         count += control_walk(b, s, STEP_FUNCS[dir], ORTHO);
     }
 
     // diagonal movement
-    for (unsigned dir = DIAG_START; dir < DIAG_STOP; ++dir) {
+    for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
         count += control_walk(b, s, STEP_FUNCS[dir], DIAG);
     }
     
     
-    unsigned x = get_x(s);
-    unsigned y = get_y(s);
+    int x = get_x(s);
+    int y = get_y(s);
     Square sq;
     
     // knights
@@ -361,35 +364,3 @@ int control_count(const Board & b, const Square s) {
     return count;
     
 }
-
-// print out a little grid of the control counts for each square
-void display_control_counts(const Board & b) {
-
-    
-    for (int y = 7; y >= 0; --y) {
-        for (int x = 0; x < 8; ++x) {
-            int count = control_count(b, mksq(x, y));
-            
-            std::string sign;
-            if (count > 0) { 
-                sign = "+";
-            } else if (count < 0) {
-                sign = "";
-            } else {
-                sign = " ";
-            }
-            
-            cout << sign << count << " ";
-        }
-        cout << "\n";
-    }
-
-}
-
-
-
-
-
-
-
-

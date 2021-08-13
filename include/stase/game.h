@@ -97,19 +97,19 @@ Eval black_mates_in(unsigned);
 Eval white_has_been_mated();
 Eval black_has_been_mated();
 
-float human_eval(const int);
-int int_eval(const Eval);
+float human_eval(int);
+int int_eval(Eval);
 Eval eval_from_float(float);
 
-bool is_mate(const Eval);
-bool white_is_mated(const Eval);
-bool black_is_mated(const Eval);
+bool is_mate(Eval);
+bool white_is_mated(Eval);
+bool black_is_mated(Eval);
 
-int signed_mate_distance(const Eval);
-int abs_mate_distance(const Eval);
+int signed_mate_distance(Eval);
+int abs_mate_distance(Eval);
 
-std::string etos(const Eval, unsigned digits);
-std::string etos(const Eval);
+std::string etos(Eval, int digits);
+std::string etos(Eval);
 
 // heuristic evaluation
 int heur(const Gamestate &);
@@ -123,11 +123,11 @@ float piece_activity_beta(const Board &);
 float piece_activity_gamma(const Board &);
 
 // control functions
-unsigned alpha_control(const Board &, const Square);
-unsigned beta_control(const Board &, const Square);
-unsigned gamma_control(const Board &, const Square);
+int alpha_control(const Board &, Square);
+int beta_control(const Board &, Square);
+int gamma_control(const Board &, Square);
 
-int control_count(const Board &, const Square);
+int control_count(const Board &, Square);
 void display_control_counts(const Board &);
 
 #endif //STASE_GAME_H

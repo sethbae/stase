@@ -99,7 +99,7 @@ Eval eval_from_float(float f) {
     
 }
 
-string etos(const Eval eval, unsigned digits) {
+string etos(const Eval eval, int digits) {
     stringstream ss;
     ss << std::fixed << std::setprecision(digits) << human_eval(eval);
     return ss.str();

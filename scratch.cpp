@@ -54,7 +54,9 @@ int main(int argc, char** argv) {
 
     heur_with_description(b);
 
-    analyse_position(fen_str);
+    // analyse_position(fen_str);
+
+    display_control_counts(b);
 
     return 0;
 

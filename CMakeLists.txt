@@ -24,7 +24,7 @@ set(SOURCE_FILES
 
         src/puzzle/puzzle.cpp
 
-        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp)
+        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp src/game/helper.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
