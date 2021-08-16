@@ -11,11 +11,11 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "-board") == 0) {
-            cout << "Testing board\n";
+            cout << "Benching board\n";
             bench_board();
             ++benchmarks_run;
         } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-game") == 0) {
-            cout << "Testing game\n";
+            cout << "Benching game\n";
             bench_game();
             ++benchmarks_run;
         } else {

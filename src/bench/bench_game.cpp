@@ -15,7 +15,8 @@ using std::vector;
 
 #include <string>
 using std::string;
-
+#include <iomanip>
+using std::setw;
 #include <fstream>
 using std::ifstream;
 using std::ios;
@@ -25,6 +26,7 @@ using std::time;
 
 #include "game.h"
 #include "puzzle.h"
+#include "../game/heur/heur.h"
 
 void gamestate_recalculation() {
     Board b = fen_to_board("r1br2k1/1p3ppp/p1nqpb2/3nN3/3P1P2/1B2B3/PPN3PP/R2Q1RK1 w Qq - 0 1");
@@ -151,9 +153,56 @@ void heuristic_evaluation() {
     
 }
 
-int bench_game(void) {
+double bench_metric(Metric *m, const string & name) {
 
-    heuristic_evaluation();
+    vector<string> vec;
+    read_all_fens(vec);
+
+    // initialise all boards
+    Gamestate *states = new Gamestate[vec.size()];
+    for (int i = 0; i < vec.size(); ++i) {
+        states[i].board = fen_to_board(vec[i]);
+    }
+
+    // start timer
+    auto start = high_resolution_clock::now();
+
+    double scores = 0.0;
+
+    for (int i = 0; i < vec.size(); ++i) {
+        scores += (*m)(states[i].board);
+    }
+
+    /* end benchmark and return */
+    auto stop = high_resolution_clock::now();
+    double per_board = (double)(duration_cast<microseconds>(stop - start)).count() / (double)vec.size();
+
+    cout << std::left << setw(20) << name << ": "
+            << std::right << setw(8) << per_board
+            << " microseconds     (Sum: " << setw(2) << scores << ")\n";
+
+    delete [] states;
+
+    return per_board;
+
+}
+
+int bench_game() {
+
+    // heuristic_evaluation();
+
+    double cum_micros = 0.0;
+
+    cout << "Benchmarking individual metrics\n";
+
+    for (int i = 0; i < METRICS_IN_USE; ++i) {
+        cum_micros += bench_metric(METRICS[i], METRIC_NAMES[i]);
+    }
+
+    cout << std::left << setw(20) << "\nTotal time taken" << ": "
+            << setw(6) << cum_micros << "microseconds\n";
+
+    return 0;
 
 }
 
