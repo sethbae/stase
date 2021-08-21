@@ -187,20 +187,26 @@ double bench_metric(Metric *m, const string & name) {
 
 }
 
+void bench_individual_metrics() {
+
+        double cum_micros = 0.0;
+
+        cout << "Benchmarking individual metrics\n";
+
+        for (int i = 0; i < METRICS_IN_USE; ++i) {
+            if (METRIC_NAMES[i] == "Centre control")
+            cum_micros += bench_metric(METRICS[i], METRIC_NAMES[i]);
+        }
+
+        cout << std::left << setw(20) << "\nTotal time taken" << ": "
+                << setw(6) << cum_micros << " microseconds\n";
+
+}
+
 int bench_game() {
 
+    bench_individual_metrics();
     // heuristic_evaluation();
-
-    double cum_micros = 0.0;
-
-    cout << "Benchmarking individual metrics\n";
-
-    for (int i = 0; i < METRICS_IN_USE; ++i) {
-        cum_micros += bench_metric(METRICS[i], METRIC_NAMES[i]);
-    }
-
-    cout << std::left << setw(20) << "\nTotal time taken" << ": "
-            << setw(6) << cum_micros << "microseconds\n";
 
     return 0;
 
