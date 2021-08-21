@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.13)
 project(stase)
 set(CMAKE_CXX_STANDARD 14)
 
+set(OPT_FLAGS -Ofast)
+
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
+
 set(SOURCE_FILES
         src/board/bitmap.cpp
         src/board/board.cpp
@@ -24,7 +28,7 @@ set(SOURCE_FILES
 
         src/puzzle/puzzle.cpp
 
-        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp src/game/helper.cpp)
+        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp src/game/helper.cpp src/game/cands/cands.h)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
