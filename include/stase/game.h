@@ -14,7 +14,7 @@ enum MoveType {
 
 // lookup tables for the step function which moves in each direction
 typedef void StepFunc(Square &);
-extern const StepFunc *STEP_FUNCS[8];
+extern StepFunc *STEP_FUNCS[8];
 
 // constants for iterating over the directions
 const unsigned ORTHO_START = 0;
@@ -47,8 +47,7 @@ inline bool can_move(Piece piece, MoveType dir) {
     return PIECE_MOVE_TYPES[piece][dir];
 }
 
-struct Gamestate
-        {
+struct Gamestate {
 
     // The enclosed board
     Board board;
@@ -80,7 +79,8 @@ struct Gamestate
     void recalculate_attacks();
     void recalculate_positions();
     void update(Move m);
-        };
+
+};
 
 bool in_check(Gamestate &);
 
