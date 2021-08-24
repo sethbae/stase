@@ -8,6 +8,9 @@ using std::ofstream;
 #include "include/stase/board.h"
 #include "include/stase/game.h"
 #include "include/stase/search.h"
+#include "include/stase/puzzle.h"
+#include "src/game/cands/cands.h"
+
 
 void record_tree_in_file(const std::string & filename, vector<SearchNode*> & nodes) {
 
@@ -42,21 +45,38 @@ void analyse_position(const std::string & fen_str) {
 
 int main(int argc, char** argv) {
 
-    std::string fen_str;
-    if (argc <= 1) {
-        cout << "No board to analyse - using previous example instead\n";
-        fen_str = "5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35";
-    } else {
-        fen_str = std::string(argv[1]);
+//    std::string fen_str;
+//    if (argc <= 1) {
+//        cout << "No board to analyse - using previous example instead\n";
+//        fen_str = "5r2/3b2kp/6p1/8/5B2/2P5/2r2PBP/R5K1 w - - 1 35";
+//    } else {
+//        fen_str = std::string(argv[1]);
+//    }
+//
+//    Board b = fen_to_board(fen_str);
+//
+//    heur_with_description(b);
+//
+//    // analyse_position(fen_str);
+//
+//    display_control_counts(b);
+
+    for (int i = 0; i < 1; ++i) {
+
+        std::string fen = "r1b2rk1/1pp1b1pp/n2ppnq1/p4p2/2PP4/1PN2NP1/PB2PPBP/R2QR1K1 w - - 4 11";
+
+        Board b = fen_to_board(fen);
+        Square sq = mksq(3, 3);
+
+        pr_board(b);
+
+        cout << "Looking at " << sqtos(sq) << "\n";
+
+        capture_walk(b, sq);
+
+        cout << "\n\n";
+
     }
-
-    Board b = fen_to_board(fen_str);
-
-    heur_with_description(b);
-
-    // analyse_position(fen_str);
-
-    display_control_counts(b);
 
     return 0;
 

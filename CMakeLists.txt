@@ -28,7 +28,7 @@ set(SOURCE_FILES
 
         src/puzzle/puzzle.cpp
 
-        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp src/game/helper.cpp src/game/cands/cands.h src/game/cands/weak.cpp)
+        src/search/search.cpp src/game/heur/development.cpp src/game/heur/king.cpp src/game/helper.cpp src/game/cands/cands.h src/game/cands/weak.cpp src/test/game/cands/test_weak.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
