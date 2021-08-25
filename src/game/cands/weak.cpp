@@ -76,13 +76,10 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
 
     // knights
     int kn_val = piece_value(W_KNIGHT);
-    cout << "Knight has value of " << piece_value(KNIGHT) << "\n";
     for (int i = 0; i < 8; ++i) {
         if (val(temp = mksq(x + xkn[i], y + ykn[i])) && (type(b.get(temp)) == KNIGHT)) {
             if (colour(b.get(temp)) == WHITE) {
                 ++balance;
-                cout << "+1\n";
-                cout << min_value_w << " " << kn_val;
                 if (min_value_w > kn_val) {
                     min_value_w = kn_val;
                 }
@@ -111,7 +108,6 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
     if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN)) {
         balance -= 1;
         if (min_value_b > pawn_val) {
-            cout << "\nhey\n";
             min_value_b = pawn_val;
         }
     }

@@ -67,12 +67,13 @@ int main(int argc, char** argv) {
 
         Board b = fen_to_board(fen);
         Square sq = mksq(3, 3);
+        int min_w, min_b;
 
         pr_board(b);
 
         cout << "Looking at " << sqtos(sq) << "\n";
 
-        capture_walk(b, sq);
+        capture_walk(b, sq, &min_w, &min_b);
 
         cout << "\n\n";
 
