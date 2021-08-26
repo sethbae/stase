@@ -1,5 +1,7 @@
 #include "game.h"
 
-int test_game() {
-    return 0;
+#include "../test.h"
+
+void test_game() {
+    test_weak();
 }

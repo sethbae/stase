@@ -13,14 +13,14 @@ int ykn[8] = {2, -2, 1, -1, 2, -2, 1, -1};
 
 /*
  * Walks along the board in the given manner, maintaining a running total of the +- control
- * of the given tempuare on the board. Updates min_threat if it encounters a threatening piece
+ * of the given square on the board. Updates min_threat if it encounters a threatening piece
  * of lower value than the current value of min_threat.
  */
 int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
     
     int balance = 0;
-    int min_value_w = piece_value(KING)*10;
-    int min_value_b = piece_value(KING)*10;
+    int min_value_w = piece_value(W_KING)*10;
+    int min_value_b = piece_value(W_KING)*10;
     int x, y;
     Square temp;
     
@@ -130,9 +130,9 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
         }
     }
 
-    cout << "Balance: " << balance
-            << "\nMin white: " << min_value_w
-            << "\nMin black: " << min_value_b << "\n";
+//    cout << "Balance: " << balance
+//            << "\nMin white: " << min_value_w
+//            << "\nMin black: " << min_value_b << "\n";
 
     *min_w = min_value_w;
     *min_b = min_value_b;

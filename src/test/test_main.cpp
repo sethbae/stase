@@ -2,8 +2,11 @@
 using std::cout;
 #include <cstring>
 using std::strcmp;
+#include <iomanip>
+using std::setw;
 
 #include "test.h"
+
 
 int main(int argc, char** argv) {
 
@@ -11,11 +14,11 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "-board") == 0) {
-            cout << "Benchmarking board\n";
+            cout << "Testing board\n";
             test_board();
             ++modules_tested;
         } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-game") == 0) {
-            cout << "Benchmarking game\n";
+            cout << "Testing game\n";
             test_game();
             ++modules_tested;
         } else {
