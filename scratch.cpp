@@ -63,17 +63,19 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < 1; ++i) {
 
-        std::string fen = "r1b2rk1/1pp1b1pp/n2ppnq1/p4p2/2PP4/1PN2NP1/PB2PPBP/R2QR1K1 w - - 4 11";
+        std::string fen = "4r2b/4r3/8/3p4/5P2/8/4R3/B3R3 w - - 0 1";
 
         Board b = fen_to_board(fen);
-        Square sq = mksq(3, 3);
+        Square sq = mksq(4, 3);
         int min_w, min_b;
 
         pr_board(b);
 
         cout << "Looking at " << sqtos(sq) << "\n";
 
-        capture_walk(b, sq, &min_w, &min_b);
+        int count = capture_walk(b, sq, &min_w, &min_b);
+
+        cout << "Count: " << count << "\nMin w: " << min_w << "\nMin b: " << min_b;
 
         cout << "\n\n";
 

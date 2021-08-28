@@ -10,13 +10,17 @@ bool evaluate_test_set(std::vector<T> & cases, bool (*func)(const T*)) {
 
     if (cases.empty()) { return true; }
 
-    int success = 0, failed = 0;
+    int success = 0, failed = 0, first_failure = -1;
 
     for (T tc : cases) {
         if ((*func)(&tc)) {
             ++success;
         } else {
             ++failed;
+            first_failure =
+                    (first_failure < 0)
+                    ? success
+                    : first_failure;
         }
     }
 
@@ -24,7 +28,8 @@ bool evaluate_test_set(std::vector<T> & cases, bool (*func)(const T*)) {
     std::cout << success << "/" << success + failed << "\n";
 
     if (failed) {
-        std::cout << "***SOME TESTS FAILED***\n";
+        std::cout << "*****SOME TESTS FAILED***** ("
+                    << cases[0].name() << "@" << first_failure << ")\n";
         return false;
     }
 

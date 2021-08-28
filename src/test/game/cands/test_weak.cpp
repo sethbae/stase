@@ -22,10 +22,58 @@ struct TestCase {
 
 };
 
-const int DEFAULT = 10*piece_value(W_KING);
+const int DEFAULT = 10 * piece_value(W_KING);
 
 std::vector<TestCase> test_cases{
-        TestCase{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" , stosq("e4"), 0, DEFAULT, DEFAULT },
+        TestCase{
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            stosq("e4"),
+            0,
+            DEFAULT,
+            DEFAULT
+        },
+        TestCase{
+            "4r2b/4r3/8/3p4/5P2/8/4R3/B3R3 w - - 0 1",
+            stosq("e4"),
+            -1,
+            piece_value(W_ROOK),
+            piece_value(B_PAWN),
+        },
+        TestCase{
+            "4r2b/4r3/8/3p4/5P2/8/4R3/B3R3 w - - 0 1",
+            stosq("e5"),
+            1,
+            piece_value(W_PAWN),
+            piece_value(B_KNIGHT)
+        },
+        TestCase{
+            "1q6/k1N5/8/2KQ4/8/8/8/8 w - - 0 1",
+            stosq("a8"),
+            0,
+            piece_value(W_BISHOP),
+            piece_value(B_QUEEN)
+        },
+        TestCase{
+            "1q6/k1N5/8/2KQ4/8/8/8/8 w - - 0 1",
+            stosq("b6"),
+            -1,
+            DEFAULT,
+            piece_value(B_QUEEN),
+        },
+        TestCase{
+            "8/k1N2n2/8/2KQ4/4B3/5P2/6P1/8 w - - 0 1",
+            stosq("f3"),
+            3,
+            piece_value(W_PAWN),
+            DEFAULT
+        },
+        TestCase{
+            "1r3k2/2n2pp1/4pp2/3pp3/1ppp4/8/8/8 w - - 0 1",
+            stosq("e8"),
+            -3,
+            DEFAULT,
+            piece_value(B_KNIGHT)
+        },
 };
 
 bool evaluate_test_case(const TestCase *tc) {
