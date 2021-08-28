@@ -1,5 +1,15 @@
 #include "game.h"
 
+/*
+ * Values for the move diffs (cannot be defined in header).
+ */
+const int XD[] = {-1, -1, 1, 1, -1, 1, 0, 0};
+const int YD[] = {-1, 1, -1, 1, 0, 0, 1, -1};
+
+const int XKN[] = {1, 1, 2, 2, -1, -1, -2, -2};
+const int YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
+
+
 /**
  *  This is the Gamestate object which is used to reduce calculations by storing some Bitmaps and other flags about the game.
  *  Each of those attributes should be updated or re-calculated every move.

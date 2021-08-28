@@ -2,6 +2,7 @@
 #define STASE_GAME_H
 
 #include "board.h"
+#include "../../src/game/cands/cands.h"
 
 enum MoveType {
     ORTHO = 0,
@@ -11,6 +12,15 @@ enum MoveType {
     KING_MOVE = 4,
     INVALID_MOVE = 5
 };
+
+/*
+ * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
+ * Given values in gamestate.cpp
+ */
+extern const int XD[];
+extern const int YD[];
+extern const int XKN[];
+extern const int YKN[];
 
 // lookup tables for the step function which moves in each direction
 typedef void StepFunc(Square &);
@@ -51,6 +61,8 @@ struct Gamestate {
 
     // The enclosed board
     Board board;
+
+    FeatureFrame** features;
 
     // Attack and occupation maps for each of the adversaries
     Bitmap fattack;

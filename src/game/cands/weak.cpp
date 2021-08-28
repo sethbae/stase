@@ -3,18 +3,12 @@ using std::cout;
 
 #include "game.h"
 #include "../heur/heur.h"
-
-int xd[8] = {-1, -1, 1, 1, -1, 1, 0, 0};
-int yd[8] = {-1, 1, -1, 1, 0, 0, 1, -1};
-
-int xkn[8] = {1, 1, 2, 2, -1, -1, -2, -2};
-int ykn[8] = {2, -2, 1, -1, 2, -2, 1, -1};
-
+#include "../cands/cands.h"
 
 /*
  * Walks along the board in the given manner, maintaining a running total of the +- control
- * of the given square on the board. Updates min_threat if it encounters a threatening piece
- * of lower value than the current value of min_threat.
+ * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
+ * of the relevant colour of lower value than the current value of min_w/min_b.
  */
 int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
     
@@ -33,7 +27,7 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
             dir = ORTHO;
         }
         
-        int x_inc = xd[i], y_inc = yd[i];
+        int x_inc = XD[i], y_inc = YD[i];
         bool cont = true;
         bool x_ray = false;
 
@@ -77,7 +71,7 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
     // knights
     int kn_val = piece_value(W_KNIGHT);
     for (int i = 0; i < 8; ++i) {
-        if (val(temp = mksq(x + xkn[i], y + ykn[i])) && (type(b.get(temp)) == KNIGHT)) {
+        if (val(temp = mksq(x + XKN[i], y + YKN[i])) && (type(b.get(temp)) == KNIGHT)) {
             if (colour(b.get(temp)) == WHITE) {
                 ++balance;
                 if (min_value_w > kn_val) {
@@ -94,7 +88,7 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
 
     // kings
     for (int i = 0; i < 8; ++i) {
-        if (val(temp = mksq(x + xd[i], y + yd[i])) && (type(b.get(temp)) == KING)) {
+        if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(b.get(temp)) == KING)) {
             if (colour(b.get(temp)) == WHITE) {
                 ++balance;
             } else {
@@ -137,4 +131,12 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
     *min_w = min_value_w;
     *min_b = min_value_b;
     return balance;
+}
+
+void weak_hook(const Board & b, FeatureFrame* frame) {
+    // check all squares calling capture walk, writing to frame
+}
+
+void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
+    // check frame and turn, delegate to major and minor adding moves.
 }
