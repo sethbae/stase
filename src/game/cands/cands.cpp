@@ -3,8 +3,11 @@
 #include "cands.h"
 
 #include <vector>
-
 using std::vector;
+#include <iostream>
+using std::cout;
+
+const int NUM_FEATURES = 10;
 
 FeatureHandler feature_handlers[] = {
         {&weak_hook, &weak_resp},
@@ -34,19 +37,19 @@ vector<Move> cands(const Gamestate &gs) {
     FeatureHandler fh;
     while ((fh = feature_handlers[i]).hook) {
         MoveSet moves;
-        (*fh.hook)(gs.board, gs.features[i]);
-        (*fh.responder)(gs.board, &moves, gs.features[i]);
+        (*fh.hook)(gs.board, gs.feature_frames[i]);
+        (*fh.responder)(gs.board, &moves, gs.feature_frames[i]);
 
-        for (int j = 0; j < MAX_MOVES_PER_HOOK(); ++j) {
+        for (int j = 0; j < MAX_MOVES_PER_HOOK; ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
-                if ((all_moves[k].from == moves[j].from)
-                        && (all_moves[k].to == moves[j].to)) {
+                if ((all_moves[k].from == moves.moves[j].from)
+                        && (all_moves[k].to == moves.moves[j].to)) {
                     present = true;
                 }
             }
             if (!present && m < MAX_MOVES - 1) {
-                all_moves[m++] = moves[j];
+                all_moves[m++] = moves.moves[j];
             }
         }
 

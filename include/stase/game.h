@@ -62,7 +62,7 @@ struct Gamestate {
     // The enclosed board
     Board board;
 
-    FeatureFrame** features;
+    FeatureFrame** feature_frames;
 
     // Attack and occupation maps for each of the adversaries
     Bitmap fattack;

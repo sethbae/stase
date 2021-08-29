@@ -1,4 +1,5 @@
 #include "game.h"
+#include "cands/cands.h"
 
 /*
  * Values for the move diffs (cannot be defined in header).
@@ -15,9 +16,12 @@ const int YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
  *  Each of those attributes should be updated or re-calculated every move.
  */
 
-Gamestate::Gamestate() {}
+Gamestate::Gamestate() {
+    feature_frames = new FeatureFrame*[NUM_FEATURES];
+}
 
 Gamestate::Gamestate(const Board & b) : board(b) {
+    feature_frames = new FeatureFrame*[NUM_FEATURES];
     recalculate_all();
 }
 

@@ -1,14 +1,17 @@
 #ifndef STASE_CANDS_H
 #define STASE_CANDS_H
 
-constexpr inline int MAX_MOVES_PER_HOOK() { return 3; }
+const int MAX_MOVES_PER_HOOK = 3;
+extern const int NUM_FEATURES;
+
+struct FeatureFrame {
+    Square centre;
+    Square secondary;
+};
 
 typedef struct {
-    const Square centre;
-    const Square secondary;
-} FeatureFrame;
-
-typedef Move MoveSet[MAX_MOVES_PER_HOOK()];
+    Move moves[MAX_MOVES_PER_HOOK];
+} MoveSet;
 
 typedef void (Hook)(const Board &, FeatureFrame*);
 typedef void (Responder)(const Board &, MoveSet*, FeatureFrame*);
@@ -19,8 +22,6 @@ typedef struct {
 } FeatureHandler;
 
 extern FeatureHandler feature_handlers[];
-
-int capture_walk(const Board &, Square, int*, int*);
 
 Hook weak_hook;
 Responder weak_resp;

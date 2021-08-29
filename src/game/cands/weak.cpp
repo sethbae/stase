@@ -3,24 +3,24 @@ using std::cout;
 
 #include "game.h"
 #include "../heur/heur.h"
-#include "../cands/cands.h"
 
 /*
  * Walks along the board in the given manner, maintaining a running total of the +- control
  * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
-int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
+bool capture_walk(const Board & b, Square s) {
     
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
     int min_value_b = piece_value(W_KING)*10;
     int x, y;
     Square temp;
-    
-    MoveType dir = DIAG;
-    
+
+    if (type(b.get(s)) == EMPTY) { return false; }
+
     // go through the delta pairs entailing each sliding direction
+    MoveType dir = DIAG;
     for (int i = 0; i < 8; ++i) {
         
         if (i == 4) {
@@ -128,15 +128,41 @@ int capture_walk(const Board & b, Square s, int* min_w, int* min_b) {
 //            << "\nMin white: " << min_value_w
 //            << "\nMin black: " << min_value_b << "\n";
 
-    *min_w = min_value_w;
-    *min_b = min_value_b;
-    return balance;
+    if (balance != 0) {
+        return true;
+    }
+
+    if (colour(b.get(s)) == WHITE) {
+        return min_value_b < piece_value(b.get(s));
+    } else {
+        return min_value_w < piece_value(b.get(s));
+    }
+
 }
 
 void weak_hook(const Board & b, FeatureFrame* frame) {
     // check all squares calling capture walk, writing to frame
+
+    Square hits[64];
+    int i = 0;
+
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            if (capture_walk(b, mksq(x, y))) {
+                hits[i++] = mksq(x, y);
+            }
+        }
+    }
+
+    frame = static_cast<FeatureFrame*> (operator new(sizeof(FeatureFrame) * i));
+
+    for (int j = 0; j < i; ++j) {
+        frame[j].centre = hits[j];
+    }
 }
 
 void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
     // check frame and turn, delegate to major and minor adding moves.
+
+    cout << "resp\n";
 }

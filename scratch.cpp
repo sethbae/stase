@@ -57,29 +57,10 @@ int main(int argc, char** argv) {
 //
 //    heur_with_description(b);
 //
-//    // analyse_position(fen_str);
-//
-//    display_control_counts(b);
 
-    for (int i = 0; i < 1; ++i) {
+    Board b = starting_pos();
 
-        std::string fen = "4r2b/4r3/8/3p4/5P2/8/4R3/B3R3 w - - 0 1";
-
-        Board b = fen_to_board(fen);
-        Square sq = mksq(4, 3);
-        int min_w, min_b;
-
-        pr_board(b);
-
-        cout << "Looking at " << sqtos(sq) << "\n";
-
-        int count = capture_walk(b, sq, &min_w, &min_b);
-
-        cout << "Count: " << count << "\nMin w: " << min_w << "\nMin b: " << min_b;
-
-        cout << "\n\n";
-
-    }
+    cands(Gamestate(b));
 
     return 0;
 
