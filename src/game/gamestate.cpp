@@ -1,5 +1,7 @@
 #include "game.h"
 #include "cands/cands.h"
+#include <iostream>
+using std::cout;
 
 /*
  * Values for the move diffs (cannot be defined in header).

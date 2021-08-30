@@ -6,7 +6,7 @@
 #include <iomanip>
 
 template <typename T>
-bool evaluate_test_set(std::vector<T> & cases, bool (*func)(const T*)) {
+bool evaluate_test_set(const std::vector<T> & cases, bool (*func)(const T*)) {
 
     if (cases.empty()) { return true; }
 

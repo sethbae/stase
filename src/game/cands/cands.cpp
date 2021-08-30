@@ -37,7 +37,7 @@ vector<Move> cands(const Gamestate &gs) {
     FeatureHandler fh;
     while ((fh = feature_handlers[i]).hook) {
         MoveSet moves;
-        (*fh.hook)(gs.board, gs.feature_frames[i]);
+        (*fh.hook)(gs.board, &gs.feature_frames[i]);
         (*fh.responder)(gs.board, &moves, gs.feature_frames[i]);
 
         for (int j = 0; j < MAX_MOVES_PER_HOOK; ++j) {
@@ -46,6 +46,7 @@ vector<Move> cands(const Gamestate &gs) {
                 if ((all_moves[k].from == moves.moves[j].from)
                         && (all_moves[k].to == moves.moves[j].to)) {
                     present = true;
+                    break;
                 }
             }
             if (!present && m < MAX_MOVES - 1) {

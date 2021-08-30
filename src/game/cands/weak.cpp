@@ -2,6 +2,7 @@
 using std::cout;
 
 #include "game.h"
+#include "../cands/cands.h"
 #include "../heur/heur.h"
 
 /*
@@ -87,12 +88,19 @@ bool capture_walk(const Board & b, Square s) {
     }
 
     // kings
+    int k_val = piece_value(W_KING);
     for (int i = 0; i < 8; ++i) {
         if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(b.get(temp)) == KING)) {
             if (colour(b.get(temp)) == WHITE) {
                 ++balance;
+                if (min_value_w > k_val) {
+                    min_value_w = k_val;
+                }
             } else {
                 --balance;
+                if (min_value_b > k_val) {
+                    min_value_b = k_val;
+                }
             }
         }
     }
@@ -128,20 +136,28 @@ bool capture_walk(const Board & b, Square s) {
 //            << "\nMin white: " << min_value_w
 //            << "\nMin black: " << min_value_b << "\n";
 
-    if (balance != 0) {
-        return true;
+    if (colour(b.get(s)) == WHITE) {
+        return (balance < 0 && min_value_b <= piece_value(B_KING)) || (min_value_b < piece_value(b.get(s)));
+    } else {
+        return (balance > 0 && min_value_w <= piece_value(W_KING)) || (min_value_w < piece_value(b.get(s)));
     }
 
-    if (colour(b.get(s)) == WHITE) {
-        return min_value_b < piece_value(b.get(s));
-    } else {
-        return min_value_w < piece_value(b.get(s));
-    }
+//    if (balance < 0 && min_value_b <= piece_value(W_QUEEN)) {
+//        return true;
+//    }
+//    if (balance > 0 && min_value_w <= piece_value(B_QUEEN)) {
+//        return true;
+//    }
+//
+//    if (colour(b.get(s)) == WHITE) {
+//        return min_value_b < piece_value(b.get(s));
+//    } else {
+//        return min_value_w < piece_value(b.get(s));
+//    }
 
 }
 
-void weak_hook(const Board & b, FeatureFrame* frame) {
-    // check all squares calling capture walk, writing to frame
+void weak_hook(const Board & b, FeatureFrame** frame) {
 
     Square hits[64];
     int i = 0;
@@ -154,11 +170,14 @@ void weak_hook(const Board & b, FeatureFrame* frame) {
         }
     }
 
-    frame = static_cast<FeatureFrame*> (operator new(sizeof(FeatureFrame) * i));
+    *frame = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
 
     for (int j = 0; j < i; ++j) {
-        frame[j].centre = hits[j];
+        (*frame)[j].centre = hits[j];
+        (*frame)[j].secondary = 0;
     }
+    (*frame)[i].centre = SQUARE_SENTINEL;
+    (*frame)[i].secondary = SQUARE_SENTINEL;
 }
 
 void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {

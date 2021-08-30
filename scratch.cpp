@@ -58,9 +58,15 @@ int main(int argc, char** argv) {
 //    heur_with_description(b);
 //
 
-    Board b = starting_pos();
+    Gamestate gs(starting_pos());
 
-    cands(Gamestate(b));
+    cands(gs);
+
+    FeatureFrame* frame_ptr = gs.feature_frames[0];
+
+    for (FeatureFrame* ff = frame_ptr; ff->centre != SQUARE_SENTINEL; ff++) {
+        cout << "Frame: " << sqtos(ff->centre) << " " << sqtos(ff->secondary) << "\n";
+    }
 
     return 0;
 
