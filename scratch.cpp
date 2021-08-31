@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 //    heur_with_description(b);
 //
 
-    Gamestate gs(fen_to_board("6b1/8/8/3Q4/2P5/8/8/8 w - - 0 1"));
+    Gamestate gs(fen_to_board("8/8/8/3r4/2P1P3/8/8/3Q4 w - - 0 1"));
 
     cands(gs);
 

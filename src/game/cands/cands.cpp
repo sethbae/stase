@@ -40,7 +40,7 @@ vector<Move> cands(const Gamestate &gs) {
         (*fh.hook)(gs.board, &gs.feature_frames[i]);
         (*fh.responder)(gs.board, &moves, gs.feature_frames[i]);
 
-        for (int j = 0; j < MAX_MOVES_PER_HOOK && moves.moves[j].from != SQUARE_SENTINEL; ++j) {
+        for (int j = 0; j < MAX_MOVES_PER_HOOK && !is_sentinel(moves.moves[j]); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if ((all_moves[k].from == moves.moves[j].from)

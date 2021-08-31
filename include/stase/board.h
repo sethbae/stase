@@ -10,6 +10,8 @@ typedef uint_fast8_t Square;
 typedef Byte Piece;
 typedef uint64_t Bitmap;
 
+const Square SQUARE_SENTINEL = 0xFF;
+
 /* enumeration of the types of pieces primarily, but also for other useful properties,
     such as WHITE or BLACK, and KING or QUEEN */
 enum Ptype {
@@ -87,6 +89,12 @@ struct Move {
     void set_cap_piece(Piece p);
 
 };
+
+const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, 0, 0};
+
+inline bool is_sentinel(const Move m) {
+    return m.from == SQUARE_SENTINEL;
+}
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {

@@ -151,9 +151,7 @@ bool capture_walk(const Board & b, Square s) {
  */
 void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter) {
 
-    const int LOCAL_MOVES_MAX = MAX_MOVES_PER_HOOK - move_counter;
-    Move local_moves[LOCAL_MOVES_MAX];
-    int local_move_counter = 0;
+    const int local_reset_point = move_counter;
 
     int min_value_seen = piece_value(W_KING) + 1;
     Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
@@ -182,12 +180,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
                 if (val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = val;
-                    local_move_counter = 0;
-                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                    move_counter = local_reset_point;
+                    moves->moves[move_counter++] = Move{temp, s, 0};
                 } else if (val == min_value_seen) {
                     // equal lowest value; append
-                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    if (move_counter < MAX_MOVES_PER_HOOK) {
+                        moves->moves[move_counter++] = Move{temp, s, 0};
                     }
                 }
                 // no x-rays!
@@ -217,12 +215,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
                 if (kn_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = kn_val;
-                    local_move_counter = 0;
-                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                    move_counter = local_reset_point;
+                    moves->moves[move_counter++] = Move{temp, s, 0};
                 } else if (kn_val == min_value_seen) {
                     // equal lowest value; append
-                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    if (move_counter < MAX_MOVES_PER_HOOK) {
+                        moves->moves[move_counter++] = Move{temp, s, 0};
                     }
                 }
             }
@@ -239,12 +237,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
                 if (k_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = k_val;
-                    local_move_counter = 0;
-                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                    move_counter = local_reset_point;
+                    moves->moves[move_counter++] = Move{temp, s, 0};
                 } else if (k_val == min_value_seen) {
                     // equal lowest value; append
-                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    if (move_counter < MAX_MOVES_PER_HOOK) {
+                        moves->moves[move_counter++] = Move{temp, s, 0};
                     }
                 }
             }
@@ -257,12 +255,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            local_move_counter = 0;
-            local_moves[local_move_counter++] = Move{temp, s, 0};
+            move_counter = local_reset_point;
+            moves->moves[move_counter++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                local_moves[local_move_counter++] = Move{temp, s, 0};
+            if (move_counter < MAX_MOVES_PER_HOOK) {
+                moves->moves[move_counter++] = Move{temp, s, 0};
             }
         }
     }
@@ -270,12 +268,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            local_move_counter = 0;
-            local_moves[local_move_counter++] = Move{temp, s, 0};
+            move_counter = local_reset_point;
+            moves->moves[move_counter++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                local_moves[local_move_counter++] = Move{temp, s, 0};
+            if (move_counter < MAX_MOVES_PER_HOOK) {
+                moves->moves[move_counter++] = Move{temp, s, 0};
             }
         }
     }
@@ -283,12 +281,12 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            local_move_counter = 0;
-            local_moves[local_move_counter++] = Move{temp, s, 0};
+            move_counter = local_reset_point;
+            moves->moves[move_counter++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                local_moves[local_move_counter++] = Move{temp, s, 0};
+            if (move_counter < MAX_MOVES_PER_HOOK) {
+                moves->moves[move_counter++] = Move{temp, s, 0};
             }
         }
     }
@@ -296,22 +294,15 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            local_move_counter = 0;
-            local_moves[local_move_counter++] = Move{temp, s, 0};
+            move_counter = local_reset_point;
+            moves->moves[move_counter++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
-                local_moves[local_move_counter++] = Move{temp, s, 0};
+            if (move_counter < MAX_MOVES_PER_HOOK) {
+                moves->moves[move_counter++] = Move{temp, s, 0};
             }
         }
     }
-
-    // copy moves across to pointer
-    for (int i = 0; i < local_move_counter; ++i) {
-        moves->moves[i] = local_moves[i];
-        // TODO add sentinel
-    }
-    move_counter += local_move_counter;
 
 }
 
@@ -355,7 +346,11 @@ void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
             capture_piece(b, ff->centre, moves, move_count);
         }
         if (move_count == MAX_MOVES_PER_HOOK) {
-            break;
+            return;
         }
+    }
+
+    if (move_count < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_count] = MOVE_SENTINEL;
     }
 }

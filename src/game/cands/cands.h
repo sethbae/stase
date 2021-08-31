@@ -2,7 +2,6 @@
 #define STASE_CANDS_H
 
 const int MAX_MOVES_PER_HOOK = 3;
-const int SQUARE_SENTINEL = 0xFF;
 extern const int NUM_FEATURES;
 
 struct FeatureFrame {
