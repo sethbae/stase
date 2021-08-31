@@ -142,18 +142,180 @@ bool capture_walk(const Board & b, Square s) {
         return (balance > 0 && min_value_w <= piece_value(W_KING)) || (min_value_w < piece_value(b.get(s)));
     }
 
-//    if (balance < 0 && min_value_b <= piece_value(W_QUEEN)) {
-//        return true;
-//    }
-//    if (balance > 0 && min_value_w <= piece_value(B_QUEEN)) {
-//        return true;
-//    }
-//
-//    if (colour(b.get(s)) == WHITE) {
-//        return min_value_b < piece_value(b.get(s));
-//    } else {
-//        return min_value_w < piece_value(b.get(s));
-//    }
+}
+
+/*
+ * Walks out from the given square to find a piece which can capture the weak piece.
+ * Selects all pieces which can capture the target and which share the minimum value
+ * among such pieces.
+ */
+void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter) {
+
+    const int LOCAL_MOVES_MAX = MAX_MOVES_PER_HOOK - move_counter;
+    Move local_moves[LOCAL_MOVES_MAX];
+    int local_move_counter = 0;
+
+    int min_value_seen = piece_value(W_KING) + 1;
+    Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
+    int x, y;
+    Square temp;
+
+    // go through the delta pairs entailing each sliding direction
+    MoveType dir = DIAG;
+    for (int i = 0; i < 8; ++i) {
+
+        if (i == 4) {
+            dir = ORTHO;
+        }
+
+        int x_inc = XD[i], y_inc = YD[i];
+        x = get_x(s) + x_inc, y = get_y(s) + y_inc;
+
+        // and go in that direction
+        while (val(temp = mksq(x, y))) {
+
+            Piece p = b.get(temp);
+
+            if ((type(p) != EMPTY) && can_move(p, dir) && colour(p) == capturing_colour) {
+                // piece of the right colour which can move in the right dir: check value
+                int val = piece_value(p);
+                if (val < min_value_seen) {
+                    // new lowest value; reset and add to the list
+                    min_value_seen = val;
+                    local_move_counter = 0;
+                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                } else if (val == min_value_seen) {
+                    // equal lowest value; append
+                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    }
+                }
+                // no x-rays!
+                break;
+            } else  if (type(p) != EMPTY) {
+                // blocking piece: abort
+                break;
+            }
+
+            x += x_inc;
+            y += y_inc;
+
+        }
+
+    }
+
+    x = get_x(s);
+    y = get_y(s);
+
+    // knights
+    int kn_val = piece_value(W_KNIGHT);
+    if (min_value_seen >= kn_val) {
+        for (int i = 0; i < 8; ++i) {
+            if (val(temp = mksq(x + XKN[i], y + YKN[i]))
+                    && (type(b.get(temp)) == KNIGHT)
+                    && (colour(b.get(temp)) == capturing_colour)) {
+                if (kn_val < min_value_seen) {
+                    // new lowest value; reset and add to the list
+                    min_value_seen = kn_val;
+                    local_move_counter = 0;
+                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                } else if (kn_val == min_value_seen) {
+                    // equal lowest value; append
+                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    }
+                }
+            }
+        }
+    }
+
+    // kings
+    int k_val = piece_value(W_KING);
+    if (min_value_seen >= k_val) {
+        for (int i = 0; i < 8; ++i) {
+            if (val(temp = mksq(x + XD[i], y + YD[i]))
+                    && (type(b.get(temp)) == KING)
+                    && (colour(b.get(temp)) == capturing_colour)) {
+                if (k_val < min_value_seen) {
+                    // new lowest value; reset and add to the list
+                    min_value_seen = k_val;
+                    local_move_counter = 0;
+                    local_moves[local_move_counter++] = Move{temp, s, 0};
+                } else if (k_val == min_value_seen) {
+                    // equal lowest value; append
+                    if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                        local_moves[local_move_counter++] = Move{temp, s, 0};
+                    }
+                }
+            }
+        }
+    }
+
+    // pawns
+    int pawn_val = piece_value(W_PAWN);
+    if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+        if (pawn_val < min_value_seen) {
+            // new lowest value; reset and add to the list
+            min_value_seen = pawn_val;
+            local_move_counter = 0;
+            local_moves[local_move_counter++] = Move{temp, s, 0};
+        } else if (pawn_val == min_value_seen) {
+            // equal lowest value; append
+            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                local_moves[local_move_counter++] = Move{temp, s, 0};
+            }
+        }
+    }
+    if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+        if (pawn_val < min_value_seen) {
+            // new lowest value; reset and add to the list
+            min_value_seen = pawn_val;
+            local_move_counter = 0;
+            local_moves[local_move_counter++] = Move{temp, s, 0};
+        } else if (pawn_val == min_value_seen) {
+            // equal lowest value; append
+            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                local_moves[local_move_counter++] = Move{temp, s, 0};
+            }
+        }
+    }
+    if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+        if (pawn_val < min_value_seen) {
+            // new lowest value; reset and add to the list
+            min_value_seen = pawn_val;
+            local_move_counter = 0;
+            local_moves[local_move_counter++] = Move{temp, s, 0};
+        } else if (pawn_val == min_value_seen) {
+            // equal lowest value; append
+            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                local_moves[local_move_counter++] = Move{temp, s, 0};
+            }
+        }
+    }
+    if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+        if (pawn_val < min_value_seen) {
+            // new lowest value; reset and add to the list
+            min_value_seen = pawn_val;
+            local_move_counter = 0;
+            local_moves[local_move_counter++] = Move{temp, s, 0};
+        } else if (pawn_val == min_value_seen) {
+            // equal lowest value; append
+            if (local_move_counter < LOCAL_MOVES_MAX - 1) {
+                local_moves[local_move_counter++] = Move{temp, s, 0};
+            }
+        }
+    }
+
+    // copy moves across to pointer
+    for (int i = 0; i < local_move_counter; ++i) {
+        moves->moves[i] = local_moves[i];
+        // TODO add sentinel
+    }
+    move_counter += local_move_counter;
+
+}
+
+void defend_piece(const Board & b, Square s, MoveSet * m, int & move_counter) {
 
 }
 
@@ -187,18 +349,13 @@ void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
 
     for (FeatureFrame* ff = frame; ff->centre != SQUARE_SENTINEL; ff++) {
         bool weak_piece_is_white = (colour(b.get(ff->centre)) == WHITE);
-        if (white == weak_piece_is_white) {
-            move_count += defend_piece(b, ff->centre, moves);
+        if (white_to_play == weak_piece_is_white) {
+            defend_piece(b, ff->centre, moves, move_count);
         } else {
-            move_count += capture_piece(b, ff->centre, moves);
+            capture_piece(b, ff->centre, moves, move_count);
+        }
+        if (move_count == MAX_MOVES_PER_HOOK) {
+            break;
         }
     }
-}
-
-int defend_piece(const Board & b, Square s, MoveSet * m) {
-
-}
-
-int capture_piece(const Board & b, Square s, MoveSet * m) {
-
 }

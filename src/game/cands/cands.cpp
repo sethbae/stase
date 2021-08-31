@@ -40,7 +40,7 @@ vector<Move> cands(const Gamestate &gs) {
         (*fh.hook)(gs.board, &gs.feature_frames[i]);
         (*fh.responder)(gs.board, &moves, gs.feature_frames[i]);
 
-        for (int j = 0; j < MAX_MOVES_PER_HOOK; ++j) {
+        for (int j = 0; j < MAX_MOVES_PER_HOOK && moves.moves[j].from != SQUARE_SENTINEL; ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if ((all_moves[k].from == moves.moves[j].from)
@@ -49,7 +49,7 @@ vector<Move> cands(const Gamestate &gs) {
                     break;
                 }
             }
-            if (!present && m < MAX_MOVES - 1) {
+            if (!present && m < MAX_MOVES) {
                 all_moves[m++] = moves.moves[j];
             }
         }
@@ -59,6 +59,7 @@ vector<Move> cands(const Gamestate &gs) {
 
     vector<Move> vec;
     for (int j = 0; j < m; ++j) {
+        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
         vec.push_back(all_moves[j]);
     }
 
