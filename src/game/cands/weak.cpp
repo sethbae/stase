@@ -182,6 +182,23 @@ void weak_hook(const Board & b, FeatureFrame** frame) {
 
 void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
     // check frame and turn, delegate to major and minor adding moves.
+    bool white_to_play = b.get_white();
+    int move_count = 0;
 
-    cout << "resp\n";
+    for (FeatureFrame* ff = frame; ff->centre != SQUARE_SENTINEL; ff++) {
+        bool weak_piece_is_white = (colour(b.get(ff->centre)) == WHITE);
+        if (white == weak_piece_is_white) {
+            move_count += defend_piece(b, ff->centre, moves);
+        } else {
+            move_count += capture_piece(b, ff->centre, moves);
+        }
+    }
+}
+
+int defend_piece(const Board & b, Square s, MoveSet * m) {
+
+}
+
+int capture_piece(const Board & b, Square s, MoveSet * m) {
+
 }
