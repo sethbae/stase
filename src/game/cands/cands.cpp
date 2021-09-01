@@ -57,6 +57,8 @@ vector<Move> cands(const Gamestate &gs) {
         ++i;
     }
 
+    cout << "Starting new list\n";
+
     vector<Move> vec;
     for (int j = 0; j < m; ++j) {
         cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";

@@ -37,9 +37,12 @@ bool evaluate_test_set(const std::vector<T> & cases, bool (*func)(const T*)) {
 
 }
 
+bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
+
 void test_board();
 void test_game();
 
-void test_weak();
+void test_weak_hook();
+void test_weak_cap();
 
 #endif //STASE_TEST_H

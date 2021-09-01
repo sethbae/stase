@@ -12,14 +12,14 @@ using std::cout;
 struct TestCase {
 
     std::string name() const {
-        return "game-cands-weak";
+        return "game-cands-weak-hook";
     }
 
     const std::string fen;
     const std::vector<std::string> squares;
 };
 
-const std::vector<TestCase> test_cases{
+const std::vector<TestCase> hook_test_cases{
         // starting pos
         TestCase{
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -97,67 +97,23 @@ const std::vector<TestCase> test_cases{
         }
 };
 
-int count_to_sentinel(const FeatureFrame *ff) {
-    int n = 0;
-
-    for (const FeatureFrame *ptr = ff; ptr->centre != SQUARE_SENTINEL; ptr++) {
-        ++n;
-    }
-
-    return n;
-}
-
-FeatureFrame *create_frame_list(const std::vector<std::string> strings) {
-
-    FeatureFrame *frames = new FeatureFrame[strings.size() + 1];
-    int i = 0;
-
-    for (std::string s : strings) {
-        frames[i].centre = stosq(s);
-        frames[i++].secondary = 0;
-    }
-
-    frames[i].centre = SQUARE_SENTINEL;
-    frames[i].secondary = SQUARE_SENTINEL;
-
-    return frames;
-
-}
-
-bool assert_frame_lists_equal(const FeatureFrame *ff_a, const FeatureFrame *ff_b) {
-
-    int a_n = count_to_sentinel(ff_a), b_n = count_to_sentinel(ff_b);
-
-    if (a_n != b_n) { return false; }
-
-    for (const FeatureFrame *a = ff_a; a->centre != SQUARE_SENTINEL; ++a) {
-        bool present = false;
-        for (const FeatureFrame *b = ff_b; b->centre != SQUARE_SENTINEL; ++b) {
-            if (a->centre == b->centre && a->secondary == b->secondary) {
-                present = true;
-                break;
-            }
-        }
-        if (!present) {
-            return false;
-        }
-    }
-
-    return true;
-
-}
-
-bool evaluate_test_case(const TestCase *tc) {
+bool evaluate_test_case_weak_hook(const TestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
     weak_hook(gs.board, &gs.feature_frames[0]);
 
+    std::vector<std::string> strings;
+
+    for (FeatureFrame* ff = gs.feature_frames[0]; ff->centre != SQUARE_SENTINEL; ++ff) {
+        strings.push_back(sqtos(ff->centre));
+    }
+
     // print_feature_frames(gs.feature_frames[0]);
 
-    return assert_frame_lists_equal(gs.feature_frames[0], create_frame_list(tc->squares));
+    return assert_string_lists_equal(strings, tc->squares);
 }
 
-void test_weak() {
-    evaluate_test_set(test_cases, &evaluate_test_case);
+void test_weak_hook() {
+    evaluate_test_set(hook_test_cases, &evaluate_test_case_weak_hook);
 }
