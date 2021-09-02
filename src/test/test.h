@@ -5,14 +5,23 @@
 #include <iostream>
 #include <iomanip>
 
-template <typename T>
-bool evaluate_test_set(const std::vector<T> & cases, bool (*func)(const T*)) {
+struct StringTestCase {
+    const std::string fen;
+    const std::vector<std::string> expected_results;
+};
 
-    if (cases.empty()) { return true; }
+struct StringTestSet {
+    const std::string name;
+    const std::vector<StringTestCase> cases;
+};
+
+inline bool evaluate_test_set(const StringTestSet * test_set, bool (*func)(const StringTestCase*)) {
+
+    if (test_set->cases.empty()) { return true; }
 
     int success = 0, failed = 0, first_failure = -1;
 
-    for (T tc : cases) {
+    for (StringTestCase tc : test_set->cases) {
         if ((*func)(&tc)) {
             ++success;
         } else {
@@ -24,12 +33,12 @@ bool evaluate_test_set(const std::vector<T> & cases, bool (*func)(const T*)) {
         }
     }
 
-    std::cout << std::setw(20) << cases[0].name() << ":   ";
+    std::cout << std::setw(20) << test_set->name << ":   ";
     std::cout << success << "/" << success + failed << "\n";
 
     if (failed) {
         std::cout << "*****SOME TESTS FAILED***** ("
-                    << cases[0].name() << "@" << first_failure << ")\n";
+                    << test_set->name << "@" << first_failure << ")\n";
         return false;
     }
 

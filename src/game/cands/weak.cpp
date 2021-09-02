@@ -10,7 +10,7 @@ using std::cout;
  * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
-bool capture_walk(const Board & b, Square s) {
+bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_min_b) {
     
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
@@ -132,9 +132,13 @@ bool capture_walk(const Board & b, Square s) {
         }
     }
 
-//    cout << "Balance: " << balance
-//            << "\nMin white: " << min_value_w
-//            << "\nMin black: " << min_value_b << "\n";
+    // record the minimum black and white values
+    record_min_w = min_value_w;
+    record_min_b = min_value_b;
+
+    //cout << "Balance: " << balance
+    //     << "\nMin white: " << min_value_w
+    //     << "\nMin black: " << min_value_b << "\n";
 
     if (colour(b.get(s)) == WHITE) {
         return (balance < 0 && min_value_b <= piece_value(B_KING)) || (min_value_b < piece_value(b.get(s)));
@@ -149,12 +153,13 @@ bool capture_walk(const Board & b, Square s) {
  * Selects all pieces which can capture the target and which share the minimum value
  * among such pieces.
  */
-void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter) {
+void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter, int & minw, int & minb) {
 
     const int local_reset_point = move_counter;
 
     int min_value_seen = piece_value(W_KING) + 1;
     Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
+    int weakest_defender = (capturing_colour == WHITE) ? minb : minw;
     int x, y;
     Square temp;
 
@@ -177,15 +182,17 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
             if ((type(p) != EMPTY) && can_move(p, dir) && colour(p) == capturing_colour) {
                 // piece of the right colour which can move in the right dir: check value
                 int val = piece_value(p);
-                if (val < min_value_seen) {
-                    // new lowest value; reset and add to the list
-                    min_value_seen = val;
-                    move_counter = local_reset_point;
-                    moves->moves[move_counter++] = Move{temp, s, 0};
-                } else if (val == min_value_seen) {
-                    // equal lowest value; append
-                    if (move_counter < MAX_MOVES_PER_HOOK) {
+                if (val <= weakest_defender) {
+                    if (val < min_value_seen) {
+                        // new lowest value; reset and add to the list
+                        min_value_seen = val;
+                        move_counter = local_reset_point;
                         moves->moves[move_counter++] = Move{temp, s, 0};
+                    } else if (val == min_value_seen) {
+                        // equal lowest value; append
+                        if (move_counter < MAX_MOVES_PER_HOOK) {
+                            moves->moves[move_counter++] = Move{temp, s, 0};
+                        }
                     }
                 }
                 // no x-rays!
@@ -195,6 +202,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
                 break;
             }
 
+            // square was empty, continue
             x += x_inc;
             y += y_inc;
 
@@ -207,7 +215,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
 
     // knights
     int kn_val = piece_value(W_KNIGHT);
-    if (min_value_seen >= kn_val) {
+    if (min_value_seen >= kn_val && weakest_defender >= kn_val) {
         for (int i = 0; i < 8; ++i) {
             if (val(temp = mksq(x + XKN[i], y + YKN[i]))
                     && (type(b.get(temp)) == KNIGHT)
@@ -229,7 +237,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
 
     // kings
     int k_val = piece_value(W_KING);
-    if (min_value_seen >= k_val) {
+    if (min_value_seen >= k_val && weakest_defender >= k_val) {
         for (int i = 0; i < 8; ++i) {
             if (val(temp = mksq(x + XD[i], y + YD[i]))
                     && (type(b.get(temp)) == KING)
@@ -252,6 +260,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
     // pawns
     int pawn_val = piece_value(W_PAWN);
     if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+        // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
@@ -265,6 +274,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         }
     }
     if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+        // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
@@ -278,6 +288,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         }
     }
     if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+        // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
@@ -291,6 +302,7 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
         }
     }
     if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+        // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
@@ -306,18 +318,21 @@ void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter
 
 }
 
-void defend_piece(const Board & b, Square s, MoveSet * m, int & move_counter) {
+void defend_piece(const Board & b, Square s, MoveSet * m, int & move_counter, int & minw, int & minb) {
 
 }
 
 void weak_hook(const Board & b, FeatureFrame** frame) {
 
     Square hits[64];
+    int min_ws[64];
+    int min_bs[64];
+
     int i = 0;
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (capture_walk(b, mksq(x, y))) {
+            if (capture_walk(b, mksq(x, y), min_ws[i], min_bs[i])) {
                 hits[i++] = mksq(x, y);
             }
         }
@@ -326,11 +341,10 @@ void weak_hook(const Board & b, FeatureFrame** frame) {
     *frame = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
 
     for (int j = 0; j < i; ++j) {
-        (*frame)[j].centre = hits[j];
-        (*frame)[j].secondary = 0;
+        (*frame)[j] = FeatureFrame{hits[j], 0, min_ws[j], min_bs[j]};
     }
-    (*frame)[i].centre = SQUARE_SENTINEL;
-    (*frame)[i].secondary = SQUARE_SENTINEL;
+    (*frame)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+
 }
 
 void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
@@ -341,9 +355,9 @@ void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
     for (FeatureFrame* ff = frame; ff->centre != SQUARE_SENTINEL; ff++) {
         bool weak_piece_is_white = (colour(b.get(ff->centre)) == WHITE);
         if (white_to_play == weak_piece_is_white) {
-            defend_piece(b, ff->centre, moves, move_count);
+            defend_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
         } else {
-            capture_piece(b, ff->centre, moves, move_count);
+            capture_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
         }
         if (move_count == MAX_MOVES_PER_HOOK) {
             return;

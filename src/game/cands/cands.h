@@ -7,6 +7,8 @@ extern const int NUM_FEATURES;
 struct FeatureFrame {
     Square centre;
     Square secondary;
+    int conf_1;
+    int conf_2;
 };
 
 typedef struct {
