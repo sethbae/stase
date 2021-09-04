@@ -53,9 +53,10 @@ const bool PIECE_MOVE_TYPES[][6] = {
 };
 
 // returns true if the given piece can move in the given way, false otherwise
-inline bool can_move(Piece piece, MoveType dir) {
+inline bool can_move_in_direction(Piece piece, MoveType dir) {
     return PIECE_MOVE_TYPES[piece][dir];
 }
+bool can_move_to_square(const Board &, Square from, Square to);
 
 struct Gamestate {
 

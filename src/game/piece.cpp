@@ -69,19 +69,19 @@ int alpha_control(const Board & b, const Square s) {
     
     Piece p = b.get(s);
     
-    if (can_move(p, ORTHO)) {
+    if (can_move_in_direction(p, ORTHO)) {
         for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += alpha_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
-    if (can_move(p, DIAG)) {
+    if (can_move_in_direction(p, DIAG)) {
         for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += alpha_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
-    if (can_move(p, KNIGHT_MOVE)) {
+    if (can_move_in_direction(p, KNIGHT_MOVE)) {
     
         int x = get_x(s);
         int y = get_y(s);
@@ -142,19 +142,19 @@ int beta_control(const Board & b, const Square s) {
     
     Piece p = b.get(s);
     
-    if (can_move(p, ORTHO)) {
+    if (can_move_in_direction(p, ORTHO)) {
         for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += beta_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
-    if (can_move(p, DIAG)) {
+    if (can_move_in_direction(p, DIAG)) {
         for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += beta_walk(b, s, STEP_FUNCS[dir]);
         }
     }
     
-    if (can_move(p, KNIGHT_MOVE)) {
+    if (can_move_in_direction(p, KNIGHT_MOVE)) {
     
         int x = get_x(s);
         int y = get_y(s);
@@ -199,7 +199,7 @@ inline int gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType 
             ++sum;
         } else {
             // gamma: x-ray
-            cont = (colour(otherp) == colour(b.get(s))) && can_move(otherp, dir);
+            cont = (colour(otherp) == colour(b.get(s))) && can_move_in_direction(otherp, dir);
             ++sum;
         }
         (*step)(temp);
@@ -215,19 +215,19 @@ int gamma_control(const Board & b, const Square s) {
     
     Piece p = b.get(s);
     
-    if (can_move(p, ORTHO)) {
+    if (can_move_in_direction(p, ORTHO)) {
         for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
             sum += gamma_walk(b, s, STEP_FUNCS[dir], ORTHO);
         }
     }
     
-    if (can_move(p, DIAG)) {
+    if (can_move_in_direction(p, DIAG)) {
         for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
             sum += gamma_walk(b, s, STEP_FUNCS[dir], DIAG);
         }
     }
     
-    if (can_move(p, KNIGHT_MOVE)) {
+    if (can_move_in_direction(p, KNIGHT_MOVE)) {
     
         int x = get_x(s);
         int y = get_y(s);
@@ -276,7 +276,7 @@ int control_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) 
 
         Piece otherp = b.get(temp);
 
-        if ((type(otherp) != EMPTY) && can_move(otherp, dir)) {
+        if ((type(otherp) != EMPTY) && can_move_in_direction(otherp, dir)) {
             // any piece which can move in the right dir? account and continue
             sum += ((colour(otherp) == WHITE) ? 1 : -1);
         } else  if (type(otherp) != EMPTY) {
@@ -363,4 +363,19 @@ int control_count(const Board & b, const Square s) {
         
     return count;
     
+}
+
+/*
+ * Returns true if the piece currently on the from-square could move to the to-square,
+ * disregarding check and other considerations.
+ */
+bool can_move_to_square(const Board & b, Square from_sq, Square to_sq) {
+    std::vector<Move> pmoves(10);
+    piecemoves_ignore_check(b, from_sq, pmoves);
+    for (const Move m : pmoves) {
+        if (m.to == to_sq) {
+            return true;
+        }
+    }
+    return false;
 }

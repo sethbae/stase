@@ -34,7 +34,7 @@ set(SOURCE_FILES
         src/game/helper.cpp
         src/game/cands/cands.h
         src/game/cands/weak.cpp
-        src/test/game/cands/test_weak_hook.cpp src/game/cands/feature.cpp src/game/helper.h)
+        src/test/game/cands/test_weak_hook.cpp src/game/cands/feature.cpp src/game/helper.h src/game/cands/defend.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)

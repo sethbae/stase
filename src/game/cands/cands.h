@@ -2,6 +2,7 @@
 #define STASE_CANDS_H
 
 const int MAX_MOVES_PER_HOOK = 3;
+const int MAX_RESPONSES_PER_HOOK = 3;
 extern const int NUM_FEATURES;
 
 struct FeatureFrame {
@@ -16,16 +17,27 @@ typedef struct {
 } MoveSet;
 
 typedef void (Hook)(const Board &, FeatureFrame**);
-typedef void (Responder)(const Board &, MoveSet*, FeatureFrame*);
+typedef void (Responder)(const Board &, FeatureFrame*, MoveSet*, int & move_counter);
 
 typedef struct {
     Hook* hook;
-    Responder* responder;
+    Responder* friendly_responses[MAX_RESPONSES_PER_HOOK + 1];
+    Responder* enemy_responses[MAX_RESPONSES_PER_HOOK + 1];
 } FeatureHandler;
 
-extern FeatureHandler feature_handlers[];
-
 Hook weak_hook;
-Responder weak_resp;
+Responder defend_square;
+Responder capture_piece;
+
+const FeatureHandler feature_handlers[] = {
+        FeatureHandler{
+            &weak_hook,
+            { &defend_square, nullptr },
+            { &capture_piece, nullptr }
+        },
+        FeatureHandler{  // sentinel
+            nullptr
+        }
+};
 
 #endif //STASE_CANDS_H

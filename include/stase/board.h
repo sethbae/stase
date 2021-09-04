@@ -92,9 +92,7 @@ struct Move {
 
 const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, 0, 0};
 
-inline bool is_sentinel(const Move m) {
-    return m.from == SQUARE_SENTINEL;
-}
+inline bool is_sentinel(const Move m) { return m.from == SQUARE_SENTINEL; }
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {

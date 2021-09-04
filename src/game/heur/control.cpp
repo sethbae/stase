@@ -14,7 +14,7 @@ int open_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     while (val(s)) {
 
         Piece p = b.get(s);
-        if (can_move(p, dir)) {
+        if (can_move_in_direction(p, dir)) {
             control += ((colour(p) == WHITE) ? 1 : -1);
         }
         (*step)(s);
@@ -51,7 +51,7 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
         ++squares_before_pawn;  // counting squares
 
         Piece p = b.get(s);
-        if (can_move(p, dir)) { // and control
+        if (can_move_in_direction(p, dir)) { // and control
             control += (colour(p) == WHITE) ? 1 : -1;
         }
         (*step)(s);
@@ -69,7 +69,7 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     (*step)(s);
     while (val(s)) {
         Piece p = b.get(s);
-        if (can_move(p, dir)) {
+        if (can_move_in_direction(p, dir)) {
             control += (colour(p) == WHITE) ? 1 : -1;
         }
         (*step)(s);
