@@ -57,9 +57,10 @@ set(TEST_SOURCE_FILES
         src/test/test_main.cpp
         src/test/board/test_board.cpp
         src/test/game/test_game.cpp
+        src/test/test_helpers.cpp
         src/test/game/cands/test_capture_piece.cpp
         src/test/game/cands/test_weak_hook.cpp
-        src/test/test_helpers.cpp)
+        src/test/game/cands/test_defend.cpp)
 
 include_directories(include/stase)
 

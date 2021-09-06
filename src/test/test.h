@@ -8,6 +8,17 @@
 #include "board.h"
 #include "game.h"
 #include "../../src/game/cands/cands.h"
+#include "../../src/game/heur/heur.h"
+
+// save some typing! Used for responders.
+const int p = piece_value(W_PAWN);
+const int kn = piece_value(W_KNIGHT);
+const int b = piece_value(W_BISHOP);
+const int r = piece_value(W_ROOK);
+const int q = piece_value(W_QUEEN);
+const int k = piece_value(W_KING);
+const int none = piece_value(W_KING) * 2;
+
 
 struct StringTestCase {
     const std::string fen;
@@ -83,5 +94,6 @@ void test_game();
 
 void test_weak_hook();
 void test_capture_piece();
+void test_defend_square();
 
 #endif //STASE_TEST_H
