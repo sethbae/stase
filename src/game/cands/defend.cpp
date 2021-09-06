@@ -27,7 +27,7 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
             Square temp = mksq(x, y);
-            if (colour(b.get(temp)) == defending_colour) {
+            if (colour(b.get(temp)) == defending_colour && temp != s) {
                 piece_squares[pieces_point++] = temp;
             }
         }
@@ -96,7 +96,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
             for (int j = 0; j < 8; ++j) {
                 if (val(temp = mksq(x + XKN[i] + XKN[j], y + YKN[i] + YKN[j]))
                         && (type(b.get(temp)) == KNIGHT)
-                        && (colour(b.get(temp)) == defending_colour)) {
+                        && (colour(b.get(temp)) == defending_colour)
+                        && (temp != s)) {
                     if (move_counter < MAX_MOVES_PER_HOOK) {
                         m->moves[move_counter++] = Move{temp, defend_from_square, 0};
                     } else {
@@ -119,7 +120,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
             for (int j = 0; j < 8; ++j) {
                 if (val(temp = mksq(x + XD[i] + XD[j], y + YD[i] + YD[j]))
                         && (type(b.get(temp)) == KING)
-                        && (colour(b.get(temp)) == defending_colour)) {
+                        && (colour(b.get(temp)) == defending_colour)
+                        && (temp != s)) {
                     if (move_counter < MAX_MOVES_PER_HOOK) {
                         m->moves[move_counter++] = Move{temp, defend_from_square, 0};
                     } else {

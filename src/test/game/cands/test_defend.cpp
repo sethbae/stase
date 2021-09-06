@@ -33,7 +33,7 @@ const TestSet<ResponderTestCase> defend_test_set = {
             },
             // bishop defends
             ResponderTestCase{
-                    "6P1/8/8/8/8/8/8/5B2 w - - 0 1",
+                    "6Q1/8/8/8/8/8/8/5B2 w - - 0 1",
                     std::vector<FeatureFrame>{
                             FeatureFrame{stosq("g8"), 0, none, none}
                     },
@@ -95,6 +95,22 @@ const TestSet<ResponderTestCase> defend_test_set = {
                     },
                     {"a8a6", "b8d7", "e7d8"}
             },
+            // doesn't defend with piece on same square #1
+            ResponderTestCase{
+                "r7/8/8/8/8/8/8/8 b - - 0 1",
+                std::vector<FeatureFrame>{
+                        FeatureFrame{stosq("a8"), 0, none, none}
+                },
+                {}
+            },
+            // doesn't defend with piece on same square #2
+            ResponderTestCase{
+                    "8/8/8/8/8/3K4/8/8 w - - 0 1",
+                    std::vector<FeatureFrame>{
+                            FeatureFrame{stosq("d3"), 0, none, none}
+                    },
+                    {}
+            }
         }
 };
 
