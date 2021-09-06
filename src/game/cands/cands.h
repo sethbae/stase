@@ -29,9 +29,7 @@ typedef struct {
 
 Hook weak_hook;
 Responder defend_square;
-// Responder capture_piece;
-
-void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, int & move_counter);
+Responder capture_piece;
 
 const FeatureHandler feature_handlers[] = {
         FeatureHandler{
