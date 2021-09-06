@@ -15,20 +15,22 @@ const TestSet<ResponderTestCase> defend_test_set = {
                 },
                 {"d2d3", "f2f3", "b1c3"}
             },
-//            ResponderTestCase{
-//                    "",
-//                    std::vector<FeatureFrame>{
-//                            FeatureFrame{stosq("e4"), 0, 0, 0}
-//                    },
-//                    {""}
-//            },
-//            ResponderTestCase{
-//                    "",
-//                    std::vector<FeatureFrame>{
-//                            FeatureFrame{stosq("e4"), 0, 0, 0}
-//                    },
-//                    {""}
-//            },
+            // can't defend e6
+            ResponderTestCase{
+                    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                    std::vector<FeatureFrame>{
+                            FeatureFrame{stosq("e6"), 0, none, none}
+                    },
+                    {}
+            },
+            // black defends e5
+            ResponderTestCase{
+                    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
+                    std::vector<FeatureFrame>{
+                            FeatureFrame{stosq("e5"), 0, none, none}
+                    },
+                    {"f7f6", "d7d6", "b8c6"}
+            },
 //            ResponderTestCase{
 //                    "",
 //                    std::vector<FeatureFrame>{
