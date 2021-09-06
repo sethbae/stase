@@ -4,5 +4,5 @@
 
 void test_game() {
     test_weak_hook();
-    test_weak_cap();
+    test_capture_piece();
 }

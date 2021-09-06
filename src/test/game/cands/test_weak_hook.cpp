@@ -8,7 +8,7 @@ using std::cout;
 #include "../../test.h"
 #include "../../../game/heur/heur.h"
 
-const StringTestSet hook_test_cases = {
+const TestSet<StringTestCase> hook_test_cases = {
     "game-cands-weak-hook",
     {
             // starting pos
@@ -79,6 +79,11 @@ const StringTestSet hook_test_cases = {
             // does not take defended piece of same value
             StringTestCase{
                     "6b1/8/8/3N4/2P5/8/8/8 w - - 0 1",
+                    {}
+            },
+            // does not take defended piece
+            StringTestCase{
+                    "8/8/8/8/1k2K3/1rpR3R/8/8 w - - 0 1",
                     {}
             },
             // does take defended piece of higher value

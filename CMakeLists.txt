@@ -15,26 +15,30 @@ set(SOURCE_FILES
 
         src/display/display.cpp
 
-        src/game/cands/cands.cpp
         src/game/eval.cpp
         src/game/gamestate.cpp
         src/game/piece.cpp
+        src/game/helper.h
+        src/game/helper.cpp
 
         src/game/heur/heur.cpp
         src/game/heur/heur.h
         src/game/heur/piece_activity.cpp
         src/game/heur/control.cpp
         src/game/heur/pawns.cpp
+        src/game/heur/development.cpp
+        src/game/heur/king.cpp
 
         src/puzzle/puzzle.cpp
 
         src/search/search.cpp
-        src/game/heur/development.cpp
-        src/game/heur/king.cpp
-        src/game/helper.cpp
+
         src/game/cands/cands.h
+        src/game/cands/cands.cpp
         src/game/cands/weak.cpp
-        src/test/game/cands/test_weak_hook.cpp src/game/cands/feature.cpp src/game/helper.h src/game/cands/defend.cpp)
+        src/game/cands/feature.cpp
+        src/game/cands/defend.cpp
+        src/game/cands/capture_piece.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
@@ -52,7 +56,10 @@ set(TEST_SOURCE_FILES
         src/test/test.h
         src/test/test_main.cpp
         src/test/board/test_board.cpp
-        src/test/game/test_game.cpp src/test/game/cands/test_weak_cap.cpp src/test/test_helpers.cpp)
+        src/test/game/test_game.cpp
+        src/test/game/cands/test_capture_piece.cpp
+        src/test/game/cands/test_weak_hook.cpp
+        src/test/test_helpers.cpp)
 
 include_directories(include/stase)
 

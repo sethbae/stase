@@ -9,9 +9,7 @@ using std::cout;
  * Walks out from the piece looking for other pieces which can move to the squares encountered
  * and therefore can defend the piece. Does not consider discovered defences or promotions.
  */
-void defend_square(const Board & b, FeatureFrame * ff, MoveSet * m, int & move_counter) {
-
-    cout << "Hello\n";
+void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & move_counter) {
 
     const Square s = ff->centre;
     const Ptype defending_colour = colour(b.get(s));

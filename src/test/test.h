@@ -5,23 +5,36 @@
 #include <iostream>
 #include <iomanip>
 
+#include "board.h"
+#include "game.h"
+#include "../../src/game/cands/cands.h"
+
 struct StringTestCase {
     const std::string fen;
     const std::vector<std::string> expected_results;
 };
 
-struct StringTestSet {
-    const std::string name;
-    const std::vector<StringTestCase> cases;
+struct ResponderTestCase {
+    const std::string fen;
+    const std::vector<FeatureFrame> featureFrames;
+    const std::vector<std::string> expected_results;
 };
 
-inline bool evaluate_test_set(const StringTestSet * test_set, bool (*func)(const StringTestCase*)) {
+template <typename T> struct TestSet {
+    const std::string name;
+    const std::vector<T> cases;
+};
+
+bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
+
+template <typename T>
+inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*)) {
 
     if (test_set->cases.empty()) { return true; }
 
     int success = 0, failed = 0, first_failure = -1;
 
-    for (StringTestCase tc : test_set->cases) {
+    for (T tc : test_set->cases) {
         if ((*func)(&tc)) {
             ++success;
         } else {
@@ -33,7 +46,7 @@ inline bool evaluate_test_set(const StringTestSet * test_set, bool (*func)(const
         }
     }
 
-    std::cout << std::setw(20) << test_set->name << ":   ";
+    std::cout << std::left << std::setw(30) << test_set->name << ":   ";
     std::cout << success << "/" << success + failed << "\n";
 
     if (failed) {
@@ -46,12 +59,29 @@ inline bool evaluate_test_set(const StringTestSet * test_set, bool (*func)(const
 
 }
 
-bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
+inline bool evaluate_responder_test_case(Responder r, const ResponderTestCase * tc) {
+
+    Gamestate gs(fen_to_board(tc->fen));
+    MoveSet moves;
+    int move_counter = 0;
+
+    // run the responder on the feature frames
+    r(gs.board, tc->featureFrames.data(), &moves, move_counter);
+
+    // convert the output to a vector of strings
+    std::vector<std::string> strings;
+    for (int i = 0; i < move_counter; ++i) {
+        strings.push_back(sqtos(moves.moves[i].from) + sqtos(moves.moves[i].to));
+    }
+
+    // check that they match
+    return assert_string_lists_equal(strings, tc->expected_results);
+}
 
 void test_board();
 void test_game();
 
 void test_weak_hook();
-void test_weak_cap();
+void test_capture_piece();
 
 #endif //STASE_TEST_H
