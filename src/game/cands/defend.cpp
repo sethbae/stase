@@ -7,11 +7,18 @@ using std::cout;
 
 /**
  * TODO
- *  - don't defend with pieces which already defend
- *  - make defending with a piece which is on that square a separate response (or stop it)
  *  - discovered defences not supported
- *  - x-rays!
+ *  - don't defend using unsafe squares
+ *  - queens still re-defend
  */
+
+/*
+ * Checks whether the two ints are both greater than zero, both less than zero,
+ * or both equal to zero.
+ */
+bool collinear_points(Square a, Square b, Square c) {
+    return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
+}
 
 /*
  * Walks out from the piece looking for other pieces which can move to the squares encountered
@@ -55,6 +62,12 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
             if (p == EMPTY) {
                 // check for any piece which can move here
                 for (int j = 0; j < pieces_point; ++j) {
+
+                    // check that the piece does not already control the square
+                    if (collinear_points(s, temp, piece_squares[j])) {
+                        continue;
+                    }
+
                     if (can_move_to_square(b, piece_squares[j], temp) && can_move_in_direction(b.get(piece_squares[j]), dir)) {
                         if (move_counter < MAX_MOVES_PER_HOOK) {
                             m->moves[move_counter++] = {piece_squares[j], temp, 0};
@@ -64,8 +77,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
                         }
                     }
                 }
-            } else {
-                // blocking piece: abort
+            } else if (!can_move_in_direction(p, dir)) {
+                // blocking piece (which cannot move in same direction)
                 break;
             }
 
@@ -76,12 +89,6 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
         }
 
     }
-
-//    cout << "After sliding pieces:\n";
-//    for (int i = 0; i < move_counter; ++i) {
-//        Move move = m->moves[i];
-//        cout << "Move from " << sqtos(move.from) << " to " << sqtos(move.to) << "\n";
-//    }
 
     x = get_x(s), y = get_y(s);
 
@@ -167,6 +174,12 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
 
         }
     }
+
+//    cout << "All moves(" << sqtos(s) << "):\n";
+//    for (int i = 0; i < move_counter; ++i) {
+//        Move move = m->moves[i];
+//        cout << "Move from " << sqtos(move.from) << " to " << sqtos(move.to) << "\n";
+//    }
 
     return;
 
