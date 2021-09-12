@@ -259,7 +259,7 @@ int gamma_control(const Board & b, const Square s) {
     walks outward from the given square. Returns an integer representing the resulting control
     change from that walk. 
     So if it first encounters a white piece that can move in the right way, it goes +1 but 
-    countinues looking for a different piece along the same diagonal which may be able to x-ray 
+    continues looking for a different piece along the same diagonal which may be able to x-ray
     control the square.
     
     This method ignores pawns and kings.
