@@ -95,5 +95,8 @@ void test_game();
 void test_weak_hook();
 void test_capture_piece();
 void test_defend_square();
+void test_alpha_covers();
+void test_beta_covers();
+void test_gamma_covers();
 
 #endif //STASE_TEST_H

@@ -394,11 +394,11 @@ bool alpha_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     if (type(p) == BISHOP && ortho) { return false; }
 
     // convert the actual difference to +-1
-    if (xd) { xd /= xd; }
-    if (yd) { yd /= yd; }
+    if (xd) { xd /= abs(xd); }
+    if (yd) { yd /= abs(yd); }
 
     Square temp;
-    int x = get_x(piece_sq), y = get_y(piece_sq);
+    int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
     while (val(temp = mksq(x, y)) && temp != target_sq) {
 
@@ -446,11 +446,11 @@ bool beta_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     if (type(p) == BISHOP && ortho) { return false; }
 
     // convert the actual difference to +-1
-    if (xd) { xd /= xd; }
-    if (yd) { yd /= yd; }
+    if (xd) { xd /= abs(xd); }
+    if (yd) { yd /= abs(yd); }
 
     Square temp;
-    int x = get_x(piece_sq), y = get_y(piece_sq);
+    int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
     while (val(temp = mksq(x, y)) && temp != target_sq) {
 
@@ -499,11 +499,11 @@ bool gamma_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     if (type(p) == BISHOP && ortho) { return false; }
 
     // convert the actual difference to +-1
-    if (xd) { xd /= xd; }
-    if (yd) { yd /= yd; }
+    if (xd) { xd /= abs(xd); }
+    if (yd) { yd /= abs(yd); }
 
     Square temp;
-    int x = get_x(piece_sq), y = get_y(piece_sq);
+    int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
     while (val(temp = mksq(x, y)) && temp != target_sq) {
 
