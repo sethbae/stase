@@ -379,3 +379,207 @@ bool can_move_to_square(const Board & b, Square from_sq, Square to_sq) {
     }
     return false;
 }
+
+bool alpha_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
+
+    const Piece p = b.get(piece_sq);
+    int xd = get_x(target_sq) - get_x(piece_sq);
+    int yd = get_y(target_sq) - get_y(piece_sq);
+    const bool ortho = (xd == 0) || (yd == 0);
+    const bool diag = (xd + yd == 0) || (xd - yd == 0);
+
+    if (xd == 0 && yd == 0) { return false; }
+    if (!ortho && !diag) { return false; }
+    if (type(p) == ROOK && diag) { return false; }
+    if (type(p) == BISHOP && ortho) { return false; }
+
+    // convert the actual difference to +-1
+    if (xd) { xd /= xd; }
+    if (yd) { yd /= yd; }
+
+    Square temp;
+    int x = get_x(piece_sq), y = get_y(piece_sq);
+
+    while (val(temp = mksq(x, y)) && temp != target_sq) {
+
+        const Piece otherp = b.get(temp);
+
+        if (otherp != EMPTY) {
+            return false;
+        }
+
+        x += xd;
+        y += yd;
+
+    }
+
+    // loop continued up to the target square - check that square itself!
+    return val(temp) && b.get(target_sq) == EMPTY;
+
+}
+
+/*
+ * A piece alpha covers all empty squares it can move to.
+ */
+bool alpha_covers(const Board & b, Square piece_sq, Square target_sq) {
+    switch (type(b.get(piece_sq))) {
+        case QUEEN:
+        case BISHOP:
+        case ROOK:
+            return alpha_cover_slide(b, piece_sq, target_sq);
+        default:
+            return false;
+    }
+}
+
+bool beta_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
+
+    const Piece p = b.get(piece_sq);
+    int xd = get_x(target_sq) - get_x(piece_sq);
+    int yd = get_y(target_sq) - get_y(piece_sq);
+    const bool ortho = (xd == 0) || (yd == 0);
+    const bool diag = (xd + yd == 0) || (xd - yd == 0);
+
+    if (xd == 0 && yd == 0) { return false; }
+    if (!ortho && !diag) { return false; }
+    if (type(p) == ROOK && diag) { return false; }
+    if (type(p) == BISHOP && ortho) { return false; }
+
+    // convert the actual difference to +-1
+    if (xd) { xd /= xd; }
+    if (yd) { yd /= yd; }
+
+    Square temp;
+    int x = get_x(piece_sq), y = get_y(piece_sq);
+
+    while (val(temp = mksq(x, y)) && temp != target_sq) {
+
+        const Piece otherp = b.get(temp);
+
+        if (otherp != EMPTY) {
+            return false;
+        }
+
+        x += xd;
+        y += yd;
+
+    }
+
+    return val(temp);
+
+}
+
+/*
+ * A piece beta-covers the squares it can move to, as well as those immediately following
+ * which have a piece on them.
+ */
+bool beta_covers(const Board & b, Square piece_sq, Square target_sq) {
+    switch (type(b.get(piece_sq))) {
+        case QUEEN:
+        case BISHOP:
+        case ROOK:
+            return beta_cover_slide(b, piece_sq, target_sq);
+        default:
+            return false;
+    }
+}
+
+bool gamma_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
+
+    const Piece p = b.get(piece_sq);
+    int xd = get_x(target_sq) - get_x(piece_sq);
+    int yd = get_y(target_sq) - get_y(piece_sq);
+    const bool ortho = (xd == 0) || (yd == 0);
+    const bool diag = (xd + yd == 0) || (xd - yd == 0);
+    const MoveType dir = ortho ? ORTHO : DIAG;
+
+    if (xd == 0 && yd == 0) { return false; }
+    if (!ortho && !diag) { return false; }
+    if (type(p) == ROOK && diag) { return false; }
+    if (type(p) == BISHOP && ortho) { return false; }
+
+    // convert the actual difference to +-1
+    if (xd) { xd /= xd; }
+    if (yd) { yd /= yd; }
+
+    Square temp;
+    int x = get_x(piece_sq), y = get_y(piece_sq);
+
+    while (val(temp = mksq(x, y)) && temp != target_sq) {
+
+        const Piece otherp = b.get(temp);
+
+        if (otherp != EMPTY && !can_move_in_direction(otherp, dir)) {
+            return false;
+        }
+
+        x += xd;
+        y += yd;
+
+    }
+
+    return val(temp);
+
+}
+
+/*
+ * A piece gamma controls all beta control squares, extending its reach through
+ * any non-empty squares whose pieces can also move in the same direction.
+ */
+bool gamma_covers(const Board & b, Square piece_sq, Square target_sq) {
+    switch (type(b.get(piece_sq))) {
+        case QUEEN:
+        case BISHOP:
+        case ROOK:
+            return gamma_cover_slide(b, piece_sq, target_sq);
+        default:
+            return false;
+    }
+}
+
+
+/*
+ * Below code was a start on defining these for non-sliding squares, which turns
+ * out to be kinda complicated and not immediately useful?
+ */
+
+//bool knight_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
+//    int x = get_x(piece_sq), y = get_y(piece_sq);
+//    Square temp;
+//    for (int i = 0; i < 8; ++i) {
+//        if (val(temp = mksq(x + XKN[i], y + YKN[i])) && temp == target_sq) {
+//            return true;
+//        }
+//    }
+//    return false;
+//}
+//
+//bool king_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
+//    int x = get_x(piece_sq), y = get_y(piece_sq);
+//    Square temp;
+//    for (int i = 0; i < 8; ++i) {
+//        if (val(temp = mksq(x + XD[i], y + YD[i])) && temp == target_sq) {
+//            return true;
+//        }
+//    }
+//    return false;
+//}
+//
+//bool pawn_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
+//    int x = get_x(piece_sq), y = get_y(piece_sq);
+//    Square temp;
+//    if (colour(b.get(piece_sq)) == WHITE) {
+//        if (b.get(temp = mksq(x, y + 1)) != EMPTY) { return false; }
+//        if (temp == target_sq) { return true; }
+//        if (get_y(piece_sq) == 1) {
+//            return b.get(temp = mksq(x, y + 2)) == EMPTY && temp == target_sq;
+//        }
+//    } else {
+//        if (b.get(temp = mksq(x, y - 1)) != EMPTY) { return false; }
+//        if (temp == target_sq) { return true; }
+//        if (get_y(piece_sq) == 6) {
+//            return b.get(temp = mksq(x, y - 2)) == EMPTY && temp == target_sq;
+//        }
+//    }
+//    return false;
+//}

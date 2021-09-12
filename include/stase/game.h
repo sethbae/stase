@@ -140,6 +140,11 @@ int alpha_control(const Board &, Square);
 int beta_control(const Board &, Square);
 int gamma_control(const Board &, Square);
 
+// cover functions
+bool alpha_covers(const Board &, Square piece_sq, Square target_sq);
+bool beta_covers(const Board &, Square piece_sq, Square target_sq);
+bool gamma_covers(const Board &, Square piece_sq, Square target_sq);
+
 int control_count(const Board &, Square);
 void display_control_counts(const Board &);
 

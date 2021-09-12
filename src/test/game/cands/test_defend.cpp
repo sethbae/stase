@@ -142,6 +142,14 @@ const TestSet<ResponderTestCase> defend_test_set = {
                                 FeatureFrame{stosq("d4"), 0, r, r}
                         },
                         {"e6d6", "e6e4"}
+                },
+                // queen doesn't re-defend
+                ResponderTestCase{
+                        "1k6/8/6R1/8/4Q3/8/8/1K6 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("g6"), 0, q, none}
+                        },
+                        {}
                 }
         }
 };

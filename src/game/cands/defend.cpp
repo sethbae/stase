@@ -9,7 +9,6 @@ using std::cout;
  * TODO
  *  - discovered defences not supported
  *  - don't defend using unsafe squares
- *  - queens still re-defend
  */
 
 /*
@@ -64,7 +63,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
                 for (int j = 0; j < pieces_point; ++j) {
 
                     // check that the piece does not already control the square
-                    if (collinear_points(s, temp, piece_squares[j])) {
+                    if (collinear_points(s, temp, piece_squares[j])
+                        || ((type(b.get(piece_squares[j])) == QUEEN) && gamma_covers(b, piece_squares[j], s))) {
                         continue;
                     }
 
