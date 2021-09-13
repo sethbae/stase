@@ -3,11 +3,6 @@
 
 #include "board.h"
 
-/**
- * TODO
- * - the MAX_MOVES constants aren't obeyed properly
- */
-
 const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
 const int MAX_MOVES_PER_RESPONDER = 5;
