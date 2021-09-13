@@ -8,8 +8,10 @@
  * - the MAX_MOVES constants aren't obeyed properly
  */
 
+const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
 const int MAX_MOVES_PER_RESPONDER = 5;
+const int MAX_RESPONDERS_PER_HOOK = 5;
 extern const int NUM_FEATURES;
 
 struct FeatureFrame {
@@ -28,8 +30,8 @@ typedef void (Responder)(const Board &, const FeatureFrame*, MoveSet*, int & mov
 
 struct FeatureHandler {
     Hook* hook;
-    Responder* friendly_responses[MAX_MOVES_PER_RESPONDER + 1];
-    Responder* enemy_responses[MAX_MOVES_PER_RESPONDER + 1];
+    Responder* friendly_responses[MAX_RESPONDERS_PER_HOOK + 1];
+    Responder* enemy_responses[MAX_RESPONDERS_PER_HOOK + 1];
 };
 
 Hook weak_hook;

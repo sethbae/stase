@@ -9,8 +9,6 @@ using std::cout;
 
 const int NUM_FEATURES = 10;
 
-const int MAX_MOVES = 10;
-
 // return candidate moves for a board; as a minimal working example,
 // return all legal moves
 //vector<Move> cands(const Gamestate & gs) {
@@ -23,7 +21,7 @@ const int MAX_MOVES = 10;
 
 vector<Move> cands(const Gamestate &gs) {
 
-    Move all_moves[MAX_MOVES];
+    Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
     int i = 0;
@@ -49,7 +47,7 @@ vector<Move> cands(const Gamestate &gs) {
                 (*responders[k])(gs.board, &ff, &moves, move_counter);
             }
 
-            if (move_counter == MAX_MOVES_PER_HOOK) {
+            if (move_counter == MAX_MOVES_PER_HOOK || m + move_counter >= MAX_TOTAL_CANDS) {
                 break;
             }
         }
@@ -68,8 +66,10 @@ vector<Move> cands(const Gamestate &gs) {
                     break;
                 }
             }
-            if (!present && m < MAX_MOVES) {
+            if (!present && m < MAX_TOTAL_CANDS) {
                 all_moves[m++] = moves.moves[j];
+            } else if (m >= MAX_TOTAL_CANDS) {
+                break;
             }
         }
 

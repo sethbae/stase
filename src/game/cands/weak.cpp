@@ -11,7 +11,7 @@ using std::cout;
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
 bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_min_b) {
-    
+
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
     int min_value_b = piece_value(W_KING)*10;
@@ -148,12 +148,14 @@ bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_mi
 
 }
 
-/*
- * Walks out from the given square to find a piece which can capture the weak piece.
- * Selects all pieces which can capture the target and which share the minimum value
- * among such pieces.
+/**
+ * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
+ * - a piece on a square which the enemy have more control over.
+ * - a piece threatened by a less valuable piece.
+ * Allocates and writes an array of FeatureFrames to the given address.
+ * @param b the board
+ * @param frame the address to place the address of the first frame.
  */
-
 void weak_hook(const Board & b, FeatureFrame** frame) {
 
     Square hits[64];
@@ -178,25 +180,3 @@ void weak_hook(const Board & b, FeatureFrame** frame) {
     (*frame)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
 
 }
-
-//void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
-//    // check frame and turn, delegate to major and minor adding moves.
-//    bool white_to_play = b.get_white();
-//    int move_count = 0;
-//
-//    for (FeatureFrame* ff = frame; ff->centre != SQUARE_SENTINEL; ff++) {
-//        bool weak_piece_is_white = (colour(b.get(ff->centre)) == WHITE);
-//        if (white_to_play == weak_piece_is_white) {
-//            defend_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
-//        } else {
-//            capture_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
-//        }
-//        if (move_count == MAX_MOVES_PER_HOOK) {
-//            return;
-//        }
-//    }
-//
-//    if (move_count < MAX_MOVES_PER_HOOK) {
-//        moves->moves[move_count] = MOVE_SENTINEL;
-//    }
-//}

@@ -36,7 +36,6 @@ set(SOURCE_FILES
         src/game/cands/cands.h
         src/game/cands/cands.cpp
         src/game/cands/weak.cpp
-        src/game/cands/feature.cpp
         src/game/cands/defend.cpp
         src/game/cands/capture_piece.cpp)
 
