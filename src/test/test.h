@@ -27,7 +27,7 @@ struct StringTestCase {
 
 struct ResponderTestCase {
     const std::string fen;
-    const std::vector<FeatureFrame> featureFrames;
+    const std::vector<FeatureFrame> feature_frames;
     const std::vector<std::string> expected_results;
 };
 
@@ -77,7 +77,7 @@ inline bool evaluate_responder_test_case(Responder r, const ResponderTestCase * 
     int move_counter = 0;
 
     // run the responder on the feature frames
-    r(gs.board, tc->featureFrames.data(), &moves, move_counter);
+    r(gs.board, tc->feature_frames.data(), &moves, move_counter);
 
     // convert the output to a vector of strings
     std::vector<std::string> strings;
