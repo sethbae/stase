@@ -19,18 +19,18 @@ struct FeatureFrame {
     int conf_2;
 };
 
-typedef struct {
+struct MoveSet {
     Move moves[MAX_MOVES_PER_HOOK];
-} MoveSet;
+};
 
 typedef void (Hook)(const Board &, FeatureFrame**);
 typedef void (Responder)(const Board &, const FeatureFrame*, MoveSet*, int & move_counter);
 
-typedef struct {
+struct FeatureHandler {
     Hook* hook;
     Responder* friendly_responses[MAX_MOVES_PER_RESPONDER + 1];
     Responder* enemy_responses[MAX_MOVES_PER_RESPONDER + 1];
-} FeatureHandler;
+};
 
 Hook weak_hook;
 Responder defend_square;
