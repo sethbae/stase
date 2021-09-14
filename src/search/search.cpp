@@ -159,7 +159,7 @@ void readable_printout(vector<SearchNode*> & nodes, ostream & output) {
     
         SearchNode *node = *itr;
         
-        output << movetosan(node->gs->board, node->move) << " ";
+        output << mtos(node->gs->board, node->move) << " ";
         //pr_board(node->gs->board);
         
         itr++;
@@ -190,7 +190,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     
     // SearchNode title line
     output << "SearchNode at " << node 
-                << " (created by " << movetosan(node->gs->board, node->move) << ")\n";
+                << " (created by " << mtos(node->gs->board, node->move) << ")\n";
     
     // board with conf
     wr_board_conf(node->gs->board, output);
@@ -206,7 +206,7 @@ void write_to_file(SearchNode *node, ostream & output) {
         // list of children and names
         for (int i = 0; i < node->num_children; ++i) {
             output << "Child " << i << ": " << node->children[i]
-                    << " (" << movetosan(node->children[i]->gs->board, node->children[i]->move)
+                    << " (" << mtos(node->children[i]->gs->board, node->children[i]->move)
                     << ") (" << node->children[i]->score << ")\n";
         }
     

@@ -83,7 +83,7 @@ string ptos_alg(Piece p) {
 
 /***** Move to SAN and SAN to move *****/
 
-Move santomove(const string san) {
+Move stom(const string san) {
     // TODO needs to be able to find where the piece is coming from given its destination
     san.size();
     Move m = {0, 0, 0};
@@ -91,7 +91,7 @@ Move santomove(const string san) {
 }
 
 /* accepts a move and the board it belongs to; whether or not the move has already been made */
-string movetosan(const Board & b, const Move m) {
+string mtos(const Board & b, const Move m) {
     // TODO doesn't do disambiguations
     
     if (m.from == empty_move().from && m.to == empty_move().to)

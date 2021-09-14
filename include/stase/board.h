@@ -199,8 +199,8 @@ std::string ptos_alg(const Piece);
 Piece ctop(const char);
 Square stosq(const std::string);
 std::string sqtos(const Square);
-Move santomove(const std::string);
-std::string movetosan(const Board &, const Move);
+Move stom(const std::string);
+std::string mtos(const Board &, const Move);
 
 /* write functions (write to ostream) */
 void wr_board(const Board &, std::ostream &);
