@@ -10,7 +10,7 @@ using std::cout;
  * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
-bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_min_b) {
+bool capture_walk(const Board & b, Square s, int * record_min_w, int * record_min_b) {
 
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
@@ -133,8 +133,8 @@ bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_mi
     }
 
     // record the minimum black and white values
-    record_min_w = min_value_w;
-    record_min_b = min_value_b;
+    *record_min_w = min_value_w;
+    *record_min_b = min_value_b;
 
     //cout << "Balance: " << balance
     //     << "\nMin white: " << min_value_w
@@ -152,31 +152,13 @@ bool capture_walk(const Board & b, Square s, int & record_min_w, int & record_mi
  * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
  * - a piece on a square which the enemy have more control over.
  * - a piece threatened by a less valuable piece.
- * Allocates and writes an array of FeatureFrames to the given address.
+ *
  * @param b the board
- * @param frame the address to place the address of the first frame.
+ * @param centre the square to look at
+ * @param secondary not used
+ * @param min_w the value of the least valuable white piece controlling the square
+ * @param min_b the value of the least valuable black piece controlling the square
  */
-void weak_hook(const Board & b, FeatureFrame** frame) {
-
-    Square hits[64];
-    int min_ws[64];
-    int min_bs[64];
-
-    int i = 0;
-
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (capture_walk(b, mksq(x, y), min_ws[i], min_bs[i])) {
-                hits[i++] = mksq(x, y);
-            }
-        }
-    }
-
-    *frame = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
-
-    for (int j = 0; j < i; ++j) {
-        (*frame)[j] = FeatureFrame{hits[j], 0, min_ws[j], min_bs[j]};
-    }
-    (*frame)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
-
+bool weak_hook(const Board & b, Square centre, Square * secondary, int * min_w, int * min_b) {
+    return capture_walk(b, centre, min_w, min_b);
 }

@@ -20,8 +20,10 @@ struct MoveSet {
     Move moves[MAX_MOVES_PER_HOOK];
 };
 
-typedef void (Hook)(const Board &, FeatureFrame**);
+typedef bool (Hook)(const Board &, Square centre, Square * secondary, int * conf_1, int * conf_2);
 typedef void (Responder)(const Board &, const FeatureFrame*, MoveSet*, int & move_counter);
+
+void discover_feature_frames(const Board &, Hook *, FeatureFrame **);
 
 struct FeatureHandler {
     Hook* hook;

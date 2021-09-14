@@ -9,15 +9,39 @@ using std::cout;
 
 const int NUM_FEATURES = 10;
 
-// return candidate moves for a board; as a minimal working example,
-// return all legal moves
-//vector<Move> cands(const Gamestate & gs) {
-//
-//    vector<Move> v;
-//    legal_moves(gs.board, v);
-//    return v;
-//
-//}
+/**
+ * Runs the given hook over every square on the board and records any successes in feature frames.
+ * The frames are written in an array, a pointer to which is put at the given address.
+ *
+ * @param b the board.
+ * @param hook the predicate.
+ * @param frames_ptr where to put the pointer to the results.
+ */
+void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frames_ptr) {
+
+    Square hits[64];
+    Square secondaries[64];
+    int min_ws[64];
+    int min_bs[64];
+
+    int i = 0;
+
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            if ((*hook)(b, mksq(x, y), &secondaries[i], &min_ws[i], &min_bs[i])) {
+                hits[i++] = mksq(x, y);
+            }
+        }
+    }
+
+    *frames_ptr = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
+
+    for (int j = 0; j < i; ++j) {
+        (*frames_ptr)[j] = FeatureFrame{hits[j], secondaries[i], min_ws[j], min_bs[j]};
+    }
+    (*frames_ptr)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+
+}
 
 vector<Move> cands(const Gamestate &gs) {
 
@@ -31,7 +55,8 @@ vector<Move> cands(const Gamestate &gs) {
         int move_counter = 0;
 
         // run the predicate over the board
-        (*fh.hook)(gs.board, &gs.feature_frames[i]);
+        discover_feature_frames(gs.board, fh.hook, &gs.feature_frames[i]);
+        // (*fh.hook)(gs.board, &gs.feature_frames[i]);
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[i][j].centre != SQUARE_SENTINEL; ++j) {
@@ -87,50 +112,3 @@ vector<Move> cands(const Gamestate &gs) {
     return vec;
 
 }
-//
-//void weak_hook(const Board & b, FeatureFrame** frame) {
-//
-//    Square hits[64];
-//    int min_ws[64];
-//    int min_bs[64];
-//
-//    int i = 0;
-//
-//    for (int x = 0; x < 8; ++x) {
-//        for (int y = 0; y < 8; ++y) {
-//            if (capture_walk(b, mksq(x, y), min_ws[i], min_bs[i])) {
-//                hits[i++] = mksq(x, y);
-//            }
-//        }
-//    }
-//
-//    *frame = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
-//
-//    for (int j = 0; j < i; ++j) {
-//        (*frame)[j] = FeatureFrame{hits[j], 0, min_ws[j], min_bs[j]};
-//    }
-//    (*frame)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
-//
-//}
-//
-//void weak_resp(const Board & b, MoveSet* moves, FeatureFrame* frame) {
-//    // check frame and turn, delegate to major and minor adding moves.
-//    bool white_to_play = b.get_white();
-//    int move_count = 0;
-//
-//    for (FeatureFrame* ff = frame; ff->centre != SQUARE_SENTINEL; ff++) {
-//        bool weak_piece_is_white = (colour(b.get(ff->centre)) == WHITE);
-//        if (white_to_play == weak_piece_is_white) {
-//            defend_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
-//        } else {
-//            capture_piece(b, ff->centre, moves, move_count, ff->conf_1, ff->conf_2);
-//        }
-//        if (move_count == MAX_MOVES_PER_HOOK) {
-//            return;
-//        }
-//    }
-//
-//    if (move_count < MAX_MOVES_PER_HOOK) {
-//        moves->moves[move_count] = MOVE_SENTINEL;
-//    }
-//}
