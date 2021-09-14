@@ -93,6 +93,7 @@ void test_board();
 void test_game();
 
 void test_weak_hook();
+void test_development_hook();
 void test_capture_piece();
 void test_defend_square();
 void test_alpha_covers();

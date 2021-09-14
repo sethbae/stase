@@ -32,10 +32,16 @@ struct FeatureHandler {
 };
 
 Hook weak_hook;
+Hook development_hook;
 Responder defend_square;
 Responder capture_piece;
 
 const FeatureHandler feature_handlers[] = {
+        FeatureHandler{
+          &development_hook,
+          { nullptr },
+          { nullptr }
+        },
         FeatureHandler{
             &weak_hook,
             { &defend_square, nullptr },

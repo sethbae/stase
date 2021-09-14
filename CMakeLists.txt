@@ -37,7 +37,8 @@ set(SOURCE_FILES
         src/game/cands/cands.cpp
         src/game/cands/weak.cpp
         src/game/cands/defend.cpp
-        src/game/cands/capture_piece.cpp)
+        src/game/cands/capture_piece.cpp
+        src/game/cands/development_hook.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
@@ -60,7 +61,8 @@ set(TEST_SOURCE_FILES
         src/test/game/test_piece.cpp
         src/test/game/cands/test_capture_piece.cpp
         src/test/game/cands/test_weak_hook.cpp
-        src/test/game/cands/test_defend.cpp)
+        src/test/game/cands/test_defend.cpp
+        src/test/game/cands/test_development_hook.cpp)
 
 include_directories(include/stase)
 
