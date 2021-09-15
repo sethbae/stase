@@ -38,7 +38,8 @@ set(SOURCE_FILES
         src/game/cands/weak.cpp
         src/game/cands/defend.cpp
         src/game/cands/capture_piece.cpp
-        src/game/cands/development_hook.cpp)
+        src/game/cands/development_hook.cpp
+        src/game/cands/develop_piece.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)

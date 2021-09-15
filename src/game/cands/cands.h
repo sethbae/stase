@@ -35,6 +35,7 @@ Hook weak_hook;
 Hook development_hook;
 Responder defend_square;
 Responder capture_piece;
+Responder develop_piece;
 
 const FeatureHandler feature_handlers[] = {
         FeatureHandler{
