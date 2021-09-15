@@ -106,6 +106,14 @@ const TestSet<ResponderTestCase> cap_test_set = {
                         },
                         {"c3e4", "f6e4"}
                 },
+                // does not early-exit incorrectly
+                ResponderTestCase{
+                        "Q3R3/7Q/8/8/R3b2R/5P2/3N1N2/1Q2R2Q w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("e4"), 0, p, none}
+                        },
+                        {"f3e4"}
+                },
         }
 };
 

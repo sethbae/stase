@@ -5,6 +5,12 @@
 // void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter, int & minw, int & minb) {
 void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, int & move_counter) {
 
+    /*
+     * TODO:
+     *  - early exit based on the value seen compared to the min_w/b of the capturing side
+     *  - careful tho, make sure to be correct
+     */
+
     const Square s = ff->centre;
     const int local_reset_point = move_counter;
     const Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
@@ -45,6 +51,9 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
                                 move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
                             moves->moves[move_counter++] = Move{temp, s, 0};
                         }
+                        // note that here and below, we cannot shortcut and return early. We
+                        // may later discover a less valuable piece, or a further piece of equal value.
+                        else {}
                     }
                 }
                 // no x-rays!
