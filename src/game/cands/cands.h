@@ -40,7 +40,7 @@ Responder develop_piece;
 const FeatureHandler feature_handlers[] = {
         FeatureHandler{
           &development_hook,
-          { nullptr },
+          { &develop_piece, nullptr },
           { nullptr }
         },
         FeatureHandler{

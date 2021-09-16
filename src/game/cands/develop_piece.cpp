@@ -1,62 +1,47 @@
 #include "cands.h"
 
-
-/*
-
- * * * * * * * *
- * * * * * * * *
- * * * * * * * *
- * 5 * * * * 5 *
- * * 4 * * 4 * *
- 3 * * 3 3 * * 3
- * 5 * 2 2 * 5 *
- * * B * * B * *
-
-
-
- */
-const int BISHOPS[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 2, 0, 2, 2, 0, 2, 0},
-        {1, 0, 0, 1, 1, 0, 0, 1},
-        {0, 2, 1, 0, 0, 1, 2, 0},
-        {0, 2, 1, 0, 0, 1, 2, 0},
-        {1, 0, 0, 1, 1, 0, 0, 1},
-        {0, 2, 0, 2, 2, 0, 2, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+const int BISHOPS[64] = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 2, 0, 2, 2, 0, 2, 0,
+        1, 0, 0, 1, 1, 0, 0, 1,
+        0, 2, 1, 0, 0, 1, 2, 0,
+        0, 2, 1, 0, 0, 1, 2, 0,
+        1, 0, 0, 1, 1, 0, 0, 1,
+        0, 2, 0, 2, 2, 0, 2, 0,
+        0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const int KNIGHTS[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 1, 1, 0, 0, 0},
-        {0, 0, 1, 0, 0, 1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 1, 0, 0, 1, 0, 0},
-        {0, 0, 0, 1, 1, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+const int KNIGHTS[64] = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 1, 1, 0, 0, 0,
+        0, 0, 1, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, 1, 0, 0,
+        0, 0, 0, 1, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const int ROOKS[8][8] = {
-        {0, 0, 1, 1, 1, 1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 1, 1, 1, 1, 0, 0},
+const int ROOKS[64] = {
+        0, 0, 2, 2, 2, 2, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 1,
+        1, 0, 0, 0, 0, 0, 0, 1,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 2, 2, 2, 2, 0, 0
 };
 
-const int QUEENS[8][8] = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 2, 2, 2, 0, 0, 0},
-        {0, 1, 0, 0, 0, 1, 0, 0},
-        {1, 0, 0, 0, 0, 0, 1, 1},
-        {1, 0, 0, 0, 0, 0, 1, 1},
-        {0, 1, 0, 0, 0, 1, 0, 0},
-        {0, 0, 2, 2, 2, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+const int QUEENS[64] = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 2, 2, 2, 0, 0, 0,
+        0, 1, 0, 0, 0, 1, 0, 0,
+        1, 0, 0, 0, 0, 0, 1, 1,
+        1, 0, 0, 0, 0, 0, 1, 1,
+        0, 1, 0, 0, 0, 1, 0, 0,
+        0, 0, 2, 2, 2, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0
 };
 
 const int XKN_LEGAL_W[] = {1, 2, -1, -2};
@@ -65,8 +50,88 @@ const int YKN_LEGAL_W[] = {2, 1, 2, 1};
 const int XKN_LEGAL_B[] = {1, 2, -1, -2};
 const int YKN_LEGAL_B[] = {-2, -1, -2, -1};
 
-void best_bishop_square(const Board & b, Square s, MoveSet * moves, int & move_counter) {
+Square best_square(const Board & b, Square s, const int xd, const int yd, const int * scores) {
 
+    Square best_sq;
+    int best_val = -1;
+
+    int x = get_x(s) + xd, y = get_y(s) + yd;
+    Square temp;
+
+    while (val(temp = mksq(x, y))) {
+
+        Piece p = b.get(temp);
+
+        if (colour(p) == EMPTY && scores[y*8 + x] > best_val) {
+            // empty square
+            best_sq = temp;
+            best_val = scores[y*8 + x];
+        } else if (colour(p) != colour(b.get(s))) {
+            // piece which can be captured
+            if (scores[y*8 + x] > best_val) {
+                best_sq = temp;
+                best_val = scores[y*8 + x];
+            }
+            break;
+        } else {
+            // blocking square
+            break;
+        }
+
+        x += xd;
+        y += yd;
+    }
+
+    if (best_val > -1) {
+        return best_sq;
+    } else {
+        return SQUARE_SENTINEL;
+    }
+
+}
+
+void best_diag_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
+
+    int yd = b.get_white() ? -1 : 1;
+
+    // negative diagonal
+    Square sq = best_square(b, s, -1, yd, scores);
+    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_counter++] = Move{s, sq, 0};
+    }
+
+    // positive diagonal
+    sq = best_square(b, s, 1, yd, scores);
+    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_counter++] = Move{s, sq, 0};
+    }
+
+    return;
+}
+
+void best_ortho_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
+
+    int yd = b.get_white() ? -1 : 1;
+
+    // vertical
+    Square sq = best_square(b, s, 0, yd, scores);
+    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_counter++] = Move{s, sq, 0};
+    }
+
+    // left
+    sq = best_square(b, s, 1, 0, scores);
+    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_counter++] = Move{s, sq, 0};
+    }
+
+    // right
+    sq = best_square(b, s, 1, 0, scores);
+    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
+        moves->moves[move_counter++] = Move{s, sq, 0};
+    }
+
+    return;
 }
 
 void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_counter) {
@@ -75,35 +140,51 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
     const int * xd = white ? XKN_LEGAL_W : XKN_LEGAL_B;
     const int * yd = white ? YKN_LEGAL_W : YKN_LEGAL_B;
 
+    Square best_sq;
+    int best_val = -1;
+
+    for (int i = 0; i < 4; ++i) {
+        Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
+        int score = KNIGHTS[get_y(temp)*8 + get_x(temp)];
+        if (score > best_val && colour(b.get(temp) != b.get(s))) {
+            best_sq = temp;
+            best_val = score;
+        }
+    }
+
+    if (best_val > -1) {
+        moves->moves[move_counter++] = Move{s, best_sq, 0};
+    }
+
+    return;
+
 }
 
-void best_queen_square(const Board & b, Square s, MoveSet * moves, int & move_counter) {
-
-}
-
-void best_rook_square(const Board & b, Square s, MoveSet * moves, int & move_counter) {
-
-}
-
+/**
+ * Looks for the best square to develop the given piece to. Although this is deterministic
+ * up to the position of the pieces, it may return more than one square for all pieces which
+ * are not knights.
+ */
 void develop_piece(const Board & b, FeatureFrame * ff, MoveSet *moves, int & move_counter) {
 
-    bool white_piece = colour(b.get(s)) == WHITE;
+    bool white_piece = colour(b.get(ff->centre)) == WHITE;
     if (b.get_white() != white_piece) {
         return;
     }
 
     switch (type(b.get(ff->centre))) {
         case BISHOP:
-            best_bishop_square(b, ff->centre, moves, move_counter);
+            best_diag_squares(b, ff->centre, moves, move_counter, BISHOPS);
             return;
         case KNIGHT:
             best_knight_square(b, ff->centre, moves, move_counter);
             return;
         case ROOK:
-            best_rook_square(b, ff->centre, moves, move_counter);
+            best_ortho_squares(b, ff->centre, moves, move_counter, ROOKS);
             return;
         case QUEEN:
-            best_queen_square(b, ff->centre, moves, move_counter);
+            best_diag_squares(b, ff->centre, moves, move_counter, QUEENS);
+            best_ortho_squares(b, ff->centre, moves, move_counter, QUEENS);
             return;
         default:
             return;
