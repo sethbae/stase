@@ -8,4 +8,5 @@ void test_game() {
     test_development_hook();
     test_capture_piece();
     test_defend_square();
+    test_develop_piece();
 }

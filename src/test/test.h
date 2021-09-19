@@ -99,5 +99,6 @@ void test_defend_square();
 void test_alpha_covers();
 void test_beta_covers();
 void test_gamma_covers();
+void test_develop_piece();
 
 #endif //STASE_TEST_H

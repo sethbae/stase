@@ -63,7 +63,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_capture_piece.cpp
         src/test/game/cands/test_weak_hook.cpp
         src/test/game/cands/test_defend.cpp
-        src/test/game/cands/test_development_hook.cpp)
+        src/test/game/cands/test_development_hook.cpp
+        src/test/game/cands/test_develop_piece.cpp)
 
 include_directories(include/stase)
 
