@@ -1,3 +1,4 @@
+#include <iostream>
 #include "cands.h"
 
 const int BISHOPS[64] = {
@@ -53,7 +54,7 @@ const int YKN_LEGAL_B[] = {-2, -1, -2, -1};
 Square best_square(const Board & b, Square s, const int xd, const int yd, const int * scores) {
 
     Square best_sq;
-    int best_val = -1;
+    int best_val = 0;
 
     int x = get_x(s) + xd, y = get_y(s) + yd;
     Square temp;
@@ -62,10 +63,12 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
         Piece p = b.get(temp);
 
-        if (colour(p) == EMPTY && scores[y*8 + x] > best_val) {
-            // empty square
-            best_sq = temp;
-            best_val = scores[y*8 + x];
+        if (colour(p) == EMPTY) {
+            if (scores[y*8 + x] > best_val) {
+                // empty square
+                best_sq = temp;
+                best_val = scores[y * 8 + x];
+            }
         } else if (colour(p) != colour(b.get(s))) {
             // piece which can be captured
             if (scores[y*8 + x] > best_val) {
@@ -82,7 +85,7 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
         y += yd;
     }
 
-    if (best_val > -1) {
+    if (best_val > 0) {
         return best_sq;
     } else {
         return SQUARE_SENTINEL;
@@ -141,7 +144,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
     const int * yd = white ? YKN_LEGAL_W : YKN_LEGAL_B;
 
     Square best_sq;
-    int best_val = -1;
+    int best_val = 0;
 
     for (int i = 0; i < 4; ++i) {
         Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
@@ -152,7 +155,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
         }
     }
 
-    if (best_val > -1) {
+    if (best_val > 0) {
         moves->moves[move_counter++] = Move{s, best_sq, 0};
     }
 
