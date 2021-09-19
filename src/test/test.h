@@ -70,14 +70,14 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 }
 
-inline bool evaluate_responder_test_case(Responder r, const ResponderTestCase * tc) {
+inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase * tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
     MoveSet moves;
     int move_counter = 0;
 
     // run the responder on the feature frames
-    r(gs.board, tc->feature_frames.data(), &moves, move_counter);
+    resp(gs.board, tc->feature_frames.data(), &moves, move_counter);
 
     // convert the output to a vector of strings
     std::vector<std::string> strings;

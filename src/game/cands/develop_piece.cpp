@@ -165,7 +165,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
  */
-void develop_piece(const Board & b, FeatureFrame * ff, MoveSet *moves, int & move_counter) {
+void develop_piece(const Board & b, const FeatureFrame * ff, MoveSet *moves, int & move_counter) {
 
     bool white_piece = colour(b.get(ff->centre)) == WHITE;
     if (b.get_white() != white_piece) {
