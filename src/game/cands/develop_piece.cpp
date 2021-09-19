@@ -111,7 +111,7 @@ void best_diag_squares(const Board & b, Square s, MoveSet * moves, int & move_co
 
 void best_ortho_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
 
-    int yd = b.get_white() ? -1 : 1;
+    int yd = b.get_white() ? 1 : -1;
 
     // vertical
     Square sq = best_square(b, s, 0, yd, scores);
@@ -120,7 +120,7 @@ void best_ortho_squares(const Board & b, Square s, MoveSet * moves, int & move_c
     }
 
     // left
-    sq = best_square(b, s, 1, 0, scores);
+    sq = best_square(b, s, -1, 0, scores);
     if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
         moves->moves[move_counter++] = Move{s, sq, 0};
     }
