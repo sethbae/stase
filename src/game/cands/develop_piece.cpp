@@ -92,7 +92,7 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
 void best_diag_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
 
-    int yd = b.get_white() ? -1 : 1;
+    int yd = b.get_white() ? 1 : -1;
 
     // negative diagonal
     Square sq = best_square(b, s, -1, yd, scores);
@@ -146,7 +146,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
     for (int i = 0; i < 4; ++i) {
         Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
         int score = KNIGHTS[get_y(temp)*8 + get_x(temp)];
-        if (score > best_val && colour(b.get(temp) != b.get(s))) {
+        if (val(temp) && score > best_val && colour(b.get(temp) != b.get(s))) {
             best_sq = temp;
             best_val = score;
         }
