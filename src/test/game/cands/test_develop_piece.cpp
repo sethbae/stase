@@ -87,13 +87,52 @@ const TestSet<ResponderTestCase> develop_test_cases = {
                         },
                         { "d8c7", "d8d7", "d8e7" }
                 },
-
                 // test that captures
-
+                ResponderTestCase{
+                        "6n1/8/8/8/8/8/8/6N1 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("g1"), 0, 0, 0}
+                        },
+                        { "g1f3" }
+                },
                 // test that chooses worse if blocked
-
-                // medley
-
+                ResponderTestCase{
+                        "6n1/8/5n2/8/8/8/8/8 b - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("g8"), 0, 0, 0}
+                        },
+                        { "g8e7" }
+                },
+                // medley # 1
+                ResponderTestCase{
+                        "rnbqkbnr/ppp2ppp/3p4/3Pp3/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("a1"), 0, 0, 0},
+                                FeatureFrame{stosq("b1"), 0, 0, 0},
+                                FeatureFrame{stosq("c1"), 0, 0, 0},
+                                FeatureFrame{stosq("d1"), 0, 0, 0},
+                                FeatureFrame{stosq("e1"), 0, 0, 0},
+                                FeatureFrame{stosq("f1"), 0, 0, 0},
+                                FeatureFrame{stosq("g1"), 0, 0, 0},
+                                FeatureFrame{stosq("h1"), 0, 0, 0},
+                        },
+                        { "b1c3", "f1e2", "c1d2", "d1d2", "d1e2" }
+                },
+                // medley # 2
+                ResponderTestCase{
+                        "rnbqkb1r/ppp1pp1p/3p1np1/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("a8"), 0, 0, 0},
+                                FeatureFrame{stosq("b8"), 0, 0, 0},
+                                FeatureFrame{stosq("c8"), 0, 0, 0},
+                                FeatureFrame{stosq("d8"), 0, 0, 0},
+                                FeatureFrame{stosq("e8"), 0, 0, 0},
+                                FeatureFrame{stosq("f8"), 0, 0, 0},
+                                FeatureFrame{stosq("g8"), 0, 0, 0},
+                                FeatureFrame{stosq("h8"), 0, 0, 0},
+                        },
+                        { "b8c6", "c8d7", "d8d7", "f8g7" }
+                }
         }
 };
 

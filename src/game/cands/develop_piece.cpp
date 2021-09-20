@@ -149,7 +149,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
     for (int i = 0; i < 4; ++i) {
         Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
         int score = KNIGHTS[get_y(temp)*8 + get_x(temp)];
-        if (val(temp) && score > best_val && colour(b.get(temp) != b.get(s))) {
+        if (val(temp) && score > best_val && colour(b.get(temp)) != colour(b.get(s))) {
             best_sq = temp;
             best_val = score;
         }
