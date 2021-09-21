@@ -1,4 +1,3 @@
-#include <iostream>
 #include "cands.h"
 
 const int BISHOPS[64] = {
@@ -93,51 +92,51 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
 }
 
-void best_diag_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
+void best_diag_squares(const Board & b, Square s, Move * moves, MoveCounter & move_counter, const int * scores) {
 
     int yd = b.get_white() ? 1 : -1;
 
     // negative diagonal
     Square sq = best_square(b, s, -1, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
-        moves->moves[move_counter++] = Move{s, sq, 0};
+    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // positive diagonal
     sq = best_square(b, s, 1, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
-        moves->moves[move_counter++] = Move{s, sq, 0};
+    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     return;
 }
 
-void best_ortho_squares(const Board & b, Square s, MoveSet * moves, int & move_counter, const int * scores) {
+void best_ortho_squares(const Board & b, Square s, Move * moves, MoveCounter & move_counter, const int * scores) {
 
     int yd = b.get_white() ? 1 : -1;
 
     // vertical
     Square sq = best_square(b, s, 0, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
-        moves->moves[move_counter++] = Move{s, sq, 0};
+    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // left
     sq = best_square(b, s, -1, 0, scores);
-    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
-        moves->moves[move_counter++] = Move{s, sq, 0};
+    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // right
     sq = best_square(b, s, 1, 0, scores);
-    if (sq != SQUARE_SENTINEL && move_counter < MAX_MOVES_PER_HOOK) {
-        moves->moves[move_counter++] = Move{s, sq, 0};
+    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     return;
 }
 
-void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_counter) {
+void best_knight_square(const Board & b, Square s, Move * moves, MoveCounter & move_counter) {
 
     const bool white = (colour(b.get(s)) == WHITE);
     const int * xd = white ? XKN_LEGAL_W : XKN_LEGAL_B;
@@ -155,8 +154,8 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
         }
     }
 
-    if (best_val > 0) {
-        moves->moves[move_counter++] = Move{s, best_sq, 0};
+    if (best_val > 0 && move_counter.has_space()) {
+        moves[move_counter.inc()] = Move{s, best_sq, 0};
     }
 
     return;
@@ -168,7 +167,7 @@ void best_knight_square(const Board & b, Square s, MoveSet * moves, int & move_c
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
  */
-void develop_piece(const Board & b, const FeatureFrame * ff, MoveSet *moves, int & move_counter) {
+void develop_piece(const Board & b, const FeatureFrame * ff, Move * moves, MoveCounter & move_counter) {
 
     bool white_piece = colour(b.get(ff->centre)) == WHITE;
     if (b.get_white() != white_piece) {

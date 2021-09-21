@@ -23,11 +23,10 @@ bool collinear_points(Square a, Square b, Square c) {
  * Walks out from the piece looking for other pieces which can move to the squares encountered
  * and therefore can defend the piece. Does not consider discovered defences or promotions.
  */
-void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & move_counter) {
+void defend_square(const Board & b, const FeatureFrame * ff, Move * moves, MoveCounter & move_counter) {
 
     const Square s = ff->centre;
     const Ptype defending_colour = b.get_white() ? WHITE : BLACK;
-    int moves_found = 0;
 
     Square piece_squares[16];
     int pieces_point = 0;
@@ -70,9 +69,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
                     }
 
                     if (can_move_to_square(b, piece_squares[j], temp) && can_move_in_direction(b.get(piece_squares[j]), dir)) {
-                        if (move_counter < MAX_MOVES_PER_HOOK && moves_found < MAX_MOVES_PER_RESPONDER) {
-                            m->moves[move_counter++] = {piece_squares[j], temp, 0};
-                            ++moves_found;
+                        if (move_counter.has_space()) {
+                            moves[move_counter.inc()] = {piece_squares[j], temp, 0};
                         } else {
                             // no space remaining
                             return;
@@ -107,9 +105,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
                         && (temp != s)) {
-                    if (move_counter < MAX_MOVES_PER_HOOK && moves_found < MAX_MOVES_PER_RESPONDER) {
-                        m->moves[move_counter++] = Move{temp, defend_from_square, 0};
-                        ++moves_found;
+                    if (move_counter.has_space()) {
+                        moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
                         // no space remaining
                         return;
@@ -132,9 +129,8 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
                         && (type(b.get(temp)) == KING)
                         && (colour(b.get(temp)) == defending_colour)
                         && (temp != s)) {
-                    if (move_counter < MAX_MOVES_PER_HOOK && moves_found < MAX_MOVES_PER_RESPONDER) {
-                        m->moves[move_counter++] = Move{temp, defend_from_square, 0};
-                        ++moves_found;
+                    if (move_counter.has_space()) {
+                        moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
                         // no space remaining
                         return;
@@ -160,18 +156,16 @@ void defend_square(const Board & b, const FeatureFrame * ff, MoveSet * m, int & 
         if (type(b.get(piece_squares[i])) == PAWN) {
             if (val(left_pawn_defence_square)
                     && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)) {
-                if (move_counter < MAX_MOVES_PER_HOOK && moves_found < MAX_MOVES_PER_RESPONDER) {
-                    m->moves[move_counter++] = Move{piece_squares[i], left_pawn_defence_square, 0};
-                    ++moves_found;
+                if (move_counter.has_space()) {
+                    moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
                 } else {
                     // no space remaining
                     return;
                 }
             } else if (val(right_pawn_defence_square)
                         && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)) {
-                if (move_counter < MAX_MOVES_PER_HOOK && moves_found < MAX_MOVES_PER_RESPONDER) {
-                    m->moves[move_counter++] = Move{piece_squares[i], right_pawn_defence_square, 0};
-                    ++moves_found;
+                if (move_counter.has_space()) {
+                    moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
                 } else {
                     // no space remaining
                     return;

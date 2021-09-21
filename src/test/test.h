@@ -73,18 +73,18 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase * tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
-    MoveSet moves;
-    int move_counter = 0;
+    Move moves[MAX_MOVES_PER_HOOK];
+    MoveCounter move_counter(MAX_MOVES_PER_HOOK);
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
-        resp(gs.board, &ff, &moves, move_counter);
+        resp(gs.board, &ff, &moves[0], move_counter);
     }
 
     // convert the output to a vector of strings
     std::vector<std::string> strings;
-    for (int i = 0; i < move_counter; ++i) {
-        strings.push_back(sqtos(moves.moves[i].from) + sqtos(moves.moves[i].to));
+    for (int i = 0; i < move_counter.itr_max(); ++i) {
+        strings.push_back(sqtos(moves[i].from) + sqtos(moves[i].to));
     }
 
     // check that they match

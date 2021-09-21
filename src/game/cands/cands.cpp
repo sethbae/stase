@@ -45,18 +45,19 @@ void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frame
 
 vector<Move> cands(const Gamestate &gs) {
 
+    MoveCounter counter(MAX_TOTAL_CANDS);
+
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
     int i = 0;
     FeatureHandler fh;
     while ((fh = feature_handlers[i]).hook != nullptr) {
-        MoveSet moves;
-        int move_counter = 0;
+        Move moves[MAX_MOVES_PER_HOOK];
+        counter.add_allowance(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
         discover_feature_frames(gs.board, fh.hook, &gs.feature_frames[i]);
-        // (*fh.hook)(gs.board, &gs.feature_frames[i]);
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[i][j].centre != SQUARE_SENTINEL; ++j) {
@@ -68,31 +69,27 @@ vector<Move> cands(const Gamestate &gs) {
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
-            for (int k = 0; responders[k] != nullptr; ++k) {
-                (*responders[k])(gs.board, &ff, &moves, move_counter);
+            for (int k = 0; responders[k] != nullptr && counter.has_space(); ++k) {
+                (*responders[k])(gs.board, &ff, &moves[0], counter);
             }
 
-            if (move_counter == MAX_MOVES_PER_HOOK || m + move_counter >= MAX_TOTAL_CANDS) {
+            if (!counter.has_space()) {
                 break;
             }
         }
 
-        if (move_counter < MAX_MOVES_PER_HOOK) {
-            moves.moves[move_counter] = MOVE_SENTINEL;
-        }
-
         // add moves not yet present
-        for (int j = 0; j < MAX_MOVES_PER_HOOK && !is_sentinel(moves.moves[j]); ++j) {
+        for (int j = 0; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
-                if ((all_moves[k].from == moves.moves[j].from)
-                        && (all_moves[k].to == moves.moves[j].to)) {
+                if ((all_moves[k].from == moves[j].from)
+                        && (all_moves[k].to == moves[j].to)) {
                     present = true;
                     break;
                 }
             }
             if (!present && m < MAX_TOTAL_CANDS) {
-                all_moves[m++] = moves.moves[j];
+                all_moves[m++] = moves[j];
             } else if (m >= MAX_TOTAL_CANDS) {
                 break;
             }

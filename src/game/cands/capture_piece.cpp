@@ -2,8 +2,7 @@
 #include "cands.h"
 #include "game.h"
 
-// void capture_piece(const Board & b, Square s, MoveSet *moves, int & move_counter, int & minw, int & minb) {
-void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, int & move_counter) {
+void capture_piece(const Board & b, const FeatureFrame * ff, Move * moves, MoveCounter & counter) {
 
     /*
      * TODO:
@@ -12,7 +11,7 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
      */
 
     const Square s = ff->centre;
-    const int local_reset_point = move_counter;
+    const int local_reset_point = counter.idx();
     const Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
     const int weakest_defender = (capturing_colour == WHITE) ? ff->conf_2 : ff->conf_1;
 
@@ -43,13 +42,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
                     if (val < min_value_seen) {
                         // new lowest value; reset and add to the list
                         min_value_seen = val;
-                        move_counter = local_reset_point;
-                        moves->moves[move_counter++] = Move{temp, s, 0};
+                        counter.current_index = local_reset_point;
+                        moves[counter.current_index++] = Move{temp, s, 0};
                     } else if (val == min_value_seen) {
                         // equal lowest value; append
-                        if (move_counter < MAX_MOVES_PER_HOOK &&
-                                move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                            moves->moves[move_counter++] = Move{temp, s, 0};
+                        if (counter.has_space()) {
+                            moves[counter.inc()] = Move{temp, s, 0};
                         }
                         // note that here and below, we cannot shortcut and return early. We
                         // may later discover a less valuable piece, or a further piece of equal value.
@@ -84,13 +82,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
                 if (kn_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = kn_val;
-                    move_counter = local_reset_point;
-                    moves->moves[move_counter++] = Move{temp, s, 0};
+                    counter.current_index = local_reset_point;
+                    moves[counter.current_index++] = Move{temp, s, 0};
                 } else if (kn_val == min_value_seen) {
                     // equal lowest value; append
-                    if (move_counter < MAX_MOVES_PER_HOOK &&
-                            move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                        moves->moves[move_counter++] = Move{temp, s, 0};
+                    if (counter.has_space()) {
+                        moves[counter.inc()] = Move{temp, s, 0};
                     }
                 }
             }
@@ -107,13 +104,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
                 if (k_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = k_val;
-                    move_counter = local_reset_point;
-                    moves->moves[move_counter++] = Move{temp, s, 0};
+                    counter.current_index = local_reset_point;
+                    moves[counter.current_index++] = Move{temp, s, 0};
                 } else if (k_val == min_value_seen) {
                     // equal lowest value; append
-                    if (move_counter < MAX_MOVES_PER_HOOK &&
-                            move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                        moves->moves[move_counter++] = Move{temp, s, 0};
+                    if (counter.has_space()) {
+                        moves[counter.inc()] = Move{temp, s, 0};
                     }
                 }
             }
@@ -127,12 +123,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            move_counter = local_reset_point;
-            moves->moves[move_counter++] = Move{temp, s, 0};
+            counter.current_index = local_reset_point;
+            moves[counter.current_index++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (move_counter < MAX_MOVES_PER_HOOK && move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                moves->moves[move_counter++] = Move{temp, s, 0};
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{temp, s, 0};
             }
         }
     }
@@ -141,12 +137,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            move_counter = local_reset_point;
-            moves->moves[move_counter++] = Move{temp, s, 0};
+            counter.current_index = local_reset_point;
+            moves[counter.current_index++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (move_counter < MAX_MOVES_PER_HOOK && move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                moves->moves[move_counter++] = Move{temp, s, 0};
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{temp, s, 0};
             }
         }
     }
@@ -155,12 +151,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            move_counter = local_reset_point;
-            moves->moves[move_counter++] = Move{temp, s, 0};
+            counter.current_index = local_reset_point;
+            moves[counter.current_index++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (move_counter < MAX_MOVES_PER_HOOK && move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                moves->moves[move_counter++] = Move{temp, s, 0};
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{temp, s, 0};
             }
         }
     }
@@ -169,12 +165,12 @@ void capture_piece(const Board & b, const FeatureFrame * ff, MoveSet * moves, in
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
             min_value_seen = pawn_val;
-            move_counter = local_reset_point;
-            moves->moves[move_counter++] = Move{temp, s, 0};
+            counter.current_index = local_reset_point;
+            moves[counter.current_index++] = Move{temp, s, 0};
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
-            if (move_counter < MAX_MOVES_PER_HOOK && move_counter - local_reset_point < MAX_MOVES_PER_RESPONDER) {
-                moves->moves[move_counter++] = Move{temp, s, 0};
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{temp, s, 0};
             }
         }
     }
