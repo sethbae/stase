@@ -92,7 +92,7 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
 }
 
-void best_diag_squares(const Board & b, Square s, Move * moves, MoveCounter & move_counter, const int * scores) {
+void best_diag_squares(const Board & b, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
 
     int yd = b.get_white() ? 1 : -1;
 
@@ -111,7 +111,7 @@ void best_diag_squares(const Board & b, Square s, Move * moves, MoveCounter & mo
     return;
 }
 
-void best_ortho_squares(const Board & b, Square s, Move * moves, MoveCounter & move_counter, const int * scores) {
+void best_ortho_squares(const Board & b, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
 
     int yd = b.get_white() ? 1 : -1;
 
@@ -136,7 +136,7 @@ void best_ortho_squares(const Board & b, Square s, Move * moves, MoveCounter & m
     return;
 }
 
-void best_knight_square(const Board & b, Square s, Move * moves, MoveCounter & move_counter) {
+void best_knight_square(const Board & b, Square s, Move * moves, IndexCounter & move_counter) {
 
     const bool white = (colour(b.get(s)) == WHITE);
     const int * xd = white ? XKN_LEGAL_W : XKN_LEGAL_B;
@@ -167,7 +167,7 @@ void best_knight_square(const Board & b, Square s, Move * moves, MoveCounter & m
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
  */
-void develop_piece(const Board & b, const FeatureFrame * ff, Move * moves, MoveCounter & move_counter) {
+void develop_piece(const Board & b, const FeatureFrame * ff, Move * moves, IndexCounter & move_counter) {
 
     bool white_piece = colour(b.get(ff->centre)) == WHITE;
     if (b.get_white() != white_piece) {

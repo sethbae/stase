@@ -74,7 +74,7 @@ inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase
 
     Gamestate gs(fen_to_board(tc->fen));
     Move moves[MAX_MOVES_PER_HOOK];
-    MoveCounter move_counter(MAX_MOVES_PER_HOOK);
+    IndexCounter move_counter(MAX_MOVES_PER_HOOK);
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
@@ -83,7 +83,7 @@ inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase
 
     // convert the output to a vector of strings
     std::vector<std::string> strings;
-    for (int i = 0; i < move_counter.itr_max(); ++i) {
+    for (int i = 0; i < move_counter.idx(); ++i) {
         strings.push_back(sqtos(moves[i].from) + sqtos(moves[i].to));
     }
 

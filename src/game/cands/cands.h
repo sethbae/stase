@@ -15,12 +15,12 @@ struct FeatureFrame {
     int conf_2;
 };
 
-struct MoveCounter {
+struct IndexCounter {
     int hard_limit;
     int soft_limit;
     int current_index;
 
-    MoveCounter(int hard_limit) {
+    IndexCounter(int hard_limit) {
         this->hard_limit = hard_limit;
         this->current_index = 0;
         this->soft_limit = 0;
@@ -39,7 +39,6 @@ struct MoveCounter {
 
     inline int idx() { return current_index; }
     inline int inc() { return current_index++; }
-    inline int itr_max() { return current_index; }
 
     /**
      * Sets a new, temporary limit on the counter. Allows the index to increase
@@ -61,7 +60,7 @@ struct MoveCounter {
 };
 
 typedef bool (Hook)(const Board &, Square centre, Square * secondary, int * conf_1, int * conf_2);
-typedef void (Responder)(const Board &, const FeatureFrame *, Move *, MoveCounter & move_counter);
+typedef void (Responder)(const Board &, const FeatureFrame *, Move *, IndexCounter & move_counter);
 
 void discover_feature_frames(const Board &, Hook *, FeatureFrame **);
 

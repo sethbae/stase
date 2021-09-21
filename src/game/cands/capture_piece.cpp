@@ -2,7 +2,7 @@
 #include "cands.h"
 #include "game.h"
 
-void capture_piece(const Board & b, const FeatureFrame * ff, Move * moves, MoveCounter & counter) {
+void capture_piece(const Board & b, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
     /*
      * TODO:

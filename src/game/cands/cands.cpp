@@ -45,7 +45,7 @@ void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frame
 
 vector<Move> cands(const Gamestate &gs) {
 
-    MoveCounter counter(MAX_TOTAL_CANDS);
+    IndexCounter counter(MAX_TOTAL_CANDS);
 
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
