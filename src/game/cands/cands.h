@@ -54,7 +54,7 @@ struct IndexCounter {
      * Clears any allowance, if some was previously given.
      * @param limit
      */
-    inline void clear_soft_limit(int limit) {
+    inline void clear_soft_limit() {
         soft_limit = 0;
     }
 };
