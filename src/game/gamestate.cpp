@@ -18,13 +18,29 @@ const int YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
  *  Each of those attributes should be updated or re-calculated every move.
  */
 
+/**
+ * Allocates memory for all the fields in a gamestate which need it.
+ */
+void alloc(Gamestate * gs) {
+    gs->feature_frames = new FeatureFrame*[NUM_FEATURES];
+    gs->wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
+    gs->bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
+}
+
 Gamestate::Gamestate() {
-    feature_frames = new FeatureFrame*[NUM_FEATURES];
+    alloc(this);
 }
 
 Gamestate::Gamestate(const Board & b) : board(b) {
-    feature_frames = new FeatureFrame*[NUM_FEATURES];
+    alloc(this);
     recalculate_all();
+}
+
+/**
+ * Populate all the information in the caches completely from scratch.
+ */
+void Gamestate::repopulate_caches() {
+    // for each square, pieces
 }
 
 Bitmap g_attack_map(const Gamestate & g, bool friendly) {

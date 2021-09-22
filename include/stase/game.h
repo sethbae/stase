@@ -63,7 +63,25 @@ struct Gamestate {
     // The enclosed board
     Board board;
 
-    FeatureFrame** feature_frames;
+    FeatureFrame ** feature_frames;
+
+    Gamestate();
+    Gamestate(const Board &);
+    void recalculate_all();
+    void recalculate_attacks();
+    void recalculate_positions();
+    void update(Move m);
+    void repopulate_caches();
+
+    // store a cache of squares on which pieces fall
+    Square * wpieces;
+    Square * bpieces;
+    inline Square * friendly_pieces() {
+        return board.get_white() ? wpieces : bpieces;
+    }
+    inline Square * enemy_pieces() {
+        return board.get_white() ? bpieces : wpieces;
+    }
 
     // Attack and occupation maps for each of the adversaries
     Bitmap fattack;
@@ -85,13 +103,6 @@ struct Gamestate {
 
     Move last_move;
     Piece last_capture;
-
-    Gamestate();
-    Gamestate(const Board &);
-    void recalculate_all();
-    void recalculate_attacks();
-    void recalculate_positions();
-    void update(Move m);
 
 };
 
