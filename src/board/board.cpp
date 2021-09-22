@@ -125,6 +125,35 @@ Ptype piece(Piece p) { return PIECE[p]; }
 Ptype type(Piece p) { return TYPE[p]; }
 Ptype colour(Piece p) { return COLOUR[p]; }
 bool is_white(Piece p) { return p & 8; }
+bool is_minor_piece(Piece p) {
+    switch (type(p)) {
+        case KNIGHT:
+        case BISHOP:
+            return true;
+        default:
+            return false;
+    }
+}
+bool is_major_piece(Piece p) {
+    switch (type(p)) {
+        case QUEEN:
+        case ROOK:
+            return true;
+        default:
+            return false;
+    }
+}
+bool is_not_pk(Piece p) {
+    switch (type(p)) {
+        case QUEEN:
+        case ROOK:
+        case KNIGHT:
+        case BISHOP:
+            return true;
+        default:
+            return false;
+    }
+}
 
 /* read 4 bits from given square address */
 Piece Board::get(const Square & sq) const {

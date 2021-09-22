@@ -454,8 +454,6 @@ void wr_bin_64(uint64_t data, ostream & output) {
  PRINTING FUNCTIONS         for board, bitmap
  ************************************************************************************/
 
-// these now delegate to writing functions above
-
 /* print out a human readable chess representation of the board */
 void pr_board(const Board & b, const string & indent) {
     wr_board(b, indent, cout);

@@ -52,6 +52,9 @@ Ptype piece(Piece);
 Ptype type(Piece);
 Ptype colour(Piece);
 bool is_white(Piece);
+bool is_minor_piece(Piece);
+bool is_major_piece(Piece);
+bool is_not_pk(Piece);
 
 /* A move structure, which stores some flags etc and get/set methods */
 struct Move {
