@@ -11,10 +11,6 @@ using std::cout;
  */
 int pk_count(const Board & b, const Square s) {
 
-    // TODO: misses pawns on same rank
-    //          rethink needed
-    //      (8/5ppk/p2q3p/1p6/1P4N1/P4Q1P/4R1K1/1r6 b - - 7 34)
-
     int score = 0;
     int x = get_x(s);
     int y = get_y(s);
@@ -269,7 +265,3 @@ float king_exposure_metric(const Board & b) {
     return (((float)one_king_exposure(b, wking)) + ((float)one_king_exposure(b, bking))) / 6.0f;
 
 }
-
-
-// TODO attacking pieces vs defending pieces
-

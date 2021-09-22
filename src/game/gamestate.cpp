@@ -32,7 +32,7 @@ Bitmap g_attack_map(const Gamestate & g, bool friendly) {
     Bitmap map = friendly ? g.foccupy : g.eoccupy;
     for (Bitmap pos = 1; pos != 0; pos <<= 1) {
         if (pos & map) {
-            attack |= pos; // TODO: implement better attack_map
+            attack |= pos;
         }
     }
     return attack;
@@ -47,10 +47,6 @@ void Gamestate::recalculate_attacks() {
 }
 
 void Gamestate::recalculate_positions() {
-    
-    // TODO: commented out to avoid unused variable warnings
-    // Ptype fcolour = board.colour_to_move();
-    // Ptype ecolour = fcolour == WHITE ? BLACK : WHITE;    
 
     vacancy = occupancy = foccupy = eoccupy = 0;
     kings = queens = bishops = knights = rooks = pawns = 0;

@@ -430,7 +430,6 @@ Board Board::successor(const Move m) const {
 }
 
 Board Board::successor_hard(const Move m) const {
-    // TODO stub
     Move m2 = m;
     m2.set_cas();
     return starting_pos();

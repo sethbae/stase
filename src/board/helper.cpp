@@ -84,7 +84,6 @@ string ptos_alg(Piece p) {
 /***** Move to SAN and SAN to move *****/
 
 Move stom(const string san) {
-    // TODO needs to be able to find where the piece is coming from given its destination
     san.size();
     Move m = {0, 0, 0};
     return m;
@@ -92,8 +91,7 @@ Move stom(const string san) {
 
 /* accepts a move and the board it belongs to; whether or not the move has already been made */
 string mtos(const Board & b, const Move m) {
-    // TODO doesn't do disambiguations
-    
+
     if (m.from == empty_move().from && m.to == empty_move().to)
         return "empty move";
     if (m.from == m.to)
@@ -282,8 +280,7 @@ string board_to_fen(const Board & b) {
 }
 
 // read PGN into a vector of the moves (still just as strings)
-vector<string> readpgn(const string & s) {
-    // TODO stub
+vector<string> read_pgn(const string & s) {
     vector<string> v;
     v.push_back(s);
     return v;
@@ -426,7 +423,6 @@ void wr_board_conf(const Board & b, ostream & output) {
 }
 
 /* prints the binary data of a bitmap in a chess board grid */
-// I changed this a bit but it's still wrong
 void wr_bitmap(const Bitmap map, ostream & output) {
     
     uint64_t mask = ( ((uint64_t) 1) << 63);
@@ -479,7 +475,6 @@ void pr_board_conf(const Board & b) {
 }
 
 /* prints the binary data of a bitmap in a chess board grid */
-// I changed this a bit but it's still wrong
 void pr_bitmap(const Bitmap map) {
     wr_bitmap(map, cout);
 }

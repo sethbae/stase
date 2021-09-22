@@ -156,7 +156,7 @@ Board empty_board();
 Board starting_pos();
 Board fen_to_board(const std::string & fen);
 std::string board_to_fen(const Board &);
-std::vector<std::string> readpgn(const std::string &);
+std::vector<std::string> read_pgn(const std::string &s);
 
 
 /* get moves for a piece or position */

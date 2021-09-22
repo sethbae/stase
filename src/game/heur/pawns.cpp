@@ -79,8 +79,6 @@ float isolated_pawns_metric(const Board & b) {
 
     int score = 0;
 
-    // TODO this is unlikely to be efficient
-
     // true indicates that black/white has a pawn in that file
     bool wpawns[8] = { false, false, false, false, false, false, false, false };
     bool bpawns[8] = { false, false, false, false, false, false, false, false };

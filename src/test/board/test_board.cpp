@@ -360,8 +360,6 @@ bool test_in_check() {
 }
 
 bool test_castling() {
-    
-    // TODO stub
 
     //"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
     //"r3k2r/8/8/8/8/8/8/R3KN1R w KQkq - 0 1"

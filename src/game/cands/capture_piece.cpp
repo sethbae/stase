@@ -4,12 +4,6 @@
 
 void capture_piece(const Board & b, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
-    /*
-     * TODO:
-     *  - early exit based on the value seen compared to the min_w/b of the capturing side
-     *  - careful tho, make sure to be correct
-     */
-
     const Square s = ff->centre;
     const int local_reset_point = counter.idx();
     const Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;

@@ -62,8 +62,6 @@ bool black_is_mated(const Eval eval) {
 float human_eval(const int eval) {
 
     /*
-    // if it represents a mate, return some semi-meaningful float
-    // TODO: infinity? NaN?
     if (white_is_mated(eval))
         return MIN_EVAL - 1;
     if (black_is_mated(eval))

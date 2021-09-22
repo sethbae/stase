@@ -68,8 +68,7 @@ bool read_all_fens(vector<string> & vec) {
     
     file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
-        cout << "WARNING: could not read puzzle csv2\n";
-        // TODO if not present, prompt and download!
+        cout << "WARNING: could not read puzzle csv\n";
         return false;
     }
     

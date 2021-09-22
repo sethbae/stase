@@ -183,7 +183,6 @@ Bitmap knight_moves(const Board & b, const Square s) {
 
 }
 
-// TODO: add castling
 Bitmap king_moves(const Board & b, const Square s) {
     
     Bitmap bmap = 0;
@@ -1026,12 +1025,10 @@ bool in_check_attack_map(const Board & b, Ptype c) {
  ************************************************************************/
 
 void legal_piecemoves(const Board & b, const Square s, vector<Move> & moves) {
-    // TODO stub
     b.get(s); moves.size();
 }
 
 Bitmap legal_piecemoves(const Board & b, const Square s) {
-    // TODO stub
     b.get(s);
     return (Bitmap) 0;
 }

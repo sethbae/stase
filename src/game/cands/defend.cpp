@@ -2,15 +2,6 @@
 #include "cands.h"
 #include "game.h"
 
-#include <iostream>
-using std::cout;
-
-/**
- * TODO
- *  - discovered defences not supported
- *  - don't defend using unsafe squares
- */
-
 /*
  * Checks whether the two ints are both greater than zero, both less than zero,
  * or both equal to zero.
