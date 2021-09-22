@@ -12,6 +12,7 @@ set(SOURCE_FILES
         src/board/helper.cpp
         src/board/move.cpp
         src/board/square.cpp
+        src/board/piece.cpp
 
         src/display/display.cpp
 
