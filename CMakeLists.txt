@@ -52,10 +52,12 @@ set(SCRATCH_SOURCE_FILES
 
 set(BENCH_SOURCE_FILES
         src/bench/bench.h
-        src/bench/bench_game.cpp
-        src/bench/bench_board.cpp
+        src/bench/game/bench_game.cpp
+        src/bench/board/bench_board.cpp
         src/bench/bench_main.cpp
-        src/bench/bench.cpp)
+        src/bench/bench.cpp
+        src/bench/game/cands/bench_cands.cpp
+        src/bench/game/heur/bench_heur.cpp)
 
 set(TEST_SOURCE_FILES
         src/test/test.h
