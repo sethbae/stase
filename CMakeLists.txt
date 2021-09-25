@@ -40,7 +40,9 @@ set(SOURCE_FILES
         src/game/cands/defend.cpp
         src/game/cands/capture_piece.cpp
         src/game/cands/development_hook.cpp
-        src/game/cands/develop_piece.cpp)
+        src/game/cands/develop_piece.cpp
+
+        src/utils/utils.h src/utils/print.cpp)
 
 set(STASE_SOURCE_FILES
         src/main.cpp)
@@ -52,7 +54,8 @@ set(BENCH_SOURCE_FILES
         src/bench/bench.h
         src/bench/bench_game.cpp
         src/bench/bench_board.cpp
-        src/bench/bench_main.cpp)
+        src/bench/bench_main.cpp
+        src/bench/bench.cpp)
 
 set(TEST_SOURCE_FILES
         src/test/test.h
