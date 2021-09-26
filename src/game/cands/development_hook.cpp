@@ -8,11 +8,9 @@ const Ptype BACK_RANK[] = {
 
 /**
  * Checks if the given square contains an undeveloped piece.
- * @param secondary unused
- * @param conf_1 unused
- * @param conf_2 unused
+ * @param ff the feature frame to record details in, if so.
  */
-bool development_hook(const Board & b, Square centre, Square * secondary, int * conf_1, int * conf_2) {
+bool development_hook(const Board & b, Square centre, FeatureFrame * ff) {
     if (get_y(centre) == 0 || get_y(centre) == 7) {
         return type(b.get(centre)) == BACK_RANK[get_x(centre)];
     } else {

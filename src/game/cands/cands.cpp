@@ -19,17 +19,14 @@ const int NUM_FEATURES = 10;
  */
 void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frames_ptr) {
 
-    Square hits[64];
-    Square secondaries[64];
-    int min_ws[64];
-    int min_bs[64];
+    FeatureFrame frames[64];
 
     int i = 0;
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if ((*hook)(b, mksq(x, y), &secondaries[i], &min_ws[i], &min_bs[i])) {
-                hits[i++] = mksq(x, y);
+            if ((*hook)(b, mksq(x, y), &frames[i])) {
+                frames[i++].centre = mksq(x, y);
             }
         }
     }
@@ -37,7 +34,7 @@ void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frame
     *frames_ptr = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
 
     for (int j = 0; j < i; ++j) {
-        (*frames_ptr)[j] = FeatureFrame{hits[j], secondaries[i], min_ws[j], min_bs[j]};
+        (*frames_ptr)[j] = frames[j];
     }
     (*frames_ptr)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
 

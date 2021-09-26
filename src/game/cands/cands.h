@@ -59,7 +59,7 @@ struct IndexCounter {
     }
 };
 
-typedef bool (Hook)(const Board &, Square centre, Square * secondary, int * conf_1, int * conf_2);
+typedef bool (Hook)(const Board &, Square centre, FeatureFrame * ff);
 typedef void (Responder)(const Board &, const FeatureFrame *, Move *, IndexCounter & move_counter);
 
 void discover_feature_frames(const Board &, Hook *, FeatureFrame **);

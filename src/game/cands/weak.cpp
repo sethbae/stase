@@ -10,7 +10,7 @@ using std::cout;
  * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
-bool capture_walk(const Board & b, Square s, int * record_min_w, int * record_min_b) {
+bool capture_walk(const Board & b, Square s, FeatureFrame * ff) {
 
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
@@ -133,8 +133,8 @@ bool capture_walk(const Board & b, Square s, int * record_min_w, int * record_mi
     }
 
     // record the minimum black and white values
-    *record_min_w = min_value_w;
-    *record_min_b = min_value_b;
+    ff->conf_1 = min_value_w;
+    ff->conf_2 = min_value_b;
 
     //cout << "Balance: " << balance
     //     << "\nMin white: " << min_value_w
@@ -153,12 +153,13 @@ bool capture_walk(const Board & b, Square s, int * record_min_w, int * record_mi
  * - a piece on a square which the enemy have more control over.
  * - a piece threatened by a less valuable piece.
  *
+ * Records in conf_1 the value of the least valuable white piece attacking the square
+ * Records in conf_2 the value of the least valuable black piece attacking the square
+ *
  * @param b the board
  * @param centre the square to look at
- * @param secondary not used
- * @param min_w the value of the least valuable white piece controlling the square
- * @param min_b the value of the least valuable black piece controlling the square
+ * @param ff the feature frame to record in, if true
  */
-bool weak_hook(const Board & b, Square centre, Square * secondary, int * min_w, int * min_b) {
-    return capture_walk(b, centre, min_w, min_b);
+bool weak_hook(const Board & b, Square centre, FeatureFrame * ff) {
+    return capture_walk(b, centre, ff);
 }
