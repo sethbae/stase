@@ -13,41 +13,17 @@ using std::setw;
 #include "../../bench.h"
 
 void bench_heuristic_evaluation() {
-
     cout << "Benching heuristic evaluation\n";
-
-    vector<string> vec;
-    retrieve_all_puzzle_fens(vec);
-
-    // initialise all boards
-    Gamestate *states = new Gamestate[vec.size()];
-    for (int i = 0; i < vec.size(); ++i) {
-        states[i].board = fen_to_board(vec[i]);
-    }
-
-    bench("heur", MICROS, states, vec.size(), heur);
-
-    delete[] states;
-
+    vector<Gamestate> gamestates;
+    puzzle_gamestates(gamestates);
+    bench("heur", MICROS, gamestates.data(), gamestates.size(), heur);
 }
 
 double bench_metric(Metric *m, const string &name) {
-
-    vector<string> vec;
-    read_all_fens(vec);
-
-    // initialise all boards
-    Board *states = new Board[vec.size()];
-    for (int i = 0; i < vec.size(); ++i) {
-        states[i] = fen_to_board(vec[i]);
-    }
-
-    double time = bench(name, MICROS, states, vec.size(), m);
-
-    delete[] states;
-
+    vector<Board> boards;
+    puzzle_boards(boards);
+    double time = bench(name, MICROS, boards.data(), boards.size(), m);
     return time;
-
 }
 
 void bench_individual_metrics() {
