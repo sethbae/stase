@@ -98,7 +98,7 @@ bool evaluate_test_case_weak_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    discover_feature_frames(gs.board, &weak_hook, &gs.feature_frames[0]);
+    discover_feature_frames(gs, &weak, 0);
 
     std::vector<std::string> strings;
 

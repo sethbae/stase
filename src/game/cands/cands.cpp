@@ -7,9 +7,6 @@ using std::vector;
 #include <iostream>
 using std::cout;
 
-// TODO use hooks array, rename
-const int NUM_FEATURES = 10;
-
 /**
  * Runs the given hook over every square on the board and records any successes in feature frames.
  *
@@ -17,7 +14,7 @@ const int NUM_FEATURES = 10;
  * @param hook the predicate.
  * @param idx the index of the hook
  */
-void discover_feature_frames(const Gamestate & gs, Hook * hook, int idx) {
+void discover_feature_frames(const Gamestate & gs, const Hook * hook, const int idx) {
 
     FeatureFrame frames[64];
 
@@ -25,7 +22,7 @@ void discover_feature_frames(const Gamestate & gs, Hook * hook, int idx) {
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if ((*hook)(gs.board, mksq(x, y), &frames[i])) {
+            if (hook->hook(gs.board, mksq(x, y), &frames[i])) {
                 frames[i++].centre = mksq(x, y);
             }
         }

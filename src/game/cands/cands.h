@@ -6,7 +6,6 @@
 
 const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
-extern const int NUM_FEATURES;
 
 struct FeatureFrame {
     Square centre;
@@ -59,41 +58,44 @@ struct IndexCounter {
     }
 };
 
-typedef bool (Hook)(const Board &, Square centre, FeatureFrame * ff);
+struct Hook {
+    const std::string name;
+    const int id;
+    bool (*hook)(const Board &, Square centre, FeatureFrame * ff);
+};
+
 typedef void (Responder)(const Board &, const FeatureFrame *, Move *, IndexCounter & move_counter);
 
-void discover_feature_frames(const Gamestate &, Hook *, int);
+void discover_feature_frames(const Gamestate &, const Hook *, const int);
 
 struct FeatureHandler {
-    Hook * hook;
+    const Hook * hook;
     const std::vector<Responder *> friendly_responses;
     const std::vector<Responder *> enemy_responses;
 };
 
-Hook weak_hook;
-Hook development_hook;
+bool weak_hook(const Board &, Square, FeatureFrame *);
+bool development_hook(const Board &, Square, FeatureFrame *);
+
+const Hook weak = Hook{"weak", 0, &weak_hook};
+const Hook develop = Hook{"development", 1, &development_hook};
 Responder defend_square;
 Responder capture_piece;
 Responder develop_piece;
 
-const std::vector<Hook *> ALL_HOOKS {
-        &weak_hook,
-        &development_hook
-};
-
-const std::vector<std::string> HOOK_NAMES {
-        "weak-hook",
-        "development-hook"
+const std::vector<Hook> ALL_HOOKS {
+        weak,
+        develop
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
         FeatureHandler{
-          &development_hook,
+          &develop,
           { &develop_piece },
           { }
         },
         FeatureHandler{
-            &weak_hook,
+            &weak,
             { &defend_square },
             { &capture_piece }
         }

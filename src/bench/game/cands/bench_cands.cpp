@@ -12,8 +12,8 @@ using std::setw;
 #include "../../bench.h"
 
 struct BenchHookParam {
-    Hook * h;
-    Board b;
+    const Hook * h;
+    const Board b;
 };
 
 bool run_hook(const BenchHookParam & b_h_p) {
@@ -27,7 +27,7 @@ bool run_hook(const BenchHookParam & b_h_p) {
     return frame_count;
 }
 
-void bench_hook(Hook * h, string name) {
+void bench_hook(const Hook * h) {
 
     vector<Board> boards;
     puzzle_boards(boards);
@@ -37,7 +37,7 @@ void bench_hook(Hook * h, string name) {
         params.push_back(BenchHookParam{h, b});
     }
 
-    bench(name, MICROS, params.data(), params.size(), &run_hook);
+    bench(h->name, MICROS, params.data(), params.size(), &run_hook);
 
 }
 
@@ -46,7 +46,7 @@ void bench_individual_hooks() {
     cout << "Benching individual hooks\n";
 
     for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-        bench_hook(ALL_HOOKS[i], HOOK_NAMES[i]);
+        bench_hook(&ALL_HOOKS[i]);
     }
 }
 

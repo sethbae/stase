@@ -22,7 +22,7 @@ const int YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
  * Allocates memory for all the fields in a gamestate which need it.
  */
 void alloc(Gamestate * gs) {
-    gs->feature_frames = new FeatureFrame*[NUM_FEATURES];
+    gs->feature_frames = new FeatureFrame*[ALL_HOOKS.size()];
     gs->wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
 }
