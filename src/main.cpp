@@ -25,7 +25,7 @@ void manual_gameplay() {
         legal_moves(b, moves);
 
         for (Move m : moves) {
-            cout << movetosan(b, m) << " ";
+            cout << mtos(b, m) << " ";
         }
         cout << "\n\n";
 
@@ -40,7 +40,7 @@ void manual_gameplay() {
             cin >> userIn;
 
             for (Move m : moves) {
-                if (movetosan(b, m) == userIn) {
+                if (mtos(b, m) == userIn) {
                     player_move = m;
                     valid_move = true;
                     break;
