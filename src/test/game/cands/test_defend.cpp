@@ -156,7 +156,7 @@ const TestSet<ResponderTestCase> defend_test_set = {
 
 
 bool evaluate_test_case_defend(const ResponderTestCase *tc) {
-    return evaluate_responder_test_case(&defend_square, tc);
+    return evaluate_responder_test_case(&defend, tc);
 }
 
 void test_defend_square() {

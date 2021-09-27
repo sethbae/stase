@@ -64,24 +64,33 @@ struct Hook {
     bool (*hook)(const Board &, Square centre, FeatureFrame * ff);
 };
 
-typedef void (Responder)(const Board &, const FeatureFrame *, Move *, IndexCounter & move_counter);
+struct Responder {
+    const std::string name;
+    const int id;
+    void (*resp)(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+};
 
 void discover_feature_frames(const Gamestate &, const Hook *, const int);
 
 struct FeatureHandler {
     const Hook * hook;
-    const std::vector<Responder *> friendly_responses;
-    const std::vector<Responder *> enemy_responses;
+    const std::vector<const Responder *> friendly_responses;
+    const std::vector<const Responder *> enemy_responses;
 };
 
 bool weak_hook(const Board &, Square, FeatureFrame *);
 bool development_hook(const Board &, Square, FeatureFrame *);
 
+void defend_square(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+void capture_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+void develop_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+
 const Hook weak = Hook{"weak", 0, &weak_hook};
 const Hook develop = Hook{"development", 1, &development_hook};
-Responder defend_square;
-Responder capture_piece;
-Responder develop_piece;
+
+const Responder defend = Responder{"defend", 0, &defend_square};
+const Responder capture = Responder{"capture", 0, &capture_piece};
+const Responder develop_resp = Responder{"develop", 0, &develop_piece};
 
 const std::vector<Hook> ALL_HOOKS {
         weak,
@@ -91,13 +100,13 @@ const std::vector<Hook> ALL_HOOKS {
 const std::vector<FeatureHandler> feature_handlers = {
         FeatureHandler{
           &develop,
-          { &develop_piece },
+          { &develop_resp },
           { }
         },
         FeatureHandler{
             &weak,
-            { &defend_square },
-            { &capture_piece }
+            { &defend },
+            { &capture }
         }
 };
 

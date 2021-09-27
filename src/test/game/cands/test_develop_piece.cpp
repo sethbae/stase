@@ -137,7 +137,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
 };
 
 bool evaluate_develop_test_case(const ResponderTestCase * tc) {
-    return evaluate_responder_test_case(&develop_piece, tc);
+    return evaluate_responder_test_case(&develop_resp, tc);
 }
 
 void test_develop_piece() {

@@ -59,13 +59,13 @@ vector<Move> cands(const Gamestate & gs) {
             FeatureFrame ff = gs.feature_frames[i][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
-            std::vector<Responder *> responders =
+            std::vector<const Responder *> responders =
                     (gs.board.get_white() == centre_piece_is_white)
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
             for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
-                (*responders[k])(gs.board, &ff, moves, counter);
+                responders[k]->resp(gs.board, &ff, moves, counter);
             }
 
             if (!counter.has_space()) {

@@ -70,7 +70,7 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 }
 
-inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase * tc) {
+inline bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCase * tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
     Move moves[MAX_MOVES_PER_HOOK];
@@ -78,7 +78,7 @@ inline bool evaluate_responder_test_case(Responder resp, const ResponderTestCase
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
-        resp(gs.board, &ff, &moves[0], move_counter);
+        resp->resp(gs.board, &ff, &moves[0], move_counter);
     }
 
     // convert the output to a vector of strings
