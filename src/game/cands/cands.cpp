@@ -49,14 +49,15 @@ vector<Move> cands(const Gamestate & gs) {
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
         counter.add_allowance(MAX_MOVES_PER_HOOK);
+        int this_handler_start_point = counter.idx();
 
         // run the predicate over the board
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; gs.feature_frames[i][j].centre != SQUARE_SENTINEL; ++j) {
+        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
 
-            FeatureFrame ff = gs.feature_frames[i][j];
+            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
             std::vector<const Responder *> responders =
@@ -74,7 +75,7 @@ vector<Move> cands(const Gamestate & gs) {
         }
 
         // add moves not yet present
-        for (int j = 0; j < counter.idx(); ++j) {
+        for (int j = this_handler_start_point; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if ((all_moves[k].from == moves[j].from)
@@ -92,11 +93,118 @@ vector<Move> cands(const Gamestate & gs) {
 
     }
 
-//    pr_board(gs.board);
-//    cout << "Candidates generated:\n";
+    pr_board(gs.board);
+    cout << "Candidates generated:\n";
     vector<Move> vec;
     for (int j = 0; j < m; ++j) {
-        // cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
+        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
+        vec.push_back(all_moves[j]);
+    }
+
+    return vec;
+
+}
+
+/**
+ * Generates candidate moves for the gamestate, while printing information to stdout.
+ * Useful for debugging (keep up to date with real implementation).
+ */
+vector<Move> cands_report(const Gamestate & gs) {
+
+    cout << "********************************\n"
+            "* Generating candidate moves\n"
+            "********************************\n\n";
+
+    pr_board_conf(gs.board);
+
+    IndexCounter counter(MAX_TOTAL_CANDS);
+    Move all_moves[MAX_TOTAL_CANDS];
+    int m = 0;
+
+    for (int i = 0; i < feature_handlers.size(); ++i) {
+
+        FeatureHandler fh = feature_handlers[i];
+        Move moves[MAX_MOVES_PER_HOOK];
+        counter.add_allowance(MAX_MOVES_PER_HOOK);
+        int this_handler_start_point = counter.idx();
+
+        std::string friends = "";
+        std::string enems = "";
+        for (const Responder * r : fh.friendly_responses) { friends = friends + " " + r->name; }
+        for (const Responder * r : fh.friendly_responses) { enems = enems + " " + r->name; }
+        cout << "\n***** Feature handler " << i << "\n";
+        cout << "* Hook: " << fh.hook->name << "\n";
+        cout << "* Friendly:" << friends << "\n";
+        cout << "* Enemy:" << enems << "\n";
+
+        // run the predicate over the board
+        discover_feature_frames(gs, fh.hook);
+
+        cout << "\nFound frames:\n";
+        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
+            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
+            cout << "Centre: " << sqtos(ff.centre) << " Second: " << sqtos(ff.secondary) << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
+        }
+        cout << "\n\n";
+
+        // for each feature frame, run either enemy or friendly responders over it
+        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
+
+            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
+            bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
+
+            cout << "Looking at frame " << j << " (" << sqtos(ff.centre) << ", " << sqtos(ff.secondary) << "):\n";
+
+            std::vector<const Responder *> responders =
+                    (gs.board.get_white() == centre_piece_is_white)
+                    ? fh.friendly_responses
+                    : fh.enemy_responses;
+
+            for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
+                cout << "   Applying " << responders[k]->name << "\n";
+                int prev_num = counter.idx();
+
+                responders[k]->resp(gs.board, &ff, moves, counter);
+
+                if (counter.idx() > prev_num) {
+                    for (int l = prev_num; l < counter.idx(); ++l) {
+                        cout << "      " << mtos(gs.board, moves[l]) << "\n";
+                    }
+                } else {
+                    cout << "      No moves\n";
+                }
+            }
+
+            if (!counter.has_space()) {
+                break;
+            }
+        }
+
+        // add moves not yet present
+        for (int j = this_handler_start_point; j < counter.idx(); ++j) {
+            bool present = false;
+            for (int k = 0; k < m; ++k) {
+                if ((all_moves[k].from == moves[j].from)
+                    && (all_moves[k].to == moves[j].to)) {
+                    present = true;
+                    break;
+                }
+            }
+            if (!present && m < MAX_TOTAL_CANDS) {
+                cout << "   Confirming " << mtos(gs.board, moves[j]) << "\n";
+                all_moves[m++] = moves[j];
+            } else if (m >= MAX_TOTAL_CANDS) {
+                break;
+            }
+        }
+
+    }
+
+    pr_board(gs.board);
+    cout << "Candidates generated:\n";
+    vector<Move> vec;
+    for (int j = 0; j < m; ++j) {
+        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << " (" << mtos(gs.board, all_moves[j]) << ")\n";
         vec.push_back(all_moves[j]);
     }
 

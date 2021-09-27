@@ -143,6 +143,7 @@ int heur_with_description(const Gamestate &);
 
 // candidate moves
 std::vector<Move> cands(const Gamestate &);
+std::vector<Move> cands_report(const Gamestate &);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);
