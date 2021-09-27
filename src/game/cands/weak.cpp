@@ -160,6 +160,6 @@ bool capture_walk(const Board & b, Square s, FeatureFrame * ff) {
  * @param centre the square to look at
  * @param ff the feature frame to record in, if true
  */
-bool is_weak_square(const Board & b, Square centre, FeatureFrame * ff) {
-    return capture_walk(b, centre, ff);
+bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
+    return capture_walk(gs.board, centre, ff);
 }

@@ -61,13 +61,13 @@ struct IndexCounter {
 struct Hook {
     const std::string name;
     const int id;
-    bool (*hook)(const Board &, Square centre, FeatureFrame * ff);
+    bool (*hook)(const Gamestate &, Square centre, FeatureFrame * ff);
 };
 
 struct Responder {
     const std::string name;
     const int id;
-    void (*resp)(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+    void (*resp)(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 };
 
 void discover_feature_frames(const Gamestate &, const Hook *);
@@ -79,13 +79,13 @@ struct FeatureHandler {
 };
 
 // functions used by hooks
-bool is_weak_square(const Board &, Square, FeatureFrame *);
-bool is_undeveloped_piece(const Board &, Square, FeatureFrame *);
+bool is_weak_square(const Gamestate &, Square, FeatureFrame *);
+bool is_undeveloped_piece(const Gamestate &, Square, FeatureFrame *);
 
 // functions used by responders
-void defend_square(const Board &, const FeatureFrame *, Move *, IndexCounter &);
-void capture_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
-void develop_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
+void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
 const Hook weak_hook = Hook{"weak", 0, &is_weak_square};

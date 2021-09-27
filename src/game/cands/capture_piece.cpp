@@ -2,9 +2,10 @@
 #include "cands.h"
 #include "game.h"
 
-void capture_piece(const Board & b, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
     const Square s = ff->centre;
+    const Board & b = gs.board;
     const int local_reset_point = counter.idx();
     const Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
     const int weakest_defender = (capturing_colour == WHITE) ? ff->conf_2 : ff->conf_1;
