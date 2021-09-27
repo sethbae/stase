@@ -93,11 +93,8 @@ vector<Move> cands(const Gamestate & gs) {
 
     }
 
-    pr_board(gs.board);
-    cout << "Candidates generated:\n";
     vector<Move> vec;
     for (int j = 0; j < m; ++j) {
-        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
         vec.push_back(all_moves[j]);
     }
 
