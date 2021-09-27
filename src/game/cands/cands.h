@@ -1,6 +1,7 @@
 #ifndef STASE_CANDS_H
 #define STASE_CANDS_H
 
+#include "game.h"
 #include "board.h"
 
 const int MAX_TOTAL_CANDS = 10;
@@ -61,7 +62,7 @@ struct IndexCounter {
 typedef bool (Hook)(const Board &, Square centre, FeatureFrame * ff);
 typedef void (Responder)(const Board &, const FeatureFrame *, Move *, IndexCounter & move_counter);
 
-void discover_feature_frames(const Board &, Hook *, FeatureFrame **);
+void discover_feature_frames(const Gamestate &, Hook *, int);
 
 struct FeatureHandler {
     Hook * hook;

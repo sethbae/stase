@@ -12,13 +12,12 @@ const int NUM_FEATURES = 10;
 
 /**
  * Runs the given hook over every square on the board and records any successes in feature frames.
- * The frames are written in an array, a pointer to which is put at the given address.
  *
- * @param b the board.
+ * @param gs the gamestate.
  * @param hook the predicate.
- * @param frames_ptr where to put the pointer to the results.
+ * @param idx the index of the hook
  */
-void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frames_ptr) {
+void discover_feature_frames(const Gamestate & gs, Hook * hook, int idx) {
 
     FeatureFrame frames[64];
 
@@ -26,22 +25,22 @@ void discover_feature_frames(const Board & b, Hook * hook, FeatureFrame ** frame
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if ((*hook)(b, mksq(x, y), &frames[i])) {
+            if ((*hook)(gs.board, mksq(x, y), &frames[i])) {
                 frames[i++].centre = mksq(x, y);
             }
         }
     }
 
-    *frames_ptr = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
+    gs.feature_frames[idx] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
 
     for (int j = 0; j < i; ++j) {
-        (*frames_ptr)[j] = frames[j];
+        gs.feature_frames[idx][j] = frames[j];
     }
-    (*frames_ptr)[i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+    gs.feature_frames[idx][i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
 
 }
 
-vector<Move> cands(const Gamestate &gs) {
+vector<Move> cands(const Gamestate & gs) {
 
     IndexCounter counter(MAX_TOTAL_CANDS);
 
@@ -55,11 +54,11 @@ vector<Move> cands(const Gamestate &gs) {
         counter.add_allowance(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
-        // TODO change signature
-        discover_feature_frames(gs.board, fh.hook, &gs.feature_frames[i]);
+        discover_feature_frames(gs, fh.hook, i);
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[i][j].centre != SQUARE_SENTINEL; ++j) {
+
             FeatureFrame ff = gs.feature_frames[i][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
@@ -94,7 +93,6 @@ vector<Move> cands(const Gamestate &gs) {
             }
         }
 
-        ++i;
     }
 
 //    pr_board(gs.board);

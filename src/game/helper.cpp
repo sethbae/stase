@@ -3,6 +3,7 @@ using std::cout;
 
 #include "board.h"
 #include "heur/heur.h"
+#include "cands/cands.h"
 
 /*
  * print out a little grid of the control counts for each square

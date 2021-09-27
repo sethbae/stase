@@ -8,7 +8,7 @@ using std::string;
 using std::setw;
 
 #include "game.h"
-#include "../../../game/heur/heur.h"
+#include "../../../game/cands/cands.h"
 #include "../../bench.h"
 
 struct BenchHookParam {
@@ -18,7 +18,7 @@ struct BenchHookParam {
 
 bool run_hook(const BenchHookParam & b_h_p) {
     Gamestate gs(b_h_p.b);
-    discover_feature_frames(gs.board, b_h_p.h, &gs.feature_frames[0]);
+    discover_feature_frames(gs, b_h_p.h, 0);
 
     // count the feature frames and return that
     int frame_count = 0;

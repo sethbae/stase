@@ -2,7 +2,6 @@
 #define STASE_GAME_H
 
 #include "board.h"
-#include "../../src/game/cands/cands.h"
 
 enum MoveType {
     ORTHO = 0,
@@ -57,6 +56,9 @@ inline bool can_move_in_direction(Piece piece, MoveType dir) {
     return PIECE_MOVE_TYPES[piece][dir];
 }
 bool can_move_to_square(const Board &, Square from, Square to);
+
+// forward declaration: see cands.h
+struct FeatureFrame;
 
 struct Gamestate {
 
