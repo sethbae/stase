@@ -90,10 +90,6 @@ inline double bench(std::string name, BenchUnit u, const T * data, int n, V (*fu
 
 }
 
-void retrieve_all_puzzle_fens(std::vector<std::string> &);
-void puzzle_gamestates(std::vector<Gamestate> &);
-void puzzle_boards(std::vector<Board> &);
-
 int bench_board();
 int bench_game();
 

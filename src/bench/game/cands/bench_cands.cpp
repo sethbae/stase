@@ -10,6 +10,7 @@ using std::setw;
 #include "game.h"
 #include "../../../game/cands/cands.h"
 #include "../../bench.h"
+#include "puzzle.h"
 
 /* bench hooks individually */
 

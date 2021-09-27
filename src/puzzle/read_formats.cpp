@@ -1,7 +1,8 @@
 #include <vector>
 #include <string>
 
-#include "bench.h"
+#include "board.h"
+#include "game.h"
 #include "puzzle.h"
 
 /**

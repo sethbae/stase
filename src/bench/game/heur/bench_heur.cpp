@@ -10,6 +10,7 @@ using std::setw;
 #include "game.h"
 #include "../../../game/heur/heur.h"
 #include "../../bench.h"
+#include "puzzle.h"
 
 void bench_heuristic_evaluation() {
     cout << "Benching heuristic evaluation\n";

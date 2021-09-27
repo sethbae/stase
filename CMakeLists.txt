@@ -31,6 +31,7 @@ set(SOURCE_FILES
         src/game/heur/king.cpp
 
         src/puzzle/puzzle.cpp
+        src/puzzle/read_formats.cpp
 
         src/search/search.cpp
 
@@ -44,24 +45,19 @@ set(SOURCE_FILES
 
         src/utils/utils.h src/utils/print.cpp)
 
-set(STASE_SOURCE_FILES
-        src/main.cpp)
+set(STASE_SOURCE_FILES)
 
-set(SCRATCH_SOURCE_FILES
-        scratch.cpp)
+set(SCRATCH_SOURCE_FILES)
 
 set(BENCH_SOURCE_FILES
         src/bench/bench.h
         src/bench/game/bench_game.cpp
         src/bench/board/bench_board.cpp
-        src/bench/bench_main.cpp
-        src/bench/bench.cpp
         src/bench/game/cands/bench_cands.cpp
         src/bench/game/heur/bench_heur.cpp)
 
 set(TEST_SOURCE_FILES
         src/test/test.h
-        src/test/test_main.cpp
         src/test/board/test_board.cpp
         src/test/game/test_game.cpp
         src/test/test_helpers.cpp
@@ -70,14 +66,20 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_weak_hook.cpp
         src/test/game/cands/test_defend.cpp
         src/test/game/cands/test_development_hook.cpp
-        src/test/game/cands/test_develop_piece.cpp)
+        src/test/game/cands/test_develop_piece.cpp
+        src/test/game/cands/stress_test_cands.cpp)
+
+set(TEST_MAIN src/test/test_main.cpp)
+set(BENCH_MAIN src/bench/bench_main.cpp)
+set(SCRATCH_MAIN scratch.cpp)
+set(STASE_MAIN src/main.cpp)
 
 include_directories(include/stase)
 
-add_executable(stase ${SOURCE_FILES} ${STASE_SOURCE_FILES} ${SOURCES})
+add_executable(stase ${STASE_MAIN} ${SOURCE_FILES} ${STASE_SOURCE_FILES} ${SOURCES})
 
-add_executable(scratch ${SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
+add_executable(scratch ${SCRATCH_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${STASE_SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
 
-add_executable(bench ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
+add_executable(bench ${BENCH_MAIN} ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
 
-add_executable(test ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES})
+add_executable(test ${TEST_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES})
