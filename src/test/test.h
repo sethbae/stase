@@ -103,4 +103,7 @@ void test_beta_covers();
 void test_gamma_covers();
 void test_develop_piece();
 
+bool stress_test_individual_hook(std::vector<Gamestate> &, const Hook *);
+bool stress_test_cands(std::vector<Gamestate> &);
+
 #endif //STASE_TEST_H
