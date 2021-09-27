@@ -18,7 +18,7 @@ struct BenchHookParam {
 
 bool run_hook(const BenchHookParam & b_h_p) {
     Gamestate gs(b_h_p.b);
-    discover_feature_frames(gs, b_h_p.h, 0);
+    discover_feature_frames(gs, b_h_p.h);
 
     // count the feature frames and return that
     int frame_count = 0;

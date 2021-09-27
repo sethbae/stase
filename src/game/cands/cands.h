@@ -70,7 +70,7 @@ struct Responder {
     void (*resp)(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 };
 
-void discover_feature_frames(const Gamestate &, const Hook *, const int);
+void discover_feature_frames(const Gamestate &, const Hook *);
 
 struct FeatureHandler {
     const Hook * hook;
@@ -78,16 +78,20 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
+// functions used by hooks
 bool is_weak_square(const Board &, Square, FeatureFrame *);
 bool is_undeveloped_piece(const Board &, Square, FeatureFrame *);
 
+// functions used by responders
 void defend_square(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 void capture_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 void develop_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 
+// the actual hooks
 const Hook weak_hook = Hook{"weak", 0, &is_weak_square};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece};
 
+// the actual responders
 const Responder defend_resp = Responder{"defend", 0, &defend_square};
 const Responder capture_resp = Responder{"capture", 0, &capture_piece};
 const Responder develop_resp = Responder{"develop", 0, &develop_piece};

@@ -14,7 +14,7 @@ using std::cout;
  * @param hook the predicate.
  * @param idx the index of the hook
  */
-void discover_feature_frames(const Gamestate & gs, const Hook * hook, const int idx) {
+void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
     FeatureFrame frames[64];
 
@@ -28,12 +28,12 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook, const int 
         }
     }
 
-    gs.feature_frames[idx] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
+    gs.feature_frames[hook->id] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
 
     for (int j = 0; j < i; ++j) {
-        gs.feature_frames[idx][j] = frames[j];
+        gs.feature_frames[hook->id][j] = frames[j];
     }
-    gs.feature_frames[idx][i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+    gs.feature_frames[hook->id][i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
 
 }
 
@@ -51,7 +51,7 @@ vector<Move> cands(const Gamestate & gs) {
         counter.add_allowance(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
-        discover_feature_frames(gs, fh.hook, i);
+        discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[i][j].centre != SQUARE_SENTINEL; ++j) {

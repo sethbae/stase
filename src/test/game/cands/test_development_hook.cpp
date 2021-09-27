@@ -50,11 +50,11 @@ bool evaluate_test_case_development_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    discover_feature_frames(gs, &develop_hook, 0);
+    discover_feature_frames(gs, &develop_hook);
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame *ff = gs.feature_frames[0]; ff->centre != SQUARE_SENTINEL; ++ff) {
+    for (FeatureFrame *ff = gs.feature_frames[develop_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
         strings.push_back(sqtos(ff->centre));
     }
 
