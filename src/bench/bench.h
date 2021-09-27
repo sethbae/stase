@@ -101,6 +101,7 @@ void bench_individual_metrics();
 void bench_heuristic_evaluation();
 
 void bench_individual_hooks();
+void bench_individual_responders();
 void bench_cands();
 
 #endif //STASE_BENCH_H

@@ -96,9 +96,15 @@ const Responder defend_resp = Responder{"defend", 0, &defend_square};
 const Responder capture_resp = Responder{"capture", 0, &capture_piece};
 const Responder develop_resp = Responder{"develop", 0, &develop_piece};
 
-const std::vector<Hook> ALL_HOOKS {
-        weak_hook,
-        develop_hook
+const std::vector<const Hook *> ALL_HOOKS {
+        &weak_hook,
+        &develop_hook
+};
+
+const std::vector<const Responder *> ALL_RESPONDERS = {
+        &defend_resp,
+        &capture_resp,
+        &develop_resp
 };
 
 const std::vector<FeatureHandler> feature_handlers = {

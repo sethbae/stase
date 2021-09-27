@@ -125,6 +125,10 @@ int bench_game() {
 
     cout << "\n";
 
+    // bench_individual_responders();
+
+    // cout << "\n";
+
     bench_cands();
 
     return 0;
