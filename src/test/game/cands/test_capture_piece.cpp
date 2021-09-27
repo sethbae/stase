@@ -118,7 +118,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
 };
 
 bool evaluate_test_case_capture(const ResponderTestCase * tc) {
-    return evaluate_responder_test_case(&capture, tc);
+    return evaluate_responder_test_case(&capture_resp, tc);
 }
 
 void test_capture_piece() {

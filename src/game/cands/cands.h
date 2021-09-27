@@ -78,35 +78,35 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-bool weak_hook(const Board &, Square, FeatureFrame *);
-bool development_hook(const Board &, Square, FeatureFrame *);
+bool is_weak_square(const Board &, Square, FeatureFrame *);
+bool is_undeveloped_piece(const Board &, Square, FeatureFrame *);
 
 void defend_square(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 void capture_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 void develop_piece(const Board &, const FeatureFrame *, Move *, IndexCounter &);
 
-const Hook weak = Hook{"weak", 0, &weak_hook};
-const Hook develop = Hook{"development", 1, &development_hook};
+const Hook weak_hook = Hook{"weak", 0, &is_weak_square};
+const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece};
 
-const Responder defend = Responder{"defend", 0, &defend_square};
-const Responder capture = Responder{"capture", 0, &capture_piece};
+const Responder defend_resp = Responder{"defend", 0, &defend_square};
+const Responder capture_resp = Responder{"capture", 0, &capture_piece};
 const Responder develop_resp = Responder{"develop", 0, &develop_piece};
 
 const std::vector<Hook> ALL_HOOKS {
-        weak,
-        develop
+        weak_hook,
+        develop_hook
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
         FeatureHandler{
-          &develop,
+          &develop_hook,
           { &develop_resp },
           { }
         },
         FeatureHandler{
-            &weak,
-            { &defend },
-            { &capture }
+            &weak_hook,
+            { &defend_resp },
+            { &capture_resp }
         }
 };
 

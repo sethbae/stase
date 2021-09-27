@@ -50,7 +50,7 @@ bool evaluate_test_case_development_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    discover_feature_frames(gs, &develop, 0);
+    discover_feature_frames(gs, &develop_hook, 0);
 
     std::vector<std::string> strings;
 
