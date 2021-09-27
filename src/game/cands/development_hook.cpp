@@ -1,5 +1,4 @@
 #include "board.h"
-#include "game.h"
 #include "cands.h"
 
 const Ptype BACK_RANK[] = {

@@ -8,7 +8,6 @@ using std::string;
 using std::setw;
 
 #include "game.h"
-#include "puzzle.h"
 #include "../../../game/heur/heur.h"
 #include "../../bench.h"
 

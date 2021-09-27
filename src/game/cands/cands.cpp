@@ -7,6 +7,7 @@ using std::vector;
 #include <iostream>
 using std::cout;
 
+// TODO use hooks array, rename
 const int NUM_FEATURES = 10;
 
 /**
@@ -47,13 +48,14 @@ vector<Move> cands(const Gamestate &gs) {
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
-    int i = 0;
-    FeatureHandler fh;
-    while ((fh = feature_handlers[i]).hook != nullptr) {
+    for (int i = 0; i < feature_handlers.size(); ++i) {
+
+        FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
         counter.add_allowance(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
+        // TODO change signature
         discover_feature_frames(gs.board, fh.hook, &gs.feature_frames[i]);
 
         // for each feature frame, run either enemy or friendly responders over it
@@ -61,13 +63,13 @@ vector<Move> cands(const Gamestate &gs) {
             FeatureFrame ff = gs.feature_frames[i][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
-            Responder ** responders =
+            std::vector<Responder *> responders =
                     (gs.board.get_white() == centre_piece_is_white)
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
-            for (int k = 0; responders[k] != nullptr && counter.has_space(); ++k) {
-                (*responders[k])(gs.board, &ff, &moves[0], counter);
+            for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
+                (*responders[k])(gs.board, &ff, moves, counter);
             }
 
             if (!counter.has_space()) {
@@ -95,11 +97,11 @@ vector<Move> cands(const Gamestate &gs) {
         ++i;
     }
 
-    pr_board(gs.board);
-    cout << "Candidates generated:\n";
+//    pr_board(gs.board);
+//    cout << "Candidates generated:\n";
     vector<Move> vec;
     for (int j = 0; j < m; ++j) {
-        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
+        // cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << "\n";
         vec.push_back(all_moves[j]);
     }
 

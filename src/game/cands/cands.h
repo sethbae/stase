@@ -5,7 +5,6 @@
 
 const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
-const int MAX_RESPONDERS_PER_HOOK = 5;
 extern const int NUM_FEATURES;
 
 struct FeatureFrame {
@@ -66,8 +65,8 @@ void discover_feature_frames(const Board &, Hook *, FeatureFrame **);
 
 struct FeatureHandler {
     Hook * hook;
-    Responder * friendly_responses[MAX_RESPONDERS_PER_HOOK + 1];
-    Responder * enemy_responses[MAX_RESPONDERS_PER_HOOK + 1];
+    const std::vector<Responder *> friendly_responses;
+    const std::vector<Responder *> enemy_responses;
 };
 
 Hook weak_hook;
@@ -76,19 +75,26 @@ Responder defend_square;
 Responder capture_piece;
 Responder develop_piece;
 
-const FeatureHandler feature_handlers[] = {
+const std::vector<Hook *> ALL_HOOKS {
+        &weak_hook,
+        &development_hook
+};
+
+const std::vector<std::string> HOOK_NAMES {
+        "weak-hook",
+        "development-hook"
+};
+
+const std::vector<FeatureHandler> feature_handlers = {
         FeatureHandler{
           &development_hook,
-          { &develop_piece, nullptr },
-          { nullptr }
+          { &develop_piece },
+          { }
         },
         FeatureHandler{
             &weak_hook,
-            { &defend_square, nullptr },
-            { &capture_piece, nullptr }
-        },
-        FeatureHandler{  // sentinel
-            nullptr
+            { &defend_square },
+            { &capture_piece }
         }
 };
 
