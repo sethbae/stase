@@ -46,7 +46,7 @@ vector<Move> cands(const Gamestate & gs) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
-       IndexCounter counter(MAX_MOVES_PER_HOOK);
+        IndexCounter counter(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
         discover_feature_frames(gs, fh.hook);
