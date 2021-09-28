@@ -16,7 +16,6 @@ void stress_test_main() {
         stress_test_individual_hook(states, h);
     }
 
-    std::cout << "Stress testing candidates\n";
     stress_test_cands(states);
 
 }
