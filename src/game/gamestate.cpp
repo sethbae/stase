@@ -25,6 +25,11 @@ void alloc(Gamestate * gs) {
     gs->feature_frames = new FeatureFrame*[ALL_HOOKS.size()];
     gs->wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
+
+    // set all pointers to null
+    for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+        gs->feature_frames[i] = nullptr;
+    }
 }
 
 Gamestate::Gamestate() {
@@ -34,6 +39,38 @@ Gamestate::Gamestate() {
 Gamestate::Gamestate(const Board & b) : board(b) {
     alloc(this);
     recalculate_all();
+}
+
+Gamestate::Gamestate(const Gamestate & o) {
+    alloc(this);
+    // copy contents of feature frame across
+    for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+        if (o.feature_frames[i]) {
+
+            FeatureFrame frames[64];
+
+            int j = 0;
+            while (o.feature_frames[i][j].centre != SQUARE_SENTINEL) {
+                frames[j] = o.feature_frames[i][j];
+                ++j;
+            }
+
+            this->feature_frames[i] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (j + 1)));
+            for (int k = 0; k < j; ++k) {
+                this->feature_frames[i][k] = o.feature_frames[i][k];
+            }
+            *this->feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
+        }
+    }
+}
+
+Gamestate::~Gamestate() {
+    for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+        delete feature_frames[i];
+    }
+    delete[] feature_frames;
+    delete wpieces;
+    delete bpieces;
 }
 
 /**

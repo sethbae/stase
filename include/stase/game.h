@@ -69,6 +69,9 @@ struct Gamestate {
 
     Gamestate();
     Gamestate(const Board &);
+    Gamestate(const Gamestate &);
+    ~Gamestate();
+
     void recalculate_all();
     void recalculate_attacks();
     void recalculate_positions();
