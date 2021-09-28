@@ -95,12 +95,12 @@ void bench_responder(std::vector<Gamestate> & gamestates, const Responder * resp
         for (Gamestate gs: gamestates) {
             discover_feature_frames(gs, fh.hook);
 
-            for (int i = 0; gs.feature_frames[resp->id][i].centre != SQUARE_SENTINEL; ++i) {
+            for (int i = 0; gs.feature_frames[fh.hook->id][i].centre != SQUARE_SENTINEL; ++i) {
                 resp_params.push_back(
                         BenchResponderParam{
                             resp,
                             &gs,
-                            &gs.feature_frames[resp->id][i],
+                            &gs.feature_frames[fh.hook->id][i],
                             ignored_moves
                         }
                 );
@@ -122,7 +122,7 @@ void bench_individual_responders() {
     puzzle_gamestates(gamestates);
 
     for (const Responder * r : ALL_RESPONDERS) {
-        bench_responder(gamestates, &develop_resp);
+        bench_responder(gamestates, r);
     }
 
 }
