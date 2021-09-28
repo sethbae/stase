@@ -2,6 +2,14 @@
 #include "cands.h"
 #include "game.h"
 
+/**
+ * Generates moves which capture a weak piece. Searches outwards from the target square looking for
+ * pieces of the right colour which can capture the piece, and suggests these moves in order of
+ * increasing strength (it starts with the weakest/least valuable piece).
+ *
+ * Reads the information needed from the given FeatureFrame and writes moves to the pointer given,
+ * while space remains in the counter.
+ */
 void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
     const Square s = ff->centre;
