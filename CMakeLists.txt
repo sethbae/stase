@@ -58,6 +58,7 @@ set(BENCH_SOURCE_FILES
 
 set(TEST_SOURCE_FILES
         src/test/test.h
+        src/test/stress_test_main.cpp
         src/test/board/test_board.cpp
         src/test/game/test_game.cpp
         src/test/test_helpers.cpp

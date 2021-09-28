@@ -21,6 +21,10 @@ int main(int argc, char** argv) {
             cout << "Testing game\n";
             test_game();
             ++modules_tested;
+        } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-stress") == 0) {
+            cout << "Running stress tests\n";
+            stress_test_main();
+            ++modules_tested;
         } else {
             cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
         }

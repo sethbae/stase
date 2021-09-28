@@ -8,6 +8,7 @@ using std::cout;
 
 bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h) {
 
+    cout << "Stress testing " << h->name << "\n";
     cout << "|                  |\n";
 
     for (int i = 0; i < states.size(); ++i) {
@@ -39,6 +40,7 @@ bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h
 
 bool stress_test_cands(std::vector<Gamestate> & states) {
 
+    cout << "Stress testing candidates\n";
     cout << "|                  |\n";
 
     for (int i = 0; i < states.size(); ++i) {
