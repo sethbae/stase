@@ -54,10 +54,17 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
 
         std::vector<Move> moves = cands(gs);
 
+        if (moves.size() > MAX_TOTAL_CANDS) {
+            cout << "\n[" << i << "] FAILED: Received too many candidates (" << moves.size() << ")\n";
+            cout << board_to_fen(gs.board) << "\n";
+            pr_board(gs.board);
+            return false;
+        }
+
         for (int j = 0; j < moves.size(); ++j) {
 
             if (!val(moves[j].from) || !val(moves[j].to)) {
-                cout << "\n[" << j << "] FAILED: Received " << sqtos(moves[j].from) << " to " << moves[j].to << "\n";
+                cout << "\n[" << i << "] FAILED: Received " << sqtos(moves[j].from) << " to " << moves[j].to << "\n";
                 cout << board_to_fen(gs.board) << "\n";
                 pr_board(gs.board);
                 return false;
