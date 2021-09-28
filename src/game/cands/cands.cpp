@@ -39,8 +39,6 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
 vector<Move> cands(const Gamestate & gs) {
 
-    IndexCounter counter(MAX_TOTAL_CANDS);
-
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
@@ -48,8 +46,7 @@ vector<Move> cands(const Gamestate & gs) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
-        counter.add_allowance(MAX_MOVES_PER_HOOK);
-        int this_handler_start_point = counter.idx();
+       IndexCounter counter(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
         discover_feature_frames(gs, fh.hook);
@@ -75,7 +72,7 @@ vector<Move> cands(const Gamestate & gs) {
         }
 
         // add moves not yet present
-        for (int j = this_handler_start_point; j < counter.idx(); ++j) {
+        for (int j = 0; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if ((all_moves[k].from == moves[j].from)
@@ -114,7 +111,6 @@ vector<Move> cands_report(const Gamestate & gs) {
 
     pr_board_conf(gs.board);
 
-    IndexCounter counter(MAX_TOTAL_CANDS);
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
@@ -122,13 +118,12 @@ vector<Move> cands_report(const Gamestate & gs) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
-        counter.add_allowance(MAX_MOVES_PER_HOOK);
-        int this_handler_start_point = counter.idx();
+        IndexCounter counter(MAX_MOVES_PER_HOOK);
 
         std::string friends = "";
         std::string enems = "";
         for (const Responder * r : fh.friendly_responses) { friends = friends + " " + r->name; }
-        for (const Responder * r : fh.friendly_responses) { enems = enems + " " + r->name; }
+        for (const Responder * r : fh.enemy_responses) { enems = enems + " " + r->name; }
         cout << "\n***** Feature handler " << i << "\n";
         cout << "* Hook: " << fh.hook->name << "\n";
         cout << "* Friendly:" << friends << "\n";
@@ -178,7 +173,7 @@ vector<Move> cands_report(const Gamestate & gs) {
         }
 
         // add moves not yet present
-        for (int j = this_handler_start_point; j < counter.idx(); ++j) {
+        for (int j = 0; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if ((all_moves[k].from == moves[j].from)
