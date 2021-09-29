@@ -33,13 +33,14 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
     if (cache.empty()) {
         std::vector<std::string> fens;
         read_all_fens(fens);
-        for (std::string fen : fens) {
-            Gamestate gs(fen_to_board(fen));
-            cache.push_back(gs);
+        for (std::string & fen : fens) {
+            Board b = fen_to_board(fen);
+            cache.emplace_back(b);
         }
     }
 
-    vec = cache;
+    // TODO may need to reinstate this...
+    // vec = cache;
 
 }
 

@@ -92,7 +92,7 @@ void bench_responder(std::vector<Gamestate> & gamestates, const Responder * resp
         if (!contains) { continue; }
 
         // run the hook on the gamestate, and add each feature frame to the params list
-        for (Gamestate gs: gamestates) {
+        for (Gamestate & gs: gamestates) {
             discover_feature_frames(gs, fh.hook);
 
             for (int i = 0; gs.feature_frames[fh.hook->id][i].centre != SQUARE_SENTINEL; ++i) {

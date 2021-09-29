@@ -18,7 +18,7 @@ bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h
             cout.flush();
         }
 
-        Gamestate gs = states[i];
+        Gamestate & gs = states[i];
 
         discover_feature_frames(gs, h);
 
@@ -50,7 +50,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
             cout.flush();
         }
 
-        Gamestate gs = states[i];
+        Gamestate & gs = states[i];
 
         std::vector<Move> moves = cands(gs);
 
