@@ -69,9 +69,12 @@ struct Gamestate {
 
     Gamestate();
     Gamestate(const Board &);
-    Gamestate(const Gamestate &) = delete;
+    Gamestate(const Gamestate &);
     Gamestate(Gamestate &&);
     ~Gamestate();
+
+    Gamestate & operator=(const Gamestate &) = default;
+    Gamestate & operator=(Gamestate &&) = default;
 
     void recalculate_all();
     void recalculate_attacks();

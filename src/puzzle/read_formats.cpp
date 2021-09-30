@@ -39,8 +39,7 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
         }
     }
 
-    // TODO may need to reinstate this...
-    // vec = cache;
+    vec = cache;
 
 }
 

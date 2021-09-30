@@ -16,28 +16,28 @@ using std::setw;
 
 struct BenchHookParam {
     const Hook * h;
-    const Board b;
+    const Gamestate & gs;
 };
 
 bool run_hook(const BenchHookParam & b_h_p) {
-    Gamestate gs(b_h_p.b);
-    discover_feature_frames(gs, b_h_p.h);
+
+    discover_feature_frames(b_h_p.gs, b_h_p.h);
 
     // count the feature frames and return that
     int frame_count = 0;
-    for (FeatureFrame * ff = gs.feature_frames[0]; ff->centre != SQUARE_SENTINEL; ++ff, ++frame_count);
+    for (FeatureFrame * ff = b_h_p.gs.feature_frames[b_h_p.h->id]; ff->centre != SQUARE_SENTINEL; ++ff, ++frame_count);
 
     return frame_count;
 }
 
 void bench_hook(const Hook * h) {
 
-    vector<Board> boards;
-    puzzle_boards(boards);
+    vector<Gamestate> states;
+    puzzle_gamestates(states);
 
     vector<BenchHookParam> params;
-    for (Board b : boards) {
-        params.push_back(BenchHookParam{h, b});
+    for (Gamestate & gs : states) {
+        params.push_back(BenchHookParam{h, gs});
     }
 
     bench(h->name, MICROS, params.data(), params.size(), &run_hook);

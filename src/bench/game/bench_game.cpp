@@ -134,4 +134,3 @@ int bench_game() {
     return 0;
 
 }
-

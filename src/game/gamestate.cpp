@@ -46,37 +46,40 @@ Gamestate::Gamestate(Gamestate && o) {
     this->feature_frames = o.feature_frames;
     this->wpieces = o.wpieces;
     this->bpieces = o.bpieces;
+    o.feature_frames = nullptr;
+    o.wpieces = nullptr;
+    o.bpieces = nullptr;
 }
 
-/*
- * This is a copy constructor. In the header, it is declared as deleted. It is pretty painfully slow,
- * and the move constructor should be used instead. There may be a convincing use case in future though.
+/**
+ * Copy constructor. This is painfully slow and should be avoided wherever possible.
+ * Currently, it's one use case is when caching the puzzles read from file: they need
+ * to be copied when a second or later benchmark asks for them.
  */
-//Gamestate::Gamestate(const Gamestate & o) {
-//    alloc(this);
-//    // copy contents of feature frame across
-//    for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-//        if (o.feature_frames[i]) {
-//
-//            FeatureFrame frames[64];
-//
-//            int j = 0;
-//            while (o.feature_frames[i][j].centre != SQUARE_SENTINEL) {
-//                frames[j] = o.feature_frames[i][j];
-//                ++j;
-//            }
-//
-//            this->feature_frames[i] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (j + 1)));
-//            for (int k = 0; k < j; ++k) {
-//                this->feature_frames[i][k] = o.feature_frames[i][k];
-//            }
-//            *this->feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
-//        }
-//    }
-//}
+Gamestate::Gamestate(const Gamestate & o) {
+    alloc(this);
+    // copy contents of feature frame across
+    for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+        if (o.feature_frames[i]) {
+
+            FeatureFrame frames[64];
+
+            int j = 0;
+            while (o.feature_frames[i][j].centre != SQUARE_SENTINEL) {
+                frames[j] = o.feature_frames[i][j];
+                ++j;
+            }
+
+            this->feature_frames[i] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (j + 1)));
+            for (int k = 0; k < j; ++k) {
+                this->feature_frames[i][k] = o.feature_frames[i][k];
+            }
+            *this->feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
+        }
+    }
+}
 
 Gamestate::~Gamestate() {
-    // TODO: in the move constructor, null out the pointers. Here, check (do you have to?)
     for (int i = 0; i < ALL_HOOKS.size(); ++i) {
         delete feature_frames[i];
     }
