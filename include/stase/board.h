@@ -14,7 +14,7 @@ const Square SQUARE_SENTINEL = 0xFF;
 
 /* enumeration of the types of pieces primarily, but also for other useful properties,
     such as WHITE or BLACK, and KING or QUEEN */
-enum Ptype {
+enum Ptype : Byte {
 
     /* defined values: so that we can translate both ways */
     B_KING = 0,
