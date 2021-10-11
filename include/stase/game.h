@@ -123,6 +123,10 @@ typedef int16_t Eval;
 
 Eval zero();
 
+inline Eval invalid_eval() {
+    return (Eval) 0x0F0F;
+}
+
 Eval mate_in(Ptype colour, unsigned);
 Eval white_mates_in(unsigned);
 Eval black_mates_in(unsigned);

@@ -11,6 +11,10 @@ using std::ofstream;
 #include <ostream>
 using std::ostream;
 
+/*
+ * TODO Best first: invalidate scores on best line and redo a 3-limited search
+ */
+
 // allocate a new SearchNode with the given gamestate, but modified by the move.
 // Original gamestate is unmodified.
 SearchNode *new_node(const Gamestate & gs, Move m) {
@@ -169,6 +173,7 @@ void readable_printout(vector<SearchNode*> & nodes, ostream & output) {
     output << "\n";
     
     output << "Evaluation: " << nodes[nodes.size()-1]->score << "\n";
+    output.flush();
     
 }
 
@@ -224,4 +229,28 @@ void write_to_file(SearchNode *node, ostream & output) {
 
 }
 
+std::vector<Move> iterative_deepening_search(const Gamestate & gs, TimeLimiter limiter) {
 
+    int d = 1;
+    std::vector<Move> best_line;
+
+    while (limiter.check()) {
+
+        vector<SearchNode *> line = depth_limited_search(gs, d);
+
+        cout << "done\n"; cout.flush();
+
+        auto itr = line.rbegin();
+        while (itr != line.rend()) {
+            best_line.push_back((*itr)->move);
+        }
+
+        readable_printout(line, cout);
+
+        ++d;
+
+    }
+
+    return best_line;
+
+}

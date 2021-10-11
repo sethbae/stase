@@ -37,6 +37,10 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
 }
 
+vector<Move> legal_cands(const Gamestate & gs) {
+    return legal_moves(gs.board);
+}
+
 /**
  * Computes and returns a set of candidate moves for the given position. Returns at most
  * MAX_TOTAL_CANDS moves which are guaranteed to be unique. No guarantee is made as to

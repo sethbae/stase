@@ -4,6 +4,9 @@
 #include "board.h"
 #include "game.h"
 
+#include <chrono>
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
 
 struct SearchNode {
 
@@ -11,12 +14,38 @@ struct SearchNode {
     Eval score;
     Move move;
     unsigned short num_children;
-    struct SearchNode **children;
+    SearchNode ** children;
 
 };
 
+struct DepthLimiter {
+
+    int cutoff;
+
+    DepthLimiter(int n) : cutoff(n) {}
+
+    inline bool check(int depth) {
+        return depth < cutoff;
+    }
+
+};
+
+struct TimeLimiter {
+
+    int cutoff;
+
+    TimeLimiter(int n) : cutoff(n) {}
+
+    inline bool check() {
+        // TODO get the current time and check if we've passed it
+        return true;
+    }
+
+};
 
 std::vector<SearchNode*> depth_limited_search(const Gamestate &, int);
+
+std::vector<Move> iterative_deepening_search(const Gamestate &, TimeLimiter);
 
 int subtree_size(SearchNode *);
 
