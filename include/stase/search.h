@@ -43,9 +43,7 @@ struct TimeLimiter {
 
 };
 
-std::vector<SearchNode*> depth_limited_search(const Gamestate &, int);
-
-std::vector<Move> iterative_deepening_search(const Gamestate &, TimeLimiter);
+std::vector<Move> iterative_deepening_search(const std::string &, int);
 
 int subtree_size(SearchNode *);
 
