@@ -26,103 +26,61 @@ using std::time;
 
 #include "board.h"
 #include "puzzle.h"
+#include "../bench.h"
 
-/* This is a short benchmark program to test the read and write speeds of the board representation.
-   It generates a random board position and then writes it to each of [k] boards.
-   It then prints out the total time (millis) and the time per board (micros) */
 
-void write_test() {
-    
-    int k = 10000000;
+struct BoardPairParam {
+    Board & board;
+    Board & blank_board;
+};
 
-    auto boards = new Board[k];
-    int ran[64];
-    
-    // initialise ran with random data
-    for (int i = 0; i < 64; ++i) {
-        ran[i] = rand();
-    }
-
-    /* start benchmark and write to boards */
-    auto start = high_resolution_clock::now();
-    
-    for (int i = 0; i < k; ++i) {
-        for (int j = 0; j < 64; ++j) {
-            boards[i].set(j, (Piece) ran[j]);
+int write_board_xy(const BoardPairParam & param) {
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            Square temp;
+            param.blank_board.set(temp = mksq(x, y), param.board.get(temp));
         }
     }
-    
-    auto stop = high_resolution_clock::now();
-    
-    
-    int x = 0;
-    for (int j = 0; j < k; ++j) {
-        Board b = boards[j];
-        for (int i = 0; i < 64; ++i) {
-            x += b.get(i);
-        }
-    }
-    
-    /* end benchmark and return */    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Write test:\n";
-    cout << "\tTime taken for " << k << " boards was " << millis << " ms ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\tSum: " << x << "\n";
-    cout << "\n";
-
-    delete [] boards;
+    return param.board.get_white() ? 1 : 0;
 }
 
-void read_test() {
-    
-    int k = 10000000;
-
-    auto boards = new Board[k];
-    int ran[64];
-    
-    // initialise ran with random data
-    for (int i = 0; i < 64; ++i) {
-        ran[i] = rand();
-    }
-    
-    for (int i = 0; i < k; ++i) {
-        for (int j = 0; j < 64; ++j) {
-            boards[i].set(j, (Piece) ran[j]);
+int write_board_yx(const BoardPairParam & param) {
+    for (int y = 0; y < 8; ++y) {
+        for (int x = 0; x < 8; ++x) {
+            Square temp;
+            param.blank_board.set(temp = mksq(x, y), param.board.get(temp));
         }
     }
-    
-    /* start benchmark and read from boards */
+    return param.board.get_white() ? 1 : 0;
+}
 
-    auto start = high_resolution_clock::now();
+int write_board_64(const BoardPairParam & param) {
+    for (int x = 0; x < 64; ++x) {
+        param.blank_board.set(x, param.board.get(x));
+    }
+    return param.board.get_white() ? 1 : 0;
+}
 
-    int x = 0;
-    for (int j = 0; j < k; ++j) {
-        Board b = boards[j];
-        for (int i = 0; i < 64; ++i) {
-            x += b.get(i);
-        }
+/**
+ * Benchmarks the read/write time for a whole board. It sets every square of a blank board
+ * to a value got from a puzzle board. There are three different strategies compared for
+ * iterating over the board: see above for the implementations.
+ */
+void bench_board_write() {
+
+    std::vector<Board> boards;
+    puzzle_boards(boards);
+
+    std::vector<BoardPairParam> params;
+    for (int i = 0; i < boards.size(); ++i) {
+        Board b = empty_board();
+        params.push_back(BoardPairParam{boards[i], b});
     }
 
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Read test:\n";
-    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\tSum: " << x << "\n";
-    cout << "\n";
-    
-    delete [] boards;
+    bench("board-get-set-xy", MICROS, params.data(), params.size(), &write_board_xy);
+    bench("board-get-set-yx", MICROS, params.data(), params.size(), &write_board_yx);
+    bench("board-get-set-64", MICROS, params.data(), params.size(), &write_board_64);
+
 }
 
 /*void legal_move_test() {
@@ -567,15 +525,16 @@ void legal_moves_puzzles() {
     for (int j = 0; j < k; ++j) {
         
         Board b = boards[j];
+        sum += legal_moves(b).size();
         
-        for (int x = 0; x < 8; ++x) {
-            for (int y = 0; y < 8; ++y) {
-                Piece p = b.get(mksq(x, y));
-                if (colour(p) == b.colour_to_move()) {
-                    sum += (unsigned) piecemoves_ignore_check(b, mksq(x, y));
-                }
-            }
-        }
+//        for (int x = 0; x < 8; ++x) {
+//            for (int y = 0; y < 8; ++y) {
+//                Piece p = b.get(mksq(x, y));
+//                if (colour(p) == b.colour_to_move()) {
+//                    sum += (unsigned) piecemoves_ignore_check(b, mksq(x, y));
+//                }
+//            }
+//        }
         
     }
     
@@ -798,7 +757,7 @@ int bench_board(void) {
 
     // compare_check();
 
-    // write_test();
+    write_test();
     // read_test();
     // size_test();
     // starting_pos_test();
@@ -807,6 +766,8 @@ int bench_board(void) {
     // write_config_test();
     // read_config_test();
     // write_parsed_config_test();
+
+    bench_board_write();
 
     legal_moves_puzzles();
 
