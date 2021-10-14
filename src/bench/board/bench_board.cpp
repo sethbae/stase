@@ -77,128 +77,58 @@ void bench_board_write() {
         params.push_back(BoardPairParam{boards[i], b});
     }
 
-    bench("board-get-set-xy", MICROS, params.data(), params.size(), &write_board_xy);
-    bench("board-get-set-yx", MICROS, params.data(), params.size(), &write_board_yx);
-    bench("board-get-set-64", MICROS, params.data(), params.size(), &write_board_64);
+    bench("board-get-set-xy", NANOS, params.data(), params.size(), &write_board_xy);
+    bench("board-get-set-yx", NANOS, params.data(), params.size(), &write_board_yx);
+    bench("board-get-set-64", NANOS, params.data(), params.size(), &write_board_64);
 
 }
 
-void write_config_test() {
-    int k = 10000000;
+int write_config_individually(const BoardPairParam & param) {
 
-    auto boards = new Board[k];
-    
-    /* start benchmark and write configs into boards */
-    auto start = high_resolution_clock::now();
-    
-    for (int i = 0; i < k; ++i) {
-        boards[i].set_white(1);
+    int sum = 0;
+    int t;
 
-        boards[i].set_cas_ws(1);
-        boards[i].set_cas_wl(1);
-        boards[i].set_cas_bs(1);
-        boards[i].set_cas_bl(1);
+    param.blank_board.set_white(t = param.board.get_white());
+    sum += t;
+    param.blank_board.set_cas_ws(t = param.board.get_cas_ws());
+    sum += t;
+    param.blank_board.set_cas_wl(t = param.board.get_cas_wl());
+    sum += t;
+    param.blank_board.set_cas_bs(t = param.board.get_cas_bs());
+    sum += t;
+    param.blank_board.set_cas_bl(t = param.board.get_cas_bl());
+    sum += t;
+    param.blank_board.set_ep_exists(t = param.board.get_ep_exists());
+    sum += t;
+    param.blank_board.set_ep_file(t = param.board.get_ep_file());
+    sum += t;
+    param.blank_board.set_halfmoves(t = param.board.get_halfmoves());
+    sum += t;
+    param.blank_board.set_wholemoves(t = param.board.get_wholemoves());
 
-        boards[i].set_ep_exists(0);
-        boards[i].set_halfmoves(0);
-        boards[i].set_wholemoves(1);
-    }
-    
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
+    return sum + t;
 
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Write config test:\n";
-    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";
-    cout << "\n";
-    
-    delete [] boards;
 }
 
-/*void write_parsed_config_test() {
-    int k = 10000000;
+int write_config_word(const BoardPairParam & param) {
+    int t;
+    param.blank_board.set_conf_word(t = param.board.get_conf_word());
+    return t;
+}
 
-    auto boards = new Board[k];
-    
-    // start benchmark and write configs into boards
-    auto start = high_resolution_clock::now();
-    
-    for (int i = 0; i < k; ++i) {
-        stringstream conf("w KQkq e6 0 3");
-        fill_config(boards[i], conf);
-    }
-    
-    // end benchmark and return 
-    auto stop = high_resolution_clock::now();
+void bench_board_write_config() {
 
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Write parsed config test:\n";
-    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";
-    cout << "\n";
-    
-    delete [] boards;
-}*/
+    std::vector<Board> boards;
+    puzzle_boards(boards);
 
-void read_config_test() {
-    int k = 10000000;
-
-    auto boards = new Board[k];
-    
-    
-    for (int i = 0; i < k; ++i) {
-        boards[i].set_white(1);
-
-        boards[i].set_cas_ws(1);
-        boards[i].set_cas_wl(1);
-        boards[i].set_cas_bs(1);
-        boards[i].set_cas_bl(1);
-
-        boards[i].set_ep_exists(0);
-        boards[i].set_halfmoves(42);
-        boards[i].set_wholemoves(17);
+    std::vector<BoardPairParam> params;
+    for (int i = 0; i < boards.size(); ++i) {
+        Board b = empty_board();
+        params.push_back(BoardPairParam{boards[i], b});
     }
 
-    /* start benchmark and read configs from boards */
-    auto start = high_resolution_clock::now();
-    
-    int x = 0;
-    for (int i = 0; i < k; ++i) {
-        x += boards[i].get_white();
-        x += boards[i].get_cas_ws();
-        x += boards[i].get_cas_wl();
-        x += boards[i].get_cas_bs();
-        x += boards[i].get_cas_bl();
-
-        x += boards[i].get_ep_exists();
-        x += boards[i].get_halfmoves();
-        x += boards[i].get_wholemoves();
-    }
-
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Read config test:\n";
-    cout << "\tTime taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";
-    cout << "\tSum: " << x << "\n";
-    cout << "\n";
-    
-    delete [] boards;
+    bench("board-copy-conf-ind", NANOS, params.data(), params.size(), &write_config_individually);
+    bench("board-copy-conf-word", NANOS, params.data(), params.size(), &write_config_word);
 
 }
 
@@ -576,7 +506,6 @@ int bench_board(void) {
 
     // compare_check();
 
-    write_test();
     // read_test();
     // size_test();
     // starting_pos_test();
@@ -587,7 +516,7 @@ int bench_board(void) {
     // write_parsed_config_test();
 
     bench_board_write();
-
+    bench_board_write_config();
     legal_moves_puzzles();
 
     // legal_move_test();
