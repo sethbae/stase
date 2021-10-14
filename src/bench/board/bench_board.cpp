@@ -1,28 +1,12 @@
-#include <iostream>
-using std::cout;
-
-#include <cstdlib>
-using std::rand;
-
 #include <chrono>
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::chrono::microseconds;
-
 #include <vector>
 using std::vector;
-
 #include <string>
 using std::string;
-
-#include <fstream>
-using std::ifstream;
-using std::ios;
-
-#include <ctime>
-using std::time;
-
 
 #include "board.h"
 #include "puzzle.h"
@@ -116,6 +100,11 @@ int write_config_word(const BoardPairParam & param) {
     return t;
 }
 
+/**
+ * Benchmarks how long it takes to benchmark the reading and writing of the boards config. First it copies
+ * (using get then set) each individual component of the config, and the second benchmark simply transfers
+ * the entire config word.
+ */
 void bench_board_write_config() {
 
     std::vector<Board> boards;
@@ -132,403 +121,78 @@ void bench_board_write_config() {
 
 }
 
-/* generates a random board with some number of the desired piece and some number of pawns,
-    all dotted around on any square at all. Warning, they may overwrite each other, so the
-    actual numbers may vary. Pawns won't overwrite the desired piece, however.
-   If you ask for pawns, it will randomly dot a different piece around. */
-Board random_board(const Piece p, int num_of_piece, int num_of_other_pieces) {
-
-    Board b = empty_board();
-    
-    for (int i = 0; i < num_of_other_pieces; ++i) {
-        Square sq = mksq(rand() % 8, rand() % 8);
-        
-        if (type(p) != PAWN) {
-            b.set(sq, (rand() % 2) ? W_PAWN : B_PAWN);
-        } else {
-            b.set(sq, (rand() % 2) ? W_QUEEN : B_QUEEN);
+int board_iteration_xy(const Board & b) {
+    int sum = 0;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            sum += b.get(mksq(x, y));
         }
     }
-
-    for (int i = 0; i < num_of_piece; ++i) {
-        Square sq = mksq(rand() % 8, rand() % 8);
-        b.set(sq, p);
+    return sum;
+}
+int board_iteration_yx(const Board & b) {
+    int sum = 0;
+    for (int y = 0; y < 8; ++y) {
+        for (int x = 0; x < 8; ++x) {
+            sum += b.get(mksq(x, y));
+        }
     }
+    return sum;
+}
+int board_iteration_64(const Board & b) {
+    int sum = 0;
+    for (int x = 0; x < 64; ++x) {
+        sum += b.get(x);
+    }
+    return sum;
+}
 
-    return b;
+/**
+ * Iterates over the board in one of three ways, as above: incrementing x then y, y then x, or straight through 64.
+ * It has to call get on each square, to avoid being optimised away, which probably constitutes a significant portion
+ * of the time taken.
+ */
+void bench_board_iteration() {
+
+    std::vector<Board> boards;
+    puzzle_boards(boards);
+
+    bench("board-iter-xy", NANOS, boards.data(), boards.size(), &board_iteration_xy);
+    bench("board-iter-yx", NANOS, boards.data(), boards.size(), &board_iteration_yx);
+    bench("board-iter-64", NANOS, boards.data(), boards.size(), &board_iteration_64);
 
 }
 
-void piecemoves_bench(const Piece target_piece, int density) {
+void bench_in_check() {
 
-    int k = 10000000;
+    std::vector<Board> boards;
+    puzzle_boards(boards);
 
-    Board *boards = new Board[k];
-    
-    for (int i = 0; i < k; ++i) {
-        boards[i] = random_board(target_piece, density, density);
-    }
-    
-    auto start = high_resolution_clock::now();
-
-    int sum = 0;
-    for (int j = 0; j < k; ++j) {
-        
-        Board b = boards[j];
-        
-        for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
-            for ( ; val_x(s); inc_x(s)) {
-                Piece p = b.get(s);
-                if (p == target_piece)
-                    sum += (unsigned) piecemoves_ignore_check(b, s);
-            }
-            reset_x(s);
-        }
-        
-    }
-
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
-    
-    delete [] boards;
+    bench("board-in-check-hard", MICROS, boards.data(), boards.size(), &in_check_hard);
 
 }
 
-/******************************************************************
- * This will read in puzzles from the lichess database, in FEN,
- * provided that you download and unzip it to the same directory.
- * It reads puzzles sequentially from a randomly selected offset,
- * which uses the current time as a seed, so will differ between
- * executions.
- * 
- * Be warned this may make it hard to reproduce bugs/errors if you
- * do not see or store the FEN somewhere.
- *
- * The puzzle database is available here: 
- *       https://database.lichess.org/#puzzles
- ******************************************************************/   
-
-/* fill the given vector with [num] randomly selected puzzles 
-    these puzzles will always differ since they are selected using a random seed */
-//bool read_fens(unsigned num, vector<string> & vec) {
-//
-//    ifstream file;
-//
-//    file.open("../puzzles/lichess_db_puzzle.csv", ios::in);
-//    if (!file) {
-//        cout << "WARNING: could not read puzzle csv\n";
-//        return false;
-//    }
-//
-//    string s;
-//
-//    // initialise the seed with current time
-//    srand(time(nullptr));
-//
-//    // and skip a random number of puzzles (different every time)
-//    unsigned x = rand() % 10000;
-//    while (x--)
-//        getline(file, s);
-//
-//    // before reading the required number of puzzles
-//    for (; getline(file, s) && num > 0; --num) {
-//
-//        // FEN is second field of CSV
-//        s = s.substr(s.find_first_of(',') + 1);
-//        s = s.substr(0, s.find_first_of(','));
-//        vec.push_back(s);
-//
-//    }
-//
-//    return true;
-//
-//}
-
-void legal_moves_puzzles() {
-
-    int k = 2000000;
-
-    vector<string> fens;
-    
-    read_fens(k, fens);
-    
-    Board *boards = new Board[k];
-    
-    int i = 0;
-    for (string s : fens)
-        boards[i++] = fen_to_board(s);
-    
-    auto start = high_resolution_clock::now();
-    
-    int sum = 0;
-    for (int j = 0; j < k; ++j) {
-        
-        Board b = boards[j];
-        sum += legal_moves(b).size();
-        
-//        for (int x = 0; x < 8; ++x) {
-//            for (int y = 0; y < 8; ++y) {
-//                Piece p = b.get(mksq(x, y));
-//                if (colour(p) == b.colour_to_move()) {
-//                    sum += (unsigned) piecemoves_ignore_check(b, mksq(x, y));
-//                }
-//            }
-//        }
-        
-    }
-    
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
-    
-    delete [] boards;
-    
+int check_legal_moves(const Board & b) {
+    std::vector<Move> moves = legal_moves(b);
+    return moves.size();
 }
 
-void board_iteration_bench(bool use_mksq) {
+void bench_legal_moves() {
 
-    int k = 10000000;
+    std::vector<Board> boards;
+    puzzle_boards(boards);
 
-    Board *boards = new Board[k];
-    
-    for (int i = 0; i < k; ++i) {
-        boards[i] = random_board(W_PAWN, 5, 5);
-    }
-    
-    auto start = high_resolution_clock::now();
-    
-    int sum = 0;
-    
-    if (use_mksq) {
-
-        for (int j = 0; j < k; ++j) {
-            
-            Board b = boards[j];
-
-            
-            for (int x = 0; x < 8; ++x) {
-                for (int y = 0; y < 8; ++y) {
-                    sum += (unsigned) b.get(mksq(x, y));
-                }
-            }
-            
-        }
-    } else {
-
-        for (int j = 0; j < k; ++j) {
-            
-            Board b = boards[j];
-
-            
-            for (Square s = mksq(0, 0); val_y(s); inc_y(s)) {
-                for ( ; val_x(s); inc_x(s)) {
-                    sum += (unsigned) b.get(s);
-                }
-                reset_x(s);
-            }
-            
-        }
-    }
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
-    
-    delete [] boards;
-
-}
-
-void attack_map_generation() {
-    // Board b = fen_to_board("r1br2k1/1p3ppp/p1nqpb2/3nN3/3P1P2/1B2B3/PPN3PP/R2Q1RK1 w Qq - 0 1");
-    Board b = starting_pos();
-
-    int k = 100000;
-
-    Board * boards = new Board[k];
-    
-    for (int i = 0; i < k; ++i) {
-        boards[i] = b;
-    }
-    
-    auto start = high_resolution_clock::now();
-    
-    int sum = 0;
-
-    for (int j = 0; j < k; ++j) {
-        sum += attack_map(boards[j], WHITE);
-    }
-            
-    
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
-
-    
-    // pr_bitmap(attack_map(b, WHITE));
-    // pr_bitmap(1ULL);
-
-    delete [] boards;
-}
-
-/*
-    Passing function by value
-    Queen:  2.5862, 2.5595 micros       piecemoves_bench(piece, 5, 5);
-    Rook:   1.6306, 1.6089 
-    Bishop: 1.3708, 1.3902
-    Knight: 0.9504, 0.9442
-    King:   0.9694, 0.9851
-    Pawn:   0.6719, 0.6754
-    
-    Puzzles: 2.1818, 2.1015 micros
-    
-    Passing function by pointer
-    Queen:  2.4390, 2.4452
-    Rook:   1.6444, 1.6386
-    Bishop: 1.3828, 1.3942
-    
-    Passing function by reference
-    Queen:  2.5701, 2.5866
-    Rook:   1.6208, 1.6280
-    Bishop: 1.3542, 1.3613
-    
-*/
-
-void compare_check() {
-
-    const int k = 1000000;
-
-    vector<string> fens;
-    read_fens(k, fens);
-    
-    Board* boards = new Board[fens.size()];
-    
-    for (int i = 0; i < (int) fens.size(); ++i)
-        boards[i] = fen_to_board(fens[i]);
-        
-    int sum = 0;
-    int count = 0;
-           
-    // first bench - using in check hard
-           
-    auto start = high_resolution_clock::now();
-    
-    /***********************************************/   
-    while (count < k) {
-        for (int i = 0; i < (int) (int) fens.size() && count < k; ++i) {
-            sum += (int) in_check_hard(boards[i]);
-            ++count;
-        }
-    }
-    /***********************************************/
-    
-    /* end benchmark and return */
-    auto stop = high_resolution_clock::now();
-    
-    auto duration = duration_cast<microseconds>(stop - start);
-    double millis = duration.count() / 1000.0;
-    double per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
-    
-    // second bench - using attack map
-    
-    sum = 0;
-    count = 0;
-    
-    start = high_resolution_clock::now();
-    
-    /***********************************************/
-    while (count < k) {
-        for (int i = 0; i < (int) fens.size() && count < k; ++i) {
-            sum += (int) in_check_attack_map(boards[i], BLACK);
-            ++count;
-        }
-    }
-    /***********************************************/
-    
-    /* end benchmark and return */
-    stop = high_resolution_clock::now();
-    
-    duration = duration_cast<microseconds>(stop - start);
-    millis = duration.count() / 1000.0;
-    per_board = duration.count() / (double) k;
-    
-    cout << "Time taken for " << k << " boards was " << millis << " milliseconds ";
-    cout << "(" << per_board << " microseconds per board)\n";  
-    cout << "\t(Sum: " << sum << ")\n";
-    cout << "\n";
+    bench("board-legal-moves", MICROS, boards.data(), boards.size(), &check_legal_moves);
 
 }
 
 int bench_board(void) {
 
-    // attack_map_generation();
-
-    // compare_check();
-
-    // read_test();
-    // size_test();
-    // starting_pos_test();
-    // board_from_fen_test();
-    // fen_from_board_test();
-    // write_config_test();
-    // read_config_test();
-    // write_parsed_config_test();
-
     bench_board_write();
     bench_board_write_config();
-    legal_moves_puzzles();
+    bench_board_iteration();
+    bench_in_check();
+    bench_legal_moves();
 
-    // legal_move_test();
-    // legal_move_test2();
-    
-    // piecemoves_bench(W_QUEEN, 5);
-    
-    // board_iteration_bench(true);
-    
-    // legal_moves_puzzles();
-    
-    // pr_board(random_board(W_QUEEN, 5, 5));
-    
     return 0;
 }
