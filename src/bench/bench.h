@@ -49,7 +49,7 @@ inline std::string unit_name(BenchUnit u) {
  * @return the number of units the function took per item.
  */
 template<typename T, typename V>
-inline double bench(std::string name, BenchUnit u, const T * data, int n, V (*func)(const T &)) {
+inline double bench(const std::string & name, BenchUnit u, const T * data, int n, V (*func)(const T &)) {
 
     // start timer
     auto start = high_resolution_clock::now();

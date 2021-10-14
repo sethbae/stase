@@ -30,8 +30,8 @@ using std::time;
 
 
 struct BoardPairParam {
-    Board & board;
-    Board & blank_board;
+    mutable Board board;
+    mutable Board blank_board;
 };
 
 int write_board_xy(const BoardPairParam & param) {
