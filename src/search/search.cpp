@@ -54,7 +54,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
  * and extends accordingly. The heuristic evaluation is called on each node and the scores of
  * all nodes are updated accordingly.
  */
-void deepen_tree(SearchNode * node) {
+void deepen_tree(SearchNode * node, int alpha, int beta) {
 
     bool white = node->gs->board.get_white();
 
@@ -94,16 +94,29 @@ void deepen_tree(SearchNode * node) {
         node->score = white ? white_has_been_mated() : black_has_been_mated();
 
         // deepen tree on each child recursively, updating the score as we go
-        for (int i = 0; i < node->num_children; ++i) {
-            deepen_tree(node->children[i]);
-            if (white && node->children[i]->score > node->score) {
-                node->score = node->children[i]->score;
-            } else if (!white && node->children[i]->score < node->score) {
-                node->score = node->children[i]->score;
+        for (int i = 0; i < node->num_children && alpha < beta; ++i) {
+
+            deepen_tree(node->children[i], alpha, beta);
+
+            Eval score = node->children[i]->score;
+            if (white && score > node->score) {
+                node->score = score;
+            } else if (!white && score < node->score) {
+                node->score = score;
+            }
+
+            if (white && score > alpha) {
+                alpha = score;
+            } else if (!white && score < beta) {
+                beta = score;
             }
         }
 
     }
+}
+
+void deepen_tree(SearchNode * root) {
+    deepen_tree(root, white_has_been_mated(), black_has_been_mated());
 }
 
 /**
