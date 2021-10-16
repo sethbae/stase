@@ -58,6 +58,7 @@ Gamestate::Gamestate(Gamestate && o) {
  */
 Gamestate::Gamestate(const Gamestate & o) {
     alloc(this);
+    this->board = o.board;
     // copy contents of feature frame across
     for (int i = 0; i < ALL_HOOKS.size(); ++i) {
         if (o.feature_frames[i]) {

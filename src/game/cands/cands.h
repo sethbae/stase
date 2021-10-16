@@ -66,7 +66,6 @@ struct Hook {
 
 struct Responder {
     const std::string name;
-    const int id;
     void (*resp)(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 };
 
@@ -92,9 +91,9 @@ const Hook weak_hook = Hook{"weak", 0, &is_weak_square};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece};
 
 // the actual responders
-const Responder defend_resp = Responder{"defend", 0, &defend_square};
-const Responder capture_resp = Responder{"capture", 0, &capture_piece};
-const Responder develop_resp = Responder{"develop", 0, &develop_piece};
+const Responder defend_resp = Responder{"defend", &defend_square};
+const Responder capture_resp = Responder{"capture", &capture_piece};
+const Responder develop_resp = Responder{"develop", &develop_piece};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &weak_hook,

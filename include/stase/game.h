@@ -82,6 +82,8 @@ struct Gamestate {
     void update(Move m);
     void repopulate_caches();
 
+    // TODO (GM-25): as and when required add these to the copy constructor
+
     // store a cache of squares on which pieces fall
     Square * wpieces;
     Square * bpieces;
