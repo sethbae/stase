@@ -2,15 +2,14 @@
 #include "cands.h"
 #include "game.h"
 
-/*
- * Checks whether the two ints are both greater than zero, both less than zero,
- * or both equal to zero.
+/**
+ * Checks whether the three points given all lie on a straight line.
  */
 bool collinear_points(Square a, Square b, Square c) {
     return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
 }
 
-/*
+/**
  * Walks out from the piece looking for other pieces which can move to the squares encountered
  * and therefore can defend the piece. Does not consider discovered defences or promotions.
  */
@@ -60,7 +59,9 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         continue;
                     }
 
-                    if (can_move_to_square(b, piece_squares[j], temp) && can_move_in_direction(b.get(piece_squares[j]), dir)) {
+                    if (can_move_to_square(b, piece_squares[j], temp)
+                            && can_move_in_direction(b.get(piece_squares[j]), dir)
+                            && !would_be_weak_square(gs, piece_squares[j], temp)) {
                         if (move_counter.has_space()) {
                             moves[move_counter.inc()] = {piece_squares[j], temp, 0};
                         } else {
@@ -96,7 +97,8 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 if (val(temp = mksq(x + XKN[i] + XKN[j], y + YKN[i] + YKN[j]))
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
-                        && (temp != s)) {
+                        && (temp != s)
+                        && !would_be_weak_square(gs, temp, defend_from_square)) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
@@ -120,7 +122,8 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 if (val(temp = mksq(x + XD[i] + XD[j], y + YD[i] + YD[j]))
                         && (type(b.get(temp)) == KING)
                         && (colour(b.get(temp)) == defending_colour)
-                        && (temp != s)) {
+                        && (temp != s)
+                        && !would_be_weak_square(gs, temp, defend_from_square)) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
@@ -147,7 +150,8 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         // check that squares are empty?
         if (type(b.get(piece_squares[i])) == PAWN) {
             if (val(left_pawn_defence_square)
-                    && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)) {
+                    && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)
+                    && !would_be_weak_square(gs, piece_squares[i], left_pawn_defence_square)) {
                 if (move_counter.has_space()) {
                     moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
                 } else {
@@ -155,7 +159,8 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                     return;
                 }
             } else if (val(right_pawn_defence_square)
-                        && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)) {
+                        && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)
+                        && !would_be_weak_square(gs, piece_squares[i], right_pawn_defence_square)) {
                 if (move_counter.has_space()) {
                     moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
                 } else {

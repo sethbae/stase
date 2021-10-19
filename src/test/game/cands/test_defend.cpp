@@ -85,7 +85,7 @@ const TestSet<ResponderTestCase> defend_test_set = {
                         std::vector<FeatureFrame>{
                                 FeatureFrame{stosq("b4"), 0, none, none}
                         },
-                        {"a2a3", "c3d5"}
+                        {"a2a3"}
                 },
                 // medley #2
                 ResponderTestCase{
@@ -93,7 +93,7 @@ const TestSet<ResponderTestCase> defend_test_set = {
                         std::vector<FeatureFrame>{
                                 FeatureFrame{stosq("b6"), 0, none, none}
                         },
-                        {"a8a6", "b8d7", "e7d8"}
+                        {"b8d7", "e7d8"}
                 },
                 // doesn't defend with piece on same square #1
                 ResponderTestCase{
@@ -150,6 +150,46 @@ const TestSet<ResponderTestCase> defend_test_set = {
                                 FeatureFrame{stosq("g6"), 0, q, none}
                         },
                         {}
+                },
+                // doesn't defend from unsafe square (bishop)
+                ResponderTestCase{
+                        "8/8/8/2kP4/8/3B4/8/8 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("d5"), 0, none, k}
+                        },
+                        {"d3e4"}
+                },
+                // doesn't defend from unsafe square (knight)
+                ResponderTestCase{
+                        "8/8/8/2kn4/8/3b4/3Q4/B7 b - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("d3"), 0, q, none}
+                        },
+                        {"d5b4", "c5c4"}
+                },
+                // doesn't defend from unsafe square (king)
+                ResponderTestCase{
+                        "7k/7P/5K2/8/8/8/8/8 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("h7"), 0, none, k}
+                        },
+                        {"f6g6"}
+                },
+                // doesn't defend from unsafe square (rook)
+                ResponderTestCase{
+                        "1k6/4P3/8/8/5K2/3r4/8/8 b - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("e8"), 0, none, none}
+                        },
+                        {}
+                },
+                // doesn't defend from unsafe square (queen)
+                ResponderTestCase{
+                        "1k1rq3/7p/6b1/8/2Q5/1P6/8/K2R4 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("d1"), 0, none, r}
+                        },
+                        {"c4f1", "c4g4", "c4c1"}
                 }
         }
 };
