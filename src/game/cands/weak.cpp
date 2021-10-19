@@ -10,15 +10,13 @@ using std::cout;
  * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
  * of the relevant colour of lower value than the current value of min_w/min_b.
  */
-bool capture_walk(const Board & b, Square s, FeatureFrame * ff) {
+void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
 
     int balance = 0;
     int min_value_w = piece_value(W_KING)*10;
     int min_value_b = piece_value(W_KING)*10;
     int x, y;
     Square temp;
-
-    if (type(b.get(s)) == EMPTY) { return false; }
 
     // go through the delta pairs entailing each sliding direction
     MoveType dir = DIAG;
@@ -132,19 +130,14 @@ bool capture_walk(const Board & b, Square s, FeatureFrame * ff) {
         }
     }
 
-    // record the minimum black and white values
-    ff->conf_1 = min_value_w;
-    ff->conf_2 = min_value_b;
+    // record the information
+    sq_status.balance = balance;
+    sq_status.min_w = min_value_w;
+    sq_status.min_b = min_value_b;
 
     //cout << "Balance: " << balance
     //     << "\nMin white: " << min_value_w
     //     << "\nMin black: " << min_value_b << "\n";
-
-    if (colour(b.get(s)) == WHITE) {
-        return (balance < 0 && min_value_b <= piece_value(B_KING)) || (min_value_b < piece_value(b.get(s)));
-    } else {
-        return (balance > 0 && min_value_w <= piece_value(W_KING)) || (min_value_w < piece_value(b.get(s)));
-    }
 
 }
 
@@ -161,5 +154,40 @@ bool capture_walk(const Board & b, Square s, FeatureFrame * ff) {
  * @param ff the feature frame to record in, if true
  */
 bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
-    return capture_walk(gs.board, centre, ff);
+
+    if (type(gs.board.get(centre)) == EMPTY) { return false; }
+
+    SquareStatus ss;
+    capture_walk(gs.board, centre, ss);
+
+    ff->conf_1 = ss.min_w;
+    ff->conf_2 = ss.min_b;
+
+    if (colour(gs.board.get(centre)) == WHITE) {
+        return (ss.balance < 0 && ss.min_b <= piece_value(B_KING)) || (ss.min_b < piece_value(gs.board.get(centre)));
+    } else {
+        return (ss.balance > 0 && ss.min_w <= piece_value(W_KING)) || (ss.min_w < piece_value(gs.board.get(centre)));
+    }
+}
+
+/**
+ * Checks whether a piece moving from [from] to [to] would then be on a weak square. The definition
+ * of weak is as elsewhere (see is_weak_square above). This assumes that the piece on the from-square
+ * can move to the to-square.
+ */
+bool would_be_weak_square(const Gamestate & gs, const Square from, const Square to) {
+
+    SquareStatus ss;
+    capture_walk(gs.board, to, ss);
+
+    // the piece on from controls the to square (because it can presumably move there), so we compensate for that
+    // by adjusting the balance, before applying the same logic as in is_weak_square
+
+    if (colour(gs.board.get(from)) == WHITE) {
+        --ss.balance;
+        return (ss.balance < 0 && ss.min_b <= piece_value(B_KING)) || (ss.min_b < piece_value(gs.board.get(from)));
+    } else {
+        ++ss.balance;
+        return (ss.balance > 0 && ss.min_w <= piece_value(W_KING)) || (ss.min_w < piece_value(gs.board.get(from)));
+    }
 }

@@ -7,6 +7,12 @@
 const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
 
+struct SquareStatus {
+    int balance = 0;
+    int min_w = 0;
+    int min_b = 0;
+};
+
 struct FeatureFrame {
     Square centre;
     Square secondary;
@@ -79,6 +85,7 @@ struct FeatureHandler {
 
 // functions used by hooks
 bool is_weak_square(const Gamestate &, Square, FeatureFrame *);
+bool would_be_weak_square(const Gamestate &, const Square, const Square);
 bool is_undeveloped_piece(const Gamestate &, Square, FeatureFrame *);
 
 // functions used by responders
