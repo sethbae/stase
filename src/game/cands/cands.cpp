@@ -8,6 +8,20 @@ using std::vector;
 using std::cout;
 
 /**
+ * Records the feature frames in the right place on the gamestate (allocating memory for them).
+ * Also adds a sentinel to the end of the list.
+ */
+void record_hook_features(const Gamestate & gs, const Hook * h, FeatureFrame * ff, int n) {
+
+    gs.feature_frames[h->id] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (n + 1)));
+    for (int i = 0; i < n; ++i) {
+        gs.feature_frames[h->id][i] = ff[i];
+    }
+    gs.feature_frames[h->id][n] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+
+}
+
+/**
  * Runs the given hook over every square on the board and records any successes in feature frames.
  *
  * @param gs the gamestate.
@@ -28,13 +42,7 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
         }
     }
 
-    gs.feature_frames[hook->id] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (i + 1)));
-
-    for (int j = 0; j < i; ++j) {
-        gs.feature_frames[hook->id][j] = frames[j];
-    }
-    gs.feature_frames[hook->id][i] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
-
+    record_hook_features(gs, hook, frames, i);
 }
 
 vector<Move> legal_cands(const Gamestate & gs) {
@@ -58,7 +66,11 @@ vector<Move> cands(const Gamestate & gs) {
         IndexCounter counter(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
-        discover_feature_frames(gs, fh.hook);
+        if (fh.hook->strategy == BY_SQUARE) {
+            discover_feature_frames(gs, fh.hook);
+        } else {
+            (*fh.hook->hook)(gs, 0, gs.feature_frames[fh.hook->id]);
+        }
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {

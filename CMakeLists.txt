@@ -42,8 +42,10 @@ set(SOURCE_FILES
         src/game/cands/capture_piece.cpp
         src/game/cands/development_hook.cpp
         src/game/cands/develop_piece.cpp
+        src/game/cands/fork.cpp
 
-        src/utils/utils.h src/utils/print.cpp)
+        src/utils/utils.h
+        src/utils/print.cpp)
 
 set(STASE_SOURCE_FILES)
 

@@ -58,10 +58,16 @@ struct IndexCounter {
     }
 };
 
+enum HookStrategy {
+    BY_SQUARE,
+    BY_BOARD
+};
+
 struct Hook {
     const std::string name;
     const int id;
-    bool (*hook)(const Gamestate &, Square centre, FeatureFrame * ff);
+    const HookStrategy strategy;
+    bool (*hook)(const Gamestate &, const Square centre, FeatureFrame * ff);
 };
 
 struct Responder {
@@ -70,6 +76,7 @@ struct Responder {
 };
 
 void discover_feature_frames(const Gamestate &, const Hook *);
+void record_hook_features(const Gamestate &, const Hook *, FeatureFrame *, int);
 
 struct FeatureHandler {
     const Hook * hook;
@@ -77,10 +84,13 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-// functions used by hooks
-bool is_weak_square(const Gamestate &, Square, FeatureFrame *);
+// functions used by hooks (BY_SQUARE)
+bool is_weak_square(const Gamestate &, const Square, FeatureFrame *);
 bool would_be_weak_square(const Gamestate &, const Square, const Square);
-bool is_undeveloped_piece(const Gamestate &, Square, FeatureFrame *);
+bool is_undeveloped_piece(const Gamestate &, const Square, FeatureFrame *);
+
+// functions used by hooks (BY_BOARD)
+bool find_forks(const Gamestate &, const Square ignored, FeatureFrame *);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -88,8 +98,9 @@ void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
-const Hook weak_hook = Hook{"weak", 0, &is_weak_square};
-const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece};
+const Hook weak_hook = Hook{"weak", 0, BY_SQUARE, &is_weak_square};
+const Hook develop_hook = Hook{"development", 1, BY_SQUARE, &is_undeveloped_piece};
+const Hook fork_hook = Hook{"fork", 2, BY_BOARD, &find_forks};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -98,7 +109,8 @@ const Responder develop_resp = Responder{"develop", &develop_piece};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &weak_hook,
-        &develop_hook
+        &develop_hook,
+        &fork_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
