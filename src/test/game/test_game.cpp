@@ -9,4 +9,5 @@ void test_game() {
     test_capture_piece();
     test_defend_square();
     test_develop_piece();
+    test_knight_fork_hook();
 }

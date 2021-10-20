@@ -69,7 +69,7 @@ vector<Move> cands(const Gamestate & gs) {
         if (fh.hook->strategy == BY_SQUARE) {
             discover_feature_frames(gs, fh.hook);
         } else {
-            (*fh.hook->hook)(gs, 0, gs.feature_frames[fh.hook->id]);
+            (*fh.hook->hook)(gs, 0, nullptr);
         }
 
         // for each feature frame, run either enemy or friendly responders over it

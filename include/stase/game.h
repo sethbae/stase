@@ -87,10 +87,10 @@ struct Gamestate {
     // store a cache of squares on which pieces fall
     Square * wpieces;
     Square * bpieces;
-    inline Square * friendly_pieces() {
+    inline Square * friendly_pieces() const {
         return board.get_white() ? wpieces : bpieces;
     }
-    inline Square * enemy_pieces() {
+    inline Square * enemy_pieces() const {
         return board.get_white() ? bpieces : wpieces;
     }
 
