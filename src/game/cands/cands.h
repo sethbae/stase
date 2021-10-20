@@ -7,12 +7,6 @@
 const int MAX_TOTAL_CANDS = 10;
 const int MAX_MOVES_PER_HOOK = 5;
 
-struct SquareStatus {
-    int balance = 0;
-    int min_w = 0;
-    int min_b = 0;
-};
-
 struct FeatureFrame {
     Square centre;
     Square secondary;

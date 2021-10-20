@@ -5,10 +5,19 @@ using std::cout;
 #include "cands.h"
 #include "../heur/heur.h"
 
-/*
- * Walks along the board in the given manner, maintaining a running total of the +- control
- * of the given square on the board. Updates min_w/min_b if it encounters a threatening piece
- * of the relevant colour of lower value than the current value of min_w/min_b.
+/**
+ * Used to pass information from capture_walk back to the following functions.
+ */
+struct SquareStatus {
+    int balance = 0;
+    int min_w = 0;
+    int min_b = 0;
+};
+
+/**
+ * Walks outward from the given piece, maintaining a running total of the +- control
+ * of the given square on the board. Maintains min_w and min_b as the pieces of each
+ * colour with minimum value that attack the given square.
  */
 void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
 
