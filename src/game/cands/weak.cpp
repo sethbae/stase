@@ -226,11 +226,11 @@ bool would_be_weak_if_attacked(const Gamestate & gs, const Square s, const Piece
     // by adjusting the balance, before applying the same logic as in is_weak_square
 
     if (colour(gs.board.get(s)) == WHITE) {
-        ++ss.balance;
+        --ss.balance;
         int min_attacker = ((piece_value(attacked_by) < ss.min_b) ? piece_value(attacked_by) : ss.min_b);
         return (ss.balance < 0) || (min_attacker < piece_value(gs.board.get(s)));
     } else {
-        --ss.balance;
+        ++ss.balance;
         int min_attacker = ((piece_value(attacked_by) < ss.min_w) ? piece_value(attacked_by) : ss.min_w);
         return (ss.balance > 0) || (min_attacker < piece_value(gs.board.get(s)));
     }

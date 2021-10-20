@@ -28,7 +28,7 @@ TestSet<StringTestCase> hook_test_cases = {
             // basic undefended pieces #3
             StringTestCase{
                 "8/b1p5/8/8/8/2N5/8/8 w - - 0 1",
-                {"b6"}
+                {"b5"}
             },
         }
 };
