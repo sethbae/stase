@@ -90,6 +90,8 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
             Square first_piece_sq = piece_squares[i];
             Square second_piece_sq = piece_squares[j];
 
+            std::cout << sqtos(first_piece_sq) << ", " << sqtos(second_piece_sq) << "\n";
+
             // pieces of same colour
             if (colour(gs.board.get(first_piece_sq)) != colour(gs.board.get(second_piece_sq))) { continue; }
 
@@ -98,22 +100,42 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
             // pieces connected by a straight, open path
             if (!is_valid_delta(delta)) { continue; }
 
-            // in a direction that neither piece can move
-            if (can_move_in_direction(type(gs.board.get(first_piece_sq)), direction_of_delta(delta))
-                    || can_move_in_direction(type(gs.board.get(second_piece_sq)), direction_of_delta(delta))) {
-                continue;
-            }
+            std::cout << "Valid path found\n";
+
+//            std::cout << type(gs.board.get(first_piece_sq)) << " " << type(gs.board.get(second_piece_sq)) << "\n";
+//            std::cout << "delta is diag: " << ((direction_of_delta(delta) == DIAG) ? "true\n" : "false\n");
+//            std::cout << "first clause: " << can_move_in_direction(type(gs.board.get(first_piece_sq)), direction_of_delta(delta)) << "\n";
+//            std::cout << "second clause: " << can_move_in_direction(type(gs.board.get(second_piece_sq)), direction_of_delta(delta)) << "\n";
 
             // find a piece which can move there!
             for (int k = 0; k < pieces_point; ++k) {
 
                 Piece forking_piece = gs.board.get(piece_squares[k]);
+                std::cout << "Potential forker on " << sqtos(piece_squares[k]) << "\n";
 
                 // piece of the right colour
-                if (colour(forking_piece) == colour(first_piece_sq)) { continue; }
+                if (colour(forking_piece) == colour(gs.board.get(first_piece_sq))) { continue; }
+
+                std::cout << "Found forker of correct colour\n";
 
                 // piece which can move in the required direction to fork
                 if (!can_move_in_direction(forking_piece, direction_of_delta(delta))) { continue; }
+
+                std::cout << "Found forker which can move correctly\n";
+
+                // check that both pieces are either weak, or more valuable than the forker
+                int forkable_pieces = 0;
+                if (would_be_weak_if_attacked(gs, first_piece_sq, forking_piece)
+                        || piece_value(gs.board.get(first_piece_sq)) > piece_value(forking_piece)) {
+                    ++forkable_pieces;
+                }
+                if (would_be_weak_if_attacked(gs, second_piece_sq, forking_piece)
+                    || piece_value(gs.board.get(second_piece_sq)) > piece_value(forking_piece)) {
+                    ++forkable_pieces;
+                }
+                if (forkable_pieces < 2) { continue; }
+
+                std::cout << "Proceeding with forker!\n";
 
                 bool continue_searching = true;
                 int x = get_x(first_piece_sq) + delta.xd, y = get_y(first_piece_sq) + delta.yd;
@@ -129,6 +151,7 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
                             frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
                         }
                     }
+                    std::cout << sqtos(temp) << " not viable\n";
                     x += delta.xd;
                     y += delta.yd;
                 }

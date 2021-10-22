@@ -1,14 +1,11 @@
 #include <string>
 #include <vector>
 #include <board.h>
-#include <iostream>
-using std::cout;
 
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
-#include "../../../game/heur/heur.h"
 
-TestSet<StringTestCase> hook_test_cases = {
+TestSet<StringTestCase> knight_fork_hook_test_cases = {
         "game-cands-knight-fork-hook",
         {
             StringTestCase{
@@ -106,5 +103,5 @@ bool evaluate_test_case_knight_fork_hook(const StringTestCase *tc) {
 }
 
 void test_knight_fork_hook() {
-    evaluate_test_set(&hook_test_cases, &evaluate_test_case_knight_fork_hook);
+    evaluate_test_set(&knight_fork_hook_test_cases, &evaluate_test_case_knight_fork_hook);
 }

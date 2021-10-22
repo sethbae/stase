@@ -10,4 +10,5 @@ void test_game() {
     test_defend_square();
     test_develop_piece();
     test_knight_fork_hook();
+    test_sliding_fork_hook();
 }

@@ -72,7 +72,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_development_hook.cpp
         src/test/game/cands/test_develop_piece.cpp
         src/test/game/cands/stress_test_cands.cpp
-        src/test/game/cands/test_knight_fork_hook.cpp)
+        src/test/game/cands/test_knight_fork_hook.cpp
+        src/test/game/cands/test_sliding_fork_hook.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

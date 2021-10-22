@@ -222,9 +222,6 @@ bool would_be_weak_if_attacked(const Gamestate & gs, const Square s, const Piece
     SquareStatus ss;
     capture_walk(gs.board, s, ss);
 
-    // the piece on from controls the to square (because it can presumably move there), so we compensate for that
-    // by adjusting the balance, before applying the same logic as in is_weak_square
-
     if (colour(gs.board.get(s)) == WHITE) {
         --ss.balance;
         int min_attacker = ((piece_value(attacked_by) < ss.min_b) ? piece_value(attacked_by) : ss.min_b);

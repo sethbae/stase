@@ -103,6 +103,7 @@ void test_beta_covers();
 void test_gamma_covers();
 void test_develop_piece();
 void test_knight_fork_hook();
+void test_sliding_fork_hook();
 
 void stress_test_main();
 
