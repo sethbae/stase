@@ -93,6 +93,7 @@ bool is_undeveloped_piece(const Gamestate &, const Square, FeatureFrame *);
 
 // functions used by hooks (BY_BOARD)
 bool find_knight_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
+bool find_sliding_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -102,7 +103,8 @@ void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 // the actual hooks
 const Hook weak_hook = Hook{"weak", 0, BY_SQUARE, &is_weak_square};
 const Hook develop_hook = Hook{"development", 1, BY_SQUARE, &is_undeveloped_piece};
-const Hook knight_fork_hook = Hook{"fork", 2, BY_BOARD, &find_knight_forks};
+const Hook knight_fork_hook = Hook{"kn-fork", 2, BY_BOARD, &find_knight_forks};
+const Hook sliding_fork_hook = Hook{"sliding-fork", 3, BY_BOARD, &find_sliding_forks};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -112,7 +114,8 @@ const Responder develop_resp = Responder{"develop", &develop_piece};
 const std::vector<const Hook *> ALL_HOOKS {
         &weak_hook,
         &develop_hook,
-        &knight_fork_hook
+        &knight_fork_hook,
+        &sliding_fork_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {

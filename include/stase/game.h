@@ -18,6 +18,12 @@ struct DeltaPair {
 };
 const DeltaPair INVALID_DELTA = { SQUARE_SENTINEL, SQUARE_SENTINEL };
 inline bool is_valid_delta(const DeltaPair d) { return d.xd != SQUARE_SENTINEL && d.yd != SQUARE_SENTINEL; }
+inline MoveType direction_of_delta(const DeltaPair d) {
+    if (d.xd == 0 || d.yd == 0) {
+        return ORTHO;
+    }
+    return DIAG;
+}
 
 /*
  * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
@@ -64,6 +70,8 @@ inline bool can_move_in_direction(Piece piece, MoveType dir) {
 }
 bool can_move_to_square(const Board &, Square from, Square to);
 bool collinear_points(Square, Square, Square);
+DeltaPair open_path_between(const Board & b, const Square, const Square);
+Square can_move_onto_line(const Board & b, const Square, const Square, const Square);
 
 // forward declaration: see cands.h
 struct FeatureFrame;

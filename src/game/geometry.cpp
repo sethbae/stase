@@ -7,11 +7,23 @@ bool collinear_points(Square a, Square b, Square c) {
     return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
 }
 
+DeltaPair get_delta_between(const Square a, const Square b) {
+    int dx = get_x(b) - get_x(a);
+    int dy = get_y(b) - get_y(a);
+    if (dx != 0) {
+        dx = (dx > 0) ? 1 : -1;
+    }
+    if (dy != 0) {
+        dy = (dy > 0) ? 1 : -1;
+    }
+    return DeltaPair{ (Byte) dx, (Byte) dy};
+}
+
 /**
  * Checks whether the given board contains a path of empty squares which lie in a straight line from
  * [from] to [to]. If so, the required direction is returned.
  */
-DeltaPair open_path_between(const Board & b, const Square from, const Square to, int xd, int yd) {
+DeltaPair open_path_between(const Board & b, const Square from, const Square to) {
 
     int dx = get_x(to) - get_x(from);
     int dy = get_y(to) - get_y(from);
@@ -56,4 +68,32 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to,
     }
 
     return INVALID_DELTA;
+}
+
+/**
+ * Checks whether the piece at the given square can move onto the line which runs from [line_start_point]
+ * to [line_end_point]. If it can move onto it, then the square which it can move onto is returned, otherwise
+ * SQUARE_SENTINEL is returned.
+ * If there are multiple squares on the line which the piece can move to, then the first encountered is returned.
+ */
+Square can_move_onto_line(
+        const Board & b, const Square piece_sq, const Square line_start_point, const Square line_end_point) {
+
+    if (line_start_point == line_end_point) { return false; }
+
+    DeltaPair delta = get_delta_between(line_start_point, line_end_point);
+    int x = get_x(line_start_point) + delta.xd, y = get_y(line_start_point) + delta.yd;
+
+    Square temp;
+
+    while (val(temp = mksq(x, y)) && temp != line_end_point) {
+        if (alpha_covers(b, piece_sq, temp)) {
+            return temp;
+        }
+        x += delta.xd;
+        y += delta.yd;
+    }
+
+    return SQUARE_SENTINEL;
+
 }
