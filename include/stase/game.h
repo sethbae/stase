@@ -12,6 +12,13 @@ enum MoveType {
     INVALID_MOVE = 5
 };
 
+struct DeltaPair {
+    Byte xd;
+    Byte yd;
+};
+const DeltaPair INVALID_DELTA = { SQUARE_SENTINEL, SQUARE_SENTINEL };
+inline bool is_valid_delta(const DeltaPair d) { return d.xd != SQUARE_SENTINEL && d.yd != SQUARE_SENTINEL; }
+
 /*
  * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
  * Given values in gamestate.cpp
@@ -56,6 +63,7 @@ inline bool can_move_in_direction(Piece piece, MoveType dir) {
     return PIECE_MOVE_TYPES[piece][dir];
 }
 bool can_move_to_square(const Board &, Square from, Square to);
+bool collinear_points(Square, Square, Square);
 
 // forward declaration: see cands.h
 struct FeatureFrame;

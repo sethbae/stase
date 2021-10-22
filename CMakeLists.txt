@@ -18,6 +18,7 @@ set(SOURCE_FILES
 
         src/game/eval.cpp
         src/game/gamestate.cpp
+        src/game/geometry.cpp
         src/game/piece.cpp
         src/game/helper.h
         src/game/helper.cpp

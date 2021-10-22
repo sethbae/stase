@@ -3,13 +3,6 @@
 #include "game.h"
 
 /**
- * Checks whether the three points given all lie on a straight line.
- */
-bool collinear_points(Square a, Square b, Square c) {
-    return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
-}
-
-/**
  * Walks out from the piece looking for other pieces which can move to the squares encountered
  * and therefore can defend the piece. Does not consider discovered defences or promotions.
  */
