@@ -29,7 +29,7 @@ bool find_knight_forks(const Gamestate & gs, const Square ignored, FeatureFrame 
             Square fork_square = mksq(get_x(piece_squares[i]) + XKN[j], get_y(piece_squares[i]) + YKN[j]);
 
             if (!val(fork_square)
-                    || would_be_weak_square(gs, piece_squares[i], fork_square)) {
+                || would_be_on_weak_square(gs, piece_squares[i], fork_square)) {
                 continue;
             }
 
@@ -146,7 +146,7 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
                         // only queens can possibly have more than one square to move to on the line
                         continue_searching = (type(forking_piece) == QUEEN);
 
-                        if (!would_be_weak_square(gs, piece_squares[k], temp)) {
+                        if (!would_be_on_weak_square(gs, piece_squares[k], temp)) {
                             // can move safely to the square! go for it.
                             frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
                         }

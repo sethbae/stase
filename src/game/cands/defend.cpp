@@ -54,7 +54,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
                     if (can_move_to_square(b, piece_squares[j], temp)
                             && can_move_in_direction(b.get(piece_squares[j]), dir)
-                            && !would_be_weak_square(gs, piece_squares[j], temp)) {
+                            && !would_be_on_weak_square(gs, piece_squares[j], temp)) {
                         if (move_counter.has_space()) {
                             moves[move_counter.inc()] = {piece_squares[j], temp, 0};
                         } else {
@@ -91,7 +91,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
                         && (temp != s)
-                        && !would_be_weak_square(gs, temp, defend_from_square)) {
+                        && !would_be_on_weak_square(gs, temp, defend_from_square)) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
@@ -116,7 +116,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         && (type(b.get(temp)) == KING)
                         && (colour(b.get(temp)) == defending_colour)
                         && (temp != s)
-                        && !would_be_weak_square(gs, temp, defend_from_square)) {
+                        && !would_be_on_weak_square(gs, temp, defend_from_square)) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
@@ -144,7 +144,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         if (type(b.get(piece_squares[i])) == PAWN) {
             if (val(left_pawn_defence_square)
                     && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)
-                    && !would_be_weak_square(gs, piece_squares[i], left_pawn_defence_square)) {
+                    && !would_be_on_weak_square(gs, piece_squares[i], left_pawn_defence_square)) {
                 if (move_counter.has_space()) {
                     moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
                 } else {
@@ -153,7 +153,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 }
             } else if (val(right_pawn_defence_square)
                         && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)
-                        && !would_be_weak_square(gs, piece_squares[i], right_pawn_defence_square)) {
+                        && !would_be_on_weak_square(gs, piece_squares[i], right_pawn_defence_square)) {
                 if (move_counter.has_space()) {
                     moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
                 } else {

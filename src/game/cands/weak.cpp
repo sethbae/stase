@@ -198,7 +198,7 @@ bool is_weak_square(const Gamestate & gs, const Square s) {
  * of weak is as elsewhere (see is_weak_square above). This assumes that the piece on the from-square
  * can move to the to-square.
  */
-bool would_be_weak_square(const Gamestate & gs, const Square from, const Square to) {
+bool would_be_on_weak_square(const Gamestate & gs, const Square from, const Square to) {
 
     SquareStatus ss;
     capture_walk(gs.board, to, ss);

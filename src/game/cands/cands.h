@@ -87,7 +87,7 @@ struct FeatureHandler {
 // functions used by hooks (BY_SQUARE)
 bool is_weak_square(const Gamestate &, const Square, FeatureFrame *);
 bool is_weak_square(const Gamestate &, const Square);
-bool would_be_weak_square(const Gamestate &, const Square, const Square);
+bool would_be_on_weak_square(const Gamestate &gs, const Square from, const Square to);
 bool would_be_weak_if_attacked(const Gamestate &, const Square, const Piece attacked_by);
 bool is_undeveloped_piece(const Gamestate &, const Square, FeatureFrame *);
 
