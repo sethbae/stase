@@ -152,8 +152,9 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
 
 /**
  * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
- * - a piece on a square which the enemy have more control over.
- * - a piece threatened by a less valuable piece.
+ * - attacked by a piece of lower value
+ * - attacked by a piece of equal value and not sufficiently defended
+ * - attacked by any piece and not defended at all
  *
  * Records in conf_1 the value of the least valuable white piece attacking the square
  * Records in conf_2 the value of the least valuable black piece attacking the square
@@ -172,25 +173,60 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
     ff->conf_1 = ss.min_w;
     ff->conf_2 = ss.min_b;
 
+    bool
+        totally_undefended,
+        attacked_at_all,
+        attacked_by_weaker,
+        attacked_by_equal,
+        under_defended;
+
     if (colour(gs.board.get(centre)) == WHITE) {
-        return (ss.balance < 0 && ss.min_b <= piece_value(B_KING)) || (ss.min_b < piece_value(gs.board.get(centre)));
+
+        totally_undefended = (ss.min_w > piece_value(W_KING));
+        attacked_at_all = (ss.min_b <= piece_value(B_KING));
+        attacked_by_weaker = (ss.min_b < piece_value(gs.board.get(centre)));
+        attacked_by_equal = (ss.min_b == piece_value(gs.board.get(centre)));
+        under_defended = (ss.balance < 0);
+
     } else {
-        return (ss.balance > 0 && ss.min_w <= piece_value(W_KING)) || (ss.min_w < piece_value(gs.board.get(centre)));
+
+        totally_undefended = (ss.min_b > piece_value(B_KING));
+        attacked_at_all = (ss.min_w <= piece_value(W_KING));
+        attacked_by_weaker = (ss.min_w < piece_value(gs.board.get(centre)));
+        attacked_by_equal = (ss.min_w == piece_value(gs.board.get(centre)));
+        under_defended = (ss.balance > 0);
+
     }
+
+//    cout << "totally undefended: " << totally_undefended << "\n";
+//    cout << "attacked at all: " << attacked_at_all << "\n";
+//    cout << "attacked by weaker: " << attacked_by_weaker << "\n";
+//    cout << "attacked by equal: " << attacked_by_equal << "\n";
+//    cout << "under defended: " << under_defended << "\n";
+
+    return (
+            attacked_by_weaker
+            || (attacked_by_equal && under_defended)
+            || (attacked_at_all && totally_undefended)
+    );
+
 }
 
+/**
+ * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
+ * - attacked by a piece of lower value
+ * - attacked by a piece of equal value and not sufficiently defended
+ * - attacked by any piece and not defended at all
+ *
+ * Records in conf_1 the value of the least valuable white piece attacking the square
+ * Records in conf_2 the value of the least valuable black piece attacking the square
+ *
+ * @param b the board
+ * @param centre the square to look at
+ */
 bool is_weak_square(const Gamestate & gs, const Square s) {
-
-    if (type(gs.board.get(s)) == EMPTY) { return false; }
-
-    SquareStatus ss;
-    capture_walk(gs.board, s, ss);
-
-    if (colour(gs.board.get(s)) == WHITE) {
-        return (ss.balance < 0 && ss.min_b <= piece_value(B_KING)) || (ss.min_b < piece_value(gs.board.get(s)));
-    } else {
-        return (ss.balance > 0 && ss.min_w <= piece_value(W_KING)) || (ss.min_w < piece_value(gs.board.get(s)));
-    }
+    FeatureFrame ff;
+    return is_weak_square(gs, s, &ff);
 }
 
 /**
