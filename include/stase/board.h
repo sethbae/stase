@@ -101,12 +101,16 @@ inline bool is_sentinel(const Move m) { return m.from == SQUARE_SENTINEL; }
 struct Board {
 
     /* board and configuration word */
-    Byte squares[8][4];
+    mutable Byte squares[8][4];
     Int conf;
 
     /* get/set squares */
     Piece get(const Square &) const;
     void set(const Square &, const Piece);
+
+    /* used to cheat! Sneakily make or unmake a move */
+    void sneak(const Move) const;
+    void unsneak(const Move) const;
 
     /* change the position of the pieces, without affecting config */
     void mutate(const Move);

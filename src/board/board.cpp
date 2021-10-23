@@ -119,6 +119,84 @@ void Board::set(const Square & sq, const Piece val) {
     
 }
 
+/**
+ * Sneak is used to make a move on the board VERY temporarily - just to check something
+ * (eg weak square? in check?) about the resulting position. It makes the move without
+ * updating any conf info.
+ * You can only SNEAK if you promise to immediately UNSNEAK!
+ */
+void Board::sneak(const Move m) const {
+
+    Piece p = this->get(m.from);
+
+    /*
+     * Set the from square to empty
+     */
+    Byte ind1 = m.from >> 4;
+    Byte ind2 = (m.from & LO3) >> 1;
+
+    if (m.from & 1) {
+        // if odd, write to low
+        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | EMPTY;
+    } else {
+        // if even, write to high
+        squares[ind1][ind2] = (EMPTY << 4) | (squares[ind1][ind2] & LO4);
+    }
+
+    /*
+     * Set the to square to the piece
+     */
+    ind1 = m.to >> 4;
+    ind2 = (m.to & LO3) >> 1;
+
+    if (m.to & 1) {
+        // if odd, write to low
+        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | p;
+    } else {
+        // if even, write to high
+        squares[ind1][ind2] = (p << 4) | (squares[ind1][ind2] & LO4);
+    }
+
+}
+
+/**
+ * Unsneak is used to undo a sneak operation. It undoes the given move, which should be
+ * the same move passed to SNEAK. You should only UNSNEAK after a SNEAK, and you should
+ * always UNSNEAK as soon as possible!
+ */
+void Board::unsneak(const Move m) const {
+
+    Piece p = this->get(m.to);
+
+    /*
+     * Set the to square to empty
+     */
+    Byte ind1 = m.to >> 4;
+    Byte ind2 = (m.to & LO3) >> 1;
+
+    if (m.to & 1) {
+        // if odd, write to low
+        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | EMPTY;
+    } else {
+        // if even, write to high
+        squares[ind1][ind2] = (EMPTY << 4) | (squares[ind1][ind2] & LO4);
+    }
+
+    /*
+     * Set the from square to the piece
+     */
+    ind1 = m.from >> 4;
+    ind2 = (m.from & LO3) >> 1;
+
+    if (m.from & 1) {
+        // if odd, write to low
+        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | p;
+    } else {
+        // if even, write to high
+        squares[ind1][ind2] = (p << 4) | (squares[ind1][ind2] & LO4);
+    }
+}
+
 /* get/set whole config word */
 void Board::set_conf_word(Int c) { conf = c; }
 Int Board::get_conf_word() const { return conf; } 
