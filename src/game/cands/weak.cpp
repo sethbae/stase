@@ -18,12 +18,44 @@ struct SquareStatus {
  * Walks outward from the given piece, maintaining a running total of the +- control
  * of the given square on the board. Maintains min_w and min_b as the pieces of each
  * colour with minimum value that attack the given square.
+ * Includes more complicated logic regarding x-rays including those of mixed colour.
  */
 void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
 
-    int balance = 0;
+    /*
+     *                  X-RAYS and POLY X-RAYS
+     *
+     * An x-ray is when multiple pieces able to move in a common direction
+     * line up to control a square, eg ...RR..p
+     *
+     * A poly x-ray is when these pieces are of mixed colours, eg:
+     *                  ..qQ...n
+     *
+     * For simple x-rays, it is okay to keep adding to the balance: they act
+     * as one. For poly x-rays this is more complicated, however. Consider this
+     * case:
+     *          . . . . . . . k
+     *          . . . q . R p .
+     *          . . . . . . Q p
+     * (fen "4r2k/3q1Rp1/6Qp/p3p3/8/2P4P/6PK/8 b - - 3 37")
+     *
+     * The black queen's defence of g7 is blocked by the white rook. It doesn't defend
+     * g7 because white can take with his queen, and the black queen cannot recapture.
+     * Suppose that the queen was on f5 however, and now the black queen could take the
+     * rook after the (inadvisable) Rxg7.
+     *
+     * The possibly flawed approach of this implementation is to count poly x-ray balances
+     * and weakest defenders separately. If the attacking side controls the square from
+     * multiple directions, then the poly x-rays are ignored. If the attackers attack only
+     * from one direction however, then poly x-rays affect the balance and min-defender.
+     */
+
+    int basic_balance = 0;
+    int poly_x_ray_balance = 0;
+    int directions_attacked_from = 0;
     int min_value_w = piece_value(W_KING)*10;
     int min_value_b = piece_value(W_KING)*10;
+    int min_poly_x_ray_defender = piece_value(W_KING) * 10;
     int x, y;
     Square temp;
 
@@ -34,35 +66,59 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
         if (i == 4) {
             dir = ORTHO;
         }
+
+        // used to check if extra defenders are discovered in this direction
+        int prior_balance = basic_balance;
         
         int x_inc = XD[i], y_inc = YD[i];
         bool cont = true;
         bool x_ray = false;
         Ptype x_ray_colour = INVALID;
+        bool poly_x_ray = false;
 
         x = get_x(s) + x_inc, y = get_y(s) + y_inc;
 
-        // and go in that direction
+        // work outwards in that direction
         while (val(temp = mksq(x, y)) && cont) {
     
             Piece p = b.get(temp);
 
             if ((type(p) != EMPTY) && can_move_in_direction(p, dir)) {
 
-                // once we're in an x-ray, only that colour can x-ray
-                if (x_ray && colour(p) != x_ray_colour) { break; }
+                // attacking piece found: update (poly) x-ray info and balances
+
+                if (x_ray && colour(p) != x_ray_colour) {
+                    poly_x_ray = true;
+                }
 
                 int val = piece_value(p);
                 if (colour(p) == WHITE) {
-                    ++balance;
-                    if (!x_ray && val < min_value_w) {
-                        min_value_w = val;
+                    if (poly_x_ray) {
+                        ++poly_x_ray_balance;
+                    } else {
+                        ++basic_balance;
+                        ++poly_x_ray_balance;
+                        if (val < min_value_w) {
+                            min_value_w = val;
+                        }
                     }
                 } else {
-                    --balance;
-                    if (!x_ray && val < min_value_b) {
-                        min_value_b = val;
+                    if (poly_x_ray) {
+                        --poly_x_ray_balance;
+                    } else {
+                        --basic_balance;
+                        --poly_x_ray_balance;
+                        if (val < min_value_b) {
+                            min_value_b = val;
+                        }
                     }
+                }
+
+                // is this piece a poly-x-ray defender?
+                if (poly_x_ray
+                        && (colour(p) == colour(b.get(s)))
+                        && piece_value(p) < min_poly_x_ray_defender) {
+                    min_poly_x_ray_defender = piece_value(p);
                 }
 
                 x_ray = true;
@@ -77,6 +133,11 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
             y += y_inc;
             
         }
+
+        if (basic_balance != prior_balance) {
+            // some defender was found in this direction
+            ++directions_attacked_from;
+        }
         
     }
 
@@ -88,16 +149,19 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
     for (int i = 0; i < 8; ++i) {
         if (val(temp = mksq(x + XKN[i], y + YKN[i])) && (type(b.get(temp)) == KNIGHT)) {
             if (colour(b.get(temp)) == WHITE) {
-                ++balance;
+                ++basic_balance;
+                ++poly_x_ray_balance;
                 if (min_value_w > kn_val) {
                     min_value_w = kn_val;
                 }
             } else {
-                --balance;
+                --basic_balance;
+                --poly_x_ray_balance;
                 if (min_value_b > kn_val) {
                     min_value_b = kn_val;
                 }
             }
+            ++directions_attacked_from;
         }
     }
 
@@ -106,54 +170,95 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
     for (int i = 0; i < 8; ++i) {
         if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(b.get(temp)) == KING)) {
             if (colour(b.get(temp)) == WHITE) {
-                ++balance;
+                ++basic_balance;
+                ++poly_x_ray_balance;
                 if (min_value_w > k_val) {
                     min_value_w = k_val;
                 }
             } else {
-                --balance;
+                --basic_balance;
+                --poly_x_ray_balance;
                 if (min_value_b > k_val) {
                     min_value_b = k_val;
                 }
             }
+            ++directions_attacked_from;
         }
     }
 
     // pawns
     int pawn_val = piece_value(W_PAWN);
     if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN)) {
-        balance -= 1;
+        --basic_balance;
+        --poly_x_ray_balance;
         if (min_value_b > pawn_val) {
             min_value_b = pawn_val;
         }
+        ++directions_attacked_from;
     }
     if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN)) {
-        balance -= 1;
+        --basic_balance;
+        --poly_x_ray_balance;
         if (min_value_b > pawn_val) {
             min_value_b = pawn_val;
         }
+        ++directions_attacked_from;
     }
     if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN)) {
-        balance += 1;
+        ++basic_balance;
+        ++poly_x_ray_balance;
         if (min_value_w > pawn_val) {
             min_value_w = pawn_val;
         }
+        ++directions_attacked_from;
     }
     if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN)) {
-        balance += 1;
+        ++basic_balance;
+        ++poly_x_ray_balance;
         if (min_value_w > pawn_val) {
             min_value_w = pawn_val;
         }
+        ++directions_attacked_from;
     }
 
-    // record the information
-    sq_status.balance = balance;
-    sq_status.min_w = min_value_w;
-    sq_status.min_b = min_value_b;
+//    cout << "attacked from " << directions_attacked_from << " directions\n";
+//    cout << "basic balance: " << basic_balance << "\n";
+//    cout << "poly_x_ray_balance: " << poly_x_ray_balance << "\n";
 
-    //cout << "Balance: " << balance
-    //     << "\nMin white: " << min_value_w
-    //     << "\nMin black: " << min_value_b << "\n";
+    // if we attack from only one direction, poly x rays count, because they act in the only direction
+    // in which we can capture; e.g. ...q.Q.n (the knight is not weak)
+    // if we attack from multiple directions, however, then a piece from another direction can capture,
+    // so the piece should be weak.
+    if (directions_attacked_from > 1) {
+
+        // attacking from multiple directions, poly x-rays do not count
+        sq_status.balance = basic_balance;
+        sq_status.min_w = min_value_w;
+        sq_status.min_b = min_value_b;
+
+    } else {
+
+        // attacking from one route only, poly x-rays do count
+        sq_status.balance = poly_x_ray_balance;
+
+        // we also need to check for poly x-ray pieces that are the only or weakest defender
+        if (colour(b.get(s)) == WHITE) {
+
+            // if the weak piece is white, its defenders are white
+            int min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
+            sq_status.min_w = min_defender;
+            sq_status.min_b = min_value_b;
+
+        } else {
+
+            // if the weak piece is black, its defenders are black
+            int min_defender = (min_poly_x_ray_defender < min_value_b) ? min_poly_x_ray_defender : min_value_b;
+            sq_status.min_w = min_value_w;
+            sq_status.min_b = min_defender;
+
+        }
+
+    }
 
 }
 
@@ -221,7 +326,7 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
 //    cout << "under defended: " << under_defended << "\n";
 //    cout << "weakest attacker: " << weakest_attacker << "\n";
 //    cout << "weakest defender: " << weakest_defender << "\n";
-//    cout << "balance: " << ss.balance << "\n";
+//    cout << "basic_balance: " << ss.balance << "\n";
 
     return (
             attacked_by_weaker
