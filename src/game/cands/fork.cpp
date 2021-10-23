@@ -108,8 +108,6 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
             Square first_piece_sq = piece_squares[i];
             Square second_piece_sq = piece_squares[j];
 
-            std::cout << sqtos(first_piece_sq) << ", " << sqtos(second_piece_sq) << "\n";
-
             // pieces of same colour
             if (colour(gs.board.get(first_piece_sq)) != colour(gs.board.get(second_piece_sq))) { continue; }
 
@@ -117,8 +115,6 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
 
             // pieces connected by a straight, open path
             if (!is_valid_delta(delta)) { continue; }
-
-            std::cout << "Valid path found\n";
 
 //            std::cout << type(gs.board.get(first_piece_sq)) << " " << type(gs.board.get(second_piece_sq)) << "\n";
 //            std::cout << "delta is diag: " << ((direction_of_delta(delta) == DIAG) ? "true\n" : "false\n");
@@ -129,17 +125,12 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
             for (int k = 0; k < pieces_point; ++k) {
 
                 Piece forking_piece = gs.board.get(piece_squares[k]);
-                std::cout << "Potential forker on " << sqtos(piece_squares[k]) << "\n";
 
                 // piece of the right colour
                 if (colour(forking_piece) == colour(gs.board.get(first_piece_sq))) { continue; }
 
-                std::cout << "Found forker of correct colour\n";
-
                 // piece which can move in the required direction to fork
                 if (!can_move_in_direction(forking_piece, direction_of_delta(delta))) { continue; }
-
-                std::cout << "Proceeding with forker!\n";
 
                 bool continue_searching = true;
                 int x = get_x(first_piece_sq) + delta.xd, y = get_y(first_piece_sq) + delta.yd;
@@ -159,11 +150,8 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
                                 Move{piece_squares[k], temp})
                             && !would_be_weak_after_move(gs, temp, Move{piece_squares[k], temp})) {
 
-                            std::cout << "Bang!\n";
                             frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
 
-                        } else {
-                            std::cout << sqtos(temp) << " not viable\n";
                         }
 
                         // only queens can possibly have more than one square to move to on the line
