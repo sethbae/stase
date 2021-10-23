@@ -162,6 +162,7 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
+ * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  *
  * Records in conf_1 the value of the least valuable white piece attacking the square
  * Records in conf_2 the value of the least valuable black piece attacking the square
@@ -186,6 +187,9 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
         attacked_by_weaker,
         attacked_by_equal,
         under_defended;
+    int
+        weakest_attacker,
+        weakest_defender;
 
     if (colour(gs.board.get(centre)) == WHITE) {
 
@@ -195,6 +199,9 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
         attacked_by_equal = (ss.min_b == piece_value(gs.board.get(centre)));
         under_defended = (ss.balance < 0);
 
+        weakest_attacker = ss.min_b;
+        weakest_defender = ss.min_w;
+
     } else {
 
         totally_undefended = (ss.min_b > piece_value(B_KING));
@@ -203,6 +210,8 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
         attacked_by_equal = (ss.min_w == piece_value(gs.board.get(centre)));
         under_defended = (ss.balance > 0);
 
+        weakest_attacker = ss.min_w;
+        weakest_defender = ss.min_b;
     }
 
 //    cout << "totally undefended: " << totally_undefended << "\n";
@@ -210,12 +219,15 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
 //    cout << "attacked by weaker: " << attacked_by_weaker << "\n";
 //    cout << "attacked by equal: " << attacked_by_equal << "\n";
 //    cout << "under defended: " << under_defended << "\n";
+//    cout << "weakest attacker: " << weakest_attacker << "\n";
+//    cout << "weakest defender: " << weakest_defender << "\n";
 //    cout << "balance: " << ss.balance << "\n";
 
     return (
             attacked_by_weaker
             || (attacked_by_equal && under_defended)
             || (attacked_at_all && totally_undefended)
+            || (under_defended && (weakest_attacker < weakest_defender))
     );
 
 }
@@ -225,6 +237,7 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
+ * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  *
  * Records in conf_1 the value of the least valuable white piece attacking the square
  * Records in conf_2 the value of the least valuable black piece attacking the square
