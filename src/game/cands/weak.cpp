@@ -38,6 +38,7 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
         int x_inc = XD[i], y_inc = YD[i];
         bool cont = true;
         bool x_ray = false;
+        Ptype x_ray_colour = INVALID;
 
         x = get_x(s) + x_inc, y = get_y(s) + y_inc;
 
@@ -47,7 +48,10 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
             Piece p = b.get(temp);
 
             if ((type(p) != EMPTY) && can_move_in_direction(p, dir)) {
-                // any piece which can move in the right dir: account and continue
+
+                // once we're in an x-ray, only that colour can x-ray
+                if (x_ray && colour(p) != x_ray_colour) { break; }
+
                 int val = piece_value(p);
                 if (colour(p) == WHITE) {
                     ++balance;
@@ -60,7 +64,10 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
                         min_value_b = val;
                     }
                 }
+
                 x_ray = true;
+                x_ray_colour = colour(p);
+
             } else  if (type(p) != EMPTY) {
                 // blocking piece: abort
                 cont = false;
@@ -203,6 +210,7 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
 //    cout << "attacked by weaker: " << attacked_by_weaker << "\n";
 //    cout << "attacked by equal: " << attacked_by_equal << "\n";
 //    cout << "under defended: " << under_defended << "\n";
+//    cout << "balance: " << ss.balance << "\n";
 
     return (
             attacked_by_weaker
