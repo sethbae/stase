@@ -194,41 +194,15 @@ bool is_weak_square(const Gamestate & gs, const Square s) {
 }
 
 /**
- * Checks whether a piece moving from [from] to [to] would then be on a weak square. The definition
- * of weak is as elsewhere (see is_weak_square above). This assumes that the piece on the from-square
- * can move to the to-square.
+ * Calculates exactly the same thing as is_weak_square, but after the given move has
+ * taken place.
  */
-bool would_be_on_weak_square(const Gamestate & gs, const Square from, const Square to) {
+bool would_be_weak_after_move(const Gamestate & gs, const Square s, const Move m) {
 
-    SquareStatus ss;
-    capture_walk(gs.board, to, ss);
+    gs.board.sneak(m);
+    bool weak = is_weak_square(gs, s);
+    gs.board.unsneak(m);
 
-    // the piece on from controls the to square (because it can presumably move there), so we compensate for that
-    // by adjusting the balance, before applying the same logic as in is_weak_square
+    return weak;
 
-    if (colour(gs.board.get(from)) == WHITE) {
-        --ss.balance;
-        return (ss.balance < 0 && ss.min_b <= piece_value(B_KING)) || (ss.min_b < piece_value(gs.board.get(from)));
-    } else {
-        ++ss.balance;
-        return (ss.balance > 0 && ss.min_w <= piece_value(W_KING)) || (ss.min_w < piece_value(gs.board.get(from)));
-    }
-}
-
-bool would_be_weak_if_attacked(const Gamestate & gs, const Square s, const Piece attacked_by) {
-
-    if (type(gs.board.get(s)) == EMPTY) { return false; }
-
-    SquareStatus ss;
-    capture_walk(gs.board, s, ss);
-
-    if (colour(gs.board.get(s)) == WHITE) {
-        --ss.balance;
-        int min_attacker = ((piece_value(attacked_by) < ss.min_b) ? piece_value(attacked_by) : ss.min_b);
-        return (ss.balance < 0) || (min_attacker < piece_value(gs.board.get(s)));
-    } else {
-        ++ss.balance;
-        int min_attacker = ((piece_value(attacked_by) < ss.min_w) ? piece_value(attacked_by) : ss.min_w);
-        return (ss.balance > 0) || (min_attacker < piece_value(gs.board.get(s)));
-    }
 }

@@ -29,7 +29,7 @@ bool find_knight_forks(const Gamestate & gs, const Square ignored, FeatureFrame 
             Square fork_square = mksq(get_x(piece_squares[i]) + XKN[j], get_y(piece_squares[i]) + YKN[j]);
 
             if (!val(fork_square)
-                || would_be_on_weak_square(gs, piece_squares[i], fork_square)) {
+                    || would_be_weak_after_move(gs, fork_square, Move{piece_squares[i], fork_square})) {
                 continue;
             }
 
@@ -48,7 +48,7 @@ bool find_knight_forks(const Gamestate & gs, const Square ignored, FeatureFrame 
 
                 if (colour(p) != colour(gs.board.get(piece_squares[i]))
                         && type(p) != KNIGHT
-                        && (would_be_weak_if_attacked(gs, forked_square, gs.board.get(piece_squares[i]))
+                        && (would_be_weak_after_move(gs, forked_square, Move{piece_squares[i], fork_square})
                             || piece_value(p) > piece_value(KNIGHT))) {
                     ++forked_count;
                 }
@@ -65,6 +65,24 @@ bool find_knight_forks(const Gamestate & gs, const Square ignored, FeatureFrame 
 
     // return value required by hook format and should be ignored
     return false;
+}
+
+/**
+ * Checks that playing the fork move does indeed make a threat to each of the forked pieces. 'Threat'
+ * is defined as making their square weak or as attacking a piece which is more valuable than the forker.
+ */
+bool would_be_effective_fork(
+        const Gamestate & gs, const Square forked_piece_a, const Square forked_piece_b, const Move fork_move) {
+    int forked_pieces = 0;
+    if (would_be_weak_after_move(gs, forked_piece_a, fork_move)
+            || piece_value(gs.board.get(forked_piece_a)) > piece_value(gs.board.get(fork_move.from))) {
+        ++forked_pieces;
+    }
+    if (would_be_weak_after_move(gs, forked_piece_b, fork_move)
+            || piece_value(gs.board.get(forked_piece_b)) > piece_value(gs.board.get(fork_move.from))) {
+        ++forked_pieces;
+    }
+    return forked_pieces == 2;
 }
 
 bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame * ignored2) {
@@ -121,20 +139,6 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
                 // piece which can move in the required direction to fork
                 if (!can_move_in_direction(forking_piece, direction_of_delta(delta))) { continue; }
 
-                std::cout << "Found forker which can move correctly\n";
-
-                // check that both pieces are either weak, or more valuable than the forker
-                int forkable_pieces = 0;
-                if (would_be_weak_after_move(gs, first_piece_sq, Move{forking_piece, })
-                        || piece_value(gs.board.get(first_piece_sq)) > piece_value(forking_piece)) {
-                    ++forkable_pieces;
-                }
-                if (would_be_weak_if_attacked(gs, second_piece_sq, forking_piece)
-                    || piece_value(gs.board.get(second_piece_sq)) > piece_value(forking_piece)) {
-                    ++forkable_pieces;
-                }
-                if (forkable_pieces < 2) { continue; }
-
                 std::cout << "Proceeding with forker!\n";
 
                 bool continue_searching = true;
@@ -143,16 +147,29 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
                 while (continue_searching && val(temp = mksq(x, y)) && temp != second_piece_sq) {
                     if (alpha_covers(gs.board, piece_squares[k], temp)) {
 
+                        /*
+                         * Check two things of the move:
+                         * - that when we fork, each piece is actually threatened (would_be_effective_fork)
+                         * - that the piece we fork with isn't moving to a weak square (would_be_weak_after_move)
+                         */
+                        if (would_be_effective_fork(
+                                gs,
+                                first_piece_sq,
+                                second_piece_sq,
+                                Move{piece_squares[k], temp})
+                            && !would_be_weak_after_move(gs, temp, Move{piece_squares[k], temp})) {
+
+                            std::cout << "Bang!\n";
+                            frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
+
+                        } else {
+                            std::cout << sqtos(temp) << " not viable\n";
+                        }
+
                         // only queens can possibly have more than one square to move to on the line
                         continue_searching = (type(forking_piece) == QUEEN);
 
-                        if (!would_be_on_weak_square(gs, piece_squares[k], temp)) {
-                            // can move safely to the square! go for it.
-                            std::cout << "BANG\n";
-                            frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
-                        }
                     }
-                    std::cout << sqtos(temp) << " not viable\n";
                     x += delta.xd;
                     y += delta.yd;
                 }
