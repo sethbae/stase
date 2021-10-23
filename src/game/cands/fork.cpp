@@ -125,7 +125,7 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
 
                 // check that both pieces are either weak, or more valuable than the forker
                 int forkable_pieces = 0;
-                if (would_be_weak_if_attacked(gs, first_piece_sq, forking_piece)
+                if (would_be_weak_after_move(gs, first_piece_sq, Move{forking_piece, })
                         || piece_value(gs.board.get(first_piece_sq)) > piece_value(forking_piece)) {
                     ++forkable_pieces;
                 }
@@ -148,6 +148,7 @@ bool find_sliding_forks(const Gamestate & gs, const Square ignored, FeatureFrame
 
                         if (!would_be_on_weak_square(gs, piece_squares[k], temp)) {
                             // can move safely to the square! go for it.
+                            std::cout << "BANG\n";
                             frames[frames_point++] = FeatureFrame{temp, piece_squares[k], 0, 0};
                         }
                     }

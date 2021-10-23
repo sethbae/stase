@@ -83,6 +83,12 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
 //                        "8/8/3p1k2/3R4/5qP1/5B2/5PK1/8 w - - 3 54",
 //                        {"f5"}
 //                },
+                // TODO this is failing because it tries to queen "fork" on d7
+                // ROOK: puzzle #3
+                StringTestCase{
+                    "r4r1k/1pq1n1pp/2p1Q3/4p2P/4P3/1PP3P1/5P2/3R1RK1 w - - 1 26",
+                    {"d7"}
+                },
 
                 // QUEEN: basic undefended pieces #1
                 StringTestCase{
