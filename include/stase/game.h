@@ -39,10 +39,10 @@ typedef void StepFunc(Square &);
 extern StepFunc *STEP_FUNCS[8];
 
 // constants for iterating over the directions
-const unsigned ORTHO_START = 0;
-const unsigned ORTHO_STOP  = 4;
-const unsigned DIAG_START  = 4;
-const unsigned DIAG_STOP   = 8;
+const unsigned DIAG_START  = 0;
+const unsigned DIAG_STOP   = 4;
+const unsigned ORTHO_START = 4;
+const unsigned ORTHO_STOP  = 8;
 
 // and a lookup table (indexed by numeric value of Ptype enumeration) for which of
 // the above movesets to use.

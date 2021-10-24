@@ -59,7 +59,8 @@ inline int piece_value(const Piece p) {
         case KNIGHT:
         case BISHOP: return 3000;
         case ROOK: return 5000;
-        default: return 9000;
+        case QUEEN: return 9000;
+        default: return 9001;
     }
 
 }
