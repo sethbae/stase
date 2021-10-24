@@ -125,9 +125,10 @@ void Board::set(const Square & sq, const Piece val) {
  * updating any conf info.
  * You can only SNEAK if you promise to immediately UNSNEAK!
  */
-void Board::sneak(const Move m) const {
+Piece Board::sneak(const Move m) const {
 
     Piece p = this->get(m.from);
+    Piece captured = this->get(m.to);
 
     /*
      * Set the from square to empty
@@ -157,29 +158,34 @@ void Board::sneak(const Move m) const {
         squares[ind1][ind2] = (p << 4) | (squares[ind1][ind2] & LO4);
     }
 
+    return captured;
+
 }
 
 /**
  * Unsneak is used to undo a sneak operation. It undoes the given move, which should be
  * the same move passed to SNEAK. You should only UNSNEAK after a SNEAK, and you should
  * always UNSNEAK as soon as possible!
+ *
+ * The captured piece was returned to you from the SNEAK. Pass it back in to avoid
+ * vanishing pieces!
  */
-void Board::unsneak(const Move m) const {
+void Board::unsneak(const Move m, const Piece captured) const {
 
     Piece p = this->get(m.to);
 
     /*
-     * Set the to square to empty
+     * Set the to square to the captured piece
      */
     Byte ind1 = m.to >> 4;
     Byte ind2 = (m.to & LO3) >> 1;
 
     if (m.to & 1) {
         // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | EMPTY;
+        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | captured;
     } else {
         // if even, write to high
-        squares[ind1][ind2] = (EMPTY << 4) | (squares[ind1][ind2] & LO4);
+        squares[ind1][ind2] = (captured << 4) | (squares[ind1][ind2] & LO4);
     }
 
     /*

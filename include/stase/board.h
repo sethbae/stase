@@ -109,8 +109,8 @@ struct Board {
     void set(const Square &, const Piece);
 
     /* used to cheat! Sneakily make or unmake a move */
-    void sneak(const Move) const;
-    void unsneak(const Move) const;
+    Piece sneak(const Move) const;
+    void unsneak(const Move, const Piece) const;
 
     /* change the position of the pieces, without affecting config */
     void mutate(const Move);
