@@ -11,4 +11,5 @@ void test_game() {
     test_develop_piece();
     test_knight_fork_hook();
     test_sliding_fork_hook();
+    test_queen_fork_hook();
 }

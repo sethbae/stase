@@ -194,9 +194,8 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
         // check that some piece was actually encountered
         if (first_piece_sq == SQUARE_SENTINEL) { continue; }
-
-        // don't fork pieces that can move in this direction
-        if (can_move_in_direction(first_p, dir)) { continue; }
+        // of the opposite colour
+        if (colour(first_p) == colour(gs.board.get(move.from))) { continue; }
 
         // only fork weak pieces or more valuable ones
         if (piece_value(first_p) > piece_value(gs.board.get(move.from))
@@ -250,7 +249,7 @@ bool find_queen_forks(const Gamestate & gs, const Square ignored, FeatureFrame *
 
                 // check for forks:
                 // - there isn't a piece on the square of the queen's colour (illegal move)
-                // - teh square is safe
+                // - the square is safe
                 if (colour(gs.board.get(temp)) != colour(gs.board.get(queen_sq))
                         && !would_be_weak_after_move(gs, temp, Move{queen_sq, temp})) {
 

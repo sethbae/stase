@@ -82,6 +82,10 @@ TestSet<StringTestCase> knight_fork_hook_test_cases = {
                 "r2qkbnr/p4ppp/2p1p3/1N6/Q1pP1B2/4PN2/PP1K1PPP/2n4R w kq - 0 12",
                 {"c7", "d3", "e5"}
             },
+            StringTestCase{
+                "r1b1kbnr/1ppp1ppp/p1n2q2/4p2Q/2B1P3/2N5/PPPP1PPP/R1B1K1NR w KQkq - 0 5",
+                {"d5"}
+            }
         }
 };
 
