@@ -72,6 +72,7 @@ bool can_move_to_square(const Board &, Square from, Square to);
 bool collinear_points(Square, Square, Square);
 DeltaPair open_path_between(const Board & b, const Square, const Square);
 Square can_move_onto_line(const Board & b, const Square, const Square, const Square);
+Square first_piece_encountered(const Board &, const Square, const DeltaPair);
 
 // forward declaration: see cands.h
 struct FeatureFrame;

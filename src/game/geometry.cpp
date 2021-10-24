@@ -97,3 +97,22 @@ Square can_move_onto_line(
     return SQUARE_SENTINEL;
 
 }
+
+/**
+ * Walks out from the given square in the given direction until it reaches a piece.
+ * It returns the square on which that piece lies, or SQUARE_SENTINEL if no piece was
+ * encountered before the edge of the board.
+ */
+Square first_piece_encountered(const Board & b, const Square start, const DeltaPair delta) {
+
+    int x = get_x(start) + delta.xd, y = get_y(start) + delta.yd;
+    Square temp;
+
+    while (val(temp = mksq(x, y)) && b.get(temp) == EMPTY) {
+        x += delta.xd;
+        y += delta.yd;
+    }
+
+    return val(temp) ? temp : SQUARE_SENTINEL;
+
+}
