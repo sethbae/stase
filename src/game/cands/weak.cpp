@@ -277,6 +277,12 @@ SquareStatus capture_walk(const Board & b, Square s) {
  */
 bool is_weak_status(const Gamestate & gs, const Square s, SquareStatus ss) {
 
+    if (gs.board.get(s) == EMPTY) {
+        return colour(gs.board.get(s)) == WHITE
+                ? ss.balance < 0
+                : ss.balance > 0;
+    }
+
     bool
         totally_undefended,
         attacked_at_all,
@@ -331,8 +337,11 @@ bool is_weak_status(const Gamestate & gs, const Square s, SquareStatus ss) {
 /**
  * Wraps the weak square logic in a hook which, if the square is weak, records a feature frame
  * including the value of the weakest attackers (min_w in conf_1, min_b in conf_2).
+ * This hook only records weak squares which have unsafe pieces on them.
  */
 void is_weak_square_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+
+    if (gs.board.get(s) == EMPTY) { return; }
 
     SquareStatus ss = capture_walk(gs.board, s);
 

@@ -26,9 +26,8 @@ void record_hook_features(const Gamestate & gs, const Hook * h, FeatureFrame * f
  */
 void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
-    std::vector<FeatureFrame> frames(64);
-
-    int i = 0;
+    std::vector<FeatureFrame> frames;
+    frames.reserve(64);
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
@@ -36,7 +35,7 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
         }
     }
 
-    record_hook_features(gs, hook, frames.data(), i);
+    record_hook_features(gs, hook, frames.data(), frames.size());
 }
 
 vector<Move> legal_cands(const Gamestate & gs) {
@@ -60,11 +59,7 @@ vector<Move> cands(const Gamestate & gs) {
         IndexCounter counter(MAX_MOVES_PER_HOOK);
 
         // run the predicate over the board
-        if (fh.hook->strategy == BY_SQUARE) {
-            discover_feature_frames(gs, fh.hook);
-        } else {
-            (*fh.hook->hook)(gs, 0, nullptr);
-        }
+        discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
         for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
