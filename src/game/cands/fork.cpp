@@ -42,6 +42,13 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 
 }
 
+/**
+ * Checks the first piece encountered in each of four orthogonal/diagonal directions (according
+ * to given [dir]). Counts the number of forkable pieces encountered, where a forkable piece is:
+ * - of lower value than the piece moving (in the given [move])
+ * - on an unsafe square after the [move]
+ * This function will not consider movements
+ */
 int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType dir) {
 
     int idx_start, idx_stop;
@@ -65,9 +72,10 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
         // of the opposite colour
         if (colour(first_p) == colour(gs.board.get(move.from))) { continue; }
 
-        // only fork weak pieces or more valuable ones
+        // only fork weak pieces or more valuable ones, and ones which we don't already threaten
         if (piece_value(first_p) > piece_value(gs.board.get(move.from))
-                || would_be_unsafe_piece_after(gs, first_piece_sq, move)) {
+                || would_be_unsafe_piece_after(gs, first_piece_sq, move)
+                && !beta_covers(gs.board, move.from, first_piece_sq)) {
             ++count;
         }
 
@@ -109,6 +117,8 @@ void find_forks(
                     && !would_be_unsafe_piece_after(gs, temp, Move{forker_sq, temp})) {
 
                 int forked_pieces = 0;
+                bool capturing = (gs.board.get(temp) != EMPTY);
+                int dir_idx_to_avoid = capturing ? j : -1;
 
                 if (ortho) {
                     forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, ORTHO);

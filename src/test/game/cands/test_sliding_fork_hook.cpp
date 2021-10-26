@@ -37,11 +37,11 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
                         "8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1",
                         {}
                 },
-//                // BISHOP: puzzle #1 TODO awaiting fork with capture
-//                StringTestCase{
-//                        "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
-//                        {"b7"}
-//                },
+                // BISHOP: puzzle #1
+                StringTestCase{
+                        "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
+                        {"b7"}
+                },
                 // BISHOP: puzzle #2
                 StringTestCase{
                         "r1b2rk1/pp3ppp/2p3n1/8/2P5/q3B3/4BQPP/1R3RK1 w - - 0 21",

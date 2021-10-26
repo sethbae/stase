@@ -24,6 +24,7 @@ inline MoveType direction_of_delta(const DeltaPair d) {
     }
     return DIAG;
 }
+DeltaPair get_delta_between(const Square, const Square);
 
 /*
  * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
