@@ -58,16 +58,10 @@ struct IndexCounter {
     }
 };
 
-enum HookStrategy {
-    BY_SQUARE,
-    BY_BOARD
-};
-
 struct Hook {
     const std::string name;
     const int id;
-    const HookStrategy strategy;
-    bool (*hook)(const Gamestate &, const Square centre, FeatureFrame * ff);
+    void (*hook)(const Gamestate &, const Square centre, std::vector<FeatureFrame> & frames);
 };
 
 struct Responder {
@@ -85,10 +79,12 @@ struct FeatureHandler {
 };
 
 // functions used by hooks (BY_SQUARE)
-bool is_weak_square(const Gamestate &, const Square, FeatureFrame *);
 bool is_weak_square(const Gamestate &, const Square);
 bool would_be_weak_after_move(const Gamestate &, const Square, const Move);
-bool is_undeveloped_piece(const Gamestate &, const Square, FeatureFrame *);
+void is_weak_square_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
+
+bool is_undeveloped_piece(const Gamestate &, const Square);
+void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by hooks (BY_BOARD)
 bool find_knight_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
@@ -101,11 +97,11 @@ void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
-const Hook weak_hook = Hook{"weak", 0, BY_SQUARE, &is_weak_square};
-const Hook develop_hook = Hook{"development", 1, BY_SQUARE, &is_undeveloped_piece};
-const Hook knight_fork_hook = Hook{"kn-fork", 2, BY_BOARD, &find_knight_forks};
-const Hook sliding_fork_hook = Hook{"sliding-fork", 3, BY_BOARD, &find_sliding_forks};
-const Hook queen_fork_hook = Hook{"queen-fork", 4, BY_BOARD, &find_queen_forks};
+const Hook weak_hook = Hook{"weak", 0, &is_weak_square_hook};
+const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
+const Hook knight_fork_hook = Hook{"kn-fork", 2, &find_knight_forks};
+const Hook sliding_fork_hook = Hook{"sliding-fork", 3, &find_sliding_forks};
+const Hook queen_fork_hook = Hook{"queen-fork", 4, &find_queen_forks};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};

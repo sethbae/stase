@@ -209,75 +209,80 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
 }
 
-bool find_queen_forks(const Gamestate & gs, const Square ignored, FeatureFrame * ignored2) {
+void find_forks(const Gamestate & gs, const Square forker_sq, const bool ortho, const bool diag, FeatureFrame * ff) {
 
     Square temp;
 
-    FeatureFrame frames[64];
-    int frames_point = 0;
+    if (type(gs.board.get(forker_sq)) != QUEEN) {
+        return;
+    }
 
-    Square piece_squares[32];
-    int pieces_point = 0;
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(temp = mksq(x, y)) != EMPTY) {
-                piece_squares[pieces_point++] = temp;
+    // fish out the correct indices to get the deltas
+    int start_idx, end_idx;
+    if (ortho && diag) { start_idx = DIAG_START, end_idx = ORTHO_STOP; }
+    else if (ortho) { start_idx = ORTHO_START, end_idx = ORTHO_STOP; }
+    else if (diag) { start_idx = DIAG_START, end_idx = DIAG_STOP; }
+    else { return; }
+
+    // for each sliding direction
+    for (int j = start_idx; j < end_idx; ++j) {
+
+        bool cont = true;
+        int x = get_x(forker_sq) + XD[j], y = get_y(forker_sq) + YD[j];
+
+        // perform a 'beta' walk, ie empty squares and at most one capture-square
+        while (val(temp = mksq(x, y)) && cont) {
+
+            // check for forks:
+            // - there isn't a piece on the square of the queen's colour (illegal move)
+            // - the square is safe
+            if (colour(gs.board.get(temp)) != colour(gs.board.get(forker_sq))
+                    && !would_be_weak_after_move(gs, temp, Move{forker_sq, temp})) {
+
+                int forked_pieces = 0;
+
+                if (ortho) {
+                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, ORTHO);
+                }
+                if (diag) {
+                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, DIAG);
+                }
+
+                if (forked_pieces >= 2) {
+                    *ff++ = FeatureFrame{forker_sq, temp, 0, 0};
+                }
+
+            }
+
+            // loop logic: stop if the square had a piece on it, otherwise take another step
+            if (gs.board.get(temp) != EMPTY) {
+                cont = false;
+            } else {
+                x += XD[j];
+                y += YD[j];
             }
         }
     }
 
-    // find each queen
-    for (int i = 0; i < pieces_point; ++i) {
+}
 
-        if (type(gs.board.get(piece_squares[i])) != QUEEN) {
-            continue;
-        }
-        Square queen_sq = piece_squares[i];
+bool fork_hook(const Gamestate & gs, const Square s, FeatureFrame * ff) {
 
-        /*
-         * For each square the queen can move to, check if it's a fork
-         */
-
-        // for each sliding direction
-        for (int j = 0; j < 8; ++j) {
-
-            bool cont = true;
-            int x = get_x(queen_sq) + XD[j], y = get_y(queen_sq) + YD[j];
-
-            // perform a 'beta' walk, ie empty squares and at most one capture-square
-            while (val(temp = mksq(x, y)) && cont) {
-
-                // check for forks:
-                // - there isn't a piece on the square of the queen's colour (illegal move)
-                // - the square is safe
-                if (colour(gs.board.get(temp)) != colour(gs.board.get(queen_sq))
-                        && !would_be_weak_after_move(gs, temp, Move{queen_sq, temp})) {
-
-                    int forked_pieces =
-                        count_forkable_pieces_after(gs, Move{queen_sq, temp}, ORTHO)
-                        + count_forkable_pieces_after(gs, Move{queen_sq, temp}, DIAG);
-
-                    if (forked_pieces >= 2) {
-                        frames[frames_point++] = FeatureFrame{temp, queen_sq, 0, 0};
-                    }
-
-                }
-
-                // loop logic: stop if the square had a piece on it, otherwise take another step
-                if (gs.board.get(temp) != EMPTY) {
-                    cont = false;
-                } else {
-                    x += XD[j];
-                    y += YD[j];
-                }
-            }
-        }
-
+    switch (type(gs.board.get(s))) {
+        case KNIGHT:
+            find_knight_forks(gs, 0, nullptr);
+            return ff->centre == SQUARE_SENTINEL;
+        case BISHOP:
+            find_forks(gs, s, false, true, ff);
+            return ff->centre == SQUARE_SENTINEL;
+        case ROOK:
+            find_forks(gs, s, true, false, ff);
+            return ff->centre == SQUARE_SENTINEL;
+        case QUEEN:
+            find_forks(gs, s, true, true, ff);
+            return ff->centre == SQUARE_SENTINEL;
+        default:
+            return false;
     }
-
-    record_hook_features(gs, &queen_fork_hook, &frames[0], frames_point);
-
-    // return value required by hook format and should be ignored
-    return false;
 
 }

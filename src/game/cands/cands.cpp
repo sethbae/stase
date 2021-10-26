@@ -23,26 +23,20 @@ void record_hook_features(const Gamestate & gs, const Hook * h, FeatureFrame * f
 
 /**
  * Runs the given hook over every square on the board and records any successes in feature frames.
- *
- * @param gs the gamestate.
- * @param hook the predicate.
- * @param idx the index of the hook
  */
 void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
-    FeatureFrame frames[64];
+    std::vector<FeatureFrame> frames(64);
 
     int i = 0;
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (hook->hook(gs.board, mksq(x, y), &frames[i])) {
-                frames[i++].centre = mksq(x, y);
-            }
+            hook->hook(gs.board, mksq(x, y), frames);
         }
     }
 
-    record_hook_features(gs, hook, frames, i);
+    record_hook_features(gs, hook, frames.data(), i);
 }
 
 vector<Move> legal_cands(const Gamestate & gs) {

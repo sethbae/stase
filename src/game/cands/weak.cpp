@@ -19,8 +19,9 @@ struct SquareStatus {
  * of the given square on the board. Maintains min_w and min_b as the pieces of each
  * colour with minimum value that attack the given square.
  * Includes more complicated logic regarding x-rays including those of mixed colour.
+ * @return a summary of the information found, a SquareStatus.
  */
-void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
+SquareStatus capture_walk(const Board & b, Square s) {
 
     /*
      *                  X-RAYS and POLY X-RAYS
@@ -58,6 +59,8 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
     int min_poly_x_ray_defender = piece_value(W_KING) * 10;
     int x, y;
     Square temp;
+
+    SquareStatus sq_status;
 
     // go through the delta pairs entailing each sliding direction
     MoveType dir = DIAG;
@@ -260,31 +263,19 @@ void capture_walk(const Board & b, Square s, SquareStatus & sq_status) {
 
     }
 
+    return sq_status;
+
 }
 
 /**
- * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
+ * Analyses a SquareStatus as returned by capture_walk to detect whether the square is in fact
+ * a weak square. A weak square is defined as:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
- *
- * Records in conf_1 the value of the least valuable white piece attacking the square
- * Records in conf_2 the value of the least valuable black piece attacking the square
- *
- * @param b the board
- * @param centre the square to look at
- * @param ff the feature frame to record in, if true
  */
-bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
-
-    if (type(gs.board.get(centre)) == EMPTY) { return false; }
-
-    SquareStatus ss;
-    capture_walk(gs.board, centre, ss);
-
-    ff->conf_1 = ss.min_w;
-    ff->conf_2 = ss.min_b;
+bool is_weak_status(const Gamestate & gs, const Square s, SquareStatus ss) {
 
     bool
         totally_undefended,
@@ -296,12 +287,12 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
         weakest_attacker,
         weakest_defender;
 
-    if (colour(gs.board.get(centre)) == WHITE) {
+    if (colour(gs.board.get(s)) == WHITE) {
 
         totally_undefended = (ss.min_w > piece_value(W_KING));
         attacked_at_all = (ss.min_b <= piece_value(B_KING));
-        attacked_by_weaker = (ss.min_b < piece_value(gs.board.get(centre)));
-        attacked_by_equal = (ss.min_b == piece_value(gs.board.get(centre)));
+        attacked_by_weaker = (ss.min_b < piece_value(gs.board.get(s)));
+        attacked_by_equal = (ss.min_b == piece_value(gs.board.get(s)));
         under_defended = (ss.balance < 0);
 
         weakest_attacker = ss.min_b;
@@ -311,8 +302,8 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
 
         totally_undefended = (ss.min_b > piece_value(B_KING));
         attacked_at_all = (ss.min_w <= piece_value(W_KING));
-        attacked_by_weaker = (ss.min_w < piece_value(gs.board.get(centre)));
-        attacked_by_equal = (ss.min_w == piece_value(gs.board.get(centre)));
+        attacked_by_weaker = (ss.min_w < piece_value(gs.board.get(s)));
+        attacked_by_equal = (ss.min_w == piece_value(gs.board.get(s)));
         under_defended = (ss.balance > 0);
 
         weakest_attacker = ss.min_w;
@@ -338,21 +329,30 @@ bool is_weak_square(const Gamestate & gs, Square centre, FeatureFrame * ff) {
 }
 
 /**
+ * Wraps the weak square logic in a hook which, if the square is weak, records a feature frame
+ * including the value of the weakest attackers (min_w in conf_1, min_b in conf_2).
+ */
+void is_weak_square_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+
+    SquareStatus ss = capture_walk(gs.board, s);
+
+    if (is_weak_status(gs, s, ss)) {
+        frames.push_back(FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});
+    }
+
+}
+
+/**
  * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
- *
- * Records in conf_1 the value of the least valuable white piece attacking the square
- * Records in conf_2 the value of the least valuable black piece attacking the square
- *
- * @param b the board
- * @param centre the square to look at
+ * However, there is more complicated logic regarding the interaction of x-rays when pieces are
+ * on the same diagonal/orthogonal line.
  */
 bool is_weak_square(const Gamestate & gs, const Square s) {
-    FeatureFrame ff;
-    return is_weak_square(gs, s, &ff);
+    return is_weak_status(gs, s, capture_walk(gs.board, s));
 }
 
 /**
