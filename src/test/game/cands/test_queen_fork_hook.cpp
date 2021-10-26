@@ -100,12 +100,15 @@ bool evaluate_test_case_queen_fork_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    find_queen_forks(gs, 0, nullptr);
+    discover_feature_frames(gs, &fork_hook);
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[queen_fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
-        strings.push_back(sqtos(ff->centre));
+    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
+        // only look at queen forks for these tests!
+        if (type(gs.board.get(ff->secondary)) == QUEEN) {
+            strings.push_back(sqtos(ff->centre));
+        }
     }
 
     // print_feature_frames(gs.feature_frames[0]);

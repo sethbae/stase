@@ -5,6 +5,8 @@
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
 
+// TODO: test capturing, test being blocked by your own piece
+
 TestSet<StringTestCase> knight_fork_hook_test_cases = {
         "game-cands-knight-fork-hook",
         {
@@ -93,12 +95,15 @@ bool evaluate_test_case_knight_fork_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    find_knight_forks(gs, 0, nullptr);
+    discover_feature_frames(gs, &fork_hook);
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[knight_fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
-        strings.push_back(sqtos(ff->centre));
+    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
+        // only look at knight forks for these tests!
+        if (type(gs.board.get(ff->secondary)) == KNIGHT) {
+            strings.push_back(sqtos(ff->centre));
+        }
     }
 
     // print_feature_frames(gs.feature_frames[0]);
