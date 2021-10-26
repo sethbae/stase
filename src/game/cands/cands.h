@@ -78,7 +78,7 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-// functions used by hooks (BY_SQUARE)
+
 bool is_weak_square(const Gamestate &, const Square);
 bool would_be_weak_after_move(const Gamestate &, const Square, const Move);
 void is_weak_square_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
@@ -86,10 +86,7 @@ void is_weak_square_hook(const Gamestate &, const Square, std::vector<FeatureFra
 bool is_undeveloped_piece(const Gamestate &, const Square);
 void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
-// functions used by hooks (BY_BOARD)
-bool find_knight_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
-bool find_sliding_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
-bool find_queen_forks(const Gamestate &, const Square ignored, FeatureFrame * ignored2);
+void find_forks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -99,9 +96,7 @@ void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 // the actual hooks
 const Hook weak_hook = Hook{"weak", 0, &is_weak_square_hook};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
-const Hook knight_fork_hook = Hook{"kn-fork", 2, &find_knight_forks};
-const Hook sliding_fork_hook = Hook{"sliding-fork", 3, &find_sliding_forks};
-const Hook queen_fork_hook = Hook{"queen-fork", 4, &find_queen_forks};
+const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -111,9 +106,7 @@ const Responder develop_resp = Responder{"develop", &develop_piece};
 const std::vector<const Hook *> ALL_HOOKS {
         &weak_hook,
         &develop_hook,
-        &knight_fork_hook,
-        &sliding_fork_hook,
-        &queen_fork_hook
+        &fork_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {

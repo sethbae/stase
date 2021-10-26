@@ -209,7 +209,12 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
 }
 
-void find_forks(const Gamestate & gs, const Square forker_sq, const bool ortho, const bool diag, FeatureFrame * ff) {
+void find_forks(
+        const Gamestate & gs,
+        const Square forker_sq,
+        const bool ortho,
+        const bool diag,
+        std::vector<FeatureFrame> & frames) {
 
     Square temp;
 
@@ -249,7 +254,7 @@ void find_forks(const Gamestate & gs, const Square forker_sq, const bool ortho, 
                 }
 
                 if (forked_pieces >= 2) {
-                    *ff++ = FeatureFrame{forker_sq, temp, 0, 0};
+                    frames.push_back(FeatureFrame{forker_sq, temp, 0, 0});
                 }
 
             }
@@ -266,23 +271,20 @@ void find_forks(const Gamestate & gs, const Square forker_sq, const bool ortho, 
 
 }
 
-bool fork_hook(const Gamestate & gs, const Square s, FeatureFrame * ff) {
+void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     switch (type(gs.board.get(s))) {
-        case KNIGHT:
-            find_knight_forks(gs, 0, nullptr);
-            return ff->centre == SQUARE_SENTINEL;
+//        case KNIGHT:
+//            find_knight_forks(gs, 0, nullptr);
+//            return ff->centre == SQUARE_SENTINEL;
         case BISHOP:
-            find_forks(gs, s, false, true, ff);
-            return ff->centre == SQUARE_SENTINEL;
+            find_forks(gs, s, false, true, frames); return;
         case ROOK:
-            find_forks(gs, s, true, false, ff);
-            return ff->centre == SQUARE_SENTINEL;
+            find_forks(gs, s, true, false, frames); return;
         case QUEEN:
-            find_forks(gs, s, true, true, ff);
-            return ff->centre == SQUARE_SENTINEL;
+            find_forks(gs, s, true, true, frames); return;
         default:
-            return false;
+            return;
     }
 
 }
