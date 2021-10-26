@@ -94,7 +94,7 @@ inline bool evaluate_responder_test_case(const Responder * resp, const Responder
 void test_board();
 void test_game();
 
-void test_weak_hook();
+void test_unsafe_piece_hook();
 void test_development_hook();
 void test_capture_piece();
 void test_defend_square();

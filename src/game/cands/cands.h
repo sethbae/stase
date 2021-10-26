@@ -78,10 +78,7 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-
-bool is_weak_square(const Gamestate &, const Square);
-bool would_be_weak_after_move(const Gamestate &, const Square, const Move);
-void is_weak_square_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
+void is_unsafe_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 bool is_undeveloped_piece(const Gamestate &, const Square);
 void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
@@ -94,7 +91,7 @@ void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
-const Hook weak_hook = Hook{"weak", 0, &is_weak_square_hook};
+const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
 const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 
@@ -104,7 +101,7 @@ const Responder capture_resp = Responder{"capture", &capture_piece};
 const Responder develop_resp = Responder{"develop", &develop_piece};
 
 const std::vector<const Hook *> ALL_HOOKS {
-        &weak_hook,
+        &unsafe_piece_hook,
         &develop_hook,
         &fork_hook
 };
@@ -122,7 +119,7 @@ const std::vector<FeatureHandler> feature_handlers = {
           { }
         },
         FeatureHandler{
-            &weak_hook,
+            &unsafe_piece_hook,
             { &defend_resp },
             { &capture_resp }
         }

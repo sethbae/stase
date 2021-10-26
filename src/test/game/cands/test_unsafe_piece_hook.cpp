@@ -94,15 +94,15 @@ const TestSet<StringTestCase> hook_test_cases = {
     }
 };
 
-bool evaluate_test_case_weak_hook(const StringTestCase *tc) {
+bool evaluate_test_case_unsafe_piece_hook(const StringTestCase *tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
-    discover_feature_frames(gs, &weak_hook);
+    discover_feature_frames(gs, &unsafe_piece_hook);
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[weak_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
+    for (FeatureFrame* ff = gs.feature_frames[unsafe_piece_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
         strings.push_back(sqtos(ff->centre));
     }
 
@@ -111,6 +111,6 @@ bool evaluate_test_case_weak_hook(const StringTestCase *tc) {
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_weak_hook() {
-    evaluate_test_set(&hook_test_cases, &evaluate_test_case_weak_hook);
+void test_unsafe_piece_hook() {
+    evaluate_test_set(&hook_test_cases, &evaluate_test_case_unsafe_piece_hook);
 }

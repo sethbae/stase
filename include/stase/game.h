@@ -192,4 +192,21 @@ bool gamma_covers(const Board &, Square piece_sq, Square target_sq);
 int control_count(const Board &, Square);
 void display_control_counts(const Board &);
 
+/**
+ * Used to pass information about the pieces attacking and controlling a certain square.
+ */
+struct SquareControlStatus {
+    int balance = 0;
+    int min_w = 0;
+    int min_b = 0;
+};
+SquareControlStatus evaluate_square_status(const Gamestate &, const Square);
+bool is_weak_status(const Gamestate &, const Square, SquareControlStatus);
+
+// weak squares/unsafe pieces
+bool is_weak_square(const Gamestate &, const Square);
+bool would_be_weak_after_move(const Gamestate &, const Square, const Move);
+bool is_unsafe_piece(const Gamestate &, const Square);
+bool would_be_unsafe_piece_after_move(const Gamestate &, const Square, const Move);
+
 #endif //STASE_GAME_H

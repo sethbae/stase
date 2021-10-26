@@ -2,26 +2,16 @@
 using std::cout;
 
 #include "game.h"
-#include "cands.h"
-#include "../heur/heur.h"
-
-/**
- * Used to pass information from capture_walk back to the following functions.
- */
-struct SquareStatus {
-    int balance = 0;
-    int min_w = 0;
-    int min_b = 0;
-};
+#include "heur/heur.h"
 
 /**
  * Walks outward from the given piece, maintaining a running total of the +- control
  * of the given square on the board. Maintains min_w and min_b as the pieces of each
  * colour with minimum value that attack the given square.
  * Includes more complicated logic regarding x-rays including those of mixed colour.
- * @return a summary of the information found, a SquareStatus.
+ * @return a summary of the information found, a SquareControlStatus.
  */
-SquareStatus capture_walk(const Board & b, Square s) {
+SquareControlStatus capture_walk(const Board & b, Square s) {
 
     /*
      *                  X-RAYS and POLY X-RAYS
@@ -60,19 +50,19 @@ SquareStatus capture_walk(const Board & b, Square s) {
     int x, y;
     Square temp;
 
-    SquareStatus sq_status;
+    SquareControlStatus sq_status;
 
     // go through the delta pairs entailing each sliding direction
     MoveType dir = DIAG;
     for (int i = 0; i < 8; ++i) {
-        
+
         if (i == 4) {
             dir = ORTHO;
         }
 
         // used to check if extra defenders are discovered in this direction
         int prior_balance = basic_balance;
-        
+
         int x_inc = XD[i], y_inc = YD[i];
         bool cont = true;
         bool x_ray = false;
@@ -83,7 +73,7 @@ SquareStatus capture_walk(const Board & b, Square s) {
 
         // work outwards in that direction
         while (val(temp = mksq(x, y)) && cont) {
-    
+
             Piece p = b.get(temp);
 
             if ((type(p) != EMPTY) && can_move_in_direction(p, dir)) {
@@ -119,8 +109,8 @@ SquareStatus capture_walk(const Board & b, Square s) {
 
                 // is this piece a poly-x-ray defender?
                 if (poly_x_ray
-                        && (colour(p) == colour(b.get(s)))
-                        && piece_value(p) < min_poly_x_ray_defender) {
+                    && (colour(p) == colour(b.get(s)))
+                    && piece_value(p) < min_poly_x_ray_defender) {
                     min_poly_x_ray_defender = piece_value(p);
                 }
 
@@ -131,17 +121,17 @@ SquareStatus capture_walk(const Board & b, Square s) {
                 // blocking piece: abort
                 cont = false;
             }
-            
+
             x += x_inc;
             y += y_inc;
-            
+
         }
 
         if (basic_balance != prior_balance) {
             // some defender was found in this direction
             ++directions_attacked_from;
         }
-        
+
     }
 
     x = get_x(s);
@@ -268,30 +258,38 @@ SquareStatus capture_walk(const Board & b, Square s) {
 }
 
 /**
- * Analyses a SquareStatus as returned by capture_walk to detect whether the square is in fact
+ * This method retrieves the actual control status of a given square, without
+ * applying any logic or interpretation to the result.
+ */
+SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s) {
+    return capture_walk(gs.board, s);
+}
+
+/**
+ * Analyses a SquareControlStatus as returned by capture_walk to detect whether the square is in fact
  * a weak square. A weak square is defined as:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  */
-bool is_weak_status(const Gamestate & gs, const Square s, SquareStatus ss) {
+bool is_weak_status(const Gamestate & gs, const Square s, SquareControlStatus ss) {
 
     if (gs.board.get(s) == EMPTY) {
         return colour(gs.board.get(s)) == WHITE
-                ? ss.balance < 0
-                : ss.balance > 0;
+               ? ss.balance < 0
+               : ss.balance > 0;
     }
 
     bool
-        totally_undefended,
-        attacked_at_all,
-        attacked_by_weaker,
-        attacked_by_equal,
-        under_defended;
+            totally_undefended,
+            attacked_at_all,
+            attacked_by_weaker,
+            attacked_by_equal,
+            under_defended;
     int
-        weakest_attacker,
-        weakest_defender;
+            weakest_attacker,
+            weakest_defender;
 
     if (colour(gs.board.get(s)) == WHITE) {
 
@@ -335,23 +333,6 @@ bool is_weak_status(const Gamestate & gs, const Square s, SquareStatus ss) {
 }
 
 /**
- * Wraps the weak square logic in a hook which, if the square is weak, records a feature frame
- * including the value of the weakest attackers (min_w in conf_1, min_b in conf_2).
- * This hook only records weak squares which have unsafe pieces on them.
- */
-void is_weak_square_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
-
-    if (gs.board.get(s) == EMPTY) { return; }
-
-    SquareStatus ss = capture_walk(gs.board, s);
-
-    if (is_weak_status(gs, s, ss)) {
-        frames.push_back(FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});
-    }
-
-}
-
-/**
  * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
@@ -376,4 +357,19 @@ bool would_be_weak_after_move(const Gamestate & gs, const Square s, const Move m
 
     return weak;
 
+}
+
+/**
+ * Returns true iff the given square is both weak and has a piece on it.
+ */
+bool is_unsafe_piece(const Gamestate & gs, const Square s) {
+    return (gs.board.get(s) != EMPTY) && is_weak_square(gs, s);
+}
+
+/**
+ * Returns true iff, after the given move has been played, the given square is both
+ * weak and has a piece on it.
+ */
+bool would_be_unsafe_piece_after_move(const Gamestate & gs, const Square s, const Move m) {
+    return (gs.board.get(s) != EMPTY || s == m.to) && would_be_weak_after_move(gs, s, m);
 }
