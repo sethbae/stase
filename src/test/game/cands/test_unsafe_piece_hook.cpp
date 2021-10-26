@@ -9,7 +9,7 @@ using std::cout;
 #include "../../../game/heur/heur.h"
 
 const TestSet<StringTestCase> hook_test_cases = {
-    "game-cands-weak-hook",
+    "game-cands-unsafe-piece-hook",
     {
             // starting pos
             StringTestCase{
