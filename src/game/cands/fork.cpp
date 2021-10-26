@@ -10,7 +10,7 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 
         if (!val(fork_square)
             || colour(gs.board.get(fork_square)) == colour(gs.board.get(s))
-            || would_be_weak_after_move(gs, fork_square, Move{s, fork_square})) {
+            || would_be_unsafe_piece_after(gs, fork_square, Move{s, fork_square})) {
             continue;
         }
 
@@ -29,7 +29,7 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 
             if (colour(p) != colour(gs.board.get(s))
                 && type(p) != KNIGHT
-                && (would_be_weak_after_move(gs, forked_square, Move{s, fork_square})
+                && (would_be_unsafe_piece_after(gs, forked_square, Move{s, fork_square})
                     || piece_value(p) > piece_value(KNIGHT))) {
                 ++forked_count;
             }
@@ -67,7 +67,7 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
         // only fork weak pieces or more valuable ones
         if (piece_value(first_p) > piece_value(gs.board.get(move.from))
-                || would_be_weak_after_move(gs, first_piece_sq, move)) {
+                || would_be_unsafe_piece_after(gs, first_piece_sq, move)) {
             ++count;
         }
 
@@ -85,10 +85,6 @@ void find_forks(
         std::vector<FeatureFrame> & frames) {
 
     Square temp;
-
-    if (type(gs.board.get(forker_sq)) != QUEEN) {
-        return;
-    }
 
     // fish out the correct indices to get the deltas
     int start_idx, end_idx;
@@ -110,7 +106,7 @@ void find_forks(
             // - there isn't a piece on the square of the queen's colour (illegal move)
             // - the square is safe
             if (colour(gs.board.get(temp)) != colour(gs.board.get(forker_sq))
-                    && !would_be_weak_after_move(gs, temp, Move{forker_sq, temp})) {
+                    && !would_be_unsafe_piece_after(gs, temp, Move{forker_sq, temp})) {
 
                 int forked_pieces = 0;
 

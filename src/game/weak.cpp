@@ -370,6 +370,6 @@ bool is_unsafe_piece(const Gamestate & gs, const Square s) {
  * Returns true iff, after the given move has been played, the given square is both
  * weak and has a piece on it.
  */
-bool would_be_unsafe_piece_after_move(const Gamestate & gs, const Square s, const Move m) {
+bool would_be_unsafe_piece_after(const Gamestate & gs, const Square s, const Move m) {
     return (gs.board.get(s) != EMPTY || s == m.to) && would_be_weak_after_move(gs, s, m);
 }

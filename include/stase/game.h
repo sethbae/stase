@@ -207,6 +207,6 @@ bool is_weak_status(const Gamestate &, const Square, SquareControlStatus);
 bool is_weak_square(const Gamestate &, const Square);
 bool would_be_weak_after_move(const Gamestate &, const Square, const Move);
 bool is_unsafe_piece(const Gamestate &, const Square);
-bool would_be_unsafe_piece_after_move(const Gamestate &, const Square, const Move);
+bool would_be_unsafe_piece_after(const Gamestate &, const Square, const Move);
 
 #endif //STASE_GAME_H

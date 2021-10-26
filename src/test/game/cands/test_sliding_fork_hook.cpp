@@ -101,8 +101,8 @@ bool evaluate_test_case_sliding_fork_hook(const StringTestCase *tc) {
 
     for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
         // only look at sliding forks for these tests!
-        if (type(gs.board.get(ff->secondary)) == ROOK || type(gs.board.get(ff->secondary)) == BISHOP) {
-            strings.push_back(sqtos(ff->centre));
+        if (type(gs.board.get(ff->centre)) == ROOK || type(gs.board.get(ff->centre)) == BISHOP) {
+            strings.push_back(sqtos(ff->secondary));
         }
     }
 
