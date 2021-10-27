@@ -206,6 +206,31 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
 
 void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
+    Ptype king_col = colour(gs.board.get(s));
+
+    for (int i = 0; i < 8; ++i) {
+
+        Square forker_sq = mksq(get_x(s) + XD[i], get_y(s) + YD[i]);
+
+        if (would_be_safe_king_square(gs, forker_sq, king_col)) {
+
+            int count = 0;
+
+            for (int j = 0; j < 8; ++j) {
+
+                Square forked_sq = mksq(get_x(forker_sq) + XD[j], get_y(forker_sq) + YD[j]);
+                if (forkable(gs, Move{s, forker_sq}, forked_sq)) {
+                    ++count;
+                }
+
+            }
+
+            if (count >= 2) {
+                frames.push_back(FeatureFrame{s, forker_sq});
+            }
+        }
+    }
+
 }
 
 void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
@@ -221,6 +246,8 @@ void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFr
             find_forks(gs, s, true, true, frames); return;
         case PAWN:
             find_pawn_forks(gs, s, frames);
+        case KING:
+            find_king_forks(gs, s, frames);
         default:
             return;
     }
