@@ -5,8 +5,6 @@
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
 
-// TODO: test capturing, test being blocked by your own piece
-
 TestSet<StringTestCase> knight_fork_hook_test_cases = {
         "game-cands-knight-fork-hook",
         {
@@ -57,6 +55,21 @@ TestSet<StringTestCase> knight_fork_hook_test_cases = {
             // does not fork knights #2
             StringTestCase{
                 "8/8/8/8/2n5/8/8/1N3K2 b - - 0 1",
+                {}
+            },
+            // forks with capture #1
+            StringTestCase{
+                "8/3b4/6q1/4p3/8/3N4/8/8 w - - 0 1",
+                {"e5"}
+            },
+            // doesn't fork pieces already attacked
+            StringTestCase{
+                "8/8/5B2/3n4/8/2R5/8/8 b - - 0 1",
+                {}
+            },
+            // fork is blocked by piece of own colour
+            StringTestCase{
+                "8/8/8/8/1Q1n4/8/2b5/4K3 w - - 0 1",
                 {}
             },
             // triple fork!

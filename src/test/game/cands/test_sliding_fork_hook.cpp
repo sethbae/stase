@@ -37,6 +37,21 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
                         "8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1",
                         {}
                 },
+                // BISHOP: forks with capture
+                StringTestCase{
+                        "8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1",
+                        {"c3"}
+                },
+                // BISHOP: doesn't fork pieces already attacked
+                StringTestCase{
+                        "8/8/1K6/8/8/2b5/8/R7 b - - 0 1",
+                        {}
+                },
+                // BISHOP: fork is blocked by own piece
+                StringTestCase{
+                        "n3n3/8/2P5/3B4/8/8/8/8 w - - 0 1",
+                        {}
+                },
                 // BISHOP: puzzle #1
                 StringTestCase{
                         "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
@@ -71,6 +86,16 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
                 // ROOK: does not fork pieces which can move in that direction
                 StringTestCase{
                         "8/8/3r4/8/8/2R3K1/8/8 b - - 0 1",
+                        {}
+                },
+                // ROOK: forks with capture
+                StringTestCase{
+                        "7k/8/8/6Rp/6P1/8/8/7q w - - 0 1",
+                        {"h5"}
+                },
+                // ROOK: doesn't fork pieces already attacked
+                StringTestCase{
+                        "8/8/3r4/N7/8/3B4/8/8 w - - 0 1",
                         {}
                 },
                 // ROOK: puzzle #1

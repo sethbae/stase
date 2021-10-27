@@ -62,6 +62,21 @@ TestSet<StringTestCase> queen_fork_hook_test_cases = {
                         "8/3R4/8/2q5/8/3R4/8/8 b - - 0 1",
                         {}
                 },
+                // forks with capture
+                StringTestCase{
+                        "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1",
+                        {"e5"}
+                },
+                // does not fork pieces already attacked
+                StringTestCase{
+                        "8/1q6/8/8/8/8/N5B1/8 b - - 0 1",
+                        {}
+                },
+                // forks are blocked by own piece!
+                StringTestCase{
+                        "1r3k2/8/3N4/8/8/3Q4/8/8 w - - 0 1",
+                        {}
+                },
                 // forks with a capture #1
                 StringTestCase{
                         "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1",
