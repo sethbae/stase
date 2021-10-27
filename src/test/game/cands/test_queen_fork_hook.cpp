@@ -87,6 +87,11 @@ TestSet<StringTestCase> queen_fork_hook_test_cases = {
                         "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1",
                         {"a5"}
                 },
+                // does not fork a piece which can just trade immediately
+                StringTestCase{
+                        "1q3r2/8/8/2B5/3Q4/8/8/8 w - - 0 1",
+                        {}
+                },
                 // puzzle #1
                 StringTestCase{
                         "r2q4/5ppk/p2p3p/1p1P4/2p1rNQ1/8/PPP3PP/5RK1 w - - 0 23",

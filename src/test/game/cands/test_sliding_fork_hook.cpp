@@ -37,6 +37,11 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
                         "8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1",
                         {}
                 },
+                // BISHOP: does not fork pieces which can just immediately trade
+                StringTestCase{
+                        "5r2/8/8/p7/1n6/4B3/8/8 w - - 0 1",
+                        {}
+                },
                 // BISHOP: forks with capture
                 StringTestCase{
                         "8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1",
@@ -96,6 +101,11 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
                 // ROOK: doesn't fork pieces already attacked
                 StringTestCase{
                         "8/8/3r4/N7/8/3B4/8/8 w - - 0 1",
+                        {}
+                },
+                // ROOK: doesn't fork pieces already attacked
+                StringTestCase{
+                        "8/8/8/8/8/2pr4/R4K2/8 w - - 0 1",
                         {}
                 },
                 // ROOK: puzzle #1

@@ -43,6 +43,44 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 }
 
 /**
+ * Returns true iff the given move poses a genuine, forking threat to the piece
+ * on the given square. This is evaluated by looking at the two values, whether
+ * the piece would become unsafe, whether it would be able to simply trade with
+ * the forker etc.
+ * Currently (GM-34), beta_covers doesn't evaluate knight moves, so this method
+ * can't be used for knights.
+ */
+bool forkable(const Gamestate &gs, const Move m, const Square forked_piece_sq) {
+
+    Piece forker_p = gs.board.get(m.from);
+    Piece forked_p = gs.board.get(forked_piece_sq);
+
+    // don't fork pieces of the same colour
+    if (colour(forked_p) == colour(forker_p)) {
+        return false;
+    }
+
+    // don't fork pieces of the same type; these are always of the same value,
+    // and can always move in the same direction as the forker
+    if (type(forked_p) == type(forker_p)) {
+        return false;
+    }
+
+    // the piece should either be more valuable, or should be made unsafe after the move
+    if (piece_value(forked_p) > piece_value(gs.board.get(m.from))
+        || would_be_unsafe_piece_after(gs, forked_piece_sq, m)) {
+
+        // avoid forking pieces which we already attacked
+        if (!beta_covers(gs.board, m.from, forked_piece_sq)) {
+            return true;
+        }
+
+    }
+
+    return false;
+}
+
+/**
  * Checks the first piece encountered in each of four orthogonal/diagonal directions (according
  * to given [dir]). Counts the number of forkable pieces encountered, where a forkable piece is:
  * - of lower value than the piece moving (in the given [move])
@@ -64,18 +102,11 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
     for (int i = idx_start; i < idx_stop; ++i) {
 
-        Square first_piece_sq = first_piece_encountered(gs.board, move.to, DeltaPair{(Byte) XD[i], (Byte) YD[i]});
-        Piece first_p = gs.board.get(first_piece_sq);
+        Square forked_piece_square =
+                first_piece_encountered(gs.board, move.to, DeltaPair{(Byte) XD[i], (Byte) YD[i]});
 
-        // check that some piece was actually encountered
-        if (first_piece_sq == SQUARE_SENTINEL) { continue; }
-        // of the opposite colour
-        if (colour(first_p) == colour(gs.board.get(move.from))) { continue; }
-
-        // only fork weak pieces or more valuable ones, and ones which we don't already threaten
-        if (piece_value(first_p) > piece_value(gs.board.get(move.from))
-                || would_be_unsafe_piece_after(gs, first_piece_sq, move)
-                && !beta_covers(gs.board, move.from, first_piece_sq)) {
+        if (forked_piece_square != SQUARE_SENTINEL
+                && forkable(gs, move, forked_piece_square)) {
             ++count;
         }
 
@@ -117,8 +148,6 @@ void find_forks(
                     && !would_be_unsafe_piece_after(gs, temp, Move{forker_sq, temp})) {
 
                 int forked_pieces = 0;
-                bool capturing = (gs.board.get(temp) != EMPTY);
-                int dir_idx_to_avoid = capturing ? j : -1;
 
                 if (ortho) {
                     forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, ORTHO);
