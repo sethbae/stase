@@ -23,6 +23,7 @@ set(SOURCE_FILES
         src/game/helper.h
         src/game/helper.cpp
         src/game/weak.cpp
+        src/game/king.cpp
 
         src/game/heur/heur.cpp
         src/game/heur/heur.h
