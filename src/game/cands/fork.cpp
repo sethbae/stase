@@ -55,6 +55,11 @@ bool forkable(const Gamestate &gs, const Move m, const Square forked_piece_sq) {
     Piece forker_p = gs.board.get(m.from);
     Piece forked_p = gs.board.get(forked_piece_sq);
 
+    // you can't fork an empty square!
+    if (forked_p == EMPTY) {
+        return false;
+    }
+
     // don't fork pieces of the same colour
     if (colour(forked_p) == colour(forker_p)) {
         return false;
@@ -174,6 +179,35 @@ void find_forks(
 
 }
 
+void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+
+    std::vector<Move> moves;
+    moves.reserve(32);
+
+    piecemoves_ignore_check(gs.board, s, moves);
+
+    int yd = (colour(gs.board.get(s)) == WHITE) ? 1 : -1;
+
+    for (int i = 0; i < moves.size(); ++i) {
+
+        Move m = moves[i];
+
+        if (!would_be_unsafe_piece_after(gs, m.to, m)) {
+
+            Square l_sq = mksq(get_x(m.to) - 1, get_y(m.to) + yd);
+            Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);
+
+            if (forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
+                frames.push_back(FeatureFrame{s, m.to, 0 , 0});
+            }
+        }
+    }
+}
+
+void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+
+}
+
 void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     switch (type(gs.board.get(s))) {
@@ -185,6 +219,8 @@ void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFr
             find_forks(gs, s, true, false, frames); return;
         case QUEEN:
             find_forks(gs, s, true, true, frames); return;
+        case PAWN:
+            find_pawn_forks(gs, s, frames);
         default:
             return;
     }
