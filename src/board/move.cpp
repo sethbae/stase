@@ -792,7 +792,7 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
     if (b.get_ep_exists() && y == START_RANK + 3*FORWARD) {
         int epfile = b.get_ep_file();
         if (epfile == x + 1 || epfile == x - 1) {
-            m.to = b.get_ep_sq();
+            m.to = mksq(epfile, y + FORWARD);
             m.set_cap();
             m.set_cap_piece((pawncolour == WHITE) ? B_PAWN : W_PAWN);
             m.set_ep();

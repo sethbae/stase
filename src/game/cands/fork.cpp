@@ -197,7 +197,7 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             Square l_sq = mksq(get_x(m.to) - 1, get_y(m.to) + yd);
             Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);
 
-            if (forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
+            if (val(l_sq) && val(r_sq) && forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
                 frames.push_back(FeatureFrame{s, m.to, 0 , 0});
             }
         }
@@ -212,14 +212,23 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
 
         Square forker_sq = mksq(get_x(s) + XD[i], get_y(s) + YD[i]);
 
-        if (would_be_safe_king_square(gs, forker_sq, king_col)) {
+        if (val(forker_sq)
+                && colour(gs.board.get(forker_sq)) != king_col
+                && would_be_safe_king_square(gs, forker_sq, king_col)) {
 
             int count = 0;
 
             for (int j = 0; j < 8; ++j) {
 
                 Square forked_sq = mksq(get_x(forker_sq) + XD[j], get_y(forker_sq) + YD[j]);
-                if (forkable(gs, Move{s, forker_sq}, forked_sq)) {
+
+                // TODO (GM-34): until beta-covers correctly handles knights, pawns and kings,
+                //  this check is necessary. If the total distance from the king's starting
+                //  square is less than 1 in all directions, the piece was already attacked.
+                int xd = get_x(forked_sq) - get_x(s), yd = get_y(forked_sq) - get_y(s);
+                if ((-1 <= xd && xd <= 1) && (-1 <= yd && yd <= 1)) { continue; }
+
+                if (val(forked_sq) && forkable(gs, Move{s, forker_sq}, forked_sq)) {
                     ++count;
                 }
 
@@ -245,9 +254,9 @@ void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFr
         case QUEEN:
             find_forks(gs, s, true, true, frames); return;
         case PAWN:
-            find_pawn_forks(gs, s, frames);
+            find_pawn_forks(gs, s, frames); return;
         case KING:
-            find_king_forks(gs, s, frames);
+            find_king_forks(gs, s, frames); return;
         default:
             return;
     }
