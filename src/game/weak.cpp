@@ -267,16 +267,18 @@ SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s)
 
 /**
  * Analyses a SquareControlStatus as returned by capture_walk to detect whether the square is in fact
- * a weak square. A weak square is defined as:
+ * a weak square. If a square is empty, a weak square is defined as one whose control count is strictly
+ * unfavourable (ie not zero) for the given colour [c].
+ * If a square is not empty, then weakness is more complex:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  */
-bool is_weak_status(const Gamestate & gs, const Square s, SquareControlStatus ss) {
+bool is_weak_status(const Gamestate & gs, const Square s, const Ptype c, SquareControlStatus ss) {
 
     if (gs.board.get(s) == EMPTY) {
-        return colour(gs.board.get(s)) == WHITE
+        return c == WHITE
                ? ss.balance < 0
                : ss.balance > 0;
     }
@@ -333,7 +335,12 @@ bool is_weak_status(const Gamestate & gs, const Square s, SquareControlStatus ss
 }
 
 /**
- * Detects squares on the board which contain weak pieces (of either colour). A weak piece is:
+ * Checks if the given square is weak for either white or black (according to the given colour [c]).
+ * If a square is empty, then only the control count is looked at, which must be strictly less or more
+ * than zero respectively.
+ * If a square is not empty, there is a more complex set of rules. In this case, the colour is not
+ * relevant and the return value represents solely the weakness/safety of the piece on the square.
+ * The definition of weakness is then:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
@@ -341,35 +348,35 @@ bool is_weak_status(const Gamestate & gs, const Square s, SquareControlStatus ss
  * However, there is more complicated logic regarding the interaction of x-rays when pieces are
  * on the same diagonal/orthogonal line.
  */
-bool is_weak_square(const Gamestate & gs, const Square s) {
-    return is_weak_status(gs, s, capture_walk(gs.board, s));
+bool is_weak_square(const Gamestate & gs, const Square s, const Ptype c) {
+    return is_weak_status(gs, s, c, capture_walk(gs.board, s));
 }
 
 /**
  * Calculates exactly the same thing as is_weak_square, but after the given move has
  * taken place.
  */
-bool would_be_weak_after_move(const Gamestate & gs, const Square s, const Move m) {
+bool would_be_weak_after(const Gamestate & gs, const Square s, const Ptype c, const Move m) {
 
-    Piece c = gs.board.sneak(m);
-    bool weak = is_weak_square(gs, s);
-    gs.board.unsneak(m, c);
+    Piece sneaked_piece = gs.board.sneak(m);
+    bool weak = is_weak_square(gs, s, c);
+    gs.board.unsneak(m, sneaked_piece);
 
     return weak;
 
 }
 
 /**
- * Returns true iff the given square is both weak and has a piece on it.
+ * Returns true iff the given square has a weak piece on it. For the definition of weak,
+ * see is_weak_square.
  */
 bool is_unsafe_piece(const Gamestate & gs, const Square s) {
-    return (gs.board.get(s) != EMPTY) && is_weak_square(gs, s);
+    return (gs.board.get(s) != EMPTY) && is_weak_square(gs, s, colour(gs.board.get(s)));
 }
 
 /**
- * Returns true iff, after the given move has been played, the given square is both
- * weak and has a piece on it.
+ * Returns the same as is_unsafe_piece, but after the given move has been played.
  */
-bool would_be_unsafe_piece_after(const Gamestate & gs, const Square s, const Move m) {
-    return (gs.board.get(s) != EMPTY || s == m.to) && would_be_weak_after_move(gs, s, m);
+bool would_be_unsafe_after(const Gamestate & gs, const Square s, const Move m) {
+    return (gs.board.get(s) != EMPTY || s == m.to) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
 }

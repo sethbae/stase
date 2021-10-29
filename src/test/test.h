@@ -106,6 +106,8 @@ void test_knight_fork_hook();
 void test_sliding_fork_hook();
 void test_queen_fork_hook();
 void test_kp_fork_hook();
+void test_weak_square();
+void test_unsafe_piece();
 
 void stress_test_main();
 

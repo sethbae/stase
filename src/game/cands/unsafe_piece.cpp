@@ -12,7 +12,7 @@ void is_unsafe_piece_hook(const Gamestate & gs, const Square s, std::vector<Feat
 
     SquareControlStatus ss = evaluate_square_status(gs, s);
 
-    if (is_weak_status(gs, s, ss)) {
+    if (is_weak_status(gs, s, colour(gs.board.get(s)), ss)) {
         frames.push_back(FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});
     }
 
