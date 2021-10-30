@@ -329,7 +329,7 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Ptype c, SquareC
             attacked_by_weaker
             || (attacked_by_equal && under_defended)
             || (attacked_at_all && totally_undefended)
-            || (under_defended && (weakest_attacker < weakest_defender))
+            || (under_defended && (weakest_attacker <= weakest_defender))
     );
 
 }

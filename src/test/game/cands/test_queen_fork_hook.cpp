@@ -97,10 +97,10 @@ TestSet<StringTestCase> queen_fork_hook_test_cases = {
                         "r2q4/5ppk/p2p3p/1p1P4/2p1rNQ1/8/PPP3PP/5RK1 w - - 0 23",
                         {"f5"}
                 },
-                // puzzle #2
+                // puzzle #2 (it finds an extra fork, on b3)
                 StringTestCase{
                         "r1b1k2r/ppq2ppp/5n2/3p4/1b1P4/2NBB3/PP3PPP/R2QK2R w KQkq - 3 11",
-                        {"a4"}
+                        {"a4", "b3"}
                 },
                 // puzzle #3
                 StringTestCase{
