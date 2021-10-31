@@ -64,6 +64,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
  * Tries to capture absolutely any piece available. If none are available, does nothing.
  */
 void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -71,7 +72,7 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
 
     // find the maximum value available
     int max_val = 0;
-    Move max_move;
+    Move max_move = MOVE_SENTINEL;
 
     for (int i = 0; i < piece_moves.size(); ++i) {
         Piece p = gs.board.get(piece_moves[i].to);
@@ -82,7 +83,7 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
     }
 
     // return a trade with the piece of maximum value
-    if (counter.has_space()) {
+    if (counter.has_space() && !is_sentinel(max_move)) {
         moves[counter.inc()] = max_move;
     } else {
         return;
