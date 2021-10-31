@@ -19,11 +19,6 @@ using std::stringstream;
  CONVERSIONS        for squares, FENs, SAN, pieces
  ************************************************************************************/
 
-/***** square to string and string to square        (0, 0) <----> "a1"          *****/
-Square stosq(string str) {
-    return mksq(str[0] - 'a', str[1] - '1');
-}
-
 string sqtos(Square sq) {
     stringstream ss;
     ss << (char) (get_x(sq) + 'a') << (char) (get_y(sq) + '1');

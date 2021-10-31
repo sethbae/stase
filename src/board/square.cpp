@@ -19,8 +19,6 @@ const Byte SHIFT_KN6 = -SHIFT_X - 2*SHIFT_Y; // -1x, -2y
 const Byte SHIFT_KN7 = -2*SHIFT_X + SHIFT_Y; // -2x, +1y
 const Byte SHIFT_KN8 = -2*SHIFT_X - SHIFT_Y; // -2x, -1y
 
-Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
-
 void inc_x(Square & s) { s += SHIFT_X; }
 void dec_x(Square & s) { s -= SHIFT_X; }
 void inc_y(Square & s) { s += SHIFT_Y; }

@@ -542,7 +542,7 @@ bool castle_checks(Board b, const Ptype col, const bool kingside) {
                 return !in_check_hard(b, BLACK);
             }
             
-        } 
+        }
     }
     
     return false;

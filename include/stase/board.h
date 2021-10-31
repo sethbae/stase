@@ -179,7 +179,7 @@ Bitmap legal_piecemoves(const Board &, const Square);
 void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
 
-Square mksq(const int, const int);
+constexpr Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
 
 /* helper functions for transforming a square */
 void inc_x(Square &);
@@ -204,7 +204,11 @@ char ptoc(const Piece);
 std::string ptos(const Piece);
 std::string ptos_alg(const Piece);
 Piece ctop(const char);
-Square stosq(const std::string);
+
+constexpr Square stosq(std::string_view str) {
+    return mksq(str[0] - 'a', str[1] - '1');
+}
+
 std::string sqtos(const Square);
 Move stom(const std::string);
 std::string mtos(const Board &, const Move);
