@@ -104,9 +104,9 @@ const Responder defend_resp = Responder{"defend", &defend_square};
 const Responder capture_resp = Responder{"capture", &capture_piece};
 const Responder develop_resp = Responder{"develop", &develop_piece};
 const Responder play_fork_resp = Responder{"fork", &play_fork};
-const Responder trade_resp = Responder{"trade", &play_fork};
-const Responder retreat_resp = Responder{"retreat", &play_fork};
-const Responder desperado_resp = Responder{"desperado", &play_fork};
+const Responder trade_resp = Responder{"trade", &trade_piece};
+const Responder retreat_resp = Responder{"retreat", &retreat_piece};
+const Responder desperado_resp = Responder{"desperado", &desperado_piece};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
