@@ -80,7 +80,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_queen_fork_hook.cpp
         src/test/game/cands/test_kp_forks.cpp
         src/test/game/test_weak.cpp
-        src/test/game/cands/test_trade_resp.cpp)
+        src/test/game/cands/test_trade_resp.cpp
+        src/test/game/cands/test_retreat_resp.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

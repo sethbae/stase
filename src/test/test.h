@@ -109,6 +109,7 @@ void test_kp_fork_hook();
 void test_weak_square();
 void test_unsafe_piece();
 void test_trade_piece();
+void test_retreat_piece();
 
 void stress_test_main();
 

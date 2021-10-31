@@ -20,4 +20,5 @@ void test_game() {
     test_queen_fork_hook();
     test_kp_fork_hook();
     test_trade_piece();
+    test_retreat_piece();
 }
