@@ -242,6 +242,14 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
 
 }
 
+/**
+ * Finds forks which can be played in the given gamestate. Adds feature frames to the given vector to
+ * record the ones it does find. The format of the FeatureFrames is this:
+ * -centre: the current square of a piece which can play a fork
+ * -secondary: the square on which it can play a fork
+ * -conf1: unused
+ * -conf2: unused
+ */
 void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     switch (type(gs.board.get(s))) {
@@ -259,6 +267,17 @@ void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFr
             find_king_forks(gs, s, frames); return;
         default:
             return;
+    }
+
+}
+
+/**
+ * Responder which takes fork FeatureFrames and plays the fork described.
+ */
+void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
+
+    if (counter.has_space()) {
+        m[counter.inc()] = Move{ff->centre, ff->secondary, 0};
     }
 
 }

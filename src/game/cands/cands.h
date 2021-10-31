@@ -89,6 +89,7 @@ void find_forks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> 
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void play_fork(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
 const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
@@ -99,6 +100,7 @@ const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 const Responder defend_resp = Responder{"defend", &defend_square};
 const Responder capture_resp = Responder{"capture", &capture_piece};
 const Responder develop_resp = Responder{"develop", &develop_piece};
+const Responder play_fork_resp = Responder{"fork", &play_fork};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
@@ -109,7 +111,8 @@ const std::vector<const Hook *> ALL_HOOKS {
 const std::vector<const Responder *> ALL_RESPONDERS = {
         &defend_resp,
         &capture_resp,
-        &develop_resp
+        &develop_resp,
+        &play_fork_resp,
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
@@ -122,6 +125,11 @@ const std::vector<FeatureHandler> feature_handlers = {
             &unsafe_piece_hook,
             { &defend_resp },
             { &capture_resp }
+        },
+        FeatureHandler{
+            &fork_hook,
+            { &play_fork_resp },
+            { &defend_resp }
         }
 };
 
