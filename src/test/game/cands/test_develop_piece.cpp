@@ -103,6 +103,22 @@ const TestSet<ResponderTestCase> develop_test_cases = {
                         },
                         { "g8e7" }
                 },
+                // castles instead of playing Rf1
+                ResponderTestCase{
+                    "r3k2r/p1pppppp/1p6/8/8/5B2/PPPPPPPP/R3K2R w KQkq - 0 1",
+                    std::vector<FeatureFrame>{
+                        FeatureFrame{stosq("e1")}
+                    },
+                    { "e1g1", "e1c1" }
+                },
+                // castles instead of playing Rf8, and only on the side that's legal
+                ResponderTestCase{
+                    "r3k2r/pBpppppp/1p6/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1",
+                    std::vector<FeatureFrame>{
+                            FeatureFrame{stosq("e8")}
+                    },
+                    { "e8g8" }
+                },
                 // medley # 1
                 ResponderTestCase{
                         "rnbqkbnr/ppp2ppp/3p4/3Pp3/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1",

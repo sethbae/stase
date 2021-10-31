@@ -163,6 +163,63 @@ void best_knight_square(const Board & b, Square s, Move * moves, IndexCounter & 
 }
 
 /**
+ * Checks whether or not the side to move can castle by performing checks on the given squares.
+ * @param ksq1 the first square the king must pass through or land on
+ * @param ksq2 the second square the king must pass through or land on
+ * @param long_castle_square if castling long, the final square which must be empty. If castling short,
+ * pass in SQUARE_SENTINEL here.
+ */
+bool check_squares_for_castling(
+        const Gamestate & gs, const Square ksq1, const Square ksq2, const Square long_castle_square) {
+
+    if (gs.board.get(ksq1) != EMPTY || gs.board.get(ksq2) != EMPTY
+            || (long_castle_square != SQUARE_SENTINEL && gs.board.get(long_castle_square) != EMPTY)) {
+        return false;
+    }
+
+    return would_be_safe_king_square(gs, ksq1, gs.board.get_white() ? WHITE : BLACK)
+            && would_be_safe_king_square(gs, ksq2, gs.board.get_white() ? WHITE : BLACK);
+}
+
+/**
+ * Tries to castle. Returns true if at least one move is suggested.
+ */
+bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCounter & counter) {
+
+    bool found = false;
+
+    if (gs.board.get_white() && s == stosq("e1")) {
+        if (gs.board.get_cas_ws() && check_squares_for_castling(gs, stosq("f1"), stosq("g1"), SQUARE_SENTINEL)) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{stosq("e1"), stosq("g1"), 0};
+                found = true;
+            }
+        }
+        if (gs.board.get_cas_wl() && check_squares_for_castling(gs, stosq("d1"), stosq("c1"), stosq("b1"))) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{stosq("e1"), stosq("c1"), 0};
+                found = true;
+            }
+        }
+    } else if (!gs.board.get_white() && s == stosq("e8")) {
+        if (gs.board.get_cas_bs() && check_squares_for_castling(gs, stosq("f8"), stosq("g8"), SQUARE_SENTINEL)) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{stosq("e8"), stosq("g8"), 0};
+                found = true;
+            }
+        }
+        if (gs.board.get_cas_bl() && check_squares_for_castling(gs, stosq("d8"), stosq("c8"), stosq("b8"))) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{stosq("e8"), stosq("c8"), 0};
+                found = true;
+            }
+        }
+    }
+
+    return found;
+}
+
+/**
  * Looks for the best square to develop the given piece to. Although this is deterministic
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
@@ -189,6 +246,9 @@ void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         case QUEEN:
             best_diag_squares(b, ff->centre, moves, move_counter, QUEENS);
             best_ortho_squares(b, ff->centre, moves, move_counter, QUEENS);
+            return;
+        case KING:
+            castling_moves(gs, ff->centre, moves, move_counter);
             return;
         default:
             return;
