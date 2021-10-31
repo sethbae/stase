@@ -46,6 +46,7 @@ set(SOURCE_FILES
         src/game/cands/development_hook.cpp
         src/game/cands/develop_piece.cpp
         src/game/cands/fork.cpp
+        src/game/cands/trade_retreat_desperado.cpp
 
         src/utils/utils.h
         src/utils/print.cpp)

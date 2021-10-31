@@ -90,6 +90,9 @@ void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void play_fork(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void trade_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void retreat_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void desperado_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
 const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
@@ -101,6 +104,9 @@ const Responder defend_resp = Responder{"defend", &defend_square};
 const Responder capture_resp = Responder{"capture", &capture_piece};
 const Responder develop_resp = Responder{"develop", &develop_piece};
 const Responder play_fork_resp = Responder{"fork", &play_fork};
+const Responder trade_resp = Responder{"trade", &play_fork};
+const Responder retreat_resp = Responder{"retreat", &play_fork};
+const Responder desperado_resp = Responder{"desperado", &play_fork};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
@@ -113,6 +119,9 @@ const std::vector<const Responder *> ALL_RESPONDERS = {
         &capture_resp,
         &develop_resp,
         &play_fork_resp,
+        &trade_resp,
+        &retreat_resp,
+        &desperado_resp,
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
@@ -123,7 +132,7 @@ const std::vector<FeatureHandler> feature_handlers = {
         },
         FeatureHandler{
             &unsafe_piece_hook,
-            { &defend_resp },
+            { &defend_resp, &trade_resp, &retreat_resp, &desperado_resp },
             { &capture_resp }
         },
         FeatureHandler{
