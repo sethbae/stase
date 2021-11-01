@@ -5,7 +5,6 @@
 using std::vector;
 #include <iostream>
 using std::cout;
-#include <functional>
 #include <fstream>
 using std::ofstream;
 #include <ostream>
@@ -20,11 +19,83 @@ int COUNT = 0;
  * @param line the nodes in the line
  */
 void print_line(std::vector<SearchNode *> & line) {
+
+    if (line.empty()) {
+        cout << "[empty line]\n";
+        return;
+    }
+
     cout << "[" << human_eval(line[0]->score) << "] ";
     for (SearchNode * s : line) {
         cout << mtos(s->gs->board, s->move) << " ";
     }
     cout << "\n";
+}
+
+/**
+ * Writes the given tree or subtree to file. May produce extremely large output!
+ * A pre-order traversal is used.
+ */
+void write_to_file(SearchNode *node, ostream & output) {
+
+    /*
+     * Format is:
+     * some hashtags ########
+     * SearchNode title line (with "created by" move)
+     * board with conf
+     * score
+     * children title
+     * list of children and names
+     */
+
+    output << "######################\n";
+
+    // SearchNode title line
+    output << "SearchNode at " << node
+           << " (created by " << mtos(node->gs->board, node->move) << ")\n";
+
+    wr_board_conf(node->gs->board, output);
+
+    output << "\nScore: " << node->score << "\n\n";
+
+    if (node->num_children == 0) {
+        output << "Has no children.\n";
+    } else {
+        output << "Children:\n";
+
+        // list of children and names
+        for (int i = 0; i < node->num_children; ++i) {
+            output << "Child " << i << ": " << node->children[i]
+                   << " (" << mtos(node->children[i]->gs->board, node->children[i]->move)
+                   << ") (" << node->children[i]->score << ")\n";
+        }
+    }
+
+    output << "\n";
+
+    // recurse for each child
+    for (int i = 0; i < node->num_children; ++i) {
+        write_to_file(node->children[i], output);
+    }
+
+    return;
+
+}
+
+void record_tree_in_file(const std::string & filename, SearchNode * root) {
+
+    ofstream file;
+    file.open(filename, std::ios::out);
+
+    file << "This file contains engine analysis of the following position\n";
+
+    wr_board_conf(root->gs->board, file);
+
+    file << "\nHere are the nodes:\n";
+
+    write_to_file(root, file);
+    file.close();
+
 }
 
 /**
@@ -85,7 +156,9 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
         }
 
         // set the best score and we're done!
-        node->score = best_score;
+        if (node->num_children != 0) {
+            node->score = best_score;
+        }
         return;
 
     } else {
@@ -196,83 +269,5 @@ int subtree_size(SearchNode *node) {
         size += subtree_size(node->children[i]);
 
     return size;
-
-}
-
-void readable_printout(vector<SearchNode*> & nodes, ostream & output) {
-
-    auto itr = nodes.rbegin();
-
-    wr_board_conf((*itr)->gs->board, output);
-    output << "\nBest line: ";
-    itr++;
-
-    while (itr != nodes.rend()) {
-
-        SearchNode *node = *itr;
-
-        output << mtos(node->gs->board, node->move) << " ";
-        //pr_board(node->gs->board);
-
-        itr++;
-
-    }
-
-    output << "\n";
-
-    output << "Evaluation: " << nodes[nodes.size()-1]->score << "\n";
-    output.flush();
-
-}
-
-// write the contents of a search tree to file (or stdout)
-// warning: can produce arbitrarily large ouptut
-// usees a pre-order tree walk
-void write_to_file(SearchNode *node, ostream & output) {
-
-    // Format is:
-    // some hashtags ########
-    // SearchNode title line (with "created by" move)
-    // board with conf
-    // score
-    // children title
-    // list of children and names
-
-    // some hashtags
-    output << "######################\n";
-
-    // SearchNode title line
-    output << "SearchNode at " << node
-                << " (created by " << mtos(node->gs->board, node->move) << ")\n";
-
-    // board with conf
-    wr_board_conf(node->gs->board, output);
-
-    output << "\nScore: " << node->score << "\n\n";
-
-    // children title
-    if (node->num_children == 0) {
-        output << "Has no children.\n";
-    } else {
-        output << "Children:\n";
-
-        // list of children and names
-        for (int i = 0; i < node->num_children; ++i) {
-            output << "Child " << i << ": " << node->children[i]
-                    << " (" << mtos(node->children[i]->gs->board, node->children[i]->move)
-                    << ") (" << node->children[i]->score << ")\n";
-        }
-
-    }
-
-    output << "\n";
-
-
-    // recurse for each child
-    for (int i = 0; i < node->num_children; ++i) {
-        write_to_file(node->children[i], output);
-    }
-
-    return;
 
 }
