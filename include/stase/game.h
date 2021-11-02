@@ -151,6 +151,7 @@ inline Eval invalid_eval() {
 Eval mate_in(Ptype colour, unsigned);
 Eval white_mates_in(unsigned);
 Eval black_mates_in(unsigned);
+Eval mate_in_one_more(const Eval);
 
 Eval white_has_been_mated();
 Eval black_has_been_mated();
@@ -166,7 +167,6 @@ bool black_is_mated(Eval);
 int signed_mate_distance(Eval);
 int abs_mate_distance(Eval);
 
-std::string etos(Eval, int digits);
 std::string etos(Eval);
 
 // heuristic evaluation

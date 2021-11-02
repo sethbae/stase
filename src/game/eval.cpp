@@ -38,6 +38,21 @@ Eval black_mates_in(unsigned num) {
     return BLACK_GIVES_MATE + ((Eval)num);
 }
 
+/**
+ * Returns an evaluation which represents checkmate in one move more than that already
+ * represented. Eg, #1 becomes #2, #-4 becomes #-5. If the given eval does not represent
+ * checkmate, then zero is returned.
+ */
+Eval mate_in_one_more(const Eval e) {
+    if (e & WHITE_GIVES_MATE) {
+        return e - 1;
+    } else if (e & BLACK_GIVES_MATE) {
+        return e + 1;
+    } else {
+        return (Eval) 0;
+    }
+}
+
 Eval white_has_been_mated() {
     return BLACK_GIVES_MATE;
 }
@@ -97,13 +112,22 @@ Eval eval_from_float(float f) {
     
 }
 
-string etos(const Eval eval, int digits) {
+/**
+ * Converts an evaluation to a human readable string, accounting for checkmates.
+ */
+string etos(const Eval e) {
+
+    // handle checkmates
+    if (e == white_has_been_mated() || e == black_has_been_mated()) {
+        return "#";
+    } else if (e & WHITE_MATE_MASK) {
+        return "#" + std::to_string(WHITE_GIVES_MATE - e);
+    } else if (e & BLACK_MATE_MASK) {
+        return "#-" + std::to_string(BLACK_GIVES_MATE - e);
+    }
+
+    // handle numerical evaluations
     stringstream ss;
-    ss << std::fixed << std::setprecision(digits) << human_eval(eval);
+    ss << std::fixed << std::setprecision(3) << human_eval(e);
     return ss.str();
 }
-
-string etos(const Eval eval) {
-    return etos(eval, 3);
-}
-

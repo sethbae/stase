@@ -42,7 +42,7 @@ void print_line(std::vector<SearchNode *> & line) {
         return;
     }
 
-    cout << "[" << human_eval(line[0]->score) << "] ";
+    cout << "[" << etos(line[0]->score) << "] ";
     for (SearchNode * s : line) {
         cout << mtos(s->gs->board, s->move) << " ";
     }
@@ -84,7 +84,7 @@ void write_to_file(SearchNode *node, ostream & output) {
         for (int i = 0; i < node->num_children; ++i) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->children[i]->gs->board, node->children[i]->move)
-                   << ") (" << node->children[i]->score << ")\n";
+                   << ") (" << etos(node->children[i]->score) << ")\n";
         }
     }
 
@@ -150,6 +150,14 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 
         // get candidate moves and initialise the score counter
         vector<Move> moves = cands(*node->gs);
+
+        if (moves.empty() && node->gs->has_been_mated) {
+            node->score = node->gs->board.get_white()
+                    ? white_has_been_mated()
+                    : black_has_been_mated();
+            return;
+        }
+
         Eval best_score = white ? white_has_been_mated() : black_has_been_mated();
 
         // set up the node's children pointers
@@ -200,6 +208,12 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
             } else if (!white && score < beta) {
                 beta = score;
             }
+        }
+
+        // if the best child's score represents mate, we need to change this (parent) node's
+        // score so that it is mate in one more move.
+        if (is_mate(node->score)) {
+            node->score = mate_in_one_more(node->score);
         }
 
     }
