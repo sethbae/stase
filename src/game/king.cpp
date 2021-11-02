@@ -138,3 +138,24 @@ bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Mo
 
     return result;
 }
+
+/**
+ * Checks whether the given-coloured king is on a safe square or not. This is functionally equivalent
+ * to the in_check functions in the board module but may be implemented more efficiently. The value of
+ * the duplication is that the slow and reliable variation can be used to check the correctness of the
+ * performance-critical version.
+ */
+bool is_safe_king(const Gamestate & gs, const Ptype king_colour) {
+    Piece king = (king_colour == WHITE) ? W_KING : B_KING;
+    Square k_sq;
+
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            if (gs.board.get(mksq(x, y)) == king) {
+                k_sq = mksq(x, y);
+            }
+        }
+    }
+
+    return is_safe_for_king(gs, k_sq);
+}

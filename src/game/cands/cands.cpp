@@ -38,7 +38,12 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
     record_hook_features(gs, hook, frames.data(), frames.size());
 }
 
-vector<Move> legal_cands(const Gamestate & gs) {
+/**
+ * Computes and returns a set of candidate moves specifically for positions when the
+ * side to move is in check.
+ */
+vector<Move> cands_in_check(const Gamestate & gs) {
+    // currently, there is no special logic.
     return legal_moves(gs.board);
 }
 
@@ -48,6 +53,11 @@ vector<Move> legal_cands(const Gamestate & gs) {
  * the minimum number of moves returned.
  */
 vector<Move> cands(const Gamestate & gs) {
+
+    // if we're in check, handle the candidates differently
+    if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
+        return cands_in_check(gs);
+    }
 
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;

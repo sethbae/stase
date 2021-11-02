@@ -190,6 +190,7 @@ bool alpha_covers(const Board &, Square piece_sq, Square target_sq);
 bool beta_covers(const Board &, Square piece_sq, Square target_sq);
 bool gamma_covers(const Board &, Square piece_sq, Square target_sq);
 
+bool is_safe_king(const Gamestate &, const Ptype colour);
 bool would_be_safe_king_square(const Gamestate &, const Square, const Ptype colour);
 bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, const Ptype colour);
 
