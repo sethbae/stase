@@ -129,9 +129,41 @@ void bench_individual_responders() {
 
 /* bench the whole candidates function */
 
-int wrap_cands(const Gamestate & gs) {
+int wrap_cands(Gamestate & gs) {
     return cands(gs).size();
 }
+//
+//int piece_fork(const Gamestate & gs) {
+//
+//    find_sliding_forks(gs, 0, nullptr);
+//
+//    // count the feature frames and return that
+//    int frame_count = 0;
+//    for (FeatureFrame * ff = gs.feature_frames[sliding_fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff, ++frame_count);
+//
+//    return frame_count;
+//}
+//
+//int queen_fork(const Gamestate & gs) {
+//
+//    find_queen_forks(gs, 0, nullptr);
+//
+//    // count the feature frames and return that
+//    int frame_count = 0;
+//    for (FeatureFrame * ff = gs.feature_frames[queen_fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff, ++frame_count);
+//
+//    return frame_count;
+//}
+//
+//void bench_forks() {
+//
+//    vector<Gamestate> states;
+//    puzzle_gamestates(states);
+//
+//    bench("piece-forks", MICROS, states.data(), states.size(), &piece_fork);
+//    bench("queen-forks", MICROS, states.data(), states.size(), &queen_fork);
+//
+//}
 
 void bench_cands() {
 
