@@ -10,7 +10,7 @@ using std::chrono::duration_cast;
 
 struct SearchNode {
 
-    const Gamestate *gs;
+    Gamestate *gs;
     Eval score;
     Move move;
     unsigned short num_children;
