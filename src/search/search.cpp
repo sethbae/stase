@@ -10,7 +10,24 @@ using std::ofstream;
 #include <ostream>
 using std::ostream;
 
+// hacky way to count the number of nodes we create
 int COUNT = 0;
+
+// recursively count the number of nodes in the subtree rooted at the given node
+int subtree_size(SearchNode *node) {
+
+    if (node == nullptr) {
+        return 0;
+    }
+
+    int size = 1;
+
+    for (int i = 0; i < node->num_children; ++i)
+        size += subtree_size(node->children[i]);
+
+    return size;
+
+}
 
 /**
  * Prints out a single line of text to cout, for example:
@@ -253,21 +270,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         }
     }
 
+    // record_tree_in_file("stase_tree", &root);
+
     return moves;
-}
-
-// recursively count the number of nodes in the subtree rooted at the given node
-int subtree_size(SearchNode *node) {
-
-    if (node == nullptr) {
-        return 0;
-    }
-
-    int size = 1;
-
-    for (int i = 0; i < node->num_children; ++i)
-        size += subtree_size(node->children[i]);
-
-    return size;
-
 }

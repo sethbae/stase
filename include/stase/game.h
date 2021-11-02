@@ -82,6 +82,7 @@ struct Gamestate {
 
     // The enclosed board
     Board board;
+    bool has_been_mated = false;
 
     FeatureFrame ** feature_frames;
 
@@ -173,8 +174,8 @@ int heur(const Gamestate &);
 int heur_with_description(const Gamestate &);
 
 // candidate moves
-std::vector<Move> cands(const Gamestate &);
-std::vector<Move> cands_report(const Gamestate &);
+std::vector<Move> cands(Gamestate &);
+std::vector<Move> cands_report(Gamestate &);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);

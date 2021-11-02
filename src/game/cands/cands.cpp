@@ -52,11 +52,15 @@ vector<Move> cands_in_check(const Gamestate & gs) {
  * MAX_TOTAL_CANDS moves which are guaranteed to be unique. No guarantee is made as to
  * the minimum number of moves returned.
  */
-vector<Move> cands(const Gamestate & gs) {
+vector<Move> cands(Gamestate & gs) {
 
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
-        return cands_in_check(gs);
+        std::vector<Move> cands = cands_in_check(gs);
+        if (cands.empty()) {
+            gs.has_been_mated = true;
+        }
+        return cands;
     }
 
     Move all_moves[MAX_TOTAL_CANDS];
@@ -123,13 +127,32 @@ vector<Move> cands(const Gamestate & gs) {
  * Generates candidate moves for the gamestate, while printing information to stdout.
  * Useful for debugging (keep up to date with real implementation).
  */
-vector<Move> cands_report(const Gamestate & gs) {
+vector<Move> cands_report(Gamestate & gs) {
 
     cout << "********************************\n"
             "* Generating candidate moves\n"
             "********************************\n\n";
 
     pr_board_conf(gs.board);
+
+    // if we're in check, handle the candidates differently
+    if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
+
+        std::vector<Move> cands = cands_in_check(gs);
+
+        if (cands.empty()) {
+            gs.has_been_mated = true;
+            cout << "The position is checkmate - no candidates\n";
+        } else{
+            cout << "In check. Returning legal moves:\n";
+            for (const Move & m : cands) {
+                cout << mtos(gs.board, m);
+            }
+            cout << "\n";
+        }
+
+        return cands;
+    }
 
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
