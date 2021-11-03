@@ -43,8 +43,8 @@ void print_line(std::vector<SearchNode *> & line) {
     }
 
     cout << "[" << etos(line[0]->score) << "] ";
-    for (SearchNode * s : line) {
-        cout << mtos(s->gs->board, s->move) << " ";
+    for (int i = 1; i < line.size(); ++i) {
+        cout << mtos(line[i]->gs->board, line[i]->move) << " ";
     }
     cout << "\n";
 }
@@ -73,7 +73,8 @@ void write_to_file(SearchNode *node, ostream & output) {
 
     wr_board_conf(node->gs->board, output);
 
-    output << "\nScore: " << node->score << "\n\n";
+    output << "\nScore: " << etos(node->score) << "\n";
+    output << "Has been mated? " << (node->gs->has_been_mated ? "true\n\n" : "false\n\n");
 
     if (node->num_children == 0) {
         output << "Has no children.\n";
@@ -138,6 +139,38 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
 }
 
 /**
+ * Checks the children of the node and sets the score and best_child pointers
+ * accordingly.
+ */
+void update_score(SearchNode * node) {
+
+    if (node->num_children == 0) {
+        node->best_child = nullptr;
+        return;
+    }
+
+    // find the best score among children
+    node->score = node->children[0]->score;
+    for (int i = 1; i < node->num_children; ++i) {
+
+        Eval score = node->children[i]->score;
+
+        if (node->gs->board.get_white() && score > node->score) {
+            node->score = score;
+            node->best_child = node->children[i];
+        } else if (!node->gs->board.get_white() && score < node->score) {
+            node->score = score;
+            node->best_child = node->children[i];
+        }
+    }
+
+    // if the score is mate, then we need to make it mate in one more move
+    if (is_mate(node->score)) {
+        node->score = mate_in_one_more(node->score);
+    }
+}
+
+/**
  * Deepens the tree or sub-tree pointed to. For each terminal node, this retrieves candidates
  * and extends accordingly. The heuristic evaluation is called on each node and the scores of
  * all nodes are updated accordingly.
@@ -151,14 +184,17 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
         // get candidate moves and initialise the score counter
         vector<Move> moves = cands(*node->gs);
 
-        if (moves.empty() && node->gs->has_been_mated) {
+        if (node->gs->has_been_mated) {
             node->score = node->gs->board.get_white()
                     ? white_has_been_mated()
                     : black_has_been_mated();
+            node->best_child = nullptr;
             return;
         }
 
-        Eval best_score = white ? white_has_been_mated() : black_has_been_mated();
+        if (moves.empty()) {
+            return;
+        }
 
         // set up the node's children pointers
         node->children = new SearchNode *[moves.size()];
@@ -169,27 +205,18 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
             // create a new child and perform the heuristic eval
             node->children[i] = new_node(*(node->gs), moves[i]);
             Eval score = heur(*node->children[i]->gs);
+            if (is_mate(score)) {
+                cout << etos(score) << "\n";
+            }
             node->children[i]->score = score;
 
-            // update the running totals
-            if (white && score > best_score) {
-                best_score = score;
-            } else if (!white && score < best_score) {
-                best_score = score;
-            }
-
         }
 
-        // set the best score and we're done!
-        if (node->num_children != 0) {
-            node->score = best_score;
-        }
+        update_score(node);
+
         return;
 
     } else {
-
-        // reset the score
-        node->score = white ? white_has_been_mated() : black_has_been_mated();
 
         // deepen tree on each child recursively, updating the score as we go
         for (int i = 0; i < node->num_children && alpha < beta; ++i) {
@@ -197,12 +224,6 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
             deepen_tree(node->children[i], alpha, beta);
 
             Eval score = node->children[i]->score;
-            if (white && score > node->score) {
-                node->score = score;
-            } else if (!white && score < node->score) {
-                node->score = score;
-            }
-
             if (white && score > alpha) {
                 alpha = score;
             } else if (!white && score < beta) {
@@ -210,12 +231,7 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
             }
         }
 
-        // if the best child's score represents mate, we need to change this (parent) node's
-        // score so that it is mate in one more move.
-        if (is_mate(node->score)) {
-            node->score = mate_in_one_more(node->score);
-        }
-
+        update_score(node);
     }
 }
 
@@ -228,22 +244,12 @@ void deepen_tree(SearchNode * root) {
  * by the scores on the nodes.
  */
 std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
-    std::vector<SearchNode *> line;
+    std::vector<SearchNode *> line{root};
     SearchNode * current = root;
 
-    while (current->num_children) {
-
-        bool found = false;
-        for (int i = 0; i < current->num_children; ++i) {
-            if (current->children[i]->score == current->score) {
-                line.push_back(current->children[i]);
-                current = current->children[i];
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) { return line; }
+    while (current->best_child) {
+        line.push_back(current->best_child);
+        current = current->best_child;
     }
 
     return line;
@@ -284,7 +290,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         }
     }
 
-    // record_tree_in_file("stase_tree", &root);
+    record_tree_in_file("stase_tree", &root);
 
     return moves;
 }

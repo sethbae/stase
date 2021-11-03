@@ -15,6 +15,7 @@ struct SearchNode {
     Move move;
     unsigned short num_children;
     SearchNode ** children;
+    SearchNode * best_child;
 
 };
 

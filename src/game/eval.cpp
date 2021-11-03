@@ -89,7 +89,7 @@ float human_eval(const int eval) {
     return MIN_EVAL + (proportional_rating * (MAX_EVAL - MIN_EVAL));
     */
     
-    return ((float) eval) / 1000.0f;
+    return ((float) eval - OFFSET) / 1000.0f;
 }
 
 int int_eval(const Eval eval) {
@@ -123,7 +123,7 @@ string etos(const Eval e) {
     } else if (e & WHITE_MATE_MASK) {
         return "#" + std::to_string(WHITE_GIVES_MATE - e);
     } else if (e & BLACK_MATE_MASK) {
-        return "#-" + std::to_string(BLACK_GIVES_MATE - e);
+        return "#" + std::to_string(BLACK_GIVES_MATE - e);
     }
 
     // handle numerical evaluations

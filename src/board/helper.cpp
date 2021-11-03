@@ -87,11 +87,16 @@ Move stom(const string san) {
 /* accepts a move and the board it belongs to; whether or not the move has already been made */
 string mtos(const Board & b, const Move m) {
 
-    if (m.from == empty_move().from && m.to == empty_move().to)
+    if (is_sentinel(m)) {
+        return "no move";
+    }
+    if (m.from == empty_move().from && m.to == empty_move().to) {
         return "empty move";
-    if (m.from == m.to)
+    }
+    if (m.from == m.to) {
         return "invalid move";
-    
+    }
+
     string s = "";
     bool move_made = (b.get(m.from) == EMPTY);
     
