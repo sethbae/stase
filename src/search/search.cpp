@@ -296,3 +296,26 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 
     return moves;
 }
+
+/**
+ * Extends the search tree indefinitely from the root. This method will never return and
+ * is intended to be used in a multi-threaded context only.
+ */
+void search_indefinite(SearchNode * root) {
+    while (true) {
+        deepen_tree(root);
+    }
+}
+
+/**
+ * Deletes completely the tree or subtree of which the given node is the root.
+ */
+void delete_tree(SearchNode * node) {
+
+    if (!node) { return; }
+
+    for (int i = 0; i < node->num_children; ++i) {
+        delete_tree(node->children[i]);
+    }
+    delete node;
+}

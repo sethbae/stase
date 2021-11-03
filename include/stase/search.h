@@ -7,6 +7,7 @@
 #include <chrono>
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
+#include <pthread.h>
 
 struct SearchNode {
 
@@ -45,11 +46,15 @@ struct TimeLimiter {
 };
 
 std::vector<Move> iterative_deepening_search(const std::string &, int);
+void search_indefinite(SearchNode *);
+void delete_tree(SearchNode *);
 
 int subtree_size(SearchNode *);
-
-void readable_printout(std::vector<SearchNode*> &, std::ostream &);
-
 void write_to_file(SearchNode*, std::ostream &);
+
+
+pthread_t run_in_background(const std::string & fen);
+Move cancel_and_fetch_move(pthread_t);
+void free_memory_for_exit();
 
 #endif //STASE_SEARCH_H

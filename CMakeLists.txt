@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(OPT_FLAGS -Ofast)
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
+SET(CMAKE_CXX_FLAGS "-pthread ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
 
 set(SOURCE_FILES
         src/board/bitmap.cpp
@@ -49,7 +49,7 @@ set(SOURCE_FILES
         src/game/cands/trade_retreat_desperado.cpp
 
         src/utils/utils.h
-        src/utils/print.cpp)
+        src/utils/print.cpp src/search/thread.cpp)
 
 set(STASE_SOURCE_FILES)
 
