@@ -6,21 +6,19 @@ using std::stringstream;
 #include <string>
 using std::string;
 #include <iomanip>
+#include <cmath>
 
-const Eval BLACK_GIVES_MATE = -32768; // 0x8000 - 16 bits with MSB set
-const Eval WHITE_GIVES_MATE = 0x7FFF; // 16 bits with all but MSB set
+const Eval BLACK_GIVES_MATE = 0x80000000; // 0x8000 - 16 bits with MSB set
+const Eval WHITE_GIVES_MATE = 0x7FFFFFFF; // 16 bits with all but MSB set
 
 // two masks for checking for mate
-const Eval BLACK_MATE_MASK = -32768; // 0x8000;
-const Eval WHITE_MATE_MASK = 0x4000;
-
-const float MIN_EVAL = -80.0f;
-const float MAX_EVAL = 80.0f;
+const Eval BLACK_MATE_MASK = 0x80000000; // 0x8000;
+const Eval WHITE_MATE_MASK = 0x40000000;
 
 // 14 bits are used to represent actual evaluations; these are the positive numbers 0-16384
 // We then use an offset when needed to map these to -8192 <= x <= 8191
 //      N.B. for correct behaviour, the offset must be half the total range
-const Eval OFFSET = 0x1000; // 2^13
+const Eval OFFSET = 0x2000000; // 2^13
 
 Eval zero() {
     return OFFSET;
@@ -76,40 +74,15 @@ bool black_is_mated(const Eval eval) {
 // convert the Eval to a float representing a more traditional human evaluation
 float human_eval(const int eval) {
 
-    /*
-    if (white_is_mated(eval))
-        return MIN_EVAL - 1;
-    if (black_is_mated(eval))
-        return MAX_EVAL + 1;
-        
-    // how far through the range of ratings is the current rating? 0 <= x <= 1
-    float proportional_rating = eval / (2.0 * OFFSET);
-
-    // map this onto the desired range of possible evaluations
-    return MIN_EVAL + (proportional_rating * (MAX_EVAL - MIN_EVAL));
-    */
-    
+    if (is_mate(eval)) {
+        // cannot be represented as a float
+        return nanf("");
+    }
     return ((float) eval - OFFSET) / 1000.0f;
 }
 
 int int_eval(const Eval eval) {
     return eval - OFFSET;
-}
-
-Eval eval_from_float(float f) {
-    
-    // if outside of range, return the corresponding checkmate
-    if (f < MIN_EVAL)
-        return BLACK_GIVES_MATE;
-    if (f > MAX_EVAL)
-        return WHITE_GIVES_MATE;
-    
-    // otherwise figure out how far it is through the range
-    float proportional_rating = (f - MIN_EVAL) / (MAX_EVAL - MIN_EVAL);
-
-    // and map to the actual rating range (as positive integer because of the offset scheme)
-    return (unsigned) (proportional_rating * OFFSET * 2);
-    
 }
 
 /**

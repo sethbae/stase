@@ -140,7 +140,7 @@ bool in_check(Gamestate &);
 
 
 // evaluation type and helper/conversion methods
-typedef int16_t Eval;
+typedef int32_t Eval;
 
 Eval zero();
 
@@ -170,8 +170,8 @@ int abs_mate_distance(Eval);
 std::string etos(Eval);
 
 // heuristic evaluation
-int heur(const Gamestate &);
-int heur_with_description(const Gamestate &);
+Eval heur(const Gamestate &);
+Eval heur_with_description(const Gamestate &);
 
 // candidate moves
 std::vector<Move> cands(Gamestate &);

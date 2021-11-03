@@ -119,9 +119,9 @@ int material_balance(const Gamestate & gs) {
 
 }
 
-int heur(const Gamestate & gs) {
+Eval heur(const Gamestate & gs) {
     
-    int ev = zero();
+    Eval ev = zero();
     
     for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
         int score = (int)(METRICS[i](gs.board) * (float)WEIGHTS[i]);
@@ -131,7 +131,7 @@ int heur(const Gamestate & gs) {
     return ev + material_balance(gs);
 }
 
-int heur_with_description(const Gamestate & gs) {
+Eval heur_with_description(const Gamestate & gs) {
 
     cout << std::left << std::setprecision(3);
 
@@ -143,7 +143,7 @@ int heur_with_description(const Gamestate & gs) {
     int mat_bal = material_balance(gs.board);
     cout << setw(20) << "Material balance" << ": " << std::right << setw(26) << mat_bal << "\n";
 
-    int ev = zero();
+    Eval ev = zero();
     for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
         float score = METRICS[i](gs.board);
         int weighted_score = (int)(score * (float)WEIGHTS[i]);
@@ -158,7 +158,7 @@ int heur_with_description(const Gamestate & gs) {
                 << "\n";
     }
     
-    int final_ev = ev + mat_bal;
+    Eval final_ev = ev + mat_bal;
     
     cout << "\nFinal evaluation  : " << human_eval(final_ev) << "\n";
     cout << "\nFinal evaluation  : " << etos(final_ev) << "\n";
