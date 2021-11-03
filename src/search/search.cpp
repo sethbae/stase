@@ -89,6 +89,12 @@ void write_to_file(SearchNode *node, ostream & output) {
         }
     }
 
+    if (node->best_child == nullptr) {
+        output << "Best child: nullptr\n";
+    } else {
+        output << "Best child: " << node->best_child << "\n";
+    }
+
     output << "\n";
 
     // recurse for each child
@@ -151,6 +157,8 @@ void update_score(SearchNode * node) {
 
     // find the best score among children
     node->score = node->children[0]->score;
+    node->best_child = node->children[0];
+
     for (int i = 1; i < node->num_children; ++i) {
 
         Eval score = node->children[i]->score;
@@ -201,15 +209,9 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
         node->num_children = moves.size();
 
         for (int i = 0; i < moves.size(); ++i) {
-
             // create a new child and perform the heuristic eval
             node->children[i] = new_node(*(node->gs), moves[i]);
-            Eval score = heur(*node->children[i]->gs);
-            if (is_mate(score)) {
-                cout << etos(score) << "\n";
-            }
-            node->children[i]->score = score;
-
+            node->children[i]->score = heur(*node->children[i]->gs);
         }
 
         update_score(node);
@@ -218,7 +220,7 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 
     } else {
 
-        // deepen tree on each child recursively, updating the score as we go
+        // deepen tree on each child recursively, updating a/b
         for (int i = 0; i < node->num_children && alpha < beta; ++i) {
 
             deepen_tree(node->children[i], alpha, beta);
