@@ -293,6 +293,10 @@ Board starting_pos() {
     return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
+std::string starting_fen() {
+    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+}
+
 Board empty_board() {
     
     Board b;

@@ -161,6 +161,7 @@ struct Board {
 Move empty_move();
 Board empty_board();
 Board starting_pos();
+std::string starting_fen();
 Board fen_to_board(const std::string & fen);
 std::string board_to_fen(const Board &);
 std::vector<std::string> read_pgn(const std::string &s);
