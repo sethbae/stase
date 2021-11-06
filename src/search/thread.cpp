@@ -1,20 +1,47 @@
 #include <pthread.h>
 #include <string>
 #include <search.h>
-#include <iostream>
-#include "unistd.h"
-
-SearchNode * most_recent_root;
+#include <csignal>
 
 struct EngineParams {
+    pthread_t t_id;
     SearchNode * root;
+    Move best_move;
 };
 
-void * start(void * arg) {
+EngineParams current_running_config =
+        {
+            0,
+            nullptr,
+            MOVE_SENTINEL
+        };
 
-    EngineParams * params = (EngineParams *) arg;
+/**
+ * Signal handler for being interrupted. Frees memory and records the
+ * best move in the current running config.
+ */
+void interrupt_execution(int) {
 
-    search_indefinite(params->root);
+    if (!current_running_config.root) { return; }
+
+    current_running_config.best_move =
+            current_running_config.root->best_child->move;
+
+    delete_tree(current_running_config.root);
+
+    pthread_exit(nullptr);
+
+}
+
+/**
+ * Entry point for the background thread. Method will not exit - interrupt
+ * with SIGINT to stop it!
+ */
+void * start(void *) {
+
+    signal(SIGINT, &interrupt_execution);
+
+    search_indefinite(current_running_config.root);
 
     return nullptr;
 }
@@ -23,11 +50,9 @@ void * start(void * arg) {
  * Starts analysing the given fen in the background. Returns a handle to the thread used
  * which can be used to cancel it later.
  */
-pthread_t run_in_background(const std::string & fen) {
+void run_in_background(const std::string & fen) {
 
-    delete_tree(most_recent_root);
-
-    most_recent_root =
+    current_running_config.root =
             new SearchNode{
                     new Gamestate(fen_to_board(fen)),
                     zero(),
@@ -37,33 +62,27 @@ pthread_t run_in_background(const std::string & fen) {
                     nullptr
             };
 
-    EngineParams * params = new EngineParams{most_recent_root};
-
     pthread_t t_id;
 
     pthread_create(
             &t_id,
             nullptr,
             &start,
-            params
+            nullptr
     );
 
-    return t_id;
+    current_running_config.t_id = t_id;
 }
 
 /**
  * Cancels the given thread and fetches the best move it found.
  */
-Move cancel_and_fetch_move(pthread_t t_id) {
-    pthread_cancel(t_id);
-    return most_recent_root->best_child->move;
-}
+Move cancel_and_fetch_move() {
 
-/**
- * Cleans up the search tree (if any) created by the background thread.
- */
-void free_memory_for_exit() {
-    if (most_recent_root) {
-        delete_tree(most_recent_root);
-    }
+    // kill the thread and wait for it to exit
+    pthread_kill(current_running_config.t_id, SIGINT);
+    pthread_join(current_running_config.t_id, nullptr);
+
+    // then return the move it selected
+    return current_running_config.best_move;
 }

@@ -6,10 +6,12 @@ using std::cin;
 using std::vector;
 #include <string>
 using std::string;
+#include <unistd.h>
 
 #include "board.h"
+#include "search.h"
 
-std::string welcome_message =
+const std::string welcome_message =
         "Welcome to Stase v4.0\n";
 
 void manual_gameplay() {
@@ -58,11 +60,97 @@ void manual_gameplay() {
 
 }
 
+void play_game(bool engine_is_white, int seconds_per_move) {
+
+    Board b = starting_pos();
+    bool players_turn = !engine_is_white;
+    bool keep_playing = true;
+
+    while (keep_playing) {
+
+        pr_board(b);
+        std::vector<Move> legals = legal_moves(b);
+
+        if (players_turn) {
+
+            Move player_move;
+            bool valid_move = false;
+
+            while (!valid_move) {
+
+                cout << ">> ";
+
+                std::string userIn;
+                cin >> userIn;
+
+                for (Move m : legals) {
+                    if (mtos(b, m) == userIn) {
+                        player_move = m;
+                        valid_move = true;
+                        break;
+                    }
+                }
+
+                if (!valid_move) {
+                    cout << "Move not recognised or not legal\n";
+                }
+            }
+
+            b = b.successor(player_move);
+
+        } else {
+
+            const std::string fen = board_to_fen(b);
+
+            cout << "Stase has " << seconds_per_move << " seconds to think\n";
+
+            run_in_background(fen);
+            sleep(seconds_per_move);
+            const Move cmove = cancel_and_fetch_move();
+
+            bool valid = false;
+            if (!is_sentinel(cmove)) {
+                for (int i = 0; i < legals.size(); ++i) {
+                    if (mtos(b, cmove) == mtos(b, legals[i])) {
+                        valid = true;
+                    }
+                }
+            }
+
+            if (valid) {
+                cout << "The computer played " << mtos(b, cmove) << "\n";
+                b = b.successor(cmove);
+            } else {
+                cout << "The computer tried to play an illegal move (from " << sqtos(cmove.from) << " to " << sqtos(cmove.to) << ").\n";
+                cout << "You win!\n";
+                keep_playing = false;
+            }
+
+        }
+
+        if (in_check_hard(b) && legal_moves(b).empty()) {
+            cout << "Checkmate!\n";
+            cout << (players_turn
+                        ? "You win!\n"
+                        : "You lose!\n");
+            keep_playing = false;
+        } else {
+            players_turn = !players_turn;
+        }
+
+    }
+
+    cout << "Goodbye\n";
+
+}
+
 int main() {
 
     cout << welcome_message;
 
-    manual_gameplay();
+    play_game(false, 10);
+
+    pthread_exit(nullptr);
 
     return 0;
 }

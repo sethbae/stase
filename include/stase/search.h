@@ -53,8 +53,7 @@ int subtree_size(SearchNode *);
 void write_to_file(SearchNode*, std::ostream &);
 
 
-pthread_t run_in_background(const std::string & fen);
-Move cancel_and_fetch_move(pthread_t);
-void free_memory_for_exit();
+void run_in_background(const std::string & fen);
+Move cancel_and_fetch_move();
 
 #endif //STASE_SEARCH_H
