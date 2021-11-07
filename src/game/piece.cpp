@@ -537,6 +537,52 @@ bool gamma_covers(const Board & b, Square piece_sq, Square target_sq) {
     }
 }
 
+/**
+ * Returns the number of white pawns controlling the given square.
+ */
+int w_pawn_defence_count(const Gamestate & gs, const Square s) {
+
+    int
+            x = get_x(s),
+            y = get_y(s),
+            count = 0;
+
+    Square temp;
+
+    if (val(temp = mksq(x + 1, y - 1)) && (gs.board.get(temp) == W_PAWN))
+        count += 1;
+    if (val(temp = mksq(x - 1, y - 1)) && (gs.board.get(temp) == W_PAWN))
+        count += 1;
+
+    return count;
+}
+
+/**
+ * Returns the number of black pawns controlling the given square.
+ */
+int b_pawn_defence_count(const Gamestate & gs, const Square s) {
+
+    int
+        x = get_x(s),
+        y = get_y(s),
+        count = 0;
+
+    Square temp;
+
+    if (val(temp = mksq(x + 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
+        count -= 1;
+    if (val(temp = mksq(x - 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
+        count -= 1;
+
+    return count;
+}
+
+/**
+ * Returns the pawn-only control balance of the given square.
+ */
+int pawn_defence_count(const Gamestate & gs, const Square s) {
+    return w_pawn_defence_count(gs, s) - b_pawn_defence_count(gs, s);
+}
 
 /*
  * Below code was a start on defining these for non-sliding squares, which turns

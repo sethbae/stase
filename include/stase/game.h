@@ -198,6 +198,10 @@ bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, c
 int control_count(const Board &, Square);
 void display_control_counts(const Board &);
 
+int w_pawn_defence_count(const Gamestate &, const Square);
+int b_pawn_defence_count(const Gamestate &, const Square);
+int pawn_defence_count(const Gamestate &, const Square);
+
 /**
  * Used to pass information about the pieces attacking and controlling a certain square.
  */
