@@ -220,6 +220,46 @@ bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCou
 }
 
 /**
+ * Suggests plausible pawn moves. Moves forward to supported (not necessarily safe) squares
+ * including double moves.
+ */
+void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounter & counter) {
+
+    int
+        x = get_x(sq),
+        y = get_y(sq);
+
+    const int FORWARD = gs.board.get_white() ? 1 : -1;
+
+    // check one square in front; if it would be supported, move there
+    if (gs.board.get(mksq(x, y + FORWARD)) == EMPTY) {
+        if ((gs.board.get_white() && w_pawn_defence_count(gs, mksq(x, y + FORWARD)) > 0)
+                || (!gs.board.get_white() && b_pawn_defence_count(gs, mksq(x, y + FORWARD)) > 0)) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{sq, mksq(x, y + FORWARD)};
+            } else {
+                // no more space, all done
+                return;
+            }
+        }
+    } else {
+        // square in front is not empty, no moves
+        return;
+    }
+
+    // check for double moves (always!)
+    bool first_rank = gs.board.get_white() ? (y == 1) : (y == 6);
+    if (first_rank && gs.board.get(mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
+        if (counter.has_space()) {
+            moves[counter.inc()] = Move{sq, mksq(x, y + FORWARD + FORWARD)};
+        } else {
+            return;
+        }
+    }
+
+}
+
+/**
  * Looks for the best square to develop the given piece to. Although this is deterministic
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
@@ -228,8 +268,8 @@ void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     const Board & b = gs.board;
 
-    bool white_piece = colour(b.get(ff->centre)) == WHITE;
-    if (b.get_white() != white_piece) {
+    bool is_white_piece = colour(b.get(ff->centre)) == WHITE;
+    if (b.get_white() != is_white_piece) {
         return;
     }
 
@@ -249,6 +289,9 @@ void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             return;
         case KING:
             castling_moves(gs, ff->centre, moves, move_counter);
+            return;
+        case PAWN:
+            pawn_moves(gs, ff->centre, moves, move_counter);
             return;
         default:
             return;

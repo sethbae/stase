@@ -570,9 +570,9 @@ int b_pawn_defence_count(const Gamestate & gs, const Square s) {
     Square temp;
 
     if (val(temp = mksq(x + 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
-        count -= 1;
+        count += 1;
     if (val(temp = mksq(x - 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
-        count -= 1;
+        count += 1;
 
     return count;
 }

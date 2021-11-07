@@ -119,6 +119,30 @@ const TestSet<ResponderTestCase> develop_test_cases = {
                     },
                     { "e8g8" }
                 },
+                // moves white pawn 2 squares or 1
+                ResponderTestCase{
+                  "8/8/6pp/8/8/8/PPPPPPPP/8 w - - 0 1",
+                  std::vector<FeatureFrame>{
+                      FeatureFrame{stosq("h2")}
+                  },
+                  { "h2h3", "h2h4" }
+                },
+                // moves black pawn only one
+                ResponderTestCase{
+                        "8/8/6pp/8/8/8/PPPPPPPP/8 b - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("g6")}
+                        },
+                        { "g6g5" }
+                },
+                // does not make a single pawn move to an unsupported square
+                ResponderTestCase{
+                    "8/8/4p3/8/8/8/8/8 w - - 0 1",
+                    std::vector<FeatureFrame>{
+                        FeatureFrame{stosq("d6")}
+                    },
+                    { }
+                },
                 // medley # 1
                 ResponderTestCase{
                         "rnbqkbnr/ppp2ppp/3p4/3Pp3/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1",
