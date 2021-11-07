@@ -12,6 +12,7 @@ using std::ofstream;
 #include "src/game/cands/cands.h"
 #include "src/bench/bench.h"
 #include "src/test/test.h"
+#include <unistd.h>
 
 
 //
@@ -108,23 +109,46 @@ void number_of_cands() {
 
 }
 
+/**
+ * Runs the responder on the given board, using a feature frame centred on the
+ * given square
+ */
+void show_responder_moves(const std::string & fen, const Responder & resp, const Square sq) {
+
+    Gamestate gs(fen_to_board(fen));
+
+    Move moves[100];
+    IndexCounter counter(100);
+
+    develop_resp.resp(gs, new FeatureFrame{sq}, moves, counter);
+
+    cout << "Responder moves (" << resp.name << "):\n";
+    for (int i = 0; i < counter.idx(); ++i) {
+        cout << mtos(gs.board, moves[i]) << "\n";
+    }
+
+}
+
 
 int main(int argc, char** argv) {
 
-//    std::string fen = "r2q1rk1/1p1nbppp/p2pbn2/4p3/4P3/1NN1BP2/PPPQ2PP/2KR1B1R w - - 5 11";
+//    std::string fen = "r2q1rk1/3nbppp/p2pbn2/1p2p1P1/4P3/1NN1BP2/PPPQ3P/2KR1B1R b - - 0 12";
 //    pr_board(fen_to_board(fen));
 //
-//    iterative_deepening_search(fen, 32);
+//    iterative_deepening_search(fen, 15);
 
-    Gamestate gs(fen_to_board("2r2rk1/1pqnbppp/p2pbn2/3Np3/4P3/1N2BP2/PPPQB1PP/2KR1R2 b - - 10 13"));
-    pr_board(gs.board);
+    Gamestate gs(fen_to_board("8/8/6pp/8/8/8/PPPPPPPP/8 b - - 0 1"));
 
-    cands_report(gs);
+    Move moves[10];
+    IndexCounter counter(10);
 
+     develop_resp.resp(gs, new FeatureFrame{stosq("g6")}, moves, counter);
 
-    cout << (would_be_unsafe_after(gs, stosq("b6"), Move{stosq("c7"), stosq("b6")})
-        ? "true\n"
-        : "false\n");
+     for (int i = 0; i < counter.idx(); ++i) {
+         cout << mtos(gs.board, moves[i]) << "\n";
+     }
+//
+//    heur_with_description(gs);
 
     return 0;
 
