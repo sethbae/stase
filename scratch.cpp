@@ -129,6 +129,22 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
 
 }
 
+/**
+ * Shows the feature frames discovered by the given hook on the gamestate
+ */
+void show_hook_frames(const std::string & fen, const Hook * h) {
+
+    Gamestate gs(fen_to_board(fen));
+
+    discover_feature_frames(gs, h);
+
+    pr_board(gs.board);
+    cout << "\nFeatureFrames found for " << h->name << ":\n";
+    for (FeatureFrame * ff = gs.feature_frames[h->id]; ff->centre != SQUARE_SENTINEL; ++ff) {
+        cout << "FeatureFrame: " << sqtos(ff->centre) << " " << sqtos(ff->secondary) << "\n";
+    }
+
+}
 
 int main(int argc, char** argv) {
 
@@ -137,18 +153,9 @@ int main(int argc, char** argv) {
 //
 //    iterative_deepening_search(fen, 15);
 
-    Gamestate gs(fen_to_board("8/8/6pp/8/8/8/PPPPPPPP/8 b - - 0 1"));
+    Gamestate gs(fen_to_board("rnbqkbnr/p1p1pppp/1p6/3P4/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"));
 
-    Move moves[10];
-    IndexCounter counter(10);
-
-     develop_resp.resp(gs, new FeatureFrame{stosq("g6")}, moves, counter);
-
-     for (int i = 0; i < counter.idx(); ++i) {
-         cout << mtos(gs.board, moves[i]) << "\n";
-     }
-//
-//    heur_with_description(gs);
+    show_hook_frames("rnbqkbnr/p1p1pppp/1p6/3P4/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1", &check_hook);
 
     return 0;
 
