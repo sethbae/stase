@@ -52,7 +52,7 @@ void print_line(std::vector<SearchNode *> & line) {
 
     cout << "[" << etos(line[0]->score) << "] ";
     for (int i = 1; i < line.size(); ++i) {
-        cout << mtos(line[i]->gs->board, line[i]->move) << " ";
+        cout << mtos(line[i-1]->gs->board, line[i]->move) << " ";
     }
     cout << "\n";
 }

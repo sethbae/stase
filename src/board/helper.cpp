@@ -103,9 +103,9 @@ string mtos(const Board & b, const Move m) {
     string s = "";
     Ptype piece_colour = colour(b.get(m.from));
 
-    bool castle = m.is_cas() || (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
-    bool capture = m.is_cap() || b.get(m.to) != EMPTY;
-    bool prom = m.is_prom() || (type(b.get(m.from)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0));
+    bool castle = (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
+    bool capture = (b.get(m.to) != EMPTY);
+    bool prom = (type(b.get(m.from)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0));
 
     if (!castle) {
     
