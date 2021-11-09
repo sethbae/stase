@@ -142,6 +142,11 @@ const std::vector<FeatureHandler> feature_handlers = {
             &fork_hook,
             { &play_fork_resp },
             { &defend_resp }
+        },
+        FeatureHandler{
+            &check_hook,
+            { &play_check_resp },
+            { }
         }
 };
 
