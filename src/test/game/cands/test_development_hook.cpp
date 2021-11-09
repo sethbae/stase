@@ -32,14 +32,24 @@ const TestSet<StringTestCase> hook_test_set{
                         "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
                         {"e1", "e8"}
                 },
+                // pawns do
+                StringTestCase{
+                        "8/8/8/1p6/8/8/6P1/8 w - - 0 1",
+                        {"g2"}
+                },
+                // pawns don't
+                StringTestCase{
+                        "8/8/8/1p6/8/8/8/8 b - - 0 1",
+                        {}
+                },
                 // others don't #1
                 StringTestCase{
-                    "bkq1r1bn/4r3/5Q2/8/8/1P2N3/R1P1B1P1/1R1K2PP w - - 0 1",
+                    "bkq1r1bn/4r3/5Q2/8/8/1PP1N1P1/R3B3/1R1K2PP b - - 0 1",
                     {}
                 },
                 // others don't #2
                 StringTestCase{
-                        "8/1p3k1p/p1b5/8/1Pr5/4R1P1/1R3K1P/8 b - - 6 38",
+                        "8/5k2/p1b5/1p5p/1Pr4P/4R1P1/1R3K2/8 b - - 6 38",
                         {}
                 }
         }

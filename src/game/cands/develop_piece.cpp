@@ -44,6 +44,10 @@ const int QUEENS[64] = {
         0, 0, 0, 0, 0, 0, 0, 0
 };
 
+const Ptype BACK_RANK[] = {
+        ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
+};
+
 const int XKN_LEGAL_W[] = {1, 2, -1, -2};
 const int YKN_LEGAL_W[] = {2, 1, 2, 1};
 
@@ -297,4 +301,30 @@ void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             return;
     }
 
+}
+
+/**
+ * Checks if the given square contains an undeveloped piece.
+ * @param ff the feature frame to record details in, if so.
+ */
+bool is_undeveloped_piece(const Gamestate & gs, Square centre) {
+    if (get_y(centre) == 0 || get_y(centre) == 7) {
+        return type(gs.board.get(centre)) == BACK_RANK[get_x(centre)];
+    } else if (get_y(centre) == 1 && gs.board.get(centre) == W_PAWN) {
+        return true;
+    } else if (get_y(centre) == 6 && gs.board.get(centre) == B_PAWN) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * Wraps the is_undeveloped_piece method in a hook which, if there is an undeveloped piece,
+ * pushes a new FeatureFrame onto the list.
+ */
+void is_undeveloped_piece_hook(const Gamestate & gs, const Square centre, std::vector<FeatureFrame> & frames) {
+    if (is_undeveloped_piece(gs, centre)) {
+        frames.push_back(FeatureFrame{centre, SQUARE_SENTINEL, 0, 0});
+    }
 }
