@@ -84,7 +84,10 @@ Move stom(const string san) {
     return m;
 }
 
-/* accepts a move and the board it belongs to; whether or not the move has already been made */
+/**
+ * Converts a move to SAN. This depends on the board, which you must therefore provide.
+ * The board must represent the position before the given move has been played.
+ */
 string mtos(const Board & b, const Move m) {
 
     if (is_sentinel(m)) {
@@ -98,26 +101,20 @@ string mtos(const Board & b, const Move m) {
     }
 
     string s = "";
-    bool move_made = (b.get(m.from) == EMPTY);
-    
-    Ptype col;
-    if (move_made)
-        col = colour(b.get(m.to));
-    else
-        col = colour(b.get(m.from));
-    
-    if (!m.is_cas()) {
+    Ptype piece_colour = colour(b.get(m.from));
+
+    bool castle = m.is_cas() || (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
+    bool capture = m.is_cap() || b.get(m.to) != EMPTY;
+    bool prom = m.is_prom() || (type(b.get(m.from)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0));
+
+    if (!castle) {
     
         // add character for piece type
-        Square piece_loc = m.from;
-        if (move_made && !m.is_prom())
-            piece_loc = m.to;
-        
-        s += ptos_alg(b.get(piece_loc));
+        s += ptos_alg(b.get(m.from));
         
         // for captures add x
-        if (m.is_cap()) {
-            if (type(b.get(piece_loc)) == PAWN || m.is_prom()) {
+        if (capture) {
+            if (prom || type(b.get(m.from)) == PAWN) {
                 s += (char) (get_x(m.from) + 'a');
             }
             s += "x";
@@ -126,18 +123,19 @@ string mtos(const Board & b, const Move m) {
         // add destination
         s += sqtos(m.to);
         
-        // for promotions, add =Q
-        if (m.is_prom()) {
+        // for promotions, add =Q/R/N/B
+        if (prom) {
             s += "=";
-            s += ptos_alg(m.get_prom_piece(col));
+            s += ptos_alg(m.get_prom_piece(piece_colour));
         }
     
     } else {
-        s = m.is_cas_short() ? "O-O" : "O-O-O";
+        bool is_cas_short = m.is_cas_short() || get_x(m.to) == 6;
+        s = is_cas_short ? "O-O" : "O-O-O";
     }
     
     // add + for check
-    Ptype opposite_colour = (col == WHITE) ? BLACK : WHITE;
+    Ptype opposite_colour = (piece_colour == WHITE) ? BLACK : WHITE;
     if (in_check_hard(b, opposite_colour)) {
         s += "+";
     }
