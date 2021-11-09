@@ -13,6 +13,10 @@ using std::ostream;
 // hacky way to count the number of nodes we create
 int COUNT = 0;
 
+int node_count() {
+    return COUNT;
+}
+
 // recursively count the number of nodes in the subtree rooted at the given node
 int subtree_size(SearchNode *node) {
 

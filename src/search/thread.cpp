@@ -2,18 +2,21 @@
 #include <string>
 #include <search.h>
 #include <csignal>
+#include "metrics.h"
 
 struct EngineParams {
     pthread_t t_id;
     SearchNode * root;
     Move best_move;
+    int nodes;
 };
 
 EngineParams current_running_config =
         {
             0,
             nullptr,
-            MOVE_SENTINEL
+            MOVE_SENTINEL,
+            0
         };
 
 /**
@@ -24,8 +27,8 @@ void interrupt_execution(int) {
 
     if (!current_running_config.root) { return; }
 
-    current_running_config.best_move =
-            current_running_config.root->best_child->move;
+    current_running_config.nodes = node_count();
+    current_running_config.best_move = current_best_move(current_running_config.root);
 
     delete_tree(current_running_config.root);
 

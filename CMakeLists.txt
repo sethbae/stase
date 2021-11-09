@@ -37,6 +37,8 @@ set(SOURCE_FILES
         src/puzzle/read_formats.cpp
 
         src/search/search.cpp
+        src/search/thread.cpp
+        src/search/metrics.h
 
         src/game/cands/cands.h
         src/game/cands/cands.cpp
@@ -48,7 +50,7 @@ set(SOURCE_FILES
         src/game/cands/trade_retreat_desperado.cpp
 
         src/utils/utils.h
-        src/utils/print.cpp src/search/thread.cpp)
+        src/utils/print.cpp)
 
 set(STASE_SOURCE_FILES)
 
