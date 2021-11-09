@@ -127,7 +127,7 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Ptype
 
 /**
  * Checks whether a king of the given [colour] would be safe on the given square in the
- * same way as would_be_safe_king_square above, except that it treats the board is if
+ * same way as would_be_safe_king_square above, except that it treats the board as if
  * the given move had already been played.
  */
 bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Ptype colour) {
