@@ -22,4 +22,5 @@ void test_game() {
     test_trade_piece();
     test_retreat_piece();
     test_desperado_piece();
+    test_check_hook();
 }

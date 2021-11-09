@@ -111,6 +111,7 @@ void test_unsafe_piece();
 void test_trade_piece();
 void test_retreat_piece();
 void test_desperado_piece();
+void test_check_hook();
 
 void stress_test_main();
 
