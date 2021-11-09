@@ -17,6 +17,10 @@ int node_count() {
     return COUNT;
 }
 
+void reset_node_count() {
+    COUNT = 0;
+}
+
 // recursively count the number of nodes in the subtree rooted at the given node
 int subtree_size(SearchNode *node) {
 

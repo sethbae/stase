@@ -54,6 +54,8 @@ void write_to_file(SearchNode*, std::ostream &);
 
 
 void run_in_background(const std::string & fen);
-Move cancel_and_fetch_move();
+void stop_engine();
+Move fetch_best_move();
+int fetch_node_count();
 
 #endif //STASE_SEARCH_H

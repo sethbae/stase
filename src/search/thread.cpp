@@ -44,6 +44,7 @@ void * start(void *) {
 
     signal(SIGINT, &interrupt_execution);
 
+    reset_node_count();
     search_indefinite(current_running_config.root);
 
     return nullptr;
@@ -80,12 +81,27 @@ void run_in_background(const std::string & fen) {
 /**
  * Cancels the given thread and fetches the best move it found.
  */
-Move cancel_and_fetch_move() {
+void stop_engine() {
 
     // kill the thread and wait for it to exit
     pthread_kill(current_running_config.t_id, SIGINT);
     pthread_join(current_running_config.t_id, nullptr);
 
-    // then return the move it selected
+}
+
+/**
+ * Returns the best move which the engine found. This should only be called after the
+ * engine has been stopped - values returned while the engine are running are not
+ * likely to be meaningful.
+ */
+Move fetch_best_move() {
     return current_running_config.best_move;
+}
+
+/**
+ * Returns the number of nodes explored by the engine. As with the best move, this is
+ * only safe to use after the engine has been stopped.
+ */
+int fetch_node_count() {
+    return current_running_config.nodes;
 }

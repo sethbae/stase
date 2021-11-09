@@ -106,7 +106,12 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
             run_in_background(fen);
             sleep(seconds_per_move);
-            const Move cmove = cancel_and_fetch_move();
+            stop_engine();
+
+            const Move cmove = fetch_best_move();
+            const int nodes = fetch_node_count();
+
+            cout << "Running speed: " << ((double)nodes) / ((double)seconds_per_move) << " n/sec\n";
 
             bool valid = false;
             if (!is_sentinel(cmove)) {
@@ -152,5 +157,4 @@ int main() {
 
     pthread_exit(nullptr);
 
-    return 0;
 }
