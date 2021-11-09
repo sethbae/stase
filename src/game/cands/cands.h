@@ -79,11 +79,9 @@ struct FeatureHandler {
 };
 
 void is_unsafe_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-
-bool is_undeveloped_piece(const Gamestate &, const Square);
 void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-
 void find_forks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
+void find_checks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -93,11 +91,13 @@ void play_fork(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void trade_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void retreat_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void desperado_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void play_check(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
 const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
 const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
+const Hook check_hook = Hook{"check", 3, &find_checks_hook};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -107,11 +107,13 @@ const Responder play_fork_resp = Responder{"fork", &play_fork};
 const Responder trade_resp = Responder{"trade", &trade_piece};
 const Responder retreat_resp = Responder{"retreat", &retreat_piece};
 const Responder desperado_resp = Responder{"desperado", &desperado_piece};
+const Responder play_check_resp = Responder{"check", &play_check};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
         &develop_hook,
-        &fork_hook
+        &fork_hook,
+        &check_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
@@ -122,6 +124,7 @@ const std::vector<const Responder *> ALL_RESPONDERS = {
         &trade_resp,
         &retreat_resp,
         &desperado_resp,
+        &play_check_resp
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
