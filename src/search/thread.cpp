@@ -20,20 +20,10 @@ EngineParams current_running_config =
         };
 
 /**
- * Signal handler for being interrupted. Frees memory and records the
- * best move in the current running config.
+ * Signal handler for being interrupted. Immediately exits with no cleanup.
  */
 void interrupt_execution(int) {
-
-    if (!current_running_config.root) { return; }
-
-    current_running_config.nodes = node_count();
-    current_running_config.best_move = current_best_move(current_running_config.root);
-
-    delete_tree(current_running_config.root);
-
     pthread_exit(nullptr);
-
 }
 
 /**
@@ -79,13 +69,23 @@ void run_in_background(const std::string & fen) {
 }
 
 /**
- * Cancels the given thread and fetches the best move it found.
+ * Cancels the given thread and fetches the best move it found. Responsible for cleaning up
+ * the memory the engine was using etc.
  */
 void stop_engine() {
 
     // kill the thread and wait for it to exit
     pthread_kill(current_running_config.t_id, SIGINT);
     pthread_join(current_running_config.t_id, nullptr);
+
+    // retrieve info from the run
+    if (current_running_config.root) {
+        current_running_config.nodes = node_count();
+        current_running_config.best_move = current_best_move(current_running_config.root);
+    }
+
+    // and delete the search tree
+    delete_tree(current_running_config.root);
 
 }
 

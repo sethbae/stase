@@ -214,13 +214,14 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 
         // set up the node's children pointers
         node->children = new SearchNode *[moves.size()];
-        node->num_children = moves.size();
 
         for (int i = 0; i < moves.size(); ++i) {
             // create a new child and perform the heuristic eval
             node->children[i] = new_node(*(node->gs), moves[i]);
             node->children[i]->score = heur(*node->children[i]->gs);
         }
+
+        node->num_children = moves.size();
 
         update_score(node);
 
