@@ -40,6 +40,6 @@ bool evaluate_retreat_test_case(const ResponderTestCase * tc) {
     return evaluate_responder_test_case(&retreat_resp, tc);
 }
 
-void test_retreat_piece() {
-    evaluate_test_set(&retreat_test_cases, &evaluate_retreat_test_case);
+bool test_retreat_piece() {
+    return evaluate_test_set(&retreat_test_cases, &evaluate_retreat_test_case);
 }

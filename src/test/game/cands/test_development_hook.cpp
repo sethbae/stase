@@ -73,6 +73,6 @@ bool evaluate_test_case_development_hook(const StringTestCase *tc) {
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_development_hook() {
-    evaluate_test_set(&hook_test_set, &evaluate_test_case_development_hook);
+bool test_development_hook() {
+    return evaluate_test_set(&hook_test_set, &evaluate_test_case_development_hook);
 }

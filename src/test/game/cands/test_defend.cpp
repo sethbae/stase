@@ -199,6 +199,6 @@ bool evaluate_test_case_defend(const ResponderTestCase *tc) {
     return evaluate_responder_test_case(&defend_resp, tc);
 }
 
-void test_defend_square() {
-    evaluate_test_set(&defend_test_set, &evaluate_test_case_defend);
+bool test_defend_square() {
+    return evaluate_test_set(&defend_test_set, &evaluate_test_case_defend);
 }

@@ -1,26 +1,30 @@
 #include "../test.h"
 
-void test_game() {
+bool test_game() {
+
+    bool passed = true;
 
     // piece
-    test_alpha_covers();
-    test_beta_covers();
-    test_gamma_covers();
-    test_weak_square();
-    test_unsafe_piece();
+    passed = test_alpha_covers() && passed;
+    passed = test_beta_covers() && passed;
+    passed = test_gamma_covers() && passed;
+    passed = test_weak_square() && passed;
+    passed = test_unsafe_piece() && passed;
 
     // cands
-    test_unsafe_piece_hook();
-    test_development_hook();
-    test_capture_piece();
-    test_defend_square();
-    test_develop_piece();
-    test_knight_fork_hook();
-    test_sliding_fork_hook();
-    test_queen_fork_hook();
-    test_kp_fork_hook();
-    test_trade_piece();
-    test_retreat_piece();
-    test_desperado_piece();
-    test_check_hook();
+    passed = test_unsafe_piece_hook() && passed;
+    passed = test_development_hook() && passed;
+    passed = test_capture_piece() && passed;
+    passed = test_defend_square() && passed;
+    passed = test_develop_piece() && passed;
+    passed = test_knight_fork_hook() && passed;
+    passed = test_sliding_fork_hook() && passed;
+    passed = test_queen_fork_hook() && passed;
+    passed = test_kp_fork_hook() && passed;
+    passed = test_trade_piece() && passed;
+    passed = test_retreat_piece() && passed;
+    passed = test_desperado_piece() && passed;
+    passed = test_check_hook() && passed;
+
+    return passed;
 }

@@ -58,6 +58,6 @@ bool evaluate_trade_test_case(const ResponderTestCase * tc) {
     return evaluate_responder_test_case(&trade_resp, tc);
 }
 
-void test_trade_piece() {
-    evaluate_test_set(&trade_test_cases, &evaluate_trade_test_case);
+bool test_trade_piece() {
+    return evaluate_test_set(&trade_test_cases, &evaluate_trade_test_case);
 }

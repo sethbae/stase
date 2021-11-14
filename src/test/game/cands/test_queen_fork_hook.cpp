@@ -136,6 +136,6 @@ bool evaluate_test_case_queen_fork_hook(const StringTestCase *tc) {
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_queen_fork_hook() {
-    evaluate_test_set(&queen_fork_hook_test_cases, &evaluate_test_case_queen_fork_hook);
+bool test_queen_fork_hook() {
+    return evaluate_test_set(&queen_fork_hook_test_cases, &evaluate_test_case_queen_fork_hook);
 }

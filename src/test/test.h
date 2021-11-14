@@ -91,29 +91,29 @@ inline bool evaluate_responder_test_case(const Responder * resp, const Responder
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_board();
-void test_game();
+bool test_board();
+bool test_game();
 
-void test_unsafe_piece_hook();
-void test_development_hook();
-void test_capture_piece();
-void test_defend_square();
-void test_alpha_covers();
-void test_beta_covers();
-void test_gamma_covers();
-void test_develop_piece();
-void test_knight_fork_hook();
-void test_sliding_fork_hook();
-void test_queen_fork_hook();
-void test_kp_fork_hook();
-void test_weak_square();
-void test_unsafe_piece();
-void test_trade_piece();
-void test_retreat_piece();
-void test_desperado_piece();
-void test_check_hook();
+bool test_unsafe_piece_hook();
+bool test_development_hook();
+bool test_capture_piece();
+bool test_defend_square();
+bool test_alpha_covers();
+bool test_beta_covers();
+bool test_gamma_covers();
+bool test_develop_piece();
+bool test_knight_fork_hook();
+bool test_sliding_fork_hook();
+bool test_queen_fork_hook();
+bool test_kp_fork_hook();
+bool test_weak_square();
+bool test_unsafe_piece();
+bool test_trade_piece();
+bool test_retreat_piece();
+bool test_desperado_piece();
+bool test_check_hook();
 
-void stress_test_main();
+bool stress_test_main();
 
 bool stress_test_individual_hook(std::vector<Gamestate> &, const Hook *);
 bool stress_test_cands(std::vector<Gamestate> &);

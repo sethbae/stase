@@ -86,6 +86,6 @@ bool evaluate_test_case_check_hook(const StringTestCase *tc) {
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_check_hook() {
-    evaluate_test_set(&check_hook_test_cases, &evaluate_test_case_check_hook);
+bool test_check_hook() {
+    return evaluate_test_set(&check_hook_test_cases, &evaluate_test_case_check_hook);
 }

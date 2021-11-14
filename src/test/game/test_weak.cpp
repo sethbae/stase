@@ -281,10 +281,10 @@ bool evaluate_unsafe_test_case(const UnsafeTestCase * tc) {
     return true;
 }
 
-void test_weak_square() {
-    evaluate_test_set(&weak_test_cases, &evaluate_weak_test_case);
+bool test_weak_square() {
+    return evaluate_test_set(&weak_test_cases, &evaluate_weak_test_case);
 }
 
-void test_unsafe_piece() {
-    evaluate_test_set(&unsafe_test_cases, &evaluate_unsafe_test_case);
+bool test_unsafe_piece() {
+    return evaluate_test_set(&unsafe_test_cases, &evaluate_unsafe_test_case);
 }

@@ -40,6 +40,6 @@ bool evaluate_desperado_test_case(const ResponderTestCase * tc) {
     return evaluate_responder_test_case(&desperado_resp, tc);
 }
 
-void test_desperado_piece() {
-    evaluate_test_set(&desperado_test_cases, &evaluate_desperado_test_case);
+bool test_desperado_piece() {
+    return evaluate_test_set(&desperado_test_cases, &evaluate_desperado_test_case);
 }

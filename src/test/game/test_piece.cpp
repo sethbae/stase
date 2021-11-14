@@ -228,14 +228,14 @@ bool evaluate_gamma_covers_test_case(const CoversTestCase * tc) {
     return tc->expected == gamma_covers(board, tc->piece_sq, tc->to_sq);
 }
 
-void test_alpha_covers() {
-    evaluate_test_set(&alpha_tests, &evaluate_alpha_covers_test_case);
+bool test_alpha_covers() {
+    return evaluate_test_set(&alpha_tests, &evaluate_alpha_covers_test_case);
 }
 
-void test_beta_covers() {
-    evaluate_test_set(&beta_tests, &evaluate_beta_covers_test_case);
+bool test_beta_covers() {
+    return evaluate_test_set(&beta_tests, &evaluate_beta_covers_test_case);
 }
 
-void test_gamma_covers() {
-    evaluate_test_set(&gamma_tests, &evaluate_gamma_covers_test_case);
+bool test_gamma_covers() {
+    return evaluate_test_set(&gamma_tests, &evaluate_gamma_covers_test_case);
 }

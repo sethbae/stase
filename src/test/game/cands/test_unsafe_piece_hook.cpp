@@ -111,6 +111,6 @@ bool evaluate_test_case_unsafe_piece_hook(const StringTestCase *tc) {
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
-void test_unsafe_piece_hook() {
-    evaluate_test_set(&hook_test_cases, &evaluate_test_case_unsafe_piece_hook);
+bool test_unsafe_piece_hook() {
+    return evaluate_test_set(&hook_test_cases, &evaluate_test_case_unsafe_piece_hook);
 }

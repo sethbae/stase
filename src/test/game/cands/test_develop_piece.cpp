@@ -180,6 +180,6 @@ bool evaluate_develop_test_case(const ResponderTestCase * tc) {
     return evaluate_responder_test_case(&develop_resp, tc);
 }
 
-void test_develop_piece() {
-    evaluate_test_set(&develop_test_cases, &evaluate_develop_test_case);
+bool test_develop_piece() {
+    return evaluate_test_set(&develop_test_cases, &evaluate_develop_test_case);
 }

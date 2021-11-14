@@ -5,7 +5,9 @@
 #include "game.h"
 #include "puzzle.h"
 
-void stress_test_main() {
+bool stress_test_main() {
+
+    bool passed = true;
 
     std::cout << "Stress testing individual hooks\n";
 
@@ -13,9 +15,10 @@ void stress_test_main() {
     puzzle_gamestates(states);
 
     for (const Hook * h : ALL_HOOKS) {
-        stress_test_individual_hook(states, h);
+        passed = stress_test_individual_hook(states, h) && passed;
     }
 
-    stress_test_cands(states);
+    passed = stress_test_cands(states) && passed;
 
+    return passed;
 }

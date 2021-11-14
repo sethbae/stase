@@ -121,6 +121,6 @@ bool evaluate_test_case_capture(const ResponderTestCase * tc) {
     return evaluate_responder_test_case(&capture_resp, tc);
 }
 
-void test_capture_piece() {
-    evaluate_test_set(&cap_test_set, &evaluate_test_case_capture);
+bool test_capture_piece() {
+    return evaluate_test_set(&cap_test_set, &evaluate_test_case_capture);
 }
