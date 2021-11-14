@@ -78,10 +78,30 @@ string ptos_alg(Piece p) {
 
 /***** Move to SAN and SAN to move *****/
 
-Move stom(const string san) {
-    san.size();
-    Move m = {0, 0, 0};
-    return m;
+/**
+ * Converts the given SAN string (eg "Be4") into a Move, operating on the given board.
+ * Requires disambiguations and checks to be used. If the move does not appear to describe
+ * any legal move, then MOVE_SENTINEL is returned.
+ */
+Move stom(const Board & b, const string & san) {
+
+    for (const Move m : legal_moves(b)) {
+        if (mtos(b, m).compare(san) == 0) {
+            return m;
+        }
+    }
+
+    if (san.size() == 4) {
+
+        const Square from = stosq(san.substr(0, 2));
+        const Square to = stosq(san.substr(2, 4));
+
+        if (val(from) && val(to)) {
+            return Move{from, to, 0};
+        }
+    }
+
+    return MOVE_SENTINEL;
 }
 
 /**

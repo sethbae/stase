@@ -83,13 +83,8 @@ void play_game(bool engine_is_white, int seconds_per_move) {
                 std::string userIn;
                 cin >> userIn;
 
-                for (Move m : legals) {
-                    if (mtos(b, m) == userIn) {
-                        player_move = m;
-                        valid_move = true;
-                        break;
-                    }
-                }
+                player_move = stom(b, userIn);
+                valid_move = !is_sentinel(player_move);
 
                 if (!valid_move) {
                     cout << "Move not recognised or not legal\n";
@@ -116,7 +111,7 @@ void play_game(bool engine_is_white, int seconds_per_move) {
             bool valid = false;
             if (!is_sentinel(cmove)) {
                 for (int i = 0; i < legals.size(); ++i) {
-                    if (mtos(b, cmove) == mtos(b, legals[i])) {
+                    if (cmove.from == legals[i].from && cmove.to == legals[i].to) {
                         valid = true;
                     }
                 }

@@ -211,7 +211,7 @@ constexpr Square stosq(std::string_view str) {
 }
 
 std::string sqtos(const Square);
-Move stom(const std::string);
+Move stom(const Board &, const std::string &);
 std::string mtos(const Board &, const Move);
 
 /* write functions (write to ostream) */
