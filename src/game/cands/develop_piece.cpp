@@ -229,6 +229,12 @@ bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCou
  */
 void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounter & counter) {
 
+    /*
+     * Currently recommended moves are:
+     *   a-h: single legal moves to pawn-defended squares
+     *   c-f: double legal moves
+     */
+
     int
         x = get_x(sq),
         y = get_y(sq);
@@ -251,7 +257,9 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
         return;
     }
 
-    // check for double moves (always!)
+    // don't double move on the wings
+    if (x < 2 || x > 5) { return; }
+
     bool first_rank = gs.board.get_white() ? (y == 1) : (y == 6);
     if (first_rank && gs.board.get(mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
         if (counter.has_space()) {

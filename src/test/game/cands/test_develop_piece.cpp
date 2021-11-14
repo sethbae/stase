@@ -123,9 +123,9 @@ const TestSet<ResponderTestCase> develop_test_cases = {
                 ResponderTestCase{
                   "8/8/6pp/8/8/8/PPPPPPPP/8 w - - 0 1",
                   std::vector<FeatureFrame>{
-                      FeatureFrame{stosq("h2")}
+                      FeatureFrame{stosq("f2")}
                   },
-                  { "h2h3", "h2h4" }
+                  { "f2f3", "f2f4" }
                 },
                 // moves black pawn only one
                 ResponderTestCase{
