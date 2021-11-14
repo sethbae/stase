@@ -85,6 +85,69 @@ Move stom(const string san) {
 }
 
 /**
+ * An enum for the different strategies by which to disambiguate moves (e.g. Nbd2).
+ */
+enum DisambigType {
+    NONE,
+    BY_RANK,
+    BY_FILE,
+    TOTAL
+};
+
+/**
+ * Checks whether disambiguation is needed for the given move on the given board. An appropriate
+ * type (e.g. rank or file) is returned. If disambiguation is required, and either rank or file
+ * would be effective, then file is returned as the default option.
+ */
+DisambigType compute_disambig(const Board & b, const Move m) {
+
+    std::vector<Move> legals = legal_moves(b);
+    bool required = false;
+    bool rank_not_usable = false;
+    bool file_not_usable = false;
+
+    for (int i = 0; i < legals.size(); ++i) {
+
+        const Move other_m = legals[i];
+
+        if (other_m.from == m.from) { continue; }
+
+        // moves of same type piece to the same destination
+        if (other_m.to == m.to
+                && type(b.get(other_m.from)) == type(b.get(m.from))) {
+
+            required = true;
+
+            // sharing start rank
+            if (get_y(other_m.from) == get_y(m.from)) {
+                rank_not_usable = true;
+            }
+            // sharing start file
+            else if (get_x(other_m.from) == get_x(m.from)) {
+                file_not_usable = true;
+            }
+
+        }
+    }
+
+    if (!required) {
+        return NONE;
+    }
+
+    if (rank_not_usable && file_not_usable) {
+        return TOTAL;
+    } else if (rank_not_usable) {
+        return BY_FILE;
+    } else if (file_not_usable) {
+        return BY_RANK;
+    } else {
+        // using files is somewhat more natural, so it's the default
+        return BY_FILE;
+    }
+
+}
+
+/**
  * Converts a move to SAN. This depends on the board, which you must therefore provide.
  * The board must represent the position before the given move has been played.
  */
@@ -106,16 +169,26 @@ string mtos(const Board & b, const Move m) {
     bool castle = (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
     bool capture = (b.get(m.to) != EMPTY);
     bool prom = (type(b.get(m.from)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0));
+    DisambigType disambig = compute_disambig(b, m);
 
     if (!castle) {
     
         // add character for piece type
         s += ptos_alg(b.get(m.from));
+
+        switch (disambig) {
+            case NONE: break;
+            case BY_RANK: s += ('1' + get_y(m.from)); break;
+            case BY_FILE: s += (get_x(m.from) + 'a'); break;
+            case TOTAL: s += sqtos(m.from); break;
+        }
         
         // for captures add x
         if (capture) {
             if (prom || type(b.get(m.from)) == PAWN) {
-                s += (char) (get_x(m.from) + 'a');
+                if (disambig == NONE) {
+                    s += (char) (get_x(m.from) + 'a');
+                }
             }
             s += "x";
         }

@@ -871,17 +871,21 @@ bool in_check_hard(const Board & b, Ptype col) {
     Piece king = (white) ? W_KING : B_KING;
     Square ksq = 0;
     int king_x = 0, king_y = 0;
+    bool king_found = false;
     
     // find king square
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             if (b.get(mksq(i, j)) == king) {
+                king_found = true;
                 ksq = mksq(i, j);
                 king_x = i;
                 king_y = j;
             }
         }
     }
+
+    if (!king_found) { return false; }
     
     // check pawns
     if (white) {
