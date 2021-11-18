@@ -562,10 +562,12 @@ void fen_from_board_test() {
 
 bool test_board(void) {
 
-    test_pieces();
-    test_set_get_square();
-    test_read_write_fens();
-    test_in_check();
+    bool passed = true;
+
+    passed = test_pieces() && passed;
+    passed = test_set_get_square() && passed;
+    passed = test_read_write_fens() && passed;
+    passed = test_in_check() && passed;
 
     vector<bool (*)(void)> tests = {
         &test_mutate_hard,
@@ -577,6 +579,5 @@ bool test_board(void) {
             exit(1);
     }
 
-    // TODO (BRD-10): we return 1 so that these tests always 'pass', pending revamp
-    return true;
+    return passed;
 }

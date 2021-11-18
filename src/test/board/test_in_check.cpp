@@ -2,7 +2,7 @@
 #include "board.h"
 
 struct CheckTestCase {
-    const std::string & fen;
+    const std::string fen;
 };
 
 const TestSet<CheckTestCase> in_check_test_set{
@@ -36,9 +36,7 @@ const TestSet<CheckTestCase> in_check_test_set{
 };
 
 bool evaluate_check_test_case(const CheckTestCase * tc) {
-    std::cout << "in test\n";
     Board b = fen_to_board(tc->fen);
-    std::cout << "here\n";
     return in_check_hard(b) == b.get_cas_ws();
 }
 
