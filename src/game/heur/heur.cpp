@@ -140,7 +140,7 @@ Eval heur_with_description(const Gamestate & gs) {
     
     cout << "Contributions for each metric (millipawns):\n";
     
-    int mat_bal = material_balance(gs.board);
+    int mat_bal = material_balance(gs);
     cout << setw(20) << "Material balance" << ": " << std::right << setw(26) << mat_bal << "\n";
 
     Eval ev = zero();

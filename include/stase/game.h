@@ -86,10 +86,10 @@ struct Gamestate {
 
     FeatureFrame ** feature_frames;
 
-    Gamestate();
-    Gamestate(const Board &);
-    Gamestate(const Gamestate &);
-    Gamestate(Gamestate &&);
+    explicit Gamestate();
+    explicit Gamestate(const Board &);
+    explicit Gamestate(const Gamestate &);
+    explicit Gamestate(Gamestate &&);
     ~Gamestate();
 
     Gamestate & operator=(const Gamestate &) = default;

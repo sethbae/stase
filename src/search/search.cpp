@@ -326,5 +326,6 @@ void delete_tree(SearchNode * node) {
     for (int i = 0; i < node->num_children; ++i) {
         delete_tree(node->children[i]);
     }
+    delete node->gs;
     delete node;
 }

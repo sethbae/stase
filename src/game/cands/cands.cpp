@@ -31,7 +31,7 @@ void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            hook->hook(gs.board, mksq(x, y), frames);
+            hook->hook(gs, mksq(x, y), frames);
         }
     }
 
@@ -87,7 +87,7 @@ vector<Move> cands(Gamestate & gs) {
                     : fh.enemy_responses;
 
             for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
-                responders[k]->resp(gs.board, &ff, moves, counter);
+                responders[k]->resp(gs, &ff, moves, counter);
             }
 
             if (!counter.has_space()) {
@@ -199,7 +199,7 @@ vector<Move> cands_report(Gamestate & gs) {
                 cout << "   Applying " << responders[k]->name << "\n";
                 int prev_num = counter.idx();
 
-                responders[k]->resp(gs.board, &ff, moves, counter);
+                responders[k]->resp(gs, &ff, moves, counter);
 
                 if (counter.idx() > prev_num) {
                     for (int l = prev_num; l < counter.idx(); ++l) {
