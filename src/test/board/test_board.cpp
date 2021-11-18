@@ -28,34 +28,6 @@ void print_results(int succ, int fail, string test_name) {
     }
 }
 
-/* if you set to a square, do you get back what you set? */
-bool setget_square() {
-
-    int succ = 0, fail = 0;
-
-    vector<Piece> pieces = {B_KING, B_QUEEN, B_ROOK, B_KNIGHT, B_BISHOP, B_PAWN,
-                            W_KING, W_QUEEN, W_ROOK, W_KNIGHT, W_BISHOP, W_PAWN};
-    Board b;
-    
-    for (int i = 0; i < 1000; ++i) {
-        
-        Piece p = pieces[rand() % pieces.size()];
-        Square s = mksq(rand() % 8, rand() % 8);
-    
-        b.set(s, p);
-        
-        if (b.get(s) == p) {
-            ++succ;
-        } else {
-            ++fail;
-        }
-        
-    }
-    
-    print_results(succ, fail, "SET/GET SQUARE");
-    return fail == 0;
-}
-
 /*do the square navigation functions work properly? */
 bool square_navigation() {
     
@@ -860,9 +832,9 @@ void fen_from_board_test() {
 bool test_board(void) {
 
     test_pieces();
+    test_set_get_square();
 
     vector<bool (*)(void)> tests = {
-        &setget_square,
         &square_navigation,
         &rw_fens,
         &test_in_check,
