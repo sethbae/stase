@@ -78,7 +78,7 @@ inline bool evaluate_responder_test_case(const Responder * resp, const Responder
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
-        resp->resp(gs.board, &ff, &moves[0], move_counter);
+        resp->resp(gs, &ff, &moves[0], move_counter);
     }
 
     // convert the output to a vector of strings
