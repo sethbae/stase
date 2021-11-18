@@ -399,34 +399,30 @@ void Board::mutate_hard(const Move m) {
 
     // promotion
     if (type(get(m.to)) == PAWN && (get_y(m.to) == 7 || get_y(m.to) == 0)) {
-        Piece p = m.get_prom_piece(colour(get(m.to)));
-        set(m.to, p);
+        Piece prom_piece = m.get_prom_piece(colour(get(m.to)));
+        set(m.to, prom_piece);
     }
     
     return;
 }
 
-/* create and return a new board, the succeeding position (config updated) */
-Board Board::successor(const Move m) const {
-    
-    // beware the difference: to refer to the board before pieces move, use [this]
-    //  i.e. get() not b.get(). Using b.get() will refer to the board after pieces move.
-    
-    // create new board and mutate it by the move
-    Board b = *this;
-    b.mutate(m);
+/**
+ * Updates the config information for the given board, assuming the move m has just been moved.
+ * This updates castling rights, en-passant, turn etc.
+ */
+void update_config_after_move(Board & b, const Move m) {
     
     // if white and there are castling rights to lose
-    if (get_white() && (get_cas_ws() || get_cas_wl())) {
+    if (b.get_white() && (b.get_cas_ws() || b.get_cas_wl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || get(m.from) == W_KING) {
+        if (m.is_cas() || b.get(m.from) == W_KING) {
             b.set_cas_ws(false);
             b.set_cas_wl(false);
         }
         
         // castling rights from rook move
-        if (get(m.from) == W_ROOK) {
+        if (b.get(m.from) == W_ROOK) {
             if (m.from == mksq(7, 0)) {
                 b.set_cas_ws(false);
             } else if (m.from == mksq(0, 0)) {
@@ -437,16 +433,16 @@ Board Board::successor(const Move m) const {
     }
     
     // if black and there are castling rights to lose
-    if (!get_white() && (get_cas_bs() || get_cas_bl())) {
+    if (!b.get_white() && (b.get_cas_bs() || b.get_cas_bl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || get(m.from) == B_KING) {
+        if (m.is_cas() || b.get(m.from) == B_KING) {
             b.set_cas_bs(false);
             b.set_cas_bl(false);
         }
         
         // castling rights from rook move
-        if (get(m.from) == B_ROOK) {
+        if (b.get(m.from) == B_ROOK) {
             if (m.from == mksq(7, 7)) {
                 b.set_cas_bs(false);
             } else if (m.from == mksq(0, 7)) {
@@ -457,37 +453,61 @@ Board Board::successor(const Move m) const {
     }
     
     // en-passant
-    if (type(get(m.from)) == PAWN) {
-        if ((get_white() && get_y(m.to) - get_y(m.from) == 2)
-                || (!get_white() && get_y(m.to) - get_y(m.from) == -2)) {
+    if (type(b.get(m.from)) == PAWN) {
+        if ((b.get_white() && get_y(m.to) - get_y(m.from) == 2)
+                || (!b.get_white() && get_y(m.to) - get_y(m.from) == -2)) {
             b.set_ep_exists(true);
             b.set_ep_file(get_x(m.from));
-        } else
+        } else {
             b.set_ep_exists(false);
-    } else
+        }
+    } else {
         b.set_ep_exists(false);
-    
+    }
+
     // half moves
-    if (m.is_cap() || type(get(m.from)) == PAWN) {
+    if (m.is_cap() || type(b.get(m.from)) == PAWN) {
         b.set_halfmoves(0);
     } else {
         b.inc_halfmoves();
     }
     
     // whole moves
-    if (!get_white())
+    if (!b.get_white())
         b.inc_wholemoves();
     
     // turn
     b.flip_white();
-    
+
+}
+
+/**
+ * Creates and returns a new Board, with the given move having been played.
+ * Updates turn, castling rights etc. This trusts that the move has all of
+ * its flags set correctly, if that is not necessarily true then use the
+ * successor_hard method.
+ */
+Board Board::successor(const Move m) const {
+
+    // create new board and mutate it by the move
+    Board b = *this;
+    b.mutate(m);
+    update_config_after_move(b, m);
+
     return b;
 }
 
+/**
+ * Acts in the same way as successor, but does not trust the flags provided by the move given.
+ */
 Board Board::successor_hard(const Move m) const {
-    Move m2 = m;
-    m2.set_cas();
-    return starting_pos();
+
+    // create new board and mutate it by the move
+    Board b = *this;
+    b.mutate_hard(m);
+    update_config_after_move(b, m);
+
+    return b;
 }
 
 /******************This is an XOR version of get/set epfile, half and whole. Comparable speed.

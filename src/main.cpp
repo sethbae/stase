@@ -91,7 +91,7 @@ void play_game(bool engine_is_white, int seconds_per_move) {
                 }
             }
 
-            b.mutate_hard(player_move);
+            b = b.successor_hard(player_move);
 
         } else {
 
@@ -119,7 +119,7 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
             if (valid) {
                 cout << "The computer played " << mtos(b, cmove) << "\n";
-                b.mutate_hard(cmove);
+                b = b.successor_hard(cmove);
             } else {
                 cout << "The computer tried to play an illegal move (from " << sqtos(cmove.from) << " to " << sqtos(cmove.to) << ").\n";
                 cout << "You win!\n";
