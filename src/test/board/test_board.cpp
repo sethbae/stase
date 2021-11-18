@@ -1,4 +1,5 @@
 #include "board.h"
+#include "../test.h"
 
 #include <iostream>
 using std::cout;
@@ -25,41 +26,6 @@ void print_results(int succ, int fail, string test_name) {
     } else if (fail > 1) {
         cout << "*****SOME TESTS FAILED*****\n";
     }
-}
-
-/* tests whether or not the pieces have correct types and colours associated with them */
-bool piece_types() {
-
-    int successful = 0;
-    int failed = 0;
-    
-    vector<Piece> pieces = {B_KING, B_QUEEN, B_ROOK, B_KNIGHT, B_BISHOP, B_PAWN,
-                            W_KING, W_QUEEN, W_ROOK, W_KNIGHT, W_BISHOP, W_PAWN};
-    vector<Ptype> correct_types = {KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN,
-                                   KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN};
-    vector<Ptype> correct_colours = {BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-                                     WHITE, WHITE, WHITE, WHITE, WHITE, WHITE};
-
-    for (unsigned i = 0; i < pieces.size(); ++i) {
-        Piece p = pieces[i];
-        
-        if (type(p) == correct_types[i]) {
-            ++successful;
-        } else {
-            ++failed;
-        }
-        
-        if (colour(p) == correct_colours[i]) {
-            ++successful;
-        } else {
-            ++failed;
-        }
-    }
-    
-    
-    print_results(successful, failed, "PIECE_TYPES");
-
-    return failed == 0;
 }
 
 /* if you set to a square, do you get back what you set? */
@@ -891,59 +857,11 @@ void fen_from_board_test() {
 
 }
 
-bool test_legal_moves() {
-    return false;
-}
+bool test_board(void) {
 
-/*void gamestate_generation() {
-    Board b = starting_pos();
-    Gamestate g(b);
-
-    cout << "Board:\n";
-    pr_board(b);
-
-    cout << "\nFriendly attack:\n";
-    pr_bitmap(g.fattack);
-
-    cout << "\nEnemy attack:\n";
-    pr_bitmap(g.eattack);
-
-    cout << "\nFriendly pieces:\n";
-    pr_bitmap(g.foccupy);
-
-    cout << "\nEnemy pieces:\n";
-    pr_bitmap(g.eoccupy);
-
-    cout << "\nOccupany:\n";
-    pr_bitmap(g.occupancy);
-
-    cout << "\nVacancy:\n";
-    pr_bitmap(g.vacancy);
-
-    cout << "\nKings:\n";
-    pr_bitmap(g.kings);
-
-    cout << "\nQueens:\n";
-    pr_bitmap(g.queens);
-
-    cout << "\nBishops:\n";
-    pr_bitmap(g.bishops);
-
-    cout << "\nKnights:\n";
-    pr_bitmap(g.knights);
-
-    cout << "\nRooks:\n";
-    pr_bitmap(g.rooks);
-
-    cout << "\nPawns:\n";
-    pr_bitmap(g.pawns);
-
-}*/
-
-int test_board(void) {
+    test_pieces();
 
     vector<bool (*)(void)> tests = {
-        &piece_types,
         &setget_square,
         &square_navigation,
         &rw_fens,
@@ -958,5 +876,5 @@ int test_board(void) {
     }
 
     // TODO (BRD-10): we return 1 so that these tests always 'pass', pending revamp
-    return 1;
+    return true;
 }

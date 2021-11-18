@@ -85,7 +85,9 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_trade_resp.cpp
         src/test/game/cands/test_retreat_resp.cpp
         src/test/game/cands/test_desperado_resp.cpp
-        src/test/game/cands/test_checks_hook.cpp)
+        src/test/game/cands/test_checks_hook.cpp
+
+        src/test/board/test_pieces.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

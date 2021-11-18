@@ -94,6 +94,8 @@ inline bool evaluate_responder_test_case(const Responder * resp, const Responder
 bool test_board();
 bool test_game();
 
+bool test_pieces();
+
 bool test_unsafe_piece_hook();
 bool test_development_hook();
 bool test_capture_piece();
