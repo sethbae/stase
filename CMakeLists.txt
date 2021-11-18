@@ -88,7 +88,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_checks_hook.cpp
 
         src/test/board/test_pieces.cpp
-        src/test/board/test_square.cpp)
+        src/test/board/test_square.cpp
+        src/test/board/test_fens.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

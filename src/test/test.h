@@ -96,6 +96,7 @@ bool test_game();
 
 bool test_pieces();
 bool test_set_get_square();
+bool test_read_write_fens();
 
 bool test_unsafe_piece_hook();
 bool test_development_hook();
