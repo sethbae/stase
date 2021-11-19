@@ -28,19 +28,6 @@ void print_results(int succ, int fail, string test_name) {
     }
 }
 
-bool test_castling() {
-
-    //"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
-    //"r3k2r/8/8/8/8/8/8/R3KN1R w KQkq - 0 1"
-    //"r3k2r/8/8/8/8/8/8/R2bK2R w KQkq - 0 1"
-    //"r3kN1r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
-    //"rq2k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1"
-    //"rq2k2r/b7/8/8/8/8/8/R3K2R w KQkq - 0 1"
-    
-
-    return false;
-}
-
 bool test_mutate_hard() {
 
     Board b;
@@ -568,6 +555,7 @@ bool test_board(void) {
     passed = test_set_get_square() && passed;
     passed = test_read_write_fens() && passed;
     passed = test_in_check() && passed;
+    passed = test_castling() && passed;
 
     vector<bool (*)(void)> tests = {
         &test_mutate_hard,
