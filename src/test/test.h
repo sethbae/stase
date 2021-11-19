@@ -91,6 +91,21 @@ inline bool evaluate_responder_test_case(const Responder * resp, const Responder
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 
+/**
+ * Converts for example "e2e4" into a Move from the e2 square to the e4 square.
+ * If the string is not valid, then MOVE_SENTINEL will be returned.
+ */
+inline Move unpack_four_char_san(const std::string & s) {
+    if (s.size() != 4) {
+        // invalid string
+        return MOVE_SENTINEL;
+    }
+    return Move{
+        stosq(s.substr(0, 2)),
+        stosq(s.substr(2, 4))
+    };
+}
+
 bool test_board();
 bool test_game();
 
@@ -99,6 +114,7 @@ bool test_set_get_square();
 bool test_read_write_fens();
 bool test_in_check();
 bool test_castling();
+bool test_mutate_hard();
 
 bool test_unsafe_piece_hook();
 bool test_development_hook();

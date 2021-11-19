@@ -91,7 +91,8 @@ set(TEST_SOURCE_FILES
         src/test/board/test_square.cpp
         src/test/board/test_fens.cpp
         src/test/board/test_in_check.cpp
-        src/test/board/test_castling.cpp)
+        src/test/board/test_castling.cpp
+        src/test/board/test_mutate.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)
