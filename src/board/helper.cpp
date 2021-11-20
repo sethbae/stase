@@ -405,7 +405,7 @@ Board empty_board() {
 }
 
 /*************************************************************************************
- WRITING FUNCTIONS         for board, bitmap                write to output stream
+ WRITING FUNCTIONS         for board                write to output stream
  ************************************************************************************/
 
 void wr_board(const Board & b, const string & indent, ostream & output) {
@@ -517,23 +517,6 @@ void wr_board_conf(const Board & b, ostream & output) {
     wr_board_conf(b, "", output);
 }
 
-/* prints the binary data of a bitmap in a chess board grid */
-void wr_bitmap(const Bitmap map, ostream & output) {
-    
-    uint64_t mask = ( ((uint64_t) 1) << 63);
-    for (int i = 0; i < 64; ++i) {
-        
-        if (map & mask)
-            output << '1';
-        else
-            output << '0';
-        mask >>= 1;
-
-        if (i % 8 == 7)
-            output << "\n";
-    }
-}
-
 /* prints out 64 bits of binary data from MSB (left) to LSB (right) */
 void wr_bin_64(uint64_t data, ostream & output) {
     
@@ -546,7 +529,7 @@ void wr_bin_64(uint64_t data, ostream & output) {
 }
 
 /*************************************************************************************
- PRINTING FUNCTIONS         for board, bitmap
+ PRINTING FUNCTIONS         for board
  ************************************************************************************/
 
 /* print out a human readable chess representation of the board */
@@ -567,14 +550,7 @@ void pr_board_conf(const Board & b) {
     wr_board_conf(b, "", cout);
 }
 
-/* prints the binary data of a bitmap in a chess board grid */
-void pr_bitmap(const Bitmap map) {
-    wr_bitmap(map, cout);
-}
-
 /* prints out 64 bits of binary data from MSB (left) to LSB (right) */
 void pr_bin_64(uint64_t data) {
     wr_bin_64(data, cout);
 }
-
-

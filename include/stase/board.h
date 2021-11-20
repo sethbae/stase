@@ -88,15 +88,12 @@ std::vector<std::string> read_pgn(const std::string &s);
 
 
 /* get moves for a piece or position */
-Bitmap piecemoves(const Board &, const Square);
-Bitmap piecemoves_ignore_check(const Board &, const Square);
 void piecemoves(const Board &, const Square, std::vector<Move> &);
 void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 bool in_check_hard(const Board &);
 bool in_check_hard(const Board &, Ptype); // (colour specified)
 bool in_check_attack_map(const Board &, Ptype);
 void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
-Bitmap legal_piecemoves(const Board &, const Square);
 void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
 
@@ -119,32 +116,12 @@ void wr_board(const Board &, std::ostream &);
 void wr_board(const Board &, const std::string & indent, std::ostream &);
 void wr_board_conf(const Board &, std::ostream &);
 void wr_board_conf(const Board &, const std::string & indent, std::ostream &);
-void wr_bitmap(const Bitmap, std::ostream &);
 void wr_bin_64(uint64_t, std::ostream &);
 /* print functions (write to stdout using cout) */
 void pr_board(const Board &);
 void pr_board(const Board &, const std::string & indent);
 void pr_board_conf(const Board &);
 void pr_board_conf(const Board &, const std::string & indent);
-void pr_bitmap(const Bitmap);
 void pr_bin_64(uint64_t);
-
-/* Bitmap functions */
-void set_square(Bitmap &, const Square);
-void unset_square(Bitmap &, const Square);
-bool test_square(const Bitmap &, const Square);
-
-Bitmap knight_map(Square);
-Bitmap king_map(Square);
-Bitmap pattern_map(Square, Piece);
-Bitmap vacancy_map(const Board &);
-Bitmap occupancy_map(const Board &);
-Bitmap friendly_map(const Board &);
-Bitmap enemy_map(const Board &);
-Bitmap attack_map(const Board &, Ptype);
-Bitmap square_map(Square);
-Square map_to_sq(Bitmap);
-Bitmap custom_map(const Board &, bool include(const Board &, Square));
-// Bitmap custom_map(const Board &, bool include(Square, Piece));
 
 #endif //STASE_BOARD_H
