@@ -4,83 +4,9 @@
 #include <string>
 #include <vector>
 
-typedef uint_fast8_t Byte;
-typedef uint_fast32_t Int;
-typedef Byte Piece;
-typedef uint64_t Bitmap;
-
-struct Square {
-    Byte x;
-    Byte y;
-};
-
-const Square SQUARE_SENTINEL{0xFF, 0xFF};
-
-constexpr Square mksq(Byte x, Byte y) { return Square{x, y}; }
-inline bool equal(const Square & a, const Square & b) { return a.x == b.x && a.y == b.y; }
-inline bool is_sentinel(const Square & s) { return s.x == 0xFF || s.y == 0xFF; }
-
-/* helper functions for transforming a square */
-void inc_x(Square &);
-void dec_x(Square &);
-void inc_y(Square &);
-void dec_y(Square &);
-void diag_ur(Square &);
-void diag_ul(Square &);
-void diag_dr(Square &);
-void diag_dl(Square &);
-void reset_x(Square &);
-void reset_y(Square &);
-
-/* helper functions for getting info about a square */
-inline int get_y(const Square & s) { return s.y; }
-inline int get_x(const Square & s) { return s.x; }
-
-inline bool val_x(const Square & s) {
-    return s.x < 8;
-}
-inline bool val_y(const Square & s) {
-    return s.y < 8;
-}
-inline bool val(const Square & s) {
-    return s.x < 8 && s.y < 8;
-}
-
-
-/* enumeration of the types of pieces primarily, but also for other useful properties,
-    such as WHITE or BLACK, and KING or QUEEN */
-enum Ptype : Byte {
-
-    /* defined values: so that we can translate both ways */
-    B_KING = 0,
-    B_QUEEN = 1,
-    B_ROOK = 2,
-    B_KNIGHT = 3,
-    B_BISHOP = 4,
-    B_PAWN = 5,
-
-    W_KING = 8,
-    W_QUEEN = 9,
-    W_ROOK = 10,
-    W_KNIGHT = 11,
-    W_BISHOP = 12,
-    W_PAWN = 13,
-
-    EMPTY = 14,
-
-    /* other values which appear in the lookup tables */
-    KING,
-    QUEEN = 16, // explicit values to read promotion pieces easily (see Move::prom_piece())
-    ROOK = 17,
-    KNIGHT = 18,
-    BISHOP = 19,
-    PAWN,
-
-    BLACK,
-    WHITE,
-
-    INVALID
-};
+#include "../../src/board/base_types.h"
+#include "../../src/board/square.h"
+#include "../../src/board/move.h"
 
 /* query information about a given piece */
 Ptype piece(Piece);
@@ -90,50 +16,6 @@ bool is_white(Piece);
 bool is_minor_piece(Piece);
 bool is_major_piece(Piece);
 bool is_not_pk(Piece);
-
-/* A move structure, which stores some flags etc and get/set methods */
-struct Move {
-
-    Square from;
-    Square to;
-    uint_fast16_t flags;
-
-    bool is_prom() const;
-    void set_prom();
-    void unset_prom();
-
-    bool is_cas() const;
-    void set_cas();
-    void unset_cas();
-
-    bool is_ep() const;
-    void set_ep();
-    void unset_ep();
-
-    bool is_cap() const;
-    void set_cap();
-    void unset_cap();
-
-    bool is_cas_short() const;
-    void set_cas_short();
-    void unset_cas_short();
-
-    int get_ep_file() const;
-
-    Byte get_prom_shift() const;
-    Piece get_prom_piece(Ptype) const;
-    void set_prom_piece(Ptype);
-    Piece get_cap_piece() const;
-    void set_cap_piece(Piece p);
-
-};
-
-const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, 0, 0};
-
-inline bool is_sentinel(const Move m) { return equal(m.from, SQUARE_SENTINEL); }
-inline bool equal(const Move m1, const Move m2) {
-    return equal(m1.from, m2.from) && equal(m1.to, m2.to);
-}
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {

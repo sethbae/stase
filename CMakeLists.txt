@@ -7,6 +7,9 @@ set(OPT_FLAGS -Ofast)
 SET(CMAKE_CXX_FLAGS "-pthread ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
 
 set(SOURCE_FILES
+        src/board/square.h
+        src/board/base_types.h
+        src/board/move.h
         src/board/bitmap.cpp
         src/board/board.cpp
         src/board/helper.cpp
