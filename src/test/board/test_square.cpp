@@ -2,7 +2,7 @@
 #include "board.h"
 
 struct SetGetTestCase {
-    const std::string & fen;
+    const std::string fen;
     const Square sq;
     const Piece p;
 };
@@ -26,7 +26,9 @@ bool test_set_get_square() {
 
     for (int i = 0; i < N; ++i) {
         Piece p = pieces[rand() % pieces.size()];
-        Square s = mksq(rand() % 8, rand() % 8);
+        int x = rand() % 8;
+        int y = rand() % 8;
+        Square s{(Byte) x, (Byte) y};
         cases.push_back(SetGetTestCase{starting_fen(), s, p});
     }
 

@@ -15,15 +15,15 @@ int main(int argc, char** argv) {
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "-board") == 0) {
-            cout << "Testing board\n";
+            cout << "\nTesting board\n";
             passed = test_board() && passed;
             ++modules_tested;
         } else if (strcmp(argv[i], "-g") == 0 || strcmp(argv[i], "-game") == 0) {
-            cout << "Testing game\n";
+            cout << "\nTesting game\n";
             passed = test_game() && passed;
             ++modules_tested;
         } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-stress") == 0) {
-            cout << "Running stress tests\n";
+            cout << "\nRunning stress tests\n";
             passed = stress_test_main() && passed;
             ++modules_tested;
         } else {
@@ -34,9 +34,11 @@ int main(int argc, char** argv) {
     if (modules_tested == 0) {
         cout << "No tests requested\n";
     } else if (!passed) {
-        cout << "\n*****SOME TESTS FAILED*****\n\n";
+        cout << "\n*****SOME TESTS FAILED*****\n";
+    } else {
+        cout << "\nAll tests passed!\n";
     }
-    cout << "Goodbye\n";
+    cout << "\nGoodbye\n";
 
     return passed ? 0 : 1;
 

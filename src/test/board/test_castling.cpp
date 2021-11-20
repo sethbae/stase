@@ -80,16 +80,16 @@ bool evaluate_castle_test_case(const CastleTestCase * tc) {
     bool b_long = false;
 
     for (const Move & m: legals) {
-        if (m.from == ws.from && m.to == ws.to) {
+        if (equal(m, ws)) {
             w_short = true;
         }
-        if (m.from == wl.from && m.to == wl.to) {
+        if (equal(m, wl)) {
             w_long = true;
         }
-        if (m.from == bs.from && m.to == bs.to) {
+        if (equal(m, bs)) {
             b_short = true;
         }
-        if (m.from == bl.from && m.to == bl.to) {
+        if (equal(m, bl)) {
             b_long = true;
         }
     }

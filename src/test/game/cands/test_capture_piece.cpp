@@ -14,7 +14,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         std::vector<FeatureFrame>{
-                            FeatureFrame{stosq("e4"), 0, 0, 0}
+                            FeatureFrame{stosq("e4"), SQUARE_SENTINEL, 0, 0}
                         },
                         {},
                 },
@@ -22,7 +22,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/6b1/8/8/3N4/2P5/8/8 b - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("d4"), 0, p, b}
+                                FeatureFrame{stosq("d4"), SQUARE_SENTINEL, p, b}
                         },
                         {}
                 },
@@ -30,7 +30,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "3r4/3q4/8/3P4/8/1B6/8/8 b - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("d5"), 0, b, q}
+                                FeatureFrame{stosq("d5"), SQUARE_SENTINEL, b, q}
                         },
                         {}
                 },
@@ -38,7 +38,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/8/8/3r4/2P1P3/8/8/3Q4 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("d5"), 0, p, r}
+                                FeatureFrame{stosq("d5"), SQUARE_SENTINEL, p, r}
                         },
                         {"c4d5", "e4d5"}
                 },
@@ -46,7 +46,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "3r4/8/8/5b2/8/3R4/8/8 b - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("d3"), 0, none, b}
+                                FeatureFrame{stosq("d3"), SQUARE_SENTINEL, none, b}
                         },
                         {"f5d3"}
                 },
@@ -54,7 +54,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "2q5/8/1N6/5b2/8/3r4/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("c8"), 0, kn, b}
+                                FeatureFrame{stosq("c8"), SQUARE_SENTINEL, kn, b}
                         },
                         {"b6c8"}
                 },
@@ -62,7 +62,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/6p1/5p2/3N4/8/8/8/B7 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("f6"), 0, kn, p}
+                                FeatureFrame{stosq("f6"), SQUARE_SENTINEL, kn, p}
                         },
                         {}
                 },
@@ -70,7 +70,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/1r3q2/8/8/8/1Q6/8/8 b - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("b3"), 0, none, r}
+                                FeatureFrame{stosq("b3"), SQUARE_SENTINEL, none, r}
                         },
                         {"b7b3"}
                 },
@@ -78,7 +78,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/5q2/8/8/8/1Q6/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("f7"), 0, q, none}
+                                FeatureFrame{stosq("f7"), SQUARE_SENTINEL, q, none}
                         },
                         {"b3f7"}
                 },
@@ -86,7 +86,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/8/8/8/1k2K3/1rqR3R/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("c3"), 0, r, r}
+                                FeatureFrame{stosq("c3"), SQUARE_SENTINEL, r, r}
                         },
                         {"d3c3"}
                 },
@@ -94,7 +94,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/8/8/8/1k2K3/3R1b1R/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("f3"), 0, r, none}
+                                FeatureFrame{stosq("f3"), SQUARE_SENTINEL, r, none}
                         },
                         {"d3f3", "h3f3"}
                 },
@@ -102,7 +102,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "8/8/5N2/8/4q3/2N2k2/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("e4"), 0, kn, none}
+                                FeatureFrame{stosq("e4"), SQUARE_SENTINEL, kn, none}
                         },
                         {"c3e4", "f6e4"}
                 },
@@ -110,7 +110,7 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 ResponderTestCase{
                         "Q3R3/7Q/8/8/R3b2R/5P2/3N1N2/1Q2R2Q w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("e4"), 0, p, none}
+                                FeatureFrame{stosq("e4"), SQUARE_SENTINEL, p, none}
                         },
                         {"f3e4"}
                 },

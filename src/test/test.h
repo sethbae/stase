@@ -115,6 +115,7 @@ bool test_read_write_fens();
 bool test_in_check();
 bool test_castling();
 bool test_mutate_hard();
+bool test_mutate();
 
 bool test_unsafe_piece_hook();
 bool test_development_hook();

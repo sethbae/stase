@@ -17,7 +17,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
             Square temp = mksq(x, y);
-            if (colour(b.get(temp)) == defending_colour && temp != s) {
+            if (colour(b.get(temp)) == defending_colour && !equal(temp, s)) {
                 piece_squares[pieces_point++] = temp;
             }
         }
@@ -90,7 +90,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 if (val(temp = mksq(x + XKN[i] + XKN[j], y + YKN[i] + YKN[j]))
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
-                        && (temp != s)
+                        && !equal(temp, s)
                         && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square})) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
@@ -115,7 +115,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 if (val(temp = mksq(x + XD[i] + XD[j], y + YD[i] + YD[j]))
                         && (type(b.get(temp)) == KING)
                         && (colour(b.get(temp)) == defending_colour)
-                        && (temp != s)
+                        && !equal(temp, s)
                         && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square})) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};

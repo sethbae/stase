@@ -373,7 +373,7 @@ bool can_move_to_square(const Board & b, Square from_sq, Square to_sq) {
     std::vector<Move> pmoves(10);
     piecemoves_ignore_check(b, from_sq, pmoves);
     for (const Move m : pmoves) {
-        if (m.to == to_sq) {
+        if (equal(m.to, to_sq)) {
             return true;
         }
     }
@@ -400,7 +400,7 @@ bool alpha_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     Square temp;
     int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
-    while (val(temp = mksq(x, y)) && temp != target_sq) {
+    while (val(temp = mksq(x, y)) && !equal(temp, target_sq)) {
 
         const Piece otherp = b.get(temp);
 
@@ -452,7 +452,7 @@ bool beta_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     Square temp;
     int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
-    while (val(temp = mksq(x, y)) && temp != target_sq) {
+    while (val(temp = mksq(x, y)) && !equal(temp, target_sq)) {
 
         const Piece otherp = b.get(temp);
 
@@ -505,7 +505,7 @@ bool gamma_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
     Square temp;
     int x = get_x(piece_sq) + xd, y = get_y(piece_sq) + yd;
 
-    while (val(temp = mksq(x, y)) && temp != target_sq) {
+    while (val(temp = mksq(x, y)) && !equal(temp, target_sq)) {
 
         const Piece otherp = b.get(temp);
 

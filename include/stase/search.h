@@ -20,31 +20,6 @@ struct SearchNode {
 
 };
 
-struct DepthLimiter {
-
-    int cutoff;
-
-    DepthLimiter(int n) : cutoff(n) {}
-
-    inline bool check(int depth) {
-        return depth < cutoff;
-    }
-
-};
-
-struct TimeLimiter {
-
-    int cutoff;
-
-    TimeLimiter(int n) : cutoff(n) {}
-
-    inline bool check() {
-        // TODO get the current time and check if we've passed it
-        return true;
-    }
-
-};
-
 std::vector<Move> iterative_deepening_search(const std::string &, int);
 void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);

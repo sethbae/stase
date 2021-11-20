@@ -78,8 +78,8 @@ int pk_count(const Board & b, const Square s) {
 
 float pawns_defend_king_metric(const Board & b) {
 
-    Square wking = (Square) 0;
-    Square bking = (Square) 0;
+    Square wking = Square{0, 0};
+    Square bking = Square{0, 0};
 
     // find kings
     for (int x = 0; x < 8; ++x) {
@@ -246,7 +246,7 @@ int one_king_exposure(const Board & b, const Square s) {
  */
 float king_exposure_metric(const Board & b) {
 
-    Square wking = (Square) 0, bking = (Square) 0;
+    Square wking = Square{0, 0}, bking = Square{0, 0};
 
     // find kings
     for (int x = 0; x < 8; ++x) {

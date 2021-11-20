@@ -16,8 +16,8 @@ struct DeltaPair {
     Byte xd;
     Byte yd;
 };
-const DeltaPair INVALID_DELTA = { SQUARE_SENTINEL, SQUARE_SENTINEL };
-inline bool is_valid_delta(const DeltaPair d) { return d.xd != SQUARE_SENTINEL && d.yd != SQUARE_SENTINEL; }
+const DeltaPair INVALID_DELTA = { 0xFF, 0xFF };
+inline bool is_valid_delta(const DeltaPair d) { return d.xd != 0xFF && d.yd != 0xFF; }
 inline MoveType direction_of_delta(const DeltaPair d) {
     if (d.xd == 0 || d.yd == 0) {
         return ORTHO;
@@ -95,10 +95,6 @@ struct Gamestate {
     Gamestate & operator=(const Gamestate &) = default;
     Gamestate & operator=(Gamestate &&) = default;
 
-    void recalculate_all();
-    void recalculate_attacks();
-    void recalculate_positions();
-    void update(Move m);
     void repopulate_caches();
 
     // TODO (GM-25): as and when required add these to the copy constructor
@@ -113,31 +109,10 @@ struct Gamestate {
         return board.get_white() ? bpieces : wpieces;
     }
 
-    // Attack and occupation maps for each of the adversaries
-    Bitmap fattack;
-    Bitmap eattack;
-    Bitmap foccupy;
-    Bitmap eoccupy;
-
-    // Overall vacancy and occupation maps
-    Bitmap vacancy;
-    Bitmap occupancy;
-
-    // Locations of all pieces of a certain type (can be ANDed with occupation to isolate pieces of desired colour)
-    Bitmap kings;
-    Bitmap pawns;
-    Bitmap queens;
-    Bitmap knights;
-    Bitmap bishops;
-    Bitmap rooks;
-
     Move last_move;
     Piece last_capture;
 
 };
-
-bool in_check(Gamestate &);
-
 
 // evaluation type and helper/conversion methods
 typedef int32_t Eval;
