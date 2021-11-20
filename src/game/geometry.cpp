@@ -34,11 +34,11 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
         int delta = (dy > 0) ? 1 : -1;
         int x = get_x(from), y = get_y(from) + delta;
 
-        while (val(temp = mksq(x, y)) && temp != to && b.get(temp) == EMPTY) {
+        while (val(temp = mksq(x, y)) && !equal(temp, to) && b.get(temp) == EMPTY) {
             y += delta;
         }
 
-        return (temp == to) ? DeltaPair{0, (Byte) delta} : INVALID_DELTA;
+        return equal(temp, to) ? DeltaPair{0, (Byte) delta} : INVALID_DELTA;
     }
 
     // orthogonal in the x direction
@@ -46,11 +46,11 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
         int delta = (dx > 0) ? 1 : -1;
         int x = get_x(from) + delta, y = get_y(from);
 
-        while (val(temp = mksq(x, y)) && temp != to && b.get(temp) == EMPTY) {
+        while (val(temp = mksq(x, y)) && !equal(temp, to) && b.get(temp) == EMPTY) {
             x += delta;
         }
 
-        return (temp == to) ? DeltaPair{(Byte) delta, 0} : INVALID_DELTA;
+        return equal(temp, to) ? DeltaPair{(Byte) delta, 0} : INVALID_DELTA;
     }
 
     // diagonal
@@ -59,12 +59,12 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
         int delta_y = (dy > 0) ? 1 : -1;
         int x = get_x(from) + delta_x, y = get_y(from) + delta_y;
 
-        while (val(temp = mksq(x, y)) && temp != to && b.get(temp) == EMPTY) {
+        while (val(temp = mksq(x, y)) && !equal(temp, to) && b.get(temp) == EMPTY) {
             x += delta_x;
             y += delta_y;
         }
 
-        return (temp == to) ? DeltaPair{(Byte) delta_x, (Byte) delta_y} : INVALID_DELTA;
+        return equal(temp, to) ? DeltaPair{(Byte) delta_x, (Byte) delta_y} : INVALID_DELTA;
     }
 
     return INVALID_DELTA;
@@ -79,14 +79,14 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
 Square can_move_onto_line(
         const Board & b, const Square piece_sq, const Square line_start_point, const Square line_end_point) {
 
-    if (line_start_point == line_end_point) { return false; }
+    if (equal(line_start_point, line_end_point)) { return SQUARE_SENTINEL; }
 
     DeltaPair delta = get_delta_between(line_start_point, line_end_point);
     int x = get_x(line_start_point) + delta.xd, y = get_y(line_start_point) + delta.yd;
 
     Square temp;
 
-    while (val(temp = mksq(x, y)) && temp != line_end_point) {
+    while (val(temp = mksq(x, y)) && !equal(temp, line_end_point)) {
         if (alpha_covers(b, piece_sq, temp)) {
             return temp;
         }

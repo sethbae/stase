@@ -130,10 +130,10 @@ DisambigType compute_disambig(const Board & b, const Move m) {
 
         const Move other_m = legals[i];
 
-        if (other_m.from == m.from) { continue; }
+        if (equal(other_m.from, m.from)) { continue; }
 
         // moves of same type piece to the same destination
-        if (other_m.to == m.to
+        if (equal(other_m.to, m.to)
                 && type(b.get(other_m.from)) == type(b.get(m.from))) {
 
             required = true;
@@ -176,10 +176,10 @@ string mtos(const Board & b, const Move m) {
     if (is_sentinel(m)) {
         return "no move";
     }
-    if (m.from == empty_move().from && m.to == empty_move().to) {
+    if (equal(m.from, empty_move().from) && equal(m.to, empty_move().to)) {
         return "empty move";
     }
-    if (m.from == m.to) {
+    if (equal(m.from, m.to)) {
         return "invalid move";
     }
 

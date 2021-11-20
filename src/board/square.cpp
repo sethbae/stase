@@ -19,22 +19,14 @@ const Byte SHIFT_KN6 = -SHIFT_X - 2*SHIFT_Y; // -1x, -2y
 const Byte SHIFT_KN7 = -2*SHIFT_X + SHIFT_Y; // -2x, +1y
 const Byte SHIFT_KN8 = -2*SHIFT_X - SHIFT_Y; // -2x, -1y
 
-void inc_x(Square & s) { s += SHIFT_X; }
-void dec_x(Square & s) { s -= SHIFT_X; }
-void inc_y(Square & s) { s += SHIFT_Y; }
-void dec_y(Square & s) { s -= SHIFT_Y; }
-void diag_ur(Square & s) { s += SHIFT_POSDIAG; }
-void diag_ul(Square & s) { s -= SHIFT_NEGDIAG; }
-void diag_dr(Square & s) { s += SHIFT_NEGDIAG; }
-void diag_dl(Square & s) { s -= SHIFT_POSDIAG; }
+void inc_x(Square & s) { ++s.x; }
+void dec_x(Square & s) { --s.x; }
+void inc_y(Square & s) { ++s.y; }
+void dec_y(Square & s) { --s.y; }
+void diag_ur(Square & s) { inc_x(s); inc_y(s); }
+void diag_ul(Square & s) { dec_x(s); inc_y(s); }
+void diag_dr(Square & s) { inc_x(s); dec_y(s); }
+void diag_dl(Square & s) { dec_x(s); dec_y(s); }
 
-void reset_x(Square & s) { s &= HI4; }
-void reset_y(Square & s) { s &= LO4; }
-
-int get_y(const Square & s) { return s >> 4; }
-int get_x(const Square & s) { return s & LO4; }
-
-bool val_y(const Square & s) { return !(s & 128); }
-bool val_x(const Square & s) { return !(s & 8); }
-bool val(const Square & s) { return !(s & 128) && !(s & 8); }
-
+void reset_x(Square & s) { s.x = 0; }
+void reset_y(Square & s) { s.y = 0; }

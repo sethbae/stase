@@ -111,7 +111,7 @@ void play_game(bool engine_is_white, int seconds_per_move) {
             bool valid = false;
             if (!is_sentinel(cmove)) {
                 for (int i = 0; i < legals.size(); ++i) {
-                    if (cmove.from == legals[i].from && cmove.to == legals[i].to) {
+                    if (equal(cmove, legals[i])) {
                         valid = true;
                     }
                 }

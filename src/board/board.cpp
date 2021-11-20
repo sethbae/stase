@@ -97,28 +97,6 @@ const unsigned EP_FILE_MASK = 7 << 6;
 const unsigned HALF_M_MASK = 127 << 9;
 const unsigned WHOLE_M_MASK = (unsigned)(~0) << 16;
 
-/* read 4 bits from given square address */
-Piece Board::get(const Square & sq) const {
-    Byte b = squares[sq >> 4][(sq & LO3) >> 1]; // use high as 0-7, low/2 as 0-3
-    return (Piece) ((sq & 1) ? (b & LO4) : (b >> 4)); // depending on parity, read 4 bits
-}
-
-/* write 4 bits to given square address */
-void Board::set(const Square & sq, const Piece val) {
-    
-    Byte ind1 = sq >> 4;    // calculate correct indices as above
-    Byte ind2 = (sq & LO3) >> 1;
-    
-    if (sq & 1) {
-         // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | val;
-    } else {
-        // if even, write to high
-        squares[ind1][ind2] = (val << 4) | (squares[ind1][ind2] & LO4);
-    }
-    
-}
-
 /**
  * Sneak is used to make a move on the board VERY temporarily - just to check something
  * (eg weak square? in check?) about the resulting position. It makes the move without
@@ -130,33 +108,13 @@ Piece Board::sneak(const Move m) const {
     Piece p = this->get(m.from);
     Piece captured = this->get(m.to);
 
-    /*
-     * Set the from square to empty
-     */
-    Byte ind1 = m.from >> 4;
-    Byte ind2 = (m.from & LO3) >> 1;
-
-    if (m.from & 1) {
-        // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | EMPTY;
-    } else {
-        // if even, write to high
-        squares[ind1][ind2] = (EMPTY << 4) | (squares[ind1][ind2] & LO4);
-    }
+    // set the from square to empty
+    squares[m.from.x][m.from.y] = EMPTY;
 
     /*
      * Set the to square to the piece
      */
-    ind1 = m.to >> 4;
-    ind2 = (m.to & LO3) >> 1;
-
-    if (m.to & 1) {
-        // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | p;
-    } else {
-        // if even, write to high
-        squares[ind1][ind2] = (p << 4) | (squares[ind1][ind2] & LO4);
-    }
+    squares[m.to.x][m.to.y] = p;
 
     return captured;
 
@@ -174,33 +132,11 @@ void Board::unsneak(const Move m, const Piece captured) const {
 
     Piece p = this->get(m.to);
 
-    /*
-     * Set the to square to the captured piece
-     */
-    Byte ind1 = m.to >> 4;
-    Byte ind2 = (m.to & LO3) >> 1;
+    // set the to square to the captured piece
+    squares[m.to.x][m.to.y] = captured;
 
-    if (m.to & 1) {
-        // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | captured;
-    } else {
-        // if even, write to high
-        squares[ind1][ind2] = (captured << 4) | (squares[ind1][ind2] & LO4);
-    }
-
-    /*
-     * Set the from square to the piece
-     */
-    ind1 = m.from >> 4;
-    ind2 = (m.from & LO3) >> 1;
-
-    if (m.from & 1) {
-        // if odd, write to low
-        squares[ind1][ind2] = (squares[ind1][ind2] & HI4) | p;
-    } else {
-        // if even, write to high
-        squares[ind1][ind2] = (p << 4) | (squares[ind1][ind2] & LO4);
-    }
+    // set the from square to the piece
+    squares[m.from.x][m.from.y] = p;
 }
 
 /* get/set whole config word */
@@ -260,16 +196,18 @@ void Board::set_ep_exists(bool b) {
 }
 
 /* read write 3 bits representing ep file */
-unsigned Board::get_ep_file() const {
+Byte Board::get_ep_file() const {
     return (conf & EP_FILE_MASK) >> 6;
 }
-void Board::set_ep_file(unsigned u) {
+void Board::set_ep_file(Byte u) {
     conf = (conf & ~EP_FILE_MASK) | (u << 6);
 }
 
 // for convenience, return the actual square
 Square Board::get_ep_sq() const {
-    return (Square) (((get_white() ? 5 : 2) << 4) | get_ep_file());
+    return get_white()
+            ? Square{ get_ep_file(), 5}
+            : Square{get_ep_file(), 2};
 }
 
 /* read write 7 bits for the half move count */
@@ -351,19 +289,19 @@ void Board::mutate_hard(const Move m) {
         if (delta == 2 || delta == -2) {
             
             // white short
-            if (m.to == mksq(6, 0)) {
+            if (equal(m.to, Square{6, 0})) {
                 set(mksq(7, 0), EMPTY);
                 set(mksq(5, 0), W_ROOK);
             }
             
             // white long
-            else if (m.to == mksq(2, 0)) {
+            else if (equal(m.to, Square{2, 0})) {
                 set(mksq(0, 0), EMPTY);
                 set(mksq(3, 0), W_ROOK);
             }
             
             // black short
-            else if (m.to == mksq(6, 7)) {
+            else if (equal(m.to, Square{6, 7})) {
                 set(mksq(7, 7), EMPTY);
                 set(mksq(5, 7), B_ROOK);
             }
@@ -423,9 +361,9 @@ void update_config_after_move(Board & b, const Move m) {
         
         // castling rights from rook move
         if (b.get(m.from) == W_ROOK) {
-            if (m.from == mksq(7, 0)) {
+            if (equal(m.from, Square{7, 0})) {
                 b.set_cas_ws(false);
-            } else if (m.from == mksq(0, 0)) {
+            } else if (equal(m.from, Square{0, 0})) {
                 b.set_cas_wl(false);
             }
         }
@@ -443,9 +381,9 @@ void update_config_after_move(Board & b, const Move m) {
         
         // castling rights from rook move
         if (b.get(m.from) == B_ROOK) {
-            if (m.from == mksq(7, 7)) {
+            if (equal(m.from, Square{7, 7})) {
                 b.set_cas_bs(false);
-            } else if (m.from == mksq(0, 7)) {
+            } else if (equal(m.from, Square{0, 7})) {
                 b.set_cas_bl(false);
             }
         }
@@ -509,37 +447,3 @@ Board Board::successor_hard(const Move m) const {
 
     return b;
 }
-
-/******************This is an XOR version of get/set epfile, half and whole. Comparable speed.
-// read write 3 bits representing ep file 
-unsigned get_ep_file() {
-    return (conf & EP_FILE_MASK) >> 6;
-}
-void set_ep_file(unsigned u) {
-    unsigned c = conf ^ (u << 6);
-    conf ^= (c & EP_FILE_MASK);
-}
-// for convenience, return the actual square
-Square get_ep_sq() {
-    Square mksq(int, int);
-    return mksq(get_white() ? 5 : 2, get_ep_file());
-}
-
-// read write 7 bits for the half move count 
-unsigned get_halfmoves() {
-    return (conf & HALF_M_MASK) >> 9;
-}
-void set_halfmoves(unsigned u) {
-    unsigned c = conf ^ (u << 9);
-    conf ^= (c & HALF_M_MASK);
-}
-
-// read write 16 bits for the half move count 
-unsigned get_wholemoves() {
-    return (conf & WHOLE_M_MASK) >> 16;
-}
-void set_wholemoves(unsigned u) {
-    unsigned c = conf ^ (u << 16);
-    conf ^= (c & WHOLE_M_MASK);
-} */
-

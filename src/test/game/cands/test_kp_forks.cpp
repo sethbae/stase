@@ -124,7 +124,7 @@ bool evaluate_test_case_kp_fork_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; ff->centre != SQUARE_SENTINEL; ++ff) {
+    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at king/pawn forks for these tests!
         if (type(gs.board.get(ff->centre)) == KING || type(gs.board.get(ff->centre)) == PAWN) {
             strings.push_back(sqtos(ff->secondary));

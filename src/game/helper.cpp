@@ -32,7 +32,7 @@ void display_control_counts(const Board & b) {
 
 void print_feature_frames(const FeatureFrame * ff) {
     cout << "Printing feature-frame list @" << ff << ":\n";
-    for (const FeatureFrame* ptr = ff; ptr->centre != SQUARE_SENTINEL; ptr++) {
+    for (const FeatureFrame* ptr = ff; !equal(ptr->centre, SQUARE_SENTINEL); ptr++) {
         cout << "Frame: " << sqtos(ptr->centre) << " " << sqtos(ptr->secondary) << "\n";
     }
     cout << "(sentinel)\n";

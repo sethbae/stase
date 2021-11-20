@@ -21,8 +21,7 @@ struct BoardPairParam {
 int write_board_xy(const BoardPairParam & param) {
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            Square temp;
-            param.blank_board.set(temp = mksq(x, y), param.board.get(temp));
+            param.blank_board.set(x, y, param.board.get(x, y));
         }
     }
     return param.board.get_white() ? 1 : 0;
@@ -31,16 +30,8 @@ int write_board_xy(const BoardPairParam & param) {
 int write_board_yx(const BoardPairParam & param) {
     for (int y = 0; y < 8; ++y) {
         for (int x = 0; x < 8; ++x) {
-            Square temp;
-            param.blank_board.set(temp = mksq(x, y), param.board.get(temp));
+            param.blank_board.set(x, y, param.board.get(x, y));
         }
-    }
-    return param.board.get_white() ? 1 : 0;
-}
-
-int write_board_64(const BoardPairParam & param) {
-    for (int x = 0; x < 64; ++x) {
-        param.blank_board.set(x, param.board.get(x));
     }
     return param.board.get_white() ? 1 : 0;
 }
@@ -63,7 +54,6 @@ void bench_board_write() {
 
     bench("board-get-set-xy", NANOS, params.data(), params.size(), &write_board_xy);
     bench("board-get-set-yx", NANOS, params.data(), params.size(), &write_board_yx);
-    bench("board-get-set-64", NANOS, params.data(), params.size(), &write_board_64);
 
 }
 
@@ -125,7 +115,7 @@ int board_iteration_xy(const Board & b) {
     int sum = 0;
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            sum += b.get(mksq(x, y));
+            sum += b.get(x, y);
         }
     }
     return sum;
@@ -134,15 +124,8 @@ int board_iteration_yx(const Board & b) {
     int sum = 0;
     for (int y = 0; y < 8; ++y) {
         for (int x = 0; x < 8; ++x) {
-            sum += b.get(mksq(x, y));
+            sum += b.get(x, y);
         }
-    }
-    return sum;
-}
-int board_iteration_64(const Board & b) {
-    int sum = 0;
-    for (int x = 0; x < 64; ++x) {
-        sum += b.get(x);
     }
     return sum;
 }
@@ -159,7 +142,6 @@ void bench_board_iteration() {
 
     bench("board-iter-xy", NANOS, boards.data(), boards.size(), &board_iteration_xy);
     bench("board-iter-yx", NANOS, boards.data(), boards.size(), &board_iteration_yx);
-    bench("board-iter-64", NANOS, boards.data(), boards.size(), &board_iteration_64);
 
 }
 

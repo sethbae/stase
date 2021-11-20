@@ -76,7 +76,7 @@ vector<Move> cands(Gamestate & gs) {
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
+        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
 
             FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
@@ -99,8 +99,7 @@ vector<Move> cands(Gamestate & gs) {
         for (int j = 0; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
-                if ((all_moves[k].from == moves[j].from)
-                        && (all_moves[k].to == moves[j].to)) {
+                if (equal(all_moves[k], moves[j])) {
                     present = true;
                     break;
                 }
@@ -176,14 +175,14 @@ vector<Move> cands_report(Gamestate & gs) {
         discover_feature_frames(gs, fh.hook);
 
         cout << "\nFound frames:\n";
-        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
+        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
             FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
             cout << "Centre: " << sqtos(ff.centre) << " Second: " << sqtos(ff.secondary) << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
         }
         cout << "\n\n";
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; gs.feature_frames[fh.hook->id][j].centre != SQUARE_SENTINEL; ++j) {
+        for (int j = 0; is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
 
             FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
@@ -219,8 +218,7 @@ vector<Move> cands_report(Gamestate & gs) {
         for (int j = 0; j < counter.idx(); ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
-                if ((all_moves[k].from == moves[j].from)
-                    && (all_moves[k].to == moves[j].to)) {
+                if (equal(all_moves[k], moves[j])) {
                     present = true;
                     break;
                 }

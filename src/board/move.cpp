@@ -91,7 +91,7 @@ void Move::set_cap_piece(Piece p) {
 }
 
 Move empty_move() {
-    Move m = {0, 0, 0};
+    Move m = {0, 0, 0, 0, 0};
     return m;
 }
 
@@ -869,7 +869,7 @@ bool in_check_hard(const Board & b, Ptype col) {
     
     bool white = (col == WHITE);
     Piece king = (white) ? W_KING : B_KING;
-    Square ksq = 0;
+    Square ksq{0, 0};
     int king_x = 0, king_y = 0;
     bool king_found = false;
     

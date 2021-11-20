@@ -16,8 +16,8 @@ struct DeltaPair {
     Byte xd;
     Byte yd;
 };
-const DeltaPair INVALID_DELTA = { SQUARE_SENTINEL, SQUARE_SENTINEL };
-inline bool is_valid_delta(const DeltaPair d) { return d.xd != SQUARE_SENTINEL && d.yd != SQUARE_SENTINEL; }
+const DeltaPair INVALID_DELTA = { 0xFF, 0xFF };
+inline bool is_valid_delta(const DeltaPair d) { return d.xd != 0xFF && d.yd != 0xFF; }
 inline MoveType direction_of_delta(const DeltaPair d) {
     if (d.xd == 0 || d.yd == 0) {
         return ORTHO;

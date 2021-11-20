@@ -378,5 +378,5 @@ bool is_unsafe_piece(const Gamestate & gs, const Square s) {
  * Returns the same as is_unsafe_piece, but after the given move has been played.
  */
 bool would_be_unsafe_after(const Gamestate & gs, const Square s, const Move m) {
-    return (gs.board.get(s) != EMPTY || s == m.to) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
+    return (gs.board.get(s) != EMPTY || equal(s, m.to)) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
 }

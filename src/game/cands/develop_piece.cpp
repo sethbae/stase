@@ -102,13 +102,13 @@ void best_diag_squares(const Board & b, Square s, Move * moves, IndexCounter & m
 
     // negative diagonal
     Square sq = best_square(b, s, -1, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+    if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // positive diagonal
     sq = best_square(b, s, 1, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+    if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
@@ -121,19 +121,19 @@ void best_ortho_squares(const Board & b, Square s, Move * moves, IndexCounter & 
 
     // vertical
     Square sq = best_square(b, s, 0, yd, scores);
-    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+    if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // left
     sq = best_square(b, s, -1, 0, scores);
-    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+    if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // right
     sq = best_square(b, s, 1, 0, scores);
-    if (sq != SQUARE_SENTINEL && move_counter.has_space()) {
+    if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
@@ -177,7 +177,7 @@ bool check_squares_for_castling(
         const Gamestate & gs, const Square ksq1, const Square ksq2, const Square long_castle_square) {
 
     if (gs.board.get(ksq1) != EMPTY || gs.board.get(ksq2) != EMPTY
-            || (long_castle_square != SQUARE_SENTINEL && gs.board.get(long_castle_square) != EMPTY)) {
+            || (!is_sentinel(long_castle_square) && gs.board.get(long_castle_square) != EMPTY)) {
         return false;
     }
 
@@ -192,7 +192,7 @@ bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCou
 
     bool found = false;
 
-    if (gs.board.get_white() && s == stosq("e1")) {
+    if (gs.board.get_white() && equal(s, stosq("e1"))) {
         if (gs.board.get_cas_ws() && check_squares_for_castling(gs, stosq("f1"), stosq("g1"), SQUARE_SENTINEL)) {
             if (counter.has_space()) {
                 moves[counter.inc()] = Move{stosq("e1"), stosq("g1"), 0};
@@ -205,7 +205,7 @@ bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCou
                 found = true;
             }
         }
-    } else if (!gs.board.get_white() && s == stosq("e8")) {
+    } else if (!gs.board.get_white() && equal(s, stosq("e8"))) {
         if (gs.board.get_cas_bs() && check_squares_for_castling(gs, stosq("f8"), stosq("g8"), SQUARE_SENTINEL)) {
             if (counter.has_space()) {
                 moves[counter.inc()] = Move{stosq("e8"), stosq("g8"), 0};

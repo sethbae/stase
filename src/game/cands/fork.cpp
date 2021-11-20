@@ -21,7 +21,7 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
             Square forked_square = mksq(get_x(fork_square) + XKN[k], get_y(fork_square) + YKN[k]);
 
             if (!val(forked_square)
-                || forked_square == s) {
+                || equal(forked_square, s)) {
                 continue;
             }
 
@@ -110,7 +110,7 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
         Square forked_piece_square =
                 first_piece_encountered(gs.board, move.to, DeltaPair{(Byte) XD[i], (Byte) YD[i]});
 
-        if (forked_piece_square != SQUARE_SENTINEL
+        if (!is_sentinel(forked_piece_square)
                 && forkable(gs, move, forked_piece_square)) {
             ++count;
         }

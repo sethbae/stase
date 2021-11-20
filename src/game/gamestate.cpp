@@ -66,7 +66,7 @@ Gamestate::Gamestate(const Gamestate & o) {
             FeatureFrame frames[64];
 
             int j = 0;
-            while (o.feature_frames[i][j].centre != SQUARE_SENTINEL) {
+            while (!is_sentinel(o.feature_frames[i][j].centre)) {
                 frames[j] = o.feature_frames[i][j];
                 ++j;
             }

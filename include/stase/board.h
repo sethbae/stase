@@ -6,11 +6,46 @@
 
 typedef uint_fast8_t Byte;
 typedef uint_fast32_t Int;
-typedef uint_fast8_t Square;
 typedef Byte Piece;
 typedef uint64_t Bitmap;
 
-const Square SQUARE_SENTINEL = 0xFF;
+struct Square {
+    Byte x;
+    Byte y;
+};
+
+const Square SQUARE_SENTINEL{0xFF, 0xFF};
+
+constexpr Square mksq(Byte x, Byte y) { return Square{x, y}; }
+inline bool equal(const Square & a, const Square & b) { return a.x == b.x && a.y == b.y; }
+inline bool is_sentinel(const Square & s) { return s.x == 0xFF || s.y == 0xFF; }
+
+/* helper functions for transforming a square */
+void inc_x(Square &);
+void dec_x(Square &);
+void inc_y(Square &);
+void dec_y(Square &);
+void diag_ur(Square &);
+void diag_ul(Square &);
+void diag_dr(Square &);
+void diag_dl(Square &);
+void reset_x(Square &);
+void reset_y(Square &);
+
+/* helper functions for getting info about a square */
+inline int get_y(const Square & s) { return s.y; }
+inline int get_x(const Square & s) { return s.x; }
+
+inline bool val_x(const Square & s) {
+    return s.x < 8;
+}
+inline bool val_y(const Square & s) {
+    return s.y < 8;
+}
+inline bool val(const Square & s) {
+    return s.x < 8 && s.y < 8;
+}
+
 
 /* enumeration of the types of pieces primarily, but also for other useful properties,
     such as WHITE or BLACK, and KING or QUEEN */
@@ -95,42 +130,47 @@ struct Move {
 
 const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, 0, 0};
 
-inline bool is_sentinel(const Move m) { return m.from == SQUARE_SENTINEL; }
+inline bool is_sentinel(const Move m) { return equal(m.from, SQUARE_SENTINEL); }
+inline bool equal(const Move m1, const Move m2) {
+    return equal(m1.from, m2.from) && equal(m1.to, m2.to);
+}
 
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {
 
-    /* board and configuration word */
-    mutable Byte squares[8][4];
+    mutable Byte squares[8][8];
     Int conf;
 
-    /* get/set squares */
-    Piece get(const Square &) const;
-    void set(const Square &, const Piece);
+    inline Piece get(const int x, const int y) const {
+        return squares[x][y];
+    };
+    inline void set(const int x, const int y, const Piece p) {
+        squares[x][y] = p;
+    }
+    inline Piece get(const Square & s) const {
+        return squares[s.x][s.y];
+    };
+    inline void set(const Square & s, const Piece p) {
+        squares[s.x][s.y] = p;
+    }
 
-    /* used to cheat! Sneakily make or unmake a move */
     Piece sneak(const Move) const;
     void unsneak(const Move, const Piece) const;
 
-    /* change the position of the pieces, without affecting config */
     void mutate(const Move);
     void mutate_hard(const Move); // does not assume move flags are correctly set
 
-    /* create and return a new board, the succeeding position (config updated) */
     Board successor(const Move) const;
     Board successor_hard(const Move) const;
 
-    /* get/set the entire config word */
     void set_conf_word(Int);
     Int get_conf_word() const;
 
-    /* whose turn it is */
     bool get_white() const;
     void set_white(bool);
     void flip_white();
     Ptype colour_to_move() const;
 
-    /* castling rights */
     bool get_cas_ws() const;
     void set_cas_ws(bool);
     bool get_cas_wl() const;
@@ -140,14 +180,12 @@ struct Board {
     bool get_cas_bl() const;
     void set_cas_bl(bool);
 
-    /* en-passant */
     bool get_ep_exists() const;
     void set_ep_exists(bool);
-    unsigned get_ep_file() const;
-    void set_ep_file(unsigned);
+    Byte get_ep_file() const;
+    void set_ep_file(Byte);
     Square get_ep_sq() const;
 
-    /* half and whole moves */
     unsigned get_halfmoves() const;
     void set_halfmoves(unsigned);
     void inc_halfmoves();
@@ -179,26 +217,6 @@ void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
 Bitmap legal_piecemoves(const Board &, const Square);
 void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
-
-constexpr Square mksq(int x, int y) { return (Square) ((y << 4) | x); }
-
-/* helper functions for transforming a square */
-void inc_x(Square &);
-void dec_x(Square &);
-void inc_y(Square &);
-void dec_y(Square &);
-void diag_ur(Square &);
-void diag_ul(Square &);
-void diag_dr(Square &);
-void diag_dl(Square &);
-void reset_x(Square &);
-void reset_y(Square &);
-/* helper functions for getting info about a square */
-int get_y(const Square &);
-int get_x(const Square &);
-bool val_y(const Square &);
-bool val_x(const Square &);
-bool val(const Square &);
 
 /* string functions for pieces, squares etc */
 char ptoc(const Piece);
