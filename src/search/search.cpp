@@ -139,7 +139,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
     COUNT++;
 
     Gamestate *new_gs = new Gamestate;
-    new_gs->board = gs.board.successor(m);
+    new_gs->board = gs.board.successor_hard(m);
 
     SearchNode *new_node = new SearchNode;
     new_node->gs = new_gs;
@@ -147,6 +147,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
     new_node->move = m;
     new_node->num_children = 0;
     new_node->children = nullptr;
+    new_node->best_child = nullptr;
 
     return new_node;
 
@@ -223,10 +224,6 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 
         node->num_children = moves.size();
 
-        update_score(node);
-
-        return;
-
     } else {
 
         // deepen tree on each child recursively, updating a/b
@@ -241,9 +238,10 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
                 beta = score;
             }
         }
-
-        update_score(node);
     }
+
+    update_score(node);
+
 }
 
 void deepen_tree(SearchNode * root) {
@@ -301,7 +299,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         }
     }
 
-    record_tree_in_file("stase_tree", &root);
+    // record_tree_in_file("stase_tree", &root);
 
     return moves;
 }

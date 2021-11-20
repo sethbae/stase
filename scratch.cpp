@@ -148,9 +148,13 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
 
 int main(int argc, char** argv) {
 
-    Gamestate gs(fen_to_board("2q2r1k/8/5Pp1/2p1p1Pp/N1QbP3/3R2K1/P1P5/3R4 w - h6 0 37"));
+    const std::string fen = "2q2r1k/8/5Pp1/2p1p1Pp/N1QbP3/3R2K1/P1P5/3R4 w - h6 0 37";
+
+    Gamestate gs(fen_to_board(fen));
 
     pr_board_conf(gs.board);
+
+    iterative_deepening_search(fen, 10);
 
     return 0;
 

@@ -40,7 +40,7 @@ struct Move {
 
 };
 
-const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, 0, 0};
+const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, SQUARE_SENTINEL, 0};
 
 inline bool is_sentinel(const Move m) { return equal(m.from, SQUARE_SENTINEL); }
 inline bool equal(const Move m1, const Move m2) {
