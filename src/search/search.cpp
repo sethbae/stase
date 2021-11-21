@@ -245,7 +245,6 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 }
 
 void deepen_tree(SearchNode * root) {
-    std::cout << "enter deepen tree\n";
     deepen_tree(root, white_has_been_mated(), black_has_been_mated());
 }
 
@@ -312,7 +311,6 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 void search_indefinite(SearchNode * root) {
     while (true) {
         deepen_tree(root);
-        record_tree_in_file("stase_tree", root);
     }
 }
 
