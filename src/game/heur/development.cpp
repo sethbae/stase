@@ -5,7 +5,7 @@ float development_metric(const Board & b) {
 
     int count = 0;
 
-    const Piece BACK_RANK[] = {
+    const Ptype BACK_RANK[] = {
             ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
     };
 

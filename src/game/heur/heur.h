@@ -49,20 +49,44 @@ extern const unsigned NUM_INNER_CENTRAL_SQUARES;
 extern const Square OUTER_CENTRAL_SQUARES[];
 extern const unsigned NUM_OUTER_CENTRAL_SQUARES;
 
-/*
- * Returns a positive integer representing the value of the piece in millipawns
+const int PAWN_VAL = 1000;
+const int BISHOP_VAL = 3000;
+const int KNIGHT_VAL = 3000;
+const int ROOK_VAL = 5000;
+const int QUEEN_VAL = 9000;
+const int KING_VAL = 9001;
+
+/**
+ * Returns a positive integer representing the value of the given piece type in millipawns.
  */
-inline int piece_value(const Piece p) {
-
-    switch (type(p)) {
-        case PAWN: return 1000;
-        case KNIGHT:
-        case BISHOP: return 3000;
-        case ROOK: return 5000;
-        case QUEEN: return 9000;
-        default: return 9001;
+constexpr int piece_value(const Ptype p) {
+    switch (p) {
+        case PAWN: return PAWN_VAL;
+        case KNIGHT: return KNIGHT_VAL;
+        case BISHOP: return BISHOP_VAL;
+        case ROOK: return ROOK_VAL;
+        case QUEEN: return QUEEN_VAL;
+        default: return KING_VAL;
     }
+}
 
+/**
+ * Returns a positive integer representing the value of the given piece in millipawns.
+ */
+constexpr int piece_value(const Piece p) {
+    switch (p) {
+        case W_PAWN: return PAWN_VAL;
+        case W_KNIGHT: return KNIGHT_VAL;
+        case W_BISHOP: return BISHOP_VAL;
+        case W_ROOK: return ROOK_VAL;
+        case W_QUEEN: return QUEEN_VAL;
+        case B_PAWN: return PAWN_VAL;
+        case B_KNIGHT: return KNIGHT_VAL;
+        case B_BISHOP: return BISHOP_VAL;
+        case B_ROOK: return ROOK_VAL;
+        case B_QUEEN: return QUEEN_VAL;
+        default: return KING_VAL;
+    }
 }
 
 int open_line_walk(const Board &, Square s, StepFunc*, MoveType);

@@ -230,7 +230,7 @@ bool evaluate_weak_test_case(const WeakTestCase * tc) {
             };
         }
 
-        Ptype colour =
+        Colour colour =
             strcmp(tc->colours[i].c_str(), "white") == 0
                 ? WHITE
                 : BLACK;

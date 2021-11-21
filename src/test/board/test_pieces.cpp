@@ -4,7 +4,7 @@
 struct PieceTestCase {
     Piece p;
     Ptype exp_type;
-    Ptype exp_colour;
+    Colour exp_colour;
 };
 
 const TestSet<PieceTestCase> piece_test_set{

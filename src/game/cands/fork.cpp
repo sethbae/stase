@@ -27,7 +27,8 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 
             Piece p = gs.board.get(forked_square);
 
-            if (colour(p) != colour(gs.board.get(s))
+            if (p != EMPTY
+                && colour(p) != colour(gs.board.get(s))
                 && type(p) != KNIGHT
                 && (would_be_unsafe_after(gs, forked_square, Move{s, fork_square})
                     || piece_value(p) > piece_value(KNIGHT))) {
@@ -206,7 +207,7 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
 
 void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
-    Ptype king_col = colour(gs.board.get(s));
+    Colour king_col = colour(gs.board.get(s));
 
     for (int i = 0; i < 8; ++i) {
 

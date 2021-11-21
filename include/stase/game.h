@@ -166,9 +166,9 @@ bool alpha_covers(const Board &, Square piece_sq, Square target_sq);
 bool beta_covers(const Board &, Square piece_sq, Square target_sq);
 bool gamma_covers(const Board &, Square piece_sq, Square target_sq);
 
-bool is_safe_king(const Gamestate &, const Ptype colour);
-bool would_be_safe_king_square(const Gamestate &, const Square, const Ptype colour);
-bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, const Ptype colour);
+bool is_safe_king(const Gamestate &, const Colour colour);
+bool would_be_safe_king_square(const Gamestate &, const Square, const Colour colour);
+bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, const Colour colour);
 
 int control_count(const Board &, Square);
 void display_control_counts(const Board &);
@@ -186,11 +186,11 @@ struct SquareControlStatus {
     int min_b = 0;
 };
 SquareControlStatus evaluate_square_status(const Gamestate &, const Square);
-bool is_weak_status(const Gamestate &, const Square, const Ptype colour, SquareControlStatus);
+bool is_weak_status(const Gamestate &, const Square, const Colour colour, SquareControlStatus);
 
 // weak squares/unsafe pieces
-bool is_weak_square(const Gamestate &, const Square, const Ptype colour);
-bool would_be_weak_after(const Gamestate &gs, const Square s, const Ptype colour, const Move m);
+bool is_weak_square(const Gamestate &, const Square, const Colour colour);
+bool would_be_weak_after(const Gamestate &gs, const Square s, const Colour colour, const Move m);
 bool is_unsafe_piece(const Gamestate &, const Square);
 bool would_be_unsafe_after(const Gamestate &gs, const Square s, const Move m);
 

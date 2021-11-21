@@ -66,7 +66,7 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
         Piece p = b.get(temp);
 
-        if (colour(p) == EMPTY) {
+        if (p == EMPTY) {
             if (scores[y*8 + x] > best_val) {
                 // empty square
                 best_sq = temp;

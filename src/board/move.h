@@ -33,7 +33,7 @@ struct Move {
     int get_ep_file() const;
 
     Byte get_prom_shift() const;
-    Piece get_prom_piece(Ptype) const;
+    Piece get_prom_piece(Colour) const;
     void set_prom_piece(Ptype);
     Piece get_cap_piece() const;
     void set_cap_piece(Piece p);

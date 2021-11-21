@@ -1,3 +1,4 @@
+#include <iostream>
 #include "board.h"
 #include "cands.h"
 #include "game.h"
@@ -10,7 +11,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     const Square s = ff->centre;
     const Board & b = gs.board;
-    const Ptype defending_colour = b.get_white() ? WHITE : BLACK;
+    const Colour defending_colour = b.get_white() ? WHITE : BLACK;
 
     Square piece_squares[16];
     int pieces_point = 0;

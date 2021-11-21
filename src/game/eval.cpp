@@ -24,7 +24,7 @@ Eval zero() {
     return OFFSET;
 }
 
-Eval mate_in(Ptype colour, unsigned num) {
+Eval mate_in(Colour colour, unsigned num) {
     return (colour == WHITE) ? white_mates_in(num) : black_mates_in(num);
 }
 

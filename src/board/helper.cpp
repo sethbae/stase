@@ -184,7 +184,7 @@ string mtos(const Board & b, const Move m) {
     }
 
     string s = "";
-    Ptype piece_colour = colour(b.get(m.from));
+    Colour piece_colour = colour(b.get(m.from));
 
     bool castle = (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
     bool capture = (b.get(m.to) != EMPTY);
@@ -228,7 +228,7 @@ string mtos(const Board & b, const Move m) {
     }
     
     // add + for check
-    Ptype opposite_colour = (piece_colour == WHITE) ? BLACK : WHITE;
+    Colour opposite_colour = (piece_colour == WHITE) ? BLACK : WHITE;
     if (in_check_hard(b, opposite_colour)) {
         s += "+";
     }

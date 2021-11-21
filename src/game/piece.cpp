@@ -48,7 +48,7 @@ inline int alpha_walk(const Board & b, const Square s, StepFunc *step) {
     while (val(temp) && cont) {
 
         Piece otherp = b.get(temp);
-        if (type(otherp) == EMPTY) {
+        if (otherp == EMPTY) {
             ++sum;
         } else {
             // ALPHA: only count empty squares
@@ -122,7 +122,7 @@ inline int beta_walk(const Board & b, const Square s, StepFunc *step) {
     while (val(temp) && cont) {
 
         Piece otherp = b.get(temp);
-        if (type(otherp) == EMPTY) {
+        if (otherp == EMPTY) {
             ++sum;
         } else {
             // BETA: count the endpoint
@@ -195,7 +195,7 @@ inline int gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType 
     while (val(temp) && cont) {
 
         Piece otherp = b.get(temp);
-        if (type(otherp) == EMPTY) {
+        if (otherp == EMPTY) {
             ++sum;
         } else {
             // gamma: x-ray
@@ -276,10 +276,10 @@ int control_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) 
 
         Piece otherp = b.get(temp);
 
-        if ((type(otherp) != EMPTY) && can_move_in_direction(otherp, dir)) {
+        if ((otherp != EMPTY) && can_move_in_direction(otherp, dir)) {
             // any piece which can move in the right dir? account and continue
             sum += ((colour(otherp) == WHITE) ? 1 : -1);
-        } else  if (type(otherp) != EMPTY) {
+        } else  if (otherp != EMPTY) {
             // blocking piece, abort
             cont = false;
         }

@@ -66,7 +66,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
         int x_inc = XD[i], y_inc = YD[i];
         bool cont = true;
         bool x_ray = false;
-        Ptype x_ray_colour = INVALID;
+        Colour x_ray_colour = INVALID_COLOUR;
         bool poly_x_ray = false;
 
         x = get_x(s) + x_inc, y = get_y(s) + y_inc;
@@ -76,7 +76,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
 
             Piece p = b.get(temp);
 
-            if ((type(p) != EMPTY) && can_move_in_direction(p, dir)) {
+            if ((p != EMPTY) && can_move_in_direction(p, dir)) {
 
                 // attacking piece found: update (poly) x-ray info and balances
 
@@ -117,7 +117,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
                 x_ray = true;
                 x_ray_colour = colour(p);
 
-            } else  if (type(p) != EMPTY) {
+            } else  if (p != EMPTY) {
                 // blocking piece: abort
                 cont = false;
             }
@@ -275,7 +275,7 @@ SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s)
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  */
-bool is_weak_status(const Gamestate & gs, const Square s, const Ptype c, SquareControlStatus ss) {
+bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, SquareControlStatus ss) {
 
     if (gs.board.get(s) == EMPTY) {
         return c == WHITE
@@ -348,7 +348,7 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Ptype c, SquareC
  * However, there is more complicated logic regarding the interaction of x-rays when pieces are
  * on the same diagonal/orthogonal line.
  */
-bool is_weak_square(const Gamestate & gs, const Square s, const Ptype c) {
+bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
     return is_weak_status(gs, s, c, capture_walk(gs.board, s));
 }
 
@@ -356,7 +356,7 @@ bool is_weak_square(const Gamestate & gs, const Square s, const Ptype c) {
  * Calculates exactly the same thing as is_weak_square, but after the given move has
  * taken place.
  */
-bool would_be_weak_after(const Gamestate & gs, const Square s, const Ptype c, const Move m) {
+bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, const Move m) {
 
     Piece sneaked_piece = gs.board.sneak(m);
     bool weak = is_weak_square(gs, s, c);

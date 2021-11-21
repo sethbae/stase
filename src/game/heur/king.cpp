@@ -14,7 +14,7 @@ int pk_count(const Board & b, const Square s) {
     int score = 0;
     int x = get_x(s);
     int y = get_y(s);
-    Ptype king_col = colour(b.get(s));
+    Colour king_col = colour(b.get(s));
     int delta = (king_col == WHITE) ? 1 : -1;
 
     // check for unusual king locations and return 0
@@ -175,7 +175,7 @@ float control_near_king_metric(const Board & b) {
  * then it is returned - otherwise 0 is returned
  */
 int exposure_count(const Board & b, const Square s,
-                   StepFunc *step, MoveType dir, Ptype col) {
+                   StepFunc *step, MoveType dir, Colour col) {
 
     Square sq = s;
     int control_count = 0, length = 0;
@@ -213,7 +213,7 @@ int exposure_count(const Board & b, const Square s,
  */
 int one_king_exposure(const Board & b, const Square s) {
 
-    Ptype col = colour(b.get(s));
+    Colour col = colour(b.get(s));
     int score = 0;
 
     Square ahead = mksq(get_x(s), get_y(s) + 1);

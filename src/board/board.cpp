@@ -152,7 +152,7 @@ void Board::set_white(bool b) {
         conf &= ~WHITE_MASK;
 }
 void Board::flip_white() { conf ^= WHITE_MASK; }
-Ptype Board::colour_to_move() const {
+Colour Board::colour_to_move() const {
     return (conf & WHITE_MASK) ? WHITE : BLACK;
 }
 
@@ -231,7 +231,7 @@ void Board::inc_wholemoves() { conf += (1 << 16); }
 /* change the position of the pieces, without affecting config */
 void Board::mutate(const Move m) {
     
-    Ptype col = colour_to_move();
+    Colour col = colour_to_move();
     
     // castling
     if (m.is_cas()) {   

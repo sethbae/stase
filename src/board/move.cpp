@@ -70,9 +70,9 @@ Byte Move::get_prom_shift() const {
 }
 
 // return the actual piece, given the colour it should be
-Piece Move::get_prom_piece(Ptype col) const {
+Piece Move::get_prom_piece(Colour col) const {
     Piece p = (col == WHITE) ? W_QUEEN : B_QUEEN;
-    return p + get_prom_shift();
+    return (Piece) (p + get_prom_shift());
 }
 
 void Move::set_prom_piece(Ptype p) {
@@ -115,7 +115,7 @@ void line_search(const Board & b, const Square s,
     while ((*valid)(temp) && cont) {
         //cout << sqtos(temp);
         Piece otherp = b.get(temp);
-        if (type(otherp) == EMPTY) {
+        if (otherp == EMPTY) {
             //cout << "e ";
             m.to = temp;
             moves.push_back(m);
@@ -155,7 +155,7 @@ void diag(const Board & b, const Square start_sq, vector<Move> & moves) {
 void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 
     int x = get_x(s), y = get_y(s);
-    Ptype knightcol = colour(b.get(s));
+    Colour knightcol = colour(b.get(s));
     Square sq;
     
     Move m = empty_move();
@@ -164,7 +164,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     // for (int i = 0; i < 8; ++i) {
     //     if (val(sq = mksq(x + knight_dirs[i][0], y + knight_dirs[i][1])) && colour(b.get(sq)) != knightcol) {
     //         m.to = sq;
-    //         if (type(b.get(sq)) != EMPTY) {
+    //         if (b.get(sq) != EMPTY) {
     //             m.set_cap();
     //             m.set_cap_piece(b.get(sq));
     //         }
@@ -175,7 +175,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -185,7 +185,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 1, y - 2)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -195,7 +195,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 2, y + 1)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -205,7 +205,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 2, y - 1)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -215,7 +215,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 1, y + 2)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -225,7 +225,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 1, y - 2)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -235,7 +235,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 2, y + 1)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -245,7 +245,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -256,7 +256,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 }
 
 // checks the kings castling squares are empty and check-free: nothing more
-bool castle_checks(Board b, const Ptype col, const bool kingside) {
+bool castle_checks(Board b, const Colour col, const bool kingside) {
     
     Square s1, s2, s3; // intermediate squares
     Square k = (col == WHITE) ? mksq(4, 0) : mksq(4, 7); // king starting square
@@ -345,7 +345,7 @@ bool castle_checks(Board b, const Ptype col, const bool kingside) {
 
 void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
-    Ptype kingcol = colour(b.get(s));
+    Colour kingcol = colour(b.get(s));
     Square sq;
     Move m = empty_move();
     m.from = s;
@@ -399,7 +399,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     //     for (int j = 0; j < 3; ++j) {
     //         if (val(sq = mksq(adj[i], adj[j])) && colour(b.get(sq)) != kingcol) {
     //             m.to = sq;
-    //             if (type(b.get(sq)) != EMPTY) {
+    //             if (b.get(sq) != EMPTY) {
     //                 m.set_cap();
     //                 m.set_cap_piece(b.get(sq));
     //             }
@@ -414,7 +414,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     int x = get_x(s), y = get_y(s);
     if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -424,7 +424,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -434,7 +434,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -444,7 +444,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -454,7 +454,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -464,7 +464,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -474,7 +474,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -484,7 +484,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol) {
         m.to = sq;
-        if (type(b.get(sq)) != EMPTY) {
+        if (b.get(sq) != EMPTY) {
             m.set_cap();
             m.set_cap_piece(b.get(sq));
         }
@@ -497,7 +497,7 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
 void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
        
     int x = get_x(s), y = get_y(s);
-    Ptype pawncolour = colour(b.get(s));
+    Colour pawn_colour = colour(b.get(s));
     Square sq;
     
     Move m = empty_move();
@@ -505,9 +505,9 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
     
     int FORWARD;
     int START_RANK;
-    Ptype capture_colour;
+    Colour capture_colour;
     
-    if (pawncolour == WHITE) {
+    if (pawn_colour == WHITE) {
         FORWARD = 1;
         START_RANK = 1;
         capture_colour = BLACK;
@@ -589,7 +589,7 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
         if (epfile == x + 1 || epfile == x - 1) {
             m.to = mksq(epfile, y + FORWARD);
             m.set_cap();
-            m.set_cap_piece((pawncolour == WHITE) ? B_PAWN : W_PAWN);
+            m.set_cap_piece((pawn_colour == WHITE) ? B_PAWN : W_PAWN);
             m.set_ep();
             moves.push_back(m);
         }
@@ -649,7 +649,7 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
 
         Piece otherp = b.get(sq);
         
-        if (type(otherp) != EMPTY) {  
+        if (otherp != EMPTY) {
             return otherp == p1 || otherp == p2;
         }
         step(sq);
@@ -660,7 +660,7 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
 }
 
 /* returns true iff the player of the given colour is in check */
-bool in_check_hard(const Board & b, Ptype col) {
+bool in_check_hard(const Board & b, Colour col) {
     
     bool white = (col == WHITE);
     Piece king = (white) ? W_KING : B_KING;
@@ -807,7 +807,7 @@ void legal_piecemoves(const Board & b, const Square s, vector<Move> & moves) {
 
 void legal_moves(const Board & b, vector<Move> & moves) {
     
-    Ptype col = b.get_white() ? WHITE : BLACK;
+    Colour col = b.get_white() ? WHITE : BLACK;
     
     // get moves for every piece on the board
     for (int x = 0; x < 8; ++x) {

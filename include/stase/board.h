@@ -9,9 +9,8 @@
 #include "../../src/board/move.h"
 
 /* query information about a given piece */
-Ptype piece(Piece);
-Ptype type(Piece);
-Ptype colour(Piece);
+constexpr Ptype type(const Piece);
+constexpr Colour colour(const Piece);
 bool is_white(Piece);
 bool is_minor_piece(Piece);
 bool is_major_piece(Piece);
@@ -20,7 +19,7 @@ bool is_not_pk(Piece);
 /* a chess board! with full game state, such as castling rights, etc */
 struct Board {
 
-    mutable Byte squares[8][8];
+    mutable Piece squares[8][8];
     Int conf;
 
     inline Piece get(const int x, const int y) const {
@@ -51,7 +50,7 @@ struct Board {
     bool get_white() const;
     void set_white(bool);
     void flip_white();
-    Ptype colour_to_move() const;
+    Colour colour_to_move() const;
 
     bool get_cas_ws() const;
     void set_cas_ws(bool);
@@ -91,7 +90,7 @@ std::vector<std::string> read_pgn(const std::string &s);
 void piecemoves(const Board &, const Square, std::vector<Move> &);
 void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 bool in_check_hard(const Board &);
-bool in_check_hard(const Board &, Ptype); // (colour specified)
+bool in_check_hard(const Board &, Colour);
 bool in_check_attack_map(const Board &, Ptype);
 void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
 void legal_moves(const Board &, std::vector<Move> &);

@@ -15,7 +15,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     const Square s = ff->centre;
     const Board & b = gs.board;
     const int local_reset_point = counter.idx();
-    const Ptype capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
+    const Colour capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
     const int weakest_defender = (capturing_colour == WHITE) ? ff->conf_2 : ff->conf_1;
 
     int min_value_seen = piece_value(W_KING) + 1;
@@ -38,7 +38,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
             Piece p = b.get(temp);
 
-            if ((type(p) != EMPTY) && can_move_in_direction(p, dir) && colour(p) == capturing_colour) {
+            if ((p != EMPTY) && can_move_in_direction(p, dir) && colour(p) == capturing_colour) {
                 // piece of the right colour which can move in the right dir: check value
                 int val = piece_value(p);
                 if (val <= weakest_defender) {
@@ -59,7 +59,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                 }
                 // no x-rays!
                 break;
-            } else if (type(p) != EMPTY) {
+            } else if (p != EMPTY) {
                 // blocking piece: abort
                 break;
             }

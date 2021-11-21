@@ -4,7 +4,7 @@
  * Looks for attackers of the opposite colour to the given king_colour by working outwards from
  * the square [s] along the given [delta]. Returns true if an attacker is found, false otherwise.
  */
-bool seek_attackers(const Board & b, const Square s, const Ptype king_colour, const DeltaPair delta) {
+bool seek_attackers(const Board & b, const Square s, const Colour king_colour, const DeltaPair delta) {
 
     Square temp;
     MoveType dir = direction_of_delta(delta);
@@ -34,7 +34,7 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
     Square temp;
     int x = get_x(s);
     int y = get_y(s);
-    Ptype king_colour = colour(gs.board.get(s));
+    Colour king_colour = colour(gs.board.get(s));
 
     // sliding directions
     for (int i = 0; i < 8; ++i) {
@@ -104,7 +104,7 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
  * square given, although note that there is no requirement for this move to be legal.
  * @param colour: the colour of the king to check this for.
  */
-bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Ptype colour) {
+bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colour colour) {
 
     Piece king = (colour == WHITE) ? W_KING : B_KING;
     Square k_sq;
@@ -130,7 +130,7 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Ptype
  * same way as would_be_safe_king_square above, except that it treats the board as if
  * the given move had already been played.
  */
-bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Ptype colour) {
+bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Colour colour) {
 
     Piece sneaked_piece = gs.board.sneak(m);
     bool result = would_be_safe_king_square(gs, s, colour);
@@ -145,7 +145,7 @@ bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Mo
  * the duplication is that the slow and reliable variation can be used to check the correctness of the
  * performance-critical version.
  */
-bool is_safe_king(const Gamestate & gs, const Ptype king_colour) {
+bool is_safe_king(const Gamestate & gs, const Colour king_colour) {
     Piece king = (king_colour == WHITE) ? W_KING : B_KING;
     Square k_sq;
 
