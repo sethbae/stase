@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(OPT_FLAGS -Ofast)
 
-SET(CMAKE_CXX_FLAGS "-pthread ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
+SET(CMAKE_CXX_FLAGS "-pthread -g -rdynamic ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
 
 set(SOURCE_FILES
         src/board/square.h

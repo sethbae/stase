@@ -179,16 +179,15 @@ int exposure_count(const Board & b, const Square s,
 
     Square sq = s;
     int control_count = 0, length = 0;
-    Piece p = b.get(sq);
+    Piece p;
 
-    while (val(sq) && type(p) != PAWN) {
+    while (val(sq) && type(p = b.get(sq)) != PAWN) {
         if (can_move_in_direction(p, dir)) {
             control_count += (colour(p) == WHITE ? 1 : -1);
         }
         ++length;
         // move to next iteration
         (*step)(sq);
-        p = b.get(sq);
     }
 
     /*

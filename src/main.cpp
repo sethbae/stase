@@ -8,8 +8,26 @@ using std::vector;
 using std::string;
 #include <unistd.h>
 
+#include <execinfo.h>
+#include <signal.h>
+
 #include "board.h"
 #include "search.h"
+
+void print_stack_trace(int sig) {
+
+    void *array[25];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 25);
+
+    // print out all the frames
+    fprintf(stdout, "Error: signal %d:\n", sig);
+    backtrace_symbols_fd(array, size, STDOUT_FILENO);
+
+    exit(1);
+}
 
 const std::string welcome_message =
         "Welcome to Stase v4.0\n";
@@ -147,6 +165,8 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 int main() {
 
     cout << welcome_message;
+
+    signal(SIGSEGV, print_stack_trace);
 
     play_game(false, 10);
 

@@ -92,7 +92,7 @@ void write_to_file(SearchNode *node, ostream & output) {
         // list of children and names
         for (int i = 0; i < node->num_children; ++i) {
             output << "Child " << i << ": " << node->children[i]
-                   << " (" << mtos(node->children[i]->gs->board, node->children[i]->move)
+                   << " (" << mtos(node->gs->board, node->children[i]->move)
                    << ") (" << etos(node->children[i]->score) << ")\n";
         }
     }
@@ -245,6 +245,7 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 }
 
 void deepen_tree(SearchNode * root) {
+    std::cout << "enter deepen tree\n";
     deepen_tree(root, white_has_been_mated(), black_has_been_mated());
 }
 
@@ -311,6 +312,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 void search_indefinite(SearchNode * root) {
     while (true) {
         deepen_tree(root);
+        record_tree_in_file("stase_tree", root);
     }
 }
 
