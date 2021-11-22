@@ -240,7 +240,7 @@ int one_king_exposure(const Board & b, const Square s) {
     return score;
 }
 
-/*
+/**
  * Combines two calls to one_king_exposure into a metric.
  */
 float king_exposure_metric(const Board & b) {

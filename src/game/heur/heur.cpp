@@ -9,65 +9,6 @@ using std::string;
 #include "board.h"
 #include "heur.h"
 
-/*
- * The order of this list is very important. It should correspond to the order
- * in which weights appear in the weights index below.
- *
- * REMEMBER TO UPDATE THE NUMBER OF METRICS USED (constant defined below)
- */
-Metric* const METRICS[] = {
-    &piece_activity_alpha_metric,
-    &piece_activity_beta_metric,
-    &piece_activity_gamma_metric,
-    &open_line_control_metric,
-    &centre_control_metric,
-    &defended_pawns_metric,
-    &development_metric,
-    &isolated_pawns_metric,
-    &central_pawns_metric,
-    &far_advanced_pawns_metric,
-    &pawns_defend_king_metric,
-    &control_near_king_metric,
-    &king_exposure_metric,
-};
-const string METRIC_NAMES[] = {
-    "Alpha activity",
-    "Beta activity", 
-    "Gamma activity", 
-    "Open line control",
-    "Centre control",
-    "Defended pawns",
-    "Development",
-    "Isolanis",
-    "Central pawns",
-    "Far advanced pawns",
-    "Pawns defend king",
-    "Control near king",
-    "King exposure",
-};
-/*
- * The weights here are mapped by index, according to the comments and the ordering
- * of the metrics in the array above.
- * REMEMBER TO UPDATE THE NUMBER OF METRICS USED (constant defined below)
- */
-const int WEIGHTS[] = {
-    600,   // piece activity: alpha
-    600,    // beta
-    600,    // gamma
-    1000,   // open line
-    1500,   // centre control
-    500,    // defended pawns
-    500,    // development
-    400,    // isolanis
-    400,    // central pawns
-    400,    // far advanced pawns
-    750,    // pawns defending king
-    750,    // control near king
-    750,    // king exposure
-};
-const unsigned METRICS_IN_USE = 13;
-
-
 // the central 16 squares
 const Square CENTRAL_SQUARES[] = {
     stosq("c6"), stosq("d6"), stosq("e6"), stosq("f6"),
@@ -123,8 +64,8 @@ Eval heur(const Gamestate & gs) {
     
     Eval ev = zero();
     
-    for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
-        int score = (int)(METRICS[i](gs.board) * (float)WEIGHTS[i]);
+    for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
+        int score = (int)(ALL_METRICS[i].metric(gs.board) * (float)ALL_METRICS[i].weight);
         ev += score;
     }
     
@@ -144,15 +85,15 @@ Eval heur_with_description(const Gamestate & gs) {
     cout << setw(20) << "Material balance" << ": " << std::right << setw(26) << mat_bal << "\n";
 
     Eval ev = zero();
-    for (unsigned i = 0; i < METRICS_IN_USE; ++i) {
-        float score = METRICS[i](gs.board);
-        int weighted_score = (int)(score * (float)WEIGHTS[i]);
+    for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
+        float score = ALL_METRICS[i].metric(gs.board);
+        int weighted_score = (int)(score * (float)ALL_METRICS[i].weight);
         ev += weighted_score;
         
-        cout << std::left << setw(20) << METRIC_NAMES[i] << ": "
+        cout << std::left << setw(20) << ALL_METRICS[i].name << ": "
                 << std::right << setw(8) << score 
                 << " * " 
-                << setw(6) << WEIGHTS[i] 
+                << setw(6) << ALL_METRICS[i].weight
                 << " = " 
                 << setw(6) << weighted_score
                 << "\n";
