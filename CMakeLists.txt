@@ -50,6 +50,7 @@ set(SOURCE_FILES
         src/game/cands/fork.cpp
         src/game/cands/trade_retreat_desperado.cpp
         src/game/cands/checks.cpp
+        src/game/cands/king_pins.cpp
 
         src/utils/utils.h
         src/utils/print.cpp)
