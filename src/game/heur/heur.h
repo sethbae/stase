@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-/*
+/**
  * Metrics measure concretely some element of the board and score it as in favour of white
  * or black. They should not anticipate pieces moving: tactics should play out elsewhere.
  * Thus it is the (somewhat unreliable) assumption that here, we have a quiescent position,
@@ -17,27 +17,11 @@
  * Each metric maps the board to a float. They return a positive (resp. negative)
  * number -1 <= x <= 1 indicating favour to one side or another.
  */
-typedef float Metric(const Board &);
-
-/*
- * List of all metrics
- */
-extern Metric* const METRICS[];
-
-/*
- * List of all metric names
- */
-extern const std::string METRIC_NAMES[];
-
-/*
- * The weights assigned to each metric
- */
-extern const int WEIGHTS[];
-
-/*
- * The number of metrics being used
- */
-extern const unsigned METRICS_IN_USE;
+struct Metric {
+    const std::string name;
+    const int weight;
+    float (*metric)(const Board &);
+};
 
 /*
  * Useful collections of squares
@@ -93,34 +77,111 @@ int open_line_walk(const Board &, Square s, Delta, MoveType);
 int half_line_walk(const Board &, Square, Delta, MoveType);
 int count_pawns(const Board &, Square, Delta);
 
-/*
- * Piece activity (also declared in game.h, but repeated here for clarity).
- */
-Metric piece_activity_alpha_metric;
-Metric piece_activity_beta_metric;
-Metric piece_activity_gamma_metric;
+// piece activity
+float piece_activity_alpha_metric(const Board &);
+float piece_activity_beta_metric(const Board &);
+float piece_activity_gamma_metric(const Board &);
 
-/*
- * File and centre control metrics (again, redeclared for clarity).
- */
-Metric open_line_control_metric;
-Metric centre_control_metric;
+// line control
+float open_line_control_metric(const Board &);
+float centre_control_metric(const Board &);
 
-/*
- * Metrics related to pawn structure
- */
-Metric defended_pawns_metric;
-Metric isolated_pawns_metric;
-Metric central_pawns_metric;
-Metric far_advanced_pawns_metric;
+// pawn structure metrics
+float defended_pawns_metric(const Board &);
+float isolated_pawns_metric(const Board &);
+float central_pawns_metric(const Board &);
+float far_advanced_pawns_metric(const Board &);
 
-Metric development_metric;
+// opening metrics
+float development_metric(const Board &);
 
-/*
- * King safety metrics
- */
-Metric pawns_defend_king_metric;
-Metric control_near_king_metric;
-Metric king_exposure_metric;
+// king safety metrics
+float pawns_defend_king_metric(const Board &);
+float control_near_king_metric(const Board &);
+float king_exposure_metric(const Board &);
+
+const Metric __piece_activity_alpha_metric{
+    "piece-activity-alpha",
+    600,
+    &piece_activity_alpha_metric
+};
+const Metric __piece_activity_beta_metric{
+    "piece-activity-beta",
+    600,
+    &piece_activity_beta_metric
+};
+const Metric __piece_activity_gamma_metric{
+    "piece-activity-gamma",
+    600,
+    &piece_activity_gamma_metric
+};
+const Metric __open_line_control_metric{
+    "open-line-control",
+    1000,
+    &open_line_control_metric
+};
+const Metric __centre_control_metric{
+    "centre-control",
+    1500,
+    &centre_control_metric
+};
+const Metric __defended_pawns_metric{
+    "defended-pawns",
+    500,
+    &defended_pawns_metric
+};
+const Metric __isolated_pawns_metric{
+    "isolated-pawns",
+    400,
+    &isolated_pawns_metric
+};
+const Metric __central_pawns_metric{
+    "central-pawns",
+    400,
+    &central_pawns_metric
+};
+const Metric __far_advanced_pawns_metric{
+    "far-advanced-pawns",
+    400,
+    &far_advanced_pawns_metric
+};
+const Metric __development_metric{
+    "development",
+    500,
+    &development_metric
+};
+const Metric __pawns_defend_king_metric{
+    "pawns-defend-king",
+    750,
+    &pawns_defend_king_metric
+};
+const Metric __control_near_king_metric{
+    "control-near-king",
+    750,
+    &control_near_king_metric
+};
+const Metric __king_exposure_metric{
+    "king-exposure",
+    750,
+    &king_exposure_metric
+};
+
+const std::vector<const Metric *> ALL_METRICS{
+
+    &__piece_activity_alpha_metric,
+    &__piece_activity_beta_metric,
+    &__piece_activity_gamma_metric,
+    &__open_line_control_metric,
+    &__centre_control_metric,
+    &__defended_pawns_metric,
+    &__isolated_pawns_metric,
+    &__central_pawns_metric,
+    &__far_advanced_pawns_metric,
+    &__development_metric,
+    &__pawns_defend_king_metric,
+    &__control_near_king_metric,
+    &__king_exposure_metric
+
+};
 
 #endif //STASE_HEUR_H
