@@ -47,4 +47,39 @@ inline bool equal(const Move m1, const Move m2) {
     return equal(m1.from, m2.from) && equal(m1.to, m2.to);
 }
 
+enum MoveType {
+    ORTHO = 0,
+    DIAG = 1,
+    KNIGHT_MOVE = 2,
+    PAWN_MOVE = 3,
+    KING_MOVE = 4,
+    INVALID_MOVE = 5
+};
+
+struct Delta {
+    SignedByte dx;
+    SignedByte dy;
+};
+const Delta INVALID_DELTA = { 127, 127 };
+inline bool is_valid_delta(const Delta d) { return d.dx != 127 && d.dy != 127; }
+inline MoveType direction_of_delta(const Delta d) {
+    return (d.dx == 0 || d.dy == 0) ? ORTHO : DIAG;
+}
+Delta get_delta_between(const Square, const Square);
+
+/**
+ * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
+ * Given values in gamestate.cpp
+ */
+extern const SignedByte XD[];
+extern const SignedByte YD[];
+extern const SignedByte XKN[];
+extern const SignedByte YKN[];
+
+// constants for iterating over the directions
+const unsigned DIAG_START  = 0;
+const unsigned DIAG_STOP   = 4;
+const unsigned ORTHO_START = 4;
+const unsigned ORTHO_STOP  = 8;
+
 #endif //STASE_MOVE_H

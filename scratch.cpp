@@ -14,40 +14,6 @@ using std::ofstream;
 #include "src/test/test.h"
 #include <unistd.h>
 
-
-//
-//void record_tree_in_file(const std::string & filename, const SearchNode * nodes) {
-//
-//    ofstream file;
-//    file.open(filename, std::ios::out);
-//
-//    file << "This file contains engine analysis of the following position\n";
-//
-//    readable_printout(nodes, file);
-//
-//    file << "NB score is inherited from best successors, computed only for leaves\n";
-//    file << "\nHere are the nodes:\n";
-//
-//    write_to_file(nodes[nodes.size() - 1], file);
-//    file.close();
-//
-//}
-
-//void analyse_position(const std::string & fen_str) {
-//    Gamestate gs;
-//    gs.board = fen_to_board(fen_str);
-//
-//    pr_board(gs.board);
-//
-//    vector<SearchNode*> nodes;
-//
-//    nodes = depth_limited_search(gs, 5);
-//    //write_to_file("test", nodes);
-//
-//    readable_printout(nodes, cout);
-//}
-
-
 void number_of_cands() {
 
     std::vector<Gamestate> states;

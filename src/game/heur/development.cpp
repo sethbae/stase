@@ -9,14 +9,11 @@ float development_metric(const Board & b) {
             ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
     };
 
-    for (Square sq = stosq("a8"); val(sq); inc_x(sq)) {
-        if (type(b.get(sq)) == BACK_RANK[get_x(sq)]) {
+    for (int x = 0; x < 8; ++x) {
+        if (type(b.get(x, 7)) == BACK_RANK[x]) {
             ++count;
         }
-    }
-
-    for (Square sq = stosq("a1"); val(sq); inc_x(sq)) {
-        if (type(b.get(sq)) == BACK_RANK[get_x(sq)]) {
+        if (type(b.get(x, 0)) == BACK_RANK[x]) {
             --count;
         }
     }

@@ -4,11 +4,11 @@
  * Looks for attackers of the opposite colour to the given king_colour by working outwards from
  * the square [s] along the given [delta]. Returns true if an attacker is found, false otherwise.
  */
-bool seek_attackers(const Board & b, const Square s, const Colour king_colour, const DeltaPair delta) {
+bool seek_attackers(const Board & b, const Square s, const Colour king_colour, const Delta delta) {
 
     Square temp;
     MoveType dir = direction_of_delta(delta);
-    int x = get_x(s) + delta.xd, y = get_y(s) + delta.yd;
+    int x = get_x(s) + delta.dx, y = get_y(s) + delta.dy;
 
     while (val(temp = mksq(x, y))) {
 
@@ -18,8 +18,8 @@ bool seek_attackers(const Board & b, const Square s, const Colour king_colour, c
             return colour(p) != king_colour && can_move_in_direction(p, dir);
         }
 
-        x += delta.xd;
-        y += delta.yd;
+        x += delta.dx;
+        y += delta.dy;
     }
 
     return false;
@@ -38,7 +38,7 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
 
     // sliding directions
     for (int i = 0; i < 8; ++i) {
-        if (seek_attackers(gs.board, s, king_colour, DeltaPair{(Byte) XD[i], (Byte) YD[i]})) {
+        if (seek_attackers(gs.board, s, king_colour, Delta{(SignedByte) XD[i], (SignedByte) YD[i]})) {
             return false;
         }
     }

@@ -4,17 +4,6 @@
 #include <iostream>
 using std::cout;
 
-StepFunc *STEP_FUNCS[] = {
-    &inc_x,
-    &dec_x,
-    &inc_y,
-    &dec_y,
-    &diag_ur,
-    &diag_ul,
-    &diag_dr,
-    &diag_dl
-};
-
 /*
 
    This file implements various notions of control which may be useful in multiple
@@ -37,14 +26,15 @@ StepFunc *STEP_FUNCS[] = {
  * Performs a linear search on the board according to the given step and val functions.
  * returns the alpha count of the walk
  */
-inline int alpha_walk(const Board & b, const Square s, StepFunc *step) {
+inline int alpha_walk(const Board & b, const Square s, Delta d) {
     
     int sum = 0;
     Square temp = s;
     bool cont = true;
     
-    (*step)(temp);
-    
+    temp.x += d.dx;
+    temp.y += d.dy;
+
     while (val(temp) && cont) {
 
         Piece otherp = b.get(temp);
@@ -54,7 +44,8 @@ inline int alpha_walk(const Board & b, const Square s, StepFunc *step) {
             // ALPHA: only count empty squares
             cont = false;
         }
-        (*step)(temp);
+        temp.x += d.dx;
+        temp.y += d.dy;
     }
     
     return sum;
@@ -70,14 +61,14 @@ int alpha_control(const Board & b, const Square s) {
     Piece p = b.get(s);
     
     if (can_move_in_direction(p, ORTHO)) {
-        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
-            sum += alpha_walk(b, s, STEP_FUNCS[dir]);
+        for (int i = ORTHO_START; i < ORTHO_STOP; ++i) {
+            sum += alpha_walk(b, s, Delta{XD[i], YD[i]});
         }
     }
     
     if (can_move_in_direction(p, DIAG)) {
-        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
-            sum += alpha_walk(b, s, STEP_FUNCS[dir]);
+        for (int i = DIAG_START; i < DIAG_STOP; ++i) {
+            sum += alpha_walk(b, s, Delta{XD[i], YD[i]});
         }
     }
     
@@ -111,13 +102,14 @@ int alpha_control(const Board & b, const Square s) {
 
 // performs a linear search on the board according to the given step and val functions.
 // returns the beta count of the walk
-inline int beta_walk(const Board & b, const Square s, StepFunc *step) {
+inline int beta_walk(const Board & b, const Square s, Delta d) {
     
     int sum = 0;
     Square temp = s;
     bool cont = true;
-    
-    (*step)(temp);
+
+    temp.x += d.dx;
+    temp.y += d.dy;
     
     while (val(temp) && cont) {
 
@@ -129,7 +121,8 @@ inline int beta_walk(const Board & b, const Square s, StepFunc *step) {
             cont = false;
             ++sum;
         }
-        (*step)(temp);
+        temp.x += d.dx;
+        temp.y += d.dy;
     }
     
     return sum;
@@ -143,14 +136,14 @@ int beta_control(const Board & b, const Square s) {
     Piece p = b.get(s);
     
     if (can_move_in_direction(p, ORTHO)) {
-        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
-            sum += beta_walk(b, s, STEP_FUNCS[dir]);
+        for (int i = ORTHO_START; i < ORTHO_STOP; ++i) {
+            sum += beta_walk(b, s, Delta{XD[i], YD[i]});
         }
     }
     
     if (can_move_in_direction(p, DIAG)) {
-        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
-            sum += beta_walk(b, s, STEP_FUNCS[dir]);
+        for (int i = DIAG_START; i < DIAG_STOP; ++i) {
+            sum += beta_walk(b, s, Delta{XD[i], YD[i]});
         }
     }
     
@@ -184,13 +177,14 @@ int beta_control(const Board & b, const Square s) {
 
 // performs a linear search on the board according to the given step and val functions.
 // returns the gamma count of the walk
-inline int gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) {
+inline int gamma_walk(const Board & b, const Square s, Delta d, MoveType dir) {
     
     int sum = 0;
     Square temp = s;
     bool cont = true;
     
-    (*step)(temp);
+    temp.x += d.dx;
+    temp.y += d.dy;
     
     while (val(temp) && cont) {
 
@@ -202,7 +196,8 @@ inline int gamma_walk(const Board & b, const Square s, StepFunc *step, MoveType 
             cont = (colour(otherp) == colour(b.get(s))) && can_move_in_direction(otherp, dir);
             ++sum;
         }
-        (*step)(temp);
+        temp.x += d.dx;
+        temp.y += d.dy;
     }
     
     return sum;
@@ -216,14 +211,14 @@ int gamma_control(const Board & b, const Square s) {
     Piece p = b.get(s);
     
     if (can_move_in_direction(p, ORTHO)) {
-        for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
-            sum += gamma_walk(b, s, STEP_FUNCS[dir], ORTHO);
+        for (int i = ORTHO_START; i < ORTHO_STOP; ++i) {
+            sum += gamma_walk(b, s, Delta{XD[i], YD[i]}, ORTHO);
         }
     }
     
     if (can_move_in_direction(p, DIAG)) {
-        for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
-            sum += gamma_walk(b, s, STEP_FUNCS[dir], DIAG);
+        for (int i = DIAG_START; i < DIAG_STOP; ++i) {
+            sum += gamma_walk(b, s, Delta{XD[i], YD[i]}, DIAG);
         }
     }
     
@@ -264,13 +259,14 @@ int gamma_control(const Board & b, const Square s) {
     
     This method ignores pawns and kings.
 */
-int control_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) {
+int control_walk(const Board & b, const Square s, Delta d, MoveType dir) {
 
     int sum = 0;
     Square temp = s;
     bool cont = true;
     
-    (*step)(temp);
+    temp.x += d.dx;
+    temp.y += d.dy;
     
     while (val(temp) && cont) {
 
@@ -283,7 +279,8 @@ int control_walk(const Board & b, const Square s, StepFunc *step, MoveType dir) 
             // blocking piece, abort
             cont = false;
         }
-        (*step)(temp);
+        temp.x += d.dx;
+        temp.y += d.dy;
     }
     
     return sum;
@@ -301,13 +298,13 @@ int control_count(const Board & b, const Square s) {
     int count = 0;
 
     // orthogonal movement
-    for (int dir = ORTHO_START; dir < ORTHO_STOP; ++dir) {
-        count += control_walk(b, s, STEP_FUNCS[dir], ORTHO);
+    for (int i = ORTHO_START; i < ORTHO_STOP; ++i) {
+        count += control_walk(b, s, Delta{XD[i], YD[i]}, ORTHO);
     }
 
     // diagonal movement
-    for (int dir = DIAG_START; dir < DIAG_STOP; ++dir) {
-        count += control_walk(b, s, STEP_FUNCS[dir], DIAG);
+    for (int i = DIAG_START; i < DIAG_STOP; ++i) {
+        count += control_walk(b, s, Delta{XD[i], YD[i]}, DIAG);
     }
     
     

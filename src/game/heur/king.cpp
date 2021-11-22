@@ -174,8 +174,7 @@ float control_near_king_metric(const Board & b) {
  * if this is unfavourable for the colour given, ie x > 0 for BLACK and x < 0 for WHITE,
  * then it is returned - otherwise 0 is returned
  */
-int exposure_count(const Board & b, const Square s,
-                   StepFunc *step, MoveType dir, Colour col) {
+int exposure_count(const Board & b, const Square s, Delta d, MoveType dir, Colour col) {
 
     Square sq = s;
     int control_count = 0, length = 0;
@@ -187,7 +186,8 @@ int exposure_count(const Board & b, const Square s,
         }
         ++length;
         // move to next iteration
-        (*step)(sq);
+        sq.x += d.dx;
+        sq.y += d.dy;
     }
 
     /*
@@ -224,17 +224,17 @@ int one_king_exposure(const Board & b, const Square s) {
     Square start_points[] = { ahead, behind, centre, left, right };
 
     for (int i = 0; i < 3; ++i) {
-        score += exposure_count(b, start_points[i], inc_x, ORTHO, col);
-        score += exposure_count(b, start_points[i], dec_x, ORTHO, col);
-        score += exposure_count(b, start_points[i], diag_ur, DIAG, col);
-        score += exposure_count(b, start_points[i], diag_ul, DIAG, col);
-        score += exposure_count(b, start_points[i], diag_dr, DIAG, col);
-        score += exposure_count(b, start_points[i], diag_dl, DIAG, col);
+        score += exposure_count(b, start_points[i], Delta{1, 0}, ORTHO, col);
+        score += exposure_count(b, start_points[i], Delta{-1, 0}, ORTHO, col);
+        score += exposure_count(b, start_points[i], Delta{1, 1}, DIAG, col);
+        score += exposure_count(b, start_points[i], Delta{-1, 1}, DIAG, col);
+        score += exposure_count(b, start_points[i], Delta{1, -1}, DIAG, col);
+        score += exposure_count(b, start_points[i], Delta{-1, -1}, DIAG, col);
     }
 
     for (int i = 3; i < 5; ++i) {
-        score += exposure_count(b, start_points[i], inc_y, ORTHO, col);
-        score += exposure_count(b, start_points[i], dec_y, ORTHO, col);
+        score += exposure_count(b, start_points[i], Delta{0, 1}, ORTHO, col);
+        score += exposure_count(b, start_points[i], Delta{0, -1}, ORTHO, col);
     }
 
     return score;

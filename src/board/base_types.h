@@ -2,6 +2,7 @@
 #define STASE_BASE_TYPES_H
 
 typedef uint_fast8_t Byte;
+typedef int_fast8_t SignedByte;
 typedef uint_fast32_t Int;
 
 /**

@@ -2,12 +2,12 @@
 #include "game.h"
 #include "heur.h"
 
-/*
+/**
  * Open files: return the number of squares controlled on the given file (which is presumed
  * to contain no pawns - tho  this is not checked).
  * Essentially this is just 7 squares for whoever controls the file.
  */
-int open_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
+int open_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
 
     int control = 0;
 
@@ -17,7 +17,8 @@ int open_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
         if (can_move_in_direction(p, dir)) {
             control += ((colour(p) == WHITE) ? 1 : -1);
         }
-        (*step)(s);
+        s.x += d.dx;
+        s.y += d.dy;
     }
 
     // White controls the file
@@ -32,14 +33,14 @@ int open_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     return 0;
 }
 
-/*
+/**
  * Returns an integer representing the difference in controlled squares on a half open file.
  * That is, it counts through the line in  two chunks: before pawn, after pawn. Each half gets
  * its length as score provided that one side has a piece on it (that moves correctly). If a
  * half has pieces of both sides on it, that scores zero. White scores count upwards, black
  * scores count downwards, and the net result is returned.
  */
-int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
+int half_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
 
     int score = 0;      // the overall score which we'll return
     int squares_before_pawn = 0;
@@ -54,7 +55,8 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
         if (can_move_in_direction(p, dir)) { // and control
             control += (colour(p) == WHITE) ? 1 : -1;
         }
-        (*step)(s);
+        s.x += d.dx;
+        s.y += d.dy;
     }
 
     // calculate contribution to score
@@ -66,13 +68,15 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
 
     // and now check who controls the other section
     control = 0;
-    (*step)(s);
+    s.x += d.dx;
+    s.y += d.dy;
     while (val(s)) {
         Piece p = b.get(s);
         if (can_move_in_direction(p, dir)) {
             control += (colour(p) == WHITE) ? 1 : -1;
         }
-        (*step)(s);
+        s.x += d.dx;
+        s.y += d.dy;
     }
 
     // and calculate contribution of second half
@@ -87,11 +91,11 @@ int half_line_walk(const Board & b, Square s, StepFunc *step, MoveType dir) {
     return score;
 }
 
-/*
+/**
  * Counts the number of pawns reachable from the given square according to the step func,
  * ie the number which are on a certain rank or file.
  */
-int count_pawns(const Board & b, Square s, StepFunc *step) {
+int count_pawns(const Board & b, Square s, Delta d) {
 
     int sum = 0;
 
@@ -101,13 +105,14 @@ int count_pawns(const Board & b, Square s, StepFunc *step) {
         if (type(p) == PAWN) {
             ++sum;
         }
-        (*step)(s);
+        s.x += d.dx;
+        s.y += d.dy;
     }
 
     return sum;
 }
 
-/*
+/**
  * Returns a measure of who controls the open lines and diagonals. This checks ranks,
  * files and major diagonals.
  */
@@ -160,11 +165,11 @@ float open_line_control_metric(const Board & b) {
     // files
     for (int x = 0; x < 8; ++x) {
         sq = mksq(x, 0);
-        num_pawns = count_pawns(b, sq, inc_y);
+        num_pawns = count_pawns(b, sq, Delta{0, 1});
         if (num_pawns == 0)
-            score += open_line_walk(b, sq, inc_y, ORTHO) * FILE_VALUES[x];
+            score += open_line_walk(b, sq, Delta{0, 1}, ORTHO) * FILE_VALUES[x];
         else if (num_pawns == 1)
-            score += half_line_walk(b, sq, inc_y, ORTHO) * FILE_VALUES[x];
+            score += half_line_walk(b, sq, Delta{0, 1}, ORTHO) * FILE_VALUES[x];
     }
 
     // int file_score = score;
@@ -173,11 +178,11 @@ float open_line_control_metric(const Board & b) {
     // ranks
     for (int y = 0; y < 8; ++y) {
         sq = mksq(0, y);
-        num_pawns = count_pawns(b, sq, inc_x);
+        num_pawns = count_pawns(b, sq, Delta{1, 0});
         if (num_pawns == 0)
-            score += open_line_walk(b, sq, inc_x, ORTHO) * RANK_VALUES[y];
+            score += open_line_walk(b, sq, Delta{1, 0}, ORTHO) * RANK_VALUES[y];
         else if (num_pawns == 1)
-            score += half_line_walk(b, sq, inc_x, ORTHO) * RANK_VALUES[y];
+            score += half_line_walk(b, sq, Delta{1, 0}, ORTHO) * RANK_VALUES[y];
     }
 
     // int rank_score = score;
@@ -185,46 +190,46 @@ float open_line_control_metric(const Board & b) {
 
     // diagonals
     sq = stosq("a2");
-    num_pawns = count_pawns(b, sq, diag_ur);
+    num_pawns = count_pawns(b, sq, Delta{1, 1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[0];
+        score += open_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[0];
     else if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[0];
+        score += half_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[0];
 
     sq = stosq("a1");
-    num_pawns = count_pawns(b, sq, diag_ur);
+    num_pawns = count_pawns(b, sq, Delta{1, 1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[1];
+        score += open_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[1];
     else if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[1];
+        score += half_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[1];
 
     sq = stosq("b1");
-    num_pawns = count_pawns(b, sq, diag_ur);
+    num_pawns = count_pawns(b, sq, Delta{1, 1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[2];
+        score += open_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[2];
     else if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_ur, DIAG) * DIAG_VALUES[2];
+        score += half_line_walk(b, sq, Delta{1, 1}, DIAG) * DIAG_VALUES[2];
 
     sq = stosq("b8");
-    num_pawns = count_pawns(b, sq, diag_dr);
+    num_pawns = count_pawns(b, sq, Delta{1, -1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[3];
+        score += open_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[3];
     if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[3];
+        score += half_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[3];
 
     sq = stosq("a8");
-    num_pawns = count_pawns(b, sq, diag_dr);
+    num_pawns = count_pawns(b, sq, Delta{1, -1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[4];
+        score += open_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[4];
     if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[4];
+        score += half_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[4];
 
     sq = stosq("a7");
-    num_pawns = count_pawns(b, sq, diag_dr);
+    num_pawns = count_pawns(b, sq, Delta{1, -1});
     if (num_pawns == 0)
-        score += open_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[5];
+        score += open_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[5];
     if (num_pawns == 1)
-        score += half_line_walk(b, sq, diag_dr, DIAG) * DIAG_VALUES[5];
+        score += half_line_walk(b, sq, Delta{1, -1}, DIAG) * DIAG_VALUES[5];
 
     // cout << "Diag score: " << score - rank_score << "\n";
 

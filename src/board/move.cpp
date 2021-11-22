@@ -38,7 +38,14 @@ const int PROM_PIECE_MASK = 3 << PROM_PIECE_OFFSET;
 const int CAP_PIECE_OFFSET = 6;
 const int CAP_PIECE_MASK = 15 << CAP_PIECE_OFFSET;
 
-const int knight_dirs[8][2] = {{1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
+/**
+ * Values for the move diffs (cannot be defined in header).
+ */
+const SignedByte XD[] = {-1, -1, 1, 1, -1, 1, 0, 0};
+const SignedByte YD[] = {-1, 1, -1, 1, 0, 0, 1, -1};
+
+const SignedByte XKN[] = {1, 1, 2, 2, -1, -1, -2, -2};
+const SignedByte YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
 
 /* get/set promotion, castle flags etc */
 bool Move::is_prom() const { return flags & PROM_FLAG; }
@@ -100,8 +107,7 @@ Move empty_move() {
  ************************************************************************/
 
 void line_search(const Board & b, const Square s,
-                    void step(Square &), 
-                    bool (* valid)(const Square &),
+                    Delta d,
                     vector<Move> & moves) {
         
     Piece p = b.get(s);
@@ -110,9 +116,10 @@ void line_search(const Board & b, const Square s,
     Move m = empty_move();
     m.from = s;
     
-    step(temp);
-    
-    while ((*valid)(temp) && cont) {
+    temp.x += d.dx;
+    temp.y += d.dy;
+
+    while (val(temp) && cont) {
         //cout << sqtos(temp);
         Piece otherp = b.get(temp);
         if (otherp == EMPTY) {
@@ -129,27 +136,28 @@ void line_search(const Board & b, const Square s,
                 moves.push_back(m);
             }
         }
-        step(temp);
+        temp.x += d.dx;
+        temp.y += d.dy;
     }
-    
+
 }
 
 void ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
-   
-    line_search(b, start_sq, inc_x, val_x, moves); 
-    line_search(b, start_sq, dec_x, val_x, moves);
-    line_search(b, start_sq, inc_y, val_y, moves);
-    line_search(b, start_sq, dec_y, val_y, moves);
-    
+
+    line_search(b, start_sq, Delta{1, 0}, moves);
+    line_search(b, start_sq, Delta{-1, 0},moves);
+    line_search(b, start_sq, Delta{0, 1}, moves);
+    line_search(b, start_sq, Delta{0, -1}, moves);
+
 }
 
 void diag(const Board & b, const Square start_sq, vector<Move> & moves) {
-    
-    line_search(b, start_sq, diag_ur, val, moves);
-    line_search(b, start_sq, diag_dl, val, moves);
-    line_search(b, start_sq, diag_dr, val, moves);
-    line_search(b, start_sq, diag_ul, val, moves);
-    
+
+    line_search(b, start_sq, Delta{1, 1}, moves);
+    line_search(b, start_sq, Delta{-1, -1}, moves);
+    line_search(b, start_sq, Delta{1, -1}, moves);
+    line_search(b, start_sq, Delta{-1, 1}, moves);
+
 }
 
 void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
@@ -639,20 +647,21 @@ void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & mov
  *  In check functions
  ************************************************************************/
 
-bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p2,
-                        void step(Square &),
-                        bool valid(const Square &)) {
+bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p2, Delta d) {
                                 
-    step(sq);
-    
-    while (valid(sq)) {
+    sq.x += d.dx;
+    sq.y += d.dy;
+
+    while (val(sq)) {
 
         Piece otherp = b.get(sq);
         
         if (otherp != EMPTY) {
             return otherp == p1 || otherp == p2;
         }
-        step(sq);
+
+        sq.x += d.dx;
+        sq.y += d.dy;
     }
     
     return false;                        
@@ -775,18 +784,18 @@ bool in_check_hard(const Board & b, Colour col) {
     }
     
     // diagonal: bishop or queen
-    if (line_search_check(b, ksq, bishop, queen, diag_ur, val)
-         || line_search_check(b, ksq, bishop, queen, diag_dr, val)
-         || line_search_check(b, ksq, bishop, queen, diag_ul, val)
-         || line_search_check(b, ksq, bishop, queen, diag_dl, val)) {
+    if (line_search_check(b, ksq, bishop, queen, Delta{1, 1})
+         || line_search_check(b, ksq, bishop, queen, Delta{1, -1})
+         || line_search_check(b, ksq, bishop, queen, Delta{-1, 1})
+         || line_search_check(b, ksq, bishop, queen, Delta{-1, -1})) {
         return true;    
     }
             
     // orthogonal: rook or queen
-    if (line_search_check(b, ksq, queen, rook, inc_x, val_x)
-         || line_search_check(b, ksq, queen, rook, dec_x, val_x)
-         || line_search_check(b, ksq, queen, rook, inc_y, val_y)
-         || line_search_check(b, ksq, queen, rook, dec_y, val_y)) {
+    if (line_search_check(b, ksq, queen, rook, Delta{1, 0})
+         || line_search_check(b, ksq, queen, rook, Delta{-1, 0})
+         || line_search_check(b, ksq, queen, rook, Delta{0, 1})
+         || line_search_check(b, ksq, queen, rook, Delta{0, -1})) {
         return true;
     }
     

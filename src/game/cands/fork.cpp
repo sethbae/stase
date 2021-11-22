@@ -109,7 +109,7 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
     for (int i = idx_start; i < idx_stop; ++i) {
 
         Square forked_piece_square =
-                first_piece_encountered(gs.board, move.to, DeltaPair{(Byte) XD[i], (Byte) YD[i]});
+                first_piece_encountered(gs.board, move.to, Delta{(SignedByte) XD[i], (SignedByte) YD[i]});
 
         if (!is_sentinel(forked_piece_square)
                 && forkable(gs, move, forked_piece_square)) {

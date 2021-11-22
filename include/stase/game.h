@@ -3,48 +3,6 @@
 
 #include "board.h"
 
-enum MoveType {
-    ORTHO = 0,
-    DIAG = 1,
-    KNIGHT_MOVE = 2,
-    PAWN_MOVE = 3,
-    KING_MOVE = 4,
-    INVALID_MOVE = 5
-};
-
-struct DeltaPair {
-    Byte xd;
-    Byte yd;
-};
-const DeltaPair INVALID_DELTA = { 0xFF, 0xFF };
-inline bool is_valid_delta(const DeltaPair d) { return d.xd != 0xFF && d.yd != 0xFF; }
-inline MoveType direction_of_delta(const DeltaPair d) {
-    if (d.xd == 0 || d.yd == 0) {
-        return ORTHO;
-    }
-    return DIAG;
-}
-DeltaPair get_delta_between(const Square, const Square);
-
-/*
- * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
- * Given values in gamestate.cpp
- */
-extern const int XD[];
-extern const int YD[];
-extern const int XKN[];
-extern const int YKN[];
-
-// lookup tables for the step function which moves in each direction
-typedef void StepFunc(Square &);
-extern StepFunc *STEP_FUNCS[8];
-
-// constants for iterating over the directions
-const unsigned DIAG_START  = 0;
-const unsigned DIAG_STOP   = 4;
-const unsigned ORTHO_START = 4;
-const unsigned ORTHO_STOP  = 8;
-
 // and a lookup table (indexed by numeric value of Ptype enumeration) for which of
 // the above movesets to use.
 const bool PIECE_MOVE_TYPES[][6] = {
@@ -71,9 +29,9 @@ inline bool can_move_in_direction(Piece piece, MoveType dir) {
 }
 bool can_move_to_square(const Board &, Square from, Square to);
 bool collinear_points(Square, Square, Square);
-DeltaPair open_path_between(const Board & b, const Square, const Square);
+Delta open_path_between(const Board & b, const Square, const Square);
 Square can_move_onto_line(const Board & b, const Square, const Square, const Square);
-Square first_piece_encountered(const Board &, const Square, const DeltaPair);
+Square first_piece_encountered(const Board &, const Square, const Delta);
 
 // forward declaration: see cands.h
 struct FeatureFrame;

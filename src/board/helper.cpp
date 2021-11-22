@@ -391,12 +391,11 @@ std::string starting_fen() {
 Board empty_board() {
     
     Board b;
-    
-    for (Square s = mksq(0, 0) ; val_y(s); inc_y(s)) {
-        for ( ; val_x(s); inc_x(s)) {
-            b.set(s, EMPTY);
+
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            b.set(x, y, EMPTY);
         }
-        reset_x(s);
     }
 
     b.conf = 0;

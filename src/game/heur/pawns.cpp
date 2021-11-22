@@ -47,8 +47,9 @@ float defended_pawns_metric(const Board & b) {
 
         // find white pawn in this file
         sq = mksq(x, 1);
-        while (val(sq) && b.get(sq) != W_PAWN)
-            inc_y(sq);
+        while (val(sq) && b.get(sq) != W_PAWN) {
+            ++sq.y;
+        }
 
         if (val(sq)) {
             // count pawns supporting this pawn
@@ -60,8 +61,9 @@ float defended_pawns_metric(const Board & b) {
 
         // find black pawn in this file
         sq = mksq(x, 6);
-        while (val(sq) && b.get(sq) != B_PAWN)
-            dec_y(sq);
+        while (val(sq) && b.get(sq) != B_PAWN) {
+            --sq.y;
+        }
 
         if (val(sq)) {
             supporters = supporting_pawns(b, sq);

@@ -7,23 +7,23 @@ bool collinear_points(Square a, Square b, Square c) {
     return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
 }
 
-DeltaPair get_delta_between(const Square a, const Square b) {
-    int dx = get_x(b) - get_x(a);
-    int dy = get_y(b) - get_y(a);
+Delta get_delta_between(const Square a, const Square b) {
+    SignedByte dx = b.x - a.x;
+    SignedByte dy = b.y - a.y;
     if (dx != 0) {
         dx = (dx > 0) ? 1 : -1;
     }
     if (dy != 0) {
         dy = (dy > 0) ? 1 : -1;
     }
-    return DeltaPair{ (Byte) dx, (Byte) dy};
+    return Delta{dx, dy};
 }
 
 /**
  * Checks whether the given board contains a path of empty squares which lie in a straight line from
  * [from] to [to]. If so, the required direction is returned.
  */
-DeltaPair open_path_between(const Board & b, const Square from, const Square to) {
+Delta open_path_between(const Board & b, const Square from, const Square to) {
 
     int dx = get_x(to) - get_x(from);
     int dy = get_y(to) - get_y(from);
@@ -38,7 +38,7 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
             y += delta;
         }
 
-        return equal(temp, to) ? DeltaPair{0, (Byte) delta} : INVALID_DELTA;
+        return equal(temp, to) ? Delta{0, (SignedByte) delta} : INVALID_DELTA;
     }
 
     // orthogonal in the x direction
@@ -50,7 +50,7 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
             x += delta;
         }
 
-        return equal(temp, to) ? DeltaPair{(Byte) delta, 0} : INVALID_DELTA;
+        return equal(temp, to) ? Delta{(SignedByte) delta, 0} : INVALID_DELTA;
     }
 
     // diagonal
@@ -64,7 +64,7 @@ DeltaPair open_path_between(const Board & b, const Square from, const Square to)
             y += delta_y;
         }
 
-        return equal(temp, to) ? DeltaPair{(Byte) delta_x, (Byte) delta_y} : INVALID_DELTA;
+        return equal(temp, to) ? Delta{(SignedByte) delta_x, (SignedByte) delta_y} : INVALID_DELTA;
     }
 
     return INVALID_DELTA;
@@ -81,8 +81,8 @@ Square can_move_onto_line(
 
     if (equal(line_start_point, line_end_point)) { return SQUARE_SENTINEL; }
 
-    DeltaPair delta = get_delta_between(line_start_point, line_end_point);
-    int x = get_x(line_start_point) + delta.xd, y = get_y(line_start_point) + delta.yd;
+    Delta delta = get_delta_between(line_start_point, line_end_point);
+    int x = get_x(line_start_point) + delta.dx, y = get_y(line_start_point) + delta.dy;
 
     Square temp;
 
@@ -90,8 +90,8 @@ Square can_move_onto_line(
         if (alpha_covers(b, piece_sq, temp)) {
             return temp;
         }
-        x += delta.xd;
-        y += delta.yd;
+        x += delta.dx;
+        y += delta.dy;
     }
 
     return SQUARE_SENTINEL;
@@ -103,14 +103,14 @@ Square can_move_onto_line(
  * It returns the square on which that piece lies, or SQUARE_SENTINEL if no piece was
  * encountered before the edge of the board.
  */
-Square first_piece_encountered(const Board & b, const Square start, const DeltaPair delta) {
+Square first_piece_encountered(const Board & b, const Square start, const Delta delta) {
 
-    int x = get_x(start) + delta.xd, y = get_y(start) + delta.yd;
+    int x = get_x(start) + delta.dx, y = get_y(start) + delta.dy;
     Square temp;
 
     while (val(temp = mksq(x, y)) && b.get(temp) == EMPTY) {
-        x += delta.xd;
-        y += delta.yd;
+        x += delta.dx;
+        y += delta.dy;
     }
 
     return val(temp) ? temp : SQUARE_SENTINEL;

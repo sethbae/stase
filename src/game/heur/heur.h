@@ -89,9 +89,9 @@ constexpr int piece_value(const Piece p) {
     }
 }
 
-int open_line_walk(const Board &, Square s, StepFunc*, MoveType);
-int half_line_walk(const Board &, Square, StepFunc*, MoveType);
-int count_pawns(const Board &, Square, StepFunc*);
+int open_line_walk(const Board &, Square s, Delta, MoveType);
+int half_line_walk(const Board &, Square, Delta, MoveType);
+int count_pawns(const Board &, Square, Delta);
 
 /*
  * Piece activity (also declared in game.h, but repeated here for clarity).
