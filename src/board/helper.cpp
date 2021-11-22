@@ -19,15 +19,9 @@ using std::stringstream;
  CONVERSIONS        for squares, FENs, SAN, pieces
  ************************************************************************************/
 
-string sqtos(Square sq) {
-    stringstream ss;
-    ss << (char) (get_x(sq) + 'a') << (char) (get_y(sq) + '1');
-    return ss.str();
-}
-
 /***** piece to string or char and vice versa       W_KING <----> 'K'           *****/
 
-char ptoc(Piece p) {
+constexpr char ptoc(Piece p) {
     switch (p) {
         case B_KING:    return 'k';
         case B_QUEEN:   return 'q';
@@ -45,7 +39,7 @@ char ptoc(Piece p) {
     }
 }
 
-Piece ctop(char c) {
+constexpr Piece ctop(char c) {
     switch (c) {
         case 'K':   return W_KING;
         case 'Q':   return W_QUEEN;
@@ -64,7 +58,7 @@ Piece ctop(char c) {
 }
 
 // for algebraic notation (SAN), even black pieces use capitals: B_KNIGHT <----> "N"
-string ptos_alg(Piece p) {
+constexpr std::string_view ptos_alg(Piece p) {
     switch (type(p)) {
         case KING: return "K";
         case QUEEN: return "Q";
@@ -251,9 +245,10 @@ int get_number(stringstream & ss) {
 
 /***** FEN to board and board to FEN *****/
 
-Board fen_to_board(const string & fen) {
-    
-    stringstream stream(fen);
+Board fen_to_board(const std::string_view & fen) {
+
+    std::string s(fen);
+    stringstream stream(s);
     Board b = empty_board();
     
     /* take the first token: the pieces on the board */
@@ -384,9 +379,7 @@ Board starting_pos() {
     return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-std::string starting_fen() {
-    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-}
+
 
 Board empty_board() {
     

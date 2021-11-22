@@ -8,15 +8,13 @@
 #include "../../src/board/square.h"
 #include "../../src/board/move.h"
 
-/* query information about a given piece */
-constexpr Ptype type(const Piece);
-constexpr Colour colour(const Piece);
-bool is_white(Piece);
-bool is_minor_piece(Piece);
-bool is_major_piece(Piece);
-bool is_not_pk(Piece);
-
-/* a chess board! with full game state, such as castling rights, etc */
+/**
+ * The board struct represents a fully-specified board position: pieces and their
+ * locations, but also whose turn it is etc. Everything required for FIDE chess.
+ *
+ * There is no validity requirement for the represented position. For example, you
+ * can have no kings, be in check on your opponents turn etc.
+ */
 struct Board {
 
     mutable Piece squares[8][8];
@@ -76,47 +74,39 @@ struct Board {
 
 };
 
-/* helper functions for board and move */
-Move empty_move();
+/** special values: empty, starting */
 Board empty_board();
 Board starting_pos();
-std::string starting_fen();
-Board fen_to_board(const std::string & fen);
-std::string board_to_fen(const Board &);
-std::vector<std::string> read_pgn(const std::string &s);
+constexpr std::string_view starting_fen() {
+    return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+}
 
-
-/* get moves for a piece or position */
+/**
+ * Legal moves. These functions provide all legal moves, those only for a certain piece
+ * as well as checking whether you're in check or not.
+ */
 void piecemoves(const Board &, const Square, std::vector<Move> &);
 void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 bool in_check_hard(const Board &);
 bool in_check_hard(const Board &, Colour);
-bool in_check_attack_map(const Board &, Ptype);
 void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
 void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
 
-/* string functions for pieces, squares etc */
-char ptoc(const Piece);
-std::string ptos(const Piece);
-std::string ptos_alg(const Piece);
-Piece ctop(const char);
-
-constexpr Square stosq(std::string_view str) {
-    return mksq(str[0] - 'a', str[1] - '1');
-}
-
-std::string sqtos(const Square);
-Move stom(const Board &, const std::string &);
-std::string mtos(const Board &, const Move);
-
-/* write functions (write to ostream) */
+/**
+ * Reading and writing helpers: into and out of FEN and displaying usefully
+ * either to stdout or to a given ostream.
+ */
+Board fen_to_board(const std::string_view & fen);
+std::string board_to_fen(const Board &);
+std::vector<std::string> read_pgn(const std::string &s);
+// write functions (write to ostream)
 void wr_board(const Board &, std::ostream &);
 void wr_board(const Board &, const std::string & indent, std::ostream &);
 void wr_board_conf(const Board &, std::ostream &);
 void wr_board_conf(const Board &, const std::string & indent, std::ostream &);
 void wr_bin_64(uint64_t, std::ostream &);
-/* print functions (write to stdout using cout) */
+// print functions (write to stdout using cout)
 void pr_board(const Board &);
 void pr_board(const Board &, const std::string & indent);
 void pr_board_conf(const Board &);

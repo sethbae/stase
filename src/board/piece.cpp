@@ -1,7 +1,6 @@
 #include "board.h"
 
-bool is_white(Piece p) { return p & 8; }
-bool is_minor_piece(Piece p) {
+constexpr bool is_minor_piece(Piece p) {
     switch (type(p)) {
         case KNIGHT:
         case BISHOP:
@@ -10,7 +9,7 @@ bool is_minor_piece(Piece p) {
             return false;
     }
 }
-bool is_major_piece(Piece p) {
+constexpr bool is_major_piece(Piece p) {
     switch (type(p)) {
         case QUEEN:
         case ROOK:
@@ -19,7 +18,7 @@ bool is_major_piece(Piece p) {
             return false;
     }
 }
-bool is_not_pk(Piece p) {
+constexpr bool is_not_pk(Piece p) {
     switch (type(p)) {
         case QUEEN:
         case ROOK:

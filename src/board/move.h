@@ -3,7 +3,13 @@
 
 #include "board.h"
 
-/* A move structure, which stores some flags etc and get/set methods */
+/**
+ * The Move struct stores a starting square and an ending square.
+ *
+ * There are also some flags, which represent information about that move,
+ * along with appropriate accessors and mutators (since the flags are bit
+ * hacks, this saves a lot of trouble).
+ */
 struct Move {
 
     Square from;
@@ -40,13 +46,22 @@ struct Move {
 
 };
 
+/**
+ * Some basic special values and utility functions.
+ */
 const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, SQUARE_SENTINEL, 0};
-
+constexpr Move empty_move() {
+    return Move{0, 0, 0, 0, 0};
+};
 inline bool is_sentinel(const Move m) { return equal(m.from, SQUARE_SENTINEL); }
 inline bool equal(const Move m1, const Move m2) {
     return equal(m1.from, m2.from) && equal(m1.to, m2.to);
 }
 
+/**
+ * The MoveType enum represents the different manners in which a piece can move
+ * on the board.
+ */
 enum MoveType {
     ORTHO = 0,
     DIAG = 1,
@@ -56,6 +71,9 @@ enum MoveType {
     INVALID_MOVE = 5
 };
 
+/**
+ * Deltas are useful for lightweight passing of direction parameters.
+ */
 struct Delta {
     SignedByte dx;
     SignedByte dy;
@@ -65,11 +83,20 @@ inline bool is_valid_delta(const Delta d) { return d.dx != 127 && d.dy != 127; }
 inline MoveType direction_of_delta(const Delta d) {
     return (d.dx == 0 || d.dy == 0) ? ORTHO : DIAG;
 }
-Delta get_delta_between(const Square, const Square);
+inline Delta get_delta_between(const Square a, const Square b){
+    SignedByte dx = b.x - a.x;
+    SignedByte dy = b.y - a.y;
+    if (dx != 0) {
+        dx = (dx > 0) ? 1 : -1;
+    }
+    if (dy != 0) {
+        dy = (dy > 0) ? 1 : -1;
+    }
+    return Delta{dx, dy};
+};
 
 /**
  * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
- * Given values in gamestate.cpp
  */
 extern const SignedByte XD[];
 extern const SignedByte YD[];
@@ -81,5 +108,12 @@ const unsigned DIAG_START  = 0;
 const unsigned DIAG_STOP   = 4;
 const unsigned ORTHO_START = 4;
 const unsigned ORTHO_STOP  = 8;
+
+/**
+ * String conversions.
+ */
+class Board;
+Move stom(const Board &, const std::string &);
+std::string mtos(const Board &, const Move);
 
 #endif //STASE_MOVE_H

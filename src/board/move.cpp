@@ -97,11 +97,6 @@ void Move::set_cap_piece(Piece p) {
     flags |= (p << CAP_PIECE_OFFSET);
 }
 
-Move empty_move() {
-    Move m = {0, 0, 0, 0, 0};
-    return m;
-}
-
 /*************************************************************************
  *  VECTOR piece move functions
  ************************************************************************/

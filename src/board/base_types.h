@@ -84,4 +84,18 @@ constexpr Colour colour(const Piece p) {
     return (Colour) (p & COLOUR_MASK);
 }
 
+/**
+ * Other helpers: minor/major pieces
+ */
+constexpr bool is_minor_piece(Piece);
+constexpr bool is_major_piece(Piece);
+constexpr bool is_not_pk(Piece);
+
+/**
+ * Conversion to and from chars.
+ */
+constexpr char ptoc(const Piece);
+constexpr std::string_view ptos_alg(const Piece);
+constexpr Piece ctop(const char);
+
 #endif //STASE_BASE_TYPES_H

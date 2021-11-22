@@ -20,10 +20,6 @@ const Eval WHITE_MATE_MASK = 0x40000000;
 //      N.B. for correct behaviour, the offset must be half the total range
 const Eval OFFSET = 0x2000000; // 2^13
 
-Eval zero() {
-    return OFFSET;
-}
-
 Eval mate_in(Colour colour, unsigned num) {
     return (colour == WHITE) ? white_mates_in(num) : black_mates_in(num);
 }

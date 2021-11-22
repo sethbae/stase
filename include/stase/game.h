@@ -74,10 +74,13 @@ struct Gamestate {
 
 // evaluation type and helper/conversion methods
 typedef int32_t Eval;
+extern const Eval OFFSET;
 
-Eval zero();
+constexpr Eval zero() {
+    return OFFSET;
+};
 
-inline Eval invalid_eval() {
+constexpr Eval invalid_eval() {
     return (Eval) 0x0F0F;
 }
 

@@ -2,7 +2,7 @@
 #include "board.h"
 
 struct SetGetTestCase {
-    const std::string fen;
+    const std::string_view fen;
     const Square sq;
     const Piece p;
 };

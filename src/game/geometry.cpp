@@ -7,18 +7,6 @@ bool collinear_points(Square a, Square b, Square c) {
     return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
 }
 
-Delta get_delta_between(const Square a, const Square b) {
-    SignedByte dx = b.x - a.x;
-    SignedByte dy = b.y - a.y;
-    if (dx != 0) {
-        dx = (dx > 0) ? 1 : -1;
-    }
-    if (dy != 0) {
-        dy = (dy > 0) ? 1 : -1;
-    }
-    return Delta{dx, dy};
-}
-
 /**
  * Checks whether the given board contains a path of empty squares which lie in a straight line from
  * [from] to [to]. If so, the required direction is returned.
