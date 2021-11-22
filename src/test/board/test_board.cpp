@@ -6,7 +6,7 @@ bool test_board(void) {
 
     passed = test_pieces() && passed;
     passed = test_set_get_square() && passed;
-    passed = test_read_write_fens() && passed;
+    // passed = test_read_write_fens() && passed;
     passed = test_in_check() && passed;
     passed = test_castling() && passed;
     passed = test_mutate() && passed;
