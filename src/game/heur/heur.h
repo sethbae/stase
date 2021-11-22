@@ -100,72 +100,87 @@ float pawns_defend_king_metric(const Board &);
 float control_near_king_metric(const Board &);
 float king_exposure_metric(const Board &);
 
-const std::vector<Metric> ALL_METRICS{
-    {
-        "piece-activity-alpha",
-        600,
-        &piece_activity_alpha_metric
-    },
-    {
-        "piece-activity-beta",
-        600,
-        &piece_activity_beta_metric
-    },
-    {
-        "piece-activity-gamma",
-        600,
-        &piece_activity_gamma_metric
-    },
-    {
-        "open-line-control",
-        1000,
-        &open_line_control_metric
-    },
-    {
-        "centre-control",
-        1500,
-        &centre_control_metric
-    },
-    {
-        "defended-pawns",
-        500,
-        &defended_pawns_metric
-    },
-    {
-        "development",
-        500,
-        &development_metric
-    },
-    {
-        "isolated-pawns",
-        400,
-        &isolated_pawns_metric
-    },
-    {
-        "central-pawns",
-        400,
-        &central_pawns_metric
-    },
-    {
-        "far-advanced-pawns",
-        400,
-        &far_advanced_pawns_metric
-    },
-    {
-        "pawns-defend-king",
-        750,
-        &pawns_defend_king_metric
-    },
-    {
-        "control-near-king",
-        750,
-        &control_near_king_metric
-    },
-    {
-        "king-exposure",
-        750,
-        &king_exposure_metric
-    },
+const Metric __piece_activity_alpha_metric{
+    "piece-activity-alpha",
+    600,
+    &piece_activity_alpha_metric
+};
+const Metric __piece_activity_beta_metric{
+    "piece-activity-beta",
+    600,
+    &piece_activity_beta_metric
+};
+const Metric __piece_activity_gamma_metric{
+    "piece-activity-gamma",
+    600,
+    &piece_activity_gamma_metric
+};
+const Metric __open_line_control_metric{
+    "open-line-control",
+    1000,
+    &open_line_control_metric
+};
+const Metric __centre_control_metric{
+    "centre-control",
+    1500,
+    &centre_control_metric
+};
+const Metric __defended_pawns_metric{
+    "defended-pawns",
+    500,
+    &defended_pawns_metric
+};
+const Metric __isolated_pawns_metric{
+    "isolated-pawns",
+    400,
+    &isolated_pawns_metric
+};
+const Metric __central_pawns_metric{
+    "central-pawns",
+    400,
+    &central_pawns_metric
+};
+const Metric __far_advanced_pawns_metric{
+    "far-advanced-pawns",
+    400,
+    &far_advanced_pawns_metric
+};
+const Metric __development_metric{
+    "development",
+    500,
+    &development_metric
+};
+const Metric __pawns_defend_king_metric{
+    "pawns-defend-king",
+    750,
+    &pawns_defend_king_metric
+};
+const Metric __control_near_king_metric{
+    "control-near-king",
+    750,
+    &control_near_king_metric
+};
+const Metric __king_exposure_metric{
+    "king-exposure",
+    750,
+    &king_exposure_metric
+};
+
+const std::vector<const Metric *> ALL_METRICS{
+
+    &__piece_activity_alpha_metric,
+    &__piece_activity_beta_metric,
+    &__piece_activity_gamma_metric,
+    &__open_line_control_metric,
+    &__centre_control_metric,
+    &__defended_pawns_metric,
+    &__isolated_pawns_metric,
+    &__central_pawns_metric,
+    &__far_advanced_pawns_metric,
+    &__development_metric,
+    &__pawns_defend_king_metric,
+    &__control_near_king_metric,
+    &__king_exposure_metric
 
 };
 

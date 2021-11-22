@@ -32,7 +32,7 @@ void bench_individual_metrics() {
 
     double total_time = 0.0;
     for (int i = 0; i < ALL_METRICS.size(); ++i) {
-        total_time += bench_metric(&ALL_METRICS[i]);
+        total_time += bench_metric(ALL_METRICS[i]);
     }
 
     cout << std::left << setw(20) << "Total" << ": "
