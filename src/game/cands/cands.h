@@ -82,6 +82,7 @@ void is_unsafe_piece_hook(const Gamestate &, const Square, std::vector<FeatureFr
 void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 void find_forks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 void find_checks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
+void find_kpinnable_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -98,6 +99,7 @@ const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
 const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 const Hook check_hook = Hook{"check", 3, &find_checks_hook};
+const Hook kpinnable_hook = Hook{"king-pin", 4, &find_kpinnable_hook};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -113,7 +115,8 @@ const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
         &develop_hook,
         &fork_hook,
-        &check_hook
+        &check_hook,
+        &kpinnable_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {

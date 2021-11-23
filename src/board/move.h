@@ -108,6 +108,8 @@ const unsigned DIAG_START  = 0;
 const unsigned DIAG_STOP   = 4;
 const unsigned ORTHO_START = 4;
 const unsigned ORTHO_STOP  = 8;
+const unsigned ALL_DIRS_START = 0;
+const unsigned ALL_DIRS_STOP = 8;
 
 /**
  * String conversions.
