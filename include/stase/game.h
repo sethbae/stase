@@ -93,7 +93,7 @@ Eval white_has_been_mated();
 Eval black_has_been_mated();
 
 float human_eval(int);
-int int_eval(Eval);
+constexpr int int_eval(Eval);
 Eval eval_from_float(float);
 
 bool is_mate(Eval);

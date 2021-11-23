@@ -183,7 +183,11 @@ void update_score(SearchNode * node) {
 
     // if the score is mate, then we need to make it mate in one more move
     if (is_mate(node->score)) {
-        node->score = mate_in_one_more(node->score);
+        if (white_is_mated(node->score) && !node->gs->board.get_white()) {
+            node->score = mate_in_one_more(node->score);
+        } else if (black_is_mated(node->score) && node->gs->board.get_white()) {
+            node->score = mate_in_one_more(node->score);
+        }
     }
 }
 

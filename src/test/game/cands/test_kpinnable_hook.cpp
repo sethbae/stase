@@ -33,6 +33,65 @@ const TestSet<HookTestCase> kpinnable_test_set{
                 ExpectedFeatureFrame{"d8", "e8", -1, 0},
                 ExpectedFeatureFrame{"f8", "e8", 1, 0},
             }
+        },
+        // basic pin: bishop
+        HookTestCase{
+            "8/3B4/8/3K2B1/8/8/8/8 w - - 0 1",
+            {
+                ExpectedFeatureFrame{"g5", "d5", 1, 0},
+                ExpectedFeatureFrame{"d7", "d5", 0, 1},
+            }
+        },
+        // basic pin: knight
+        HookTestCase{
+            "8/8/5kn1/4n3/8/8/8/8 w - - 0 1",
+            {
+                ExpectedFeatureFrame{"e5", "f6", -1, -1},
+                ExpectedFeatureFrame{"g6", "f6", 1, 0}
+            }
+        },
+        // basic pin: rook
+        HookTestCase{
+            "8/8/1kr5/8/8/2R5/1K6/8 w - - 0 1",
+            {
+                ExpectedFeatureFrame{"c3", "b2", 1, 1}
+            }
+        },
+        // basic pin: queen
+        HookTestCase{
+            "8/8/1k6/1q6/8/3R4/1K6/8 w - - 0 1",
+            {
+                ExpectedFeatureFrame{"b5", "b6", 0, -1}
+            }
+        },
+        // basic pin: queen #2
+        HookTestCase{
+            "8/8/8/3Q4/4K3/8/8/8 w - - 0 1",
+            {
+                ExpectedFeatureFrame{"d5", "e4", -1, 1}
+            }
+        },
+        // basic pin: not pawn
+        HookTestCase{
+            "6k1/5ppp/8/8/8/8/5PPP/6K1 w - - 0 1",
+            {}
+        },
+        // basic pin: not bishop
+        HookTestCase{
+            "6k1/5bpp/8/8/8/8/5BPP/6K1 w - - 0 1",
+            {}
+        },
+        // basic pin: not rook
+        HookTestCase{
+            "1r6/rkr5/1r6/8/8/8/3R4/3KR3 w - - 0 1",
+            {}
+        },
+        // puzzle #1
+        HookTestCase{
+            "r5k1/1bp4p/1p3bp1/3q1p2/4p3/4P2P/3QBPPB/2R3K1 w - - 0 27",
+            {
+                ExpectedFeatureFrame{"d5", "g8", -1, -1}
+            }
         }
     }
 };

@@ -1,18 +1,15 @@
 #include "game.h"
-#include <iostream>
-using std::cout;
-#include <sstream>
 using std::stringstream;
 #include <string>
 using std::string;
 #include <iomanip>
 #include <cmath>
 
-const Eval BLACK_GIVES_MATE = 0x80000000; // 0x8000 - 16 bits with MSB set
-const Eval WHITE_GIVES_MATE = 0x7FFFFFFF; // 16 bits with all but MSB set
+const Eval BLACK_GIVES_MATE = 0x80000000;
+const Eval WHITE_GIVES_MATE = 0x7FFFFFFF;
 
 // two masks for checking for mate
-const Eval BLACK_MATE_MASK = 0x80000000; // 0x8000;
+const Eval BLACK_MATE_MASK = 0x80000000;
 const Eval WHITE_MATE_MASK = 0x40000000;
 
 // 14 bits are used to represent actual evaluations; these are the positive numbers 0-16384
@@ -38,9 +35,9 @@ Eval black_mates_in(unsigned num) {
  * checkmate, then zero is returned.
  */
 Eval mate_in_one_more(const Eval e) {
-    if (e & WHITE_GIVES_MATE) {
+    if (e & WHITE_MATE_MASK) {
         return e - 1;
-    } else if (e & BLACK_GIVES_MATE) {
+    } else if (e & BLACK_MATE_MASK) {
         return e + 1;
     } else {
         return (Eval) 0;
@@ -77,7 +74,7 @@ float human_eval(const int eval) {
     return ((float) eval - OFFSET) / 1000.0f;
 }
 
-int int_eval(const Eval eval) {
+constexpr int int_eval(const Eval eval) {
     return eval - OFFSET;
 }
 
