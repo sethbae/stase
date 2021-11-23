@@ -88,6 +88,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_retreat_resp.cpp
         src/test/game/cands/test_desperado_resp.cpp
         src/test/game/cands/test_checks_hook.cpp
+        src/test/game/cands/test_kpinnable_hook.cpp
 
         src/test/board/test_pieces.cpp
         src/test/board/test_square.cpp
