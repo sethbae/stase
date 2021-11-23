@@ -2,6 +2,7 @@
 #define STASE_GAME_H
 
 #include "board.h"
+#include "../../src/game/eval.hpp"
 
 // and a lookup table (indexed by numeric value of Ptype enumeration) for which of
 // the above movesets to use.
@@ -71,39 +72,6 @@ struct Gamestate {
     Piece last_capture;
 
 };
-
-// evaluation type and helper/conversion methods
-typedef int32_t Eval;
-extern const Eval OFFSET;
-
-constexpr Eval zero() {
-    return OFFSET;
-};
-
-constexpr Eval invalid_eval() {
-    return (Eval) 0x0F0F;
-}
-
-Eval mate_in(Ptype colour, unsigned);
-Eval white_mates_in(unsigned);
-Eval black_mates_in(unsigned);
-Eval mate_in_one_more(const Eval);
-
-Eval white_has_been_mated();
-Eval black_has_been_mated();
-
-float human_eval(int);
-constexpr int int_eval(Eval);
-Eval eval_from_float(float);
-
-bool is_mate(Eval);
-bool white_is_mated(Eval);
-bool black_is_mated(Eval);
-
-int signed_mate_distance(Eval);
-int abs_mate_distance(Eval);
-
-std::string etos(Eval);
 
 // heuristic evaluation
 Eval heur(const Gamestate &);
