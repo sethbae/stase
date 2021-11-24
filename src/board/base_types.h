@@ -94,8 +94,53 @@ constexpr bool is_not_pk(Piece);
 /**
  * Conversion to and from chars.
  */
-constexpr char ptoc(const Piece);
-constexpr std::string_view ptos_alg(const Piece);
-constexpr Piece ctop(const char);
+constexpr char ptoc(Piece p) {
+    switch (p) {
+        case B_KING:    return 'k';
+        case B_QUEEN:   return 'q';
+        case B_ROOK:    return 'r';
+        case B_BISHOP:  return 'b';
+        case B_KNIGHT:  return 'n';
+        case B_PAWN:    return 'p';
+        case W_KING:    return 'K';
+        case W_QUEEN:   return 'Q';
+        case W_ROOK:    return 'R';
+        case W_BISHOP:  return 'B';
+        case W_KNIGHT:  return 'N';
+        case W_PAWN:    return 'P';
+        default:        return '.';
+    }
+}
+
+constexpr Piece ctop(char c) {
+    switch (c) {
+        case 'K':   return W_KING;
+        case 'Q':   return W_QUEEN;
+        case 'R':   return W_ROOK;
+        case 'B':   return W_BISHOP;
+        case 'N':   return W_KNIGHT;
+        case 'P':   return W_PAWN;
+        case 'k':   return B_KING;
+        case 'q':   return B_QUEEN;
+        case 'r':   return B_ROOK;
+        case 'b':   return B_BISHOP;
+        case 'n':   return B_KNIGHT;
+        case 'p':   return B_PAWN;
+        default:    return EMPTY;
+    }
+}
+
+// for algebraic notation (SAN), even black pieces use capitals: B_KNIGHT <----> "N"
+constexpr std::string_view ptos_alg(Piece p) {
+    switch (type(p)) {
+        case KING: return "K";
+        case QUEEN: return "Q";
+        case ROOK: return "R";
+        case BISHOP: return "B";
+        case KNIGHT: return "N";
+        case PAWN: return "";
+        default: return "";
+    }
+}
 
 #endif //STASE_BASE_TYPES_H

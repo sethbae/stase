@@ -27,6 +27,9 @@ inline int get_x(const Square & s) { return s.x; }
 inline bool val(const Square & s) {
     return s.x < 8 && s.y < 8;
 }
+inline bool val(const Byte x, const Byte y) {
+    return x < 8 && y < 8;
+}
 
 /**
  * String conversion functions.

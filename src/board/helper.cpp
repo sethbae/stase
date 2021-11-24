@@ -14,64 +14,6 @@ using std::vector;
 #include <sstream>
 using std::stringstream;
 
-
-/*************************************************************************************
- CONVERSIONS        for squares, FENs, SAN, pieces
- ************************************************************************************/
-
-/***** piece to string or char and vice versa       W_KING <----> 'K'           *****/
-
-constexpr char ptoc(Piece p) {
-    switch (p) {
-        case B_KING:    return 'k';
-        case B_QUEEN:   return 'q';
-        case B_ROOK:    return 'r';
-        case B_BISHOP:  return 'b';
-        case B_KNIGHT:  return 'n';
-        case B_PAWN:    return 'p';
-        case W_KING:    return 'K';
-        case W_QUEEN:   return 'Q';
-        case W_ROOK:    return 'R';
-        case W_BISHOP:  return 'B';
-        case W_KNIGHT:  return 'N';
-        case W_PAWN:    return 'P';
-        default:        return '.';
-    }
-}
-
-constexpr Piece ctop(char c) {
-    switch (c) {
-        case 'K':   return W_KING;
-        case 'Q':   return W_QUEEN;
-        case 'R':   return W_ROOK;
-        case 'B':   return W_BISHOP;
-        case 'N':   return W_KNIGHT;
-        case 'P':   return W_PAWN;
-        case 'k':   return B_KING;
-        case 'q':   return B_QUEEN;
-        case 'r':   return B_ROOK;
-        case 'b':   return B_BISHOP;
-        case 'n':   return B_KNIGHT;
-        case 'p':   return B_PAWN;
-        default:    return EMPTY;
-    }
-}
-
-// for algebraic notation (SAN), even black pieces use capitals: B_KNIGHT <----> "N"
-constexpr std::string_view ptos_alg(Piece p) {
-    switch (type(p)) {
-        case KING: return "K";
-        case QUEEN: return "Q";
-        case ROOK: return "R";
-        case BISHOP: return "B";
-        case KNIGHT: return "N";
-        case PAWN: return "";
-        default: return "";
-    }
-}
-
-/***** Move to SAN and SAN to move *****/
-
 /**
  * Converts the given SAN string (eg "Be4") into a Move, operating on the given board.
  * Requires disambiguations and checks to be used. If the move does not appear to describe
@@ -509,7 +451,7 @@ void wr_board_conf(const Board & b, ostream & output) {
     wr_board_conf(b, "", output);
 }
 
-/* prints out 64 bits of binary data from MSB (left) to LSB (right) */
+/* prints out 64 bits of binary lichess_db_puzzle.csv from MSB (left) to LSB (right) */
 void wr_bin_64(uint64_t data, ostream & output) {
     
     uint64_t mask = ( ((uint64_t) 1) << 63);
@@ -542,7 +484,7 @@ void pr_board_conf(const Board & b) {
     wr_board_conf(b, "", cout);
 }
 
-/* prints out 64 bits of binary data from MSB (left) to LSB (right) */
+/* prints out 64 bits of binary lichess_db_puzzle.csv from MSB (left) to LSB (right) */
 void pr_bin_64(uint64_t data) {
     wr_bin_64(data, cout);
 }
