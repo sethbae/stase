@@ -63,8 +63,12 @@ Delta open_path_between(const Board & b, const Square from, const Square to) {
  * to [line_end_point] (inclusive). If it can move onto it, then the square which it can move onto is returned, otherwise
  * SQUARE_SENTINEL is returned.
  * If there are multiple squares on the line which the piece can move to, then the first encountered is returned.
+ *
+ * @param piece_sq the square of the piece to check
+ * @param line_start_point the start square of the line - NOT INCLUDED
+ * @param line_end_point the end square of the line - POTENTIALLY INCLUDED
  */
-Square can_move_onto_line(
+Square square_piece_can_reach_on_line(
         const Board & b, const Square piece_sq, const Square line_start_point, const Square line_end_point) {
 
     if (equal(line_start_point, line_end_point)) { return SQUARE_SENTINEL; }
@@ -86,6 +90,43 @@ Square can_move_onto_line(
     }
 
     return SQUARE_SENTINEL;
+
+}
+
+/**
+ * Checks whether the piece at the given square can move onto the line which runs from [line_start_point] (exclusive)
+ * to [line_end_point] (inclusive). If it can move onto it, then a list of the squares on it can move to is returned.
+ *
+ * This should be used for queens, kings or knights. Other pieces can generally only move onto one square on any given
+ * line (along which they can move).
+ *
+ * @param piece_sq the square of the piece to check
+ * @param line_start_point the (excluded) start point of the line to move on to
+ * @param line_end_point the (included) end point of the line to move on to
+ */
+std::vector<Square> squares_piece_can_reach_on_line(
+        const Board & b, const Square piece_sq, const Square line_start_point, const Square line_end_point) {
+
+    if (equal(line_start_point, line_end_point)) { return std::vector<Square>(); }
+
+    Delta delta = get_delta_between(line_start_point, line_end_point);
+    int x = get_x(line_start_point) + delta.dx, y = get_y(line_start_point) + delta.dy;
+
+    Square temp;
+    std::vector<Square> squares;
+
+    while (val(temp = mksq(x, y))) {
+        if (alpha_covers(b, piece_sq, temp)) {
+            squares.push_back(mksq(x, y));
+        }
+        if (equal(temp, line_end_point)) {
+            return squares;
+        }
+        x += delta.dx;
+        y += delta.dy;
+    }
+
+    return squares;
 
 }
 
