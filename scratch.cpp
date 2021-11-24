@@ -107,20 +107,23 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
     pr_board(gs.board);
     cout << "\nFeatureFrames found for " << h->name << ":\n";
     for (FeatureFrame * ff = gs.feature_frames[h->id]; !is_sentinel(ff->centre); ++ff) {
-        cout << "FeatureFrame: " << sqtos(ff->centre) << " " << sqtos(ff->secondary) << "\n";
+        cout << "FeatureFrame: " << sqtos(ff->centre) << " " << sqtos(ff->secondary);
+        cout << " c1: " << ff->conf_1 << " c2: " << ff->conf_2 << "\n";
     }
 
 }
 
 int main(int argc, char** argv) {
 
-    const std::string fen = "2q2r1k/8/5Pp1/2p1p1Pp/N1QbP3/3R2K1/P1P5/3R4 w - h6 0 37";
+    const std::string fen = std::string("8/8/3K4/8/5P2/8/3PN3/8 w - - 0 1");
+
+    show_hook_frames(fen, &pin_skewer_hook);
 
     Gamestate gs(fen_to_board(fen));
 
-    pr_board_conf(gs.board);
-
-    iterative_deepening_search(fen, 10);
+//    pr_board_conf(gs.board);
+//
+//    iterative_deepening_search(fen, 10);
 
     return 0;
 
