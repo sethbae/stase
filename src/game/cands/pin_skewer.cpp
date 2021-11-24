@@ -142,18 +142,41 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                 continue;
             }
 
-            Square pin_from_square = can_move_onto_line(gs.board, mksq(x, y), ff->centre, line_end);
+            // if we are pinning with a queen, then there may be multiple squares to check
+            if (type(p) == QUEEN) {
 
-            if (is_sentinel(pin_from_square)) {
-                continue;
-            }
+                std::vector<Square> squares_on_line =
+                        squares_piece_can_reach_on_line(gs.board, mksq(x, y), ff->centre, line_end);
 
-            Move pin_move = Move{mksq(x, y), pin_from_square};
-            if (!would_be_unsafe_after(gs, pin_from_square, pin_move)) {
-                if (counter.has_space()) {
-                    moves[counter.inc()] = Move{mksq(x, y), pin_from_square};
-                } else {
-                    return;
+                for (int i = 0; i < squares_on_line.size(); ++i) {
+                    Move pin_move = Move{mksq(x, y), squares_on_line[i]};
+                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)) {
+                        if (counter.has_space()) {
+                            moves[counter.inc()] = Move{mksq(x, y), squares_on_line[i]};
+                        } else {
+                            return;
+                        }
+                    }
+                }
+
+            } else {
+
+                // bishop / rook has at most one square available to it
+
+                Square pin_from_square =
+                        square_piece_can_reach_on_line(gs.board, mksq(x, y), ff->centre, line_end);
+
+                if (is_sentinel(pin_from_square)) {
+                    continue;
+                }
+
+                Move pin_move = Move{mksq(x, y), pin_from_square};
+                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)) {
+                    if (counter.has_space()) {
+                        moves[counter.inc()] = Move{mksq(x, y), pin_from_square};
+                    } else {
+                        return;
+                    }
                 }
             }
 

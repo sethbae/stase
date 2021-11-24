@@ -136,6 +136,7 @@ bool test_retreat_piece();
 bool test_desperado_piece();
 bool test_check_hook();
 bool test_pin_skewer_hook();
+bool test_pin_skewer_resp();
 
 bool stress_test_main();
 

@@ -26,6 +26,7 @@ bool test_game() {
     passed = test_desperado_piece() && passed;
     passed = test_check_hook() && passed;
     passed = test_pin_skewer_hook() && passed;
+    passed = test_pin_skewer_resp() && passed;
 
     return passed;
 }

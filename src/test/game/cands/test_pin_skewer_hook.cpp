@@ -22,8 +22,8 @@ bool expected_frame_matches_actual(const ExpectedFeatureFrame & expected, const 
             && expected.conf_2 == actual.conf_2;
 }
 
-const TestSet<HookTestCase> pin_skewer_test_set{
-    "game-cands-pin-skewer",
+const TestSet<HookTestCase> pin_skewer_hook_test_set{
+    "game-cands-pin-skewer-hook",
     {
         HookTestCase{
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -112,7 +112,7 @@ const TestSet<HookTestCase> pin_skewer_test_set{
     }
 };
 
-bool evaluate_pin_skewer_test_case(const HookTestCase * tc) {
+bool evaluate_pin_skewer_hook_test_case(const HookTestCase * tc) {
 
     Gamestate gs(fen_to_board(tc->fen));
 
@@ -140,5 +140,5 @@ bool evaluate_pin_skewer_test_case(const HookTestCase * tc) {
 }
 
 bool test_pin_skewer_hook() {
-    return evaluate_test_set(&pin_skewer_test_set, &evaluate_pin_skewer_test_case);
+    return evaluate_test_set(&pin_skewer_hook_test_set, &evaluate_pin_skewer_hook_test_case);
 }
