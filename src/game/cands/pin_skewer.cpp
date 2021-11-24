@@ -111,3 +111,52 @@ void find_pin_skewer_hook(const Gamestate & gs, const Square s, std::vector<Feat
     }
 
 }
+
+/**
+ * This responder attempts to pin or skewer the piece as described in the feature frame. It does not
+ * do this using unsafe squares.
+ */
+void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+
+    const Delta d{(SignedByte)ff->conf_1, (SignedByte)ff->conf_2};
+    MoveType dir = direction_of_delta(d);
+
+    // find the line of empty squares along which we can pin/skewer
+    int line_end_x = ff->centre.x, line_end_y = ff->centre.y;
+    while (val(line_end_x + d.dx, line_end_y + d.dy)
+            && gs.board.get(line_end_x + d.dx, line_end_y + d.dy) == EMPTY) {
+        line_end_x += d.dx;
+        line_end_y += d.dy;
+    }
+
+    Square line_end = mksq(line_end_x, line_end_y);
+
+    // check for pieces which can move onto the line of empty squares
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+
+            Piece p = gs.board.get(x, y);
+
+            if (colour(p) == colour(gs.board.get(ff->centre))
+                || !can_move_in_direction(p, dir)) {
+                continue;
+            }
+
+            Square pin_from_square = can_move_onto_line(gs.board, mksq(x, y), ff->centre, line_end);
+
+            if (is_sentinel(pin_from_square)) {
+                continue;
+            }
+
+            Move pin_move = Move{mksq(x, y), pin_from_square};
+            if (!would_be_unsafe_after(gs, pin_from_square, pin_move)) {
+                if (counter.has_space()) {
+                    moves[counter.inc()] = Move{mksq(x, y), pin_from_square};
+                } else {
+                    return;
+                }
+            }
+
+        }
+    }
+}

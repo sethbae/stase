@@ -59,8 +59,8 @@ Delta open_path_between(const Board & b, const Square from, const Square to) {
 }
 
 /**
- * Checks whether the piece at the given square can move onto the line which runs from [line_start_point]
- * to [line_end_point]. If it can move onto it, then the square which it can move onto is returned, otherwise
+ * Checks whether the piece at the given square can move onto the line which runs from [line_start_point] (exclusive)
+ * to [line_end_point] (inclusive). If it can move onto it, then the square which it can move onto is returned, otherwise
  * SQUARE_SENTINEL is returned.
  * If there are multiple squares on the line which the piece can move to, then the first encountered is returned.
  */
@@ -74,9 +74,12 @@ Square can_move_onto_line(
 
     Square temp;
 
-    while (val(temp = mksq(x, y)) && !equal(temp, line_end_point)) {
+    while (val(temp = mksq(x, y))) {
         if (alpha_covers(b, piece_sq, temp)) {
             return temp;
+        }
+        if (equal(temp, line_end_point)) {
+            return SQUARE_SENTINEL;
         }
         x += delta.dx;
         y += delta.dy;
