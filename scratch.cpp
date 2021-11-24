@@ -79,14 +79,16 @@ void number_of_cands() {
  * Runs the responder on the given board, using a feature frame centred on the
  * given square
  */
-void show_responder_moves(const std::string & fen, const Responder & resp, const Square sq) {
+void show_responder_moves(const std::string & fen, const Responder & resp, const FeatureFrame ff) {
 
     Gamestate gs(fen_to_board(fen));
+
+    pr_board(gs.board);
 
     Move moves[100];
     IndexCounter counter(100);
 
-    develop_resp.resp(gs, new FeatureFrame{sq}, moves, counter);
+    resp.resp(gs, &ff, moves, counter);
 
     cout << "Responder moves (" << resp.name << "):\n";
     for (int i = 0; i < counter.idx(); ++i) {
@@ -115,9 +117,10 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
 
 int main(int argc, char** argv) {
 
-    const std::string fen = std::string("8/8/3K4/8/5P2/8/3PN3/8 w - - 0 1");
+    const std::string fen = std::string("Q7/8/8/K7/8/6k1/8/3q4 w - - 0 1");
+    const FeatureFrame ff{stosq("a5"), stosq("a8"), 0, -1};
 
-    show_hook_frames(fen, &pin_skewer_hook);
+    show_responder_moves(fen, pin_skewer_resp, ff);
 
     Gamestate gs(fen_to_board(fen));
 
