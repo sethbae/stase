@@ -50,7 +50,7 @@ set(SOURCE_FILES
         src/game/cands/fork.cpp
         src/game/cands/trade_retreat_desperado.cpp
         src/game/cands/checks.cpp
-        src/game/cands/king_pins.cpp
+        src/game/cands/pin_skewer.cpp
 
         src/utils/utils.h
         src/utils/print.cpp)
@@ -88,7 +88,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_retreat_resp.cpp
         src/test/game/cands/test_desperado_resp.cpp
         src/test/game/cands/test_checks_hook.cpp
-        src/test/game/cands/test_kpinnable_hook.cpp
+        src/test/game/cands/test_pin_skewer_hook.cpp
 
         src/test/board/test_pieces.cpp
         src/test/board/test_square.cpp

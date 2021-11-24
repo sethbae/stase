@@ -135,7 +135,7 @@ bool test_trade_piece();
 bool test_retreat_piece();
 bool test_desperado_piece();
 bool test_check_hook();
-bool test_kpinnable_hook();
+bool test_pin_skewer_hook();
 
 bool stress_test_main();
 
