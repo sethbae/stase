@@ -1,27 +1,5 @@
 #include "../../test.h"
 
-/**
- * This holds strings instead of squares for ease of test-case entry.
- */
-struct ExpectedFeatureFrame {
-    const std::string centre;
-    const std::string secondary;
-    const int conf_1;
-    const int conf_2;
-};
-
-struct HookTestCase {
-    const std::string fen;
-    std::vector<ExpectedFeatureFrame> expected_frames;
-};
-
-bool expected_frame_matches_actual(const ExpectedFeatureFrame & expected, const FeatureFrame & actual) {
-    return equal(stosq(expected.centre), actual.centre)
-            && equal(stosq(expected.secondary), actual.secondary)
-            && expected.conf_1 == actual.conf_1
-            && expected.conf_2 == actual.conf_2;
-}
-
 const TestSet<HookTestCase> pin_skewer_hook_test_set{
     "game-cands-pin-skewer-hook",
     {
@@ -113,30 +91,7 @@ const TestSet<HookTestCase> pin_skewer_hook_test_set{
 };
 
 bool evaluate_pin_skewer_hook_test_case(const HookTestCase * tc) {
-
-    Gamestate gs(fen_to_board(tc->fen));
-
-    discover_feature_frames(gs, &pin_skewer_hook);
-
-    int num_features = 0;
-
-    for (FeatureFrame * ff = gs.feature_frames[pin_skewer_hook.id]; !is_sentinel(ff->centre); ++ff) {
-
-        bool found = false;
-        for (const ExpectedFeatureFrame & expected : tc->expected_frames) {
-            if (expected_frame_matches_actual(expected, *ff)) {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            return false;
-        }
-        ++num_features;
-    }
-
-    return num_features == tc->expected_frames.size();
+    return evaluate_hook_test_case(&pin_skewer_hook, tc);
 }
 
 bool test_pin_skewer_hook() {

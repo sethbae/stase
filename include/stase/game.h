@@ -28,6 +28,9 @@ const bool PIECE_MOVE_TYPES[][6] = {
 inline bool can_move_in_direction(Piece piece, MoveType dir) {
     return PIECE_MOVE_TYPES[piece][dir];
 }
+inline bool can_move_in_direction(Piece p, Delta d) {
+    return can_move_in_direction(p, direction_of_delta(d));
+}
 bool can_move_to_square(const Board &, Square from, Square to);
 bool collinear_points(Square, Square, Square);
 Delta open_path_between(const Board & b, const Square, const Square);

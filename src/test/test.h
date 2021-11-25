@@ -19,6 +19,16 @@ const int q = piece_value(W_QUEEN);
 const int k = piece_value(W_KING);
 const int none = piece_value(W_KING) * 2;
 
+/**
+ * This holds strings instead of squares for ease of test-case entry.
+ */
+struct ExpectedFeatureFrame {
+    const std::string centre;
+    const std::string secondary;
+    const int conf_1;
+    const int conf_2;
+};
+
 
 struct StringTestCase {
     const std::string fen;
@@ -31,12 +41,22 @@ struct ResponderTestCase {
     const std::vector<std::string> expected_results;
 };
 
+struct HookTestCase {
+    const std::string fen;
+    std::vector<ExpectedFeatureFrame> expected_frames;
+};
+
 template <typename T> struct TestSet {
     const std::string name;
     const std::vector<T> cases;
 };
 
+
+Move unpack_four_char_san(const std::string &);
 bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
+bool expected_frame_matches_actual(const ExpectedFeatureFrame &, const FeatureFrame &);
+bool evaluate_responder_test_case(const Responder *p, const ResponderTestCase *);
+bool evaluate_hook_test_case(const Hook *, const HookTestCase *);
 
 template <typename T>
 inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*)) {
@@ -70,42 +90,6 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 }
 
-inline bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCase * tc) {
-
-    Gamestate gs(fen_to_board(tc->fen));
-    Move moves[MAX_MOVES_PER_HOOK];
-    IndexCounter move_counter(MAX_MOVES_PER_HOOK);
-
-    // run the responder on the feature frames
-    for (FeatureFrame ff : tc->feature_frames) {
-        resp->resp(gs, &ff, &moves[0], move_counter);
-    }
-
-    // convert the output to a vector of strings
-    std::vector<std::string> strings;
-    for (int i = 0; i < move_counter.idx(); ++i) {
-        strings.push_back(sqtos(moves[i].from) + sqtos(moves[i].to));
-    }
-
-    // check that they match
-    return assert_string_lists_equal(strings, tc->expected_results);
-}
-
-/**
- * Converts for example "e2e4" into a Move from the e2 square to the e4 square.
- * If the string is not valid, then MOVE_SENTINEL will be returned.
- */
-inline Move unpack_four_char_san(const std::string & s) {
-    if (s.size() != 4) {
-        // invalid string
-        return MOVE_SENTINEL;
-    }
-    return Move{
-        stosq(s.substr(0, 2)),
-        stosq(s.substr(2, 4))
-    };
-}
-
 bool test_board();
 bool test_game();
 
@@ -137,6 +121,7 @@ bool test_desperado_piece();
 bool test_check_hook();
 bool test_pin_skewer_hook();
 bool test_pin_skewer_resp();
+bool test_king_pinned_pieces_hook();
 
 bool stress_test_main();
 
