@@ -72,6 +72,13 @@ struct Gamestate {
         return board.get_white() ? bpieces : wpieces;
     }
 
+    Square * w_kpinned_pieces;
+    Square * b_kpinned_pieces;
+
+    void add_kpinned_piece(const Square);
+    void remove_kpinned_piece(const Square);
+    bool is_kpinned_piece(const Square);
+
     Move last_move;
     Piece last_capture;
 
