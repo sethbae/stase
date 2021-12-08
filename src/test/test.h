@@ -108,6 +108,8 @@ bool test_defend_square();
 bool test_alpha_covers();
 bool test_beta_covers();
 bool test_gamma_covers();
+bool test_kpinned_piece_list();
+
 bool test_develop_piece();
 bool test_knight_fork_hook();
 bool test_sliding_fork_hook();
