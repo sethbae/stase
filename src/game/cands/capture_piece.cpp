@@ -38,7 +38,9 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
             Piece p = b.get(temp);
 
-            if ((p != EMPTY) && can_move_in_direction(p, dir) && colour(p) == capturing_colour) {
+            if ((p != EMPTY) && can_move_in_direction(p, dir)
+                    && colour(p) == capturing_colour
+                    && !gs.is_kpinned_piece(temp)) {
                 // piece of the right colour which can move in the right dir: check value
                 int val = piece_value(p);
                 if (val <= weakest_defender) {

@@ -123,7 +123,7 @@ void Gamestate::add_kpinned_piece(const Square s) {
  * Checks whether the given square contains a piece which is pinned to its king,
  * and is therefore not able to move.
  */
-bool Gamestate::is_kpinned_piece(const Square s) {
+bool Gamestate::is_kpinned_piece(const Square s) const {
 
     Square * list_start = colour(board.get(s)) == WHITE
                             ? w_kpinned_pieces

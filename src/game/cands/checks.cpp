@@ -45,7 +45,7 @@ void find_checks_hook(const Gamestate & gs, const Square s, std::vector<FeatureF
 }
 
 void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    if (counter.has_space()) {
+    if (counter.has_space() && !gs.is_kpinned_piece(ff->centre)) {
         moves[counter.inc()] = Move{ff->centre, ff->secondary, 0};
     }
 }

@@ -285,6 +285,10 @@ void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         return;
     }
 
+    if (gs.is_kpinned_piece(ff->centre)) {
+        return;
+    }
+
     switch (type(b.get(ff->centre))) {
         case BISHOP:
             best_diag_squares(b, ff->centre, moves, move_counter, BISHOPS);

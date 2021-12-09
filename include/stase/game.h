@@ -77,7 +77,7 @@ struct Gamestate {
 
     void add_kpinned_piece(const Square);
     void remove_kpinned_piece(const Square);
-    bool is_kpinned_piece(const Square);
+    bool is_kpinned_piece(const Square) const;
 
     Move last_move;
     Piece last_capture;

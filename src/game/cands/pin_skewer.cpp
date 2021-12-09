@@ -142,6 +142,11 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                 continue;
             }
 
+            // don't use a piece which is already pinned
+            if (gs.is_kpinned_piece(mksq(x, y))) {
+                continue;
+            }
+
             // if we are pinning with a queen, then there may be multiple squares to check
             if (type(p) == QUEEN) {
 

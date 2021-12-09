@@ -18,7 +18,9 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
             Square temp = mksq(x, y);
-            if (colour(b.get(temp)) == defending_colour && !equal(temp, s)) {
+            if (colour(b.get(temp)) == defending_colour
+                    && !equal(temp, s)
+                    && !gs.is_kpinned_piece(temp)) {
                 piece_squares[pieces_point++] = temp;
             }
         }

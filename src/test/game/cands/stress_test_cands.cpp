@@ -53,6 +53,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         Gamestate & gs = states[i];
 
         std::vector<Move> moves = cands(gs);
+        std::vector<Move> legals = legal_moves(gs.board);
 
         if (moves.size() > MAX_TOTAL_CANDS) {
             cout << "\n[" << i << "] FAILED: Received too many candidates (" << moves.size() << ")\n";
@@ -64,6 +65,21 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         for (int j = 0; j < moves.size(); ++j) {
 
             if (!val(moves[j].from) || !val(moves[j].to)) {
+                cout << "\n[" << i << "] FAILED: Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
+                cout << board_to_fen(gs.board) << "\n";
+                pr_board(gs.board);
+                return false;
+            }
+
+            bool is_legal = false;
+            for (const Move & m : legals) {
+                if (equal(m, moves[j])) {
+                    is_legal = true;
+                    break;
+                }
+            }
+
+            if (!is_legal) {
                 cout << "\n[" << i << "] FAILED: Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
                 cout << board_to_fen(gs.board) << "\n";
                 pr_board(gs.board);

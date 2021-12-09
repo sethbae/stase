@@ -7,6 +7,10 @@
  */
 void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
+    if (gs.is_kpinned_piece(ff->centre)) {
+        return;
+    }
+
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -44,6 +48,10 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
  */
 void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
+    if (gs.is_kpinned_piece(ff->centre)) {
+        return;
+    }
+
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -64,6 +72,10 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
  * Tries to capture absolutely any piece available. If none are available, does nothing.
  */
 void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+
+    if (gs.is_kpinned_piece(ff->centre)) {
+        return;
+    }
 
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
