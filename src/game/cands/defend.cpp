@@ -120,7 +120,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         && (type(b.get(temp)) == KING)
                         && (colour(b.get(temp)) == defending_colour)
                         && !equal(temp, s)
-                        && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square})) {
+                        && would_be_safe_for_king_after(gs, defend_from_square, Move{temp, defend_from_square}, defending_colour)) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
                     } else {
