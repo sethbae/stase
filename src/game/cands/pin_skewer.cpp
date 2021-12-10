@@ -227,5 +227,6 @@ void identify_king_pinned_pieces_hook(Gamestate & gs, const Square s, std::vecto
         }
 
         frames.push_back(FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
+        gs.add_kpinned_piece(pinned_sq);
     }
 }

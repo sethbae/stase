@@ -182,7 +182,7 @@ vector<Move> cands_report(Gamestate & gs) {
         cout << "\n\n";
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
+        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
 
             FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
