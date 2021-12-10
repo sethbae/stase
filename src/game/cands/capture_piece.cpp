@@ -83,7 +83,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         for (int i = 0; i < 8; ++i) {
             if (val(temp = mksq(x + XKN[i], y + YKN[i]))
                 && (type(b.get(temp)) == KNIGHT)
-                && (colour(b.get(temp)) == capturing_colour)) {
+                && (colour(b.get(temp)) == capturing_colour)
+                && !gs.is_kpinned_piece(temp)) {
                 if (kn_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = kn_val;
@@ -123,7 +124,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     // pawns
     int pawn_val = piece_value(W_PAWN);
-    if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+    if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)
+            && !gs.is_kpinned_piece(temp)) {
         // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
@@ -137,7 +139,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             }
         }
     }
-    if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)) {
+    if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN) && (capturing_colour == BLACK)
+            && !gs.is_kpinned_piece(temp)) {
         // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
@@ -151,7 +154,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             }
         }
     }
-    if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+    if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)
+             && !gs.is_kpinned_piece(temp)) {
         // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
@@ -165,7 +169,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             }
         }
     }
-    if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)) {
+    if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN) && (capturing_colour == WHITE)
+            && !gs.is_kpinned_piece(temp)) {
         // IMPLICIT: pawns are always <= weakest defender
         if (pawn_val < min_value_seen) {
             // new lowest value; reset and add to the list
