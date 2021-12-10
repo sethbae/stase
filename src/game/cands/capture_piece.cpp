@@ -106,7 +106,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         for (int i = 0; i < 8; ++i) {
             if (val(temp = mksq(x + XD[i], y + YD[i]))
                 && (type(b.get(temp)) == KING)
-                && (colour(b.get(temp)) == capturing_colour)) {
+                && (colour(b.get(temp)) == capturing_colour)
+                && would_be_safe_for_king_after(gs, s, Move{temp, s}, capturing_colour)) {
                 if (k_val < min_value_seen) {
                     // new lowest value; reset and add to the list
                     min_value_seen = k_val;
