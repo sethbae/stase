@@ -94,6 +94,7 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
                         && !equal(temp, s)
+                        && !gs.is_kpinned_piece(temp)
                         && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square})) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
