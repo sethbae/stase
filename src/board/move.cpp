@@ -623,10 +623,9 @@ void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & mov
             knight_moves(b, s, moves);
             break;
             
-        case KING: {
+        case KING:
             king_moves(b, s, moves);
             break;
-        }
             
         case PAWN:
             pawn_moves(b, s, moves);
