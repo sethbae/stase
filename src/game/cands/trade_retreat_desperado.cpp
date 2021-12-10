@@ -57,8 +57,20 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
+    bool is_king = type(gs.board.get(ff->centre)) == KING;
+
     for (int i = 0; i < piece_moves.size(); ++i) {
-        if (!would_be_unsafe_after(gs, piece_moves[i].to, piece_moves[i])) {
+
+        bool would_be_unsafe;
+
+        if (is_king) {
+            const Colour c = colour(gs.board.get(ff->centre));
+            would_be_unsafe = !would_be_safe_for_king_after(gs, piece_moves[i].to, piece_moves[i], c);
+        } else {
+            would_be_unsafe = would_be_unsafe_after(gs, piece_moves[i].to, piece_moves[i]);
+        }
+
+        if (!would_be_unsafe) {
             if (counter.has_space()) {
                 moves[counter.inc()] = piece_moves[i];
             } else {

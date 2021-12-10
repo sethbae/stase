@@ -355,6 +355,7 @@ bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
 /**
  * Calculates exactly the same thing as is_weak_square, but after the given move has
  * taken place.
+ * Not suitable for kings (use eg is_safe_for_king).
  */
 bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, const Move m) {
 
@@ -369,6 +370,7 @@ bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, c
 /**
  * Returns true iff the given square has a weak piece on it. For the definition of weak,
  * see is_weak_square.
+ * Not suitable for kings (use eg is_safe_for_king).
  */
 bool is_unsafe_piece(const Gamestate & gs, const Square s) {
     return (gs.board.get(s) != EMPTY) && is_weak_square(gs, s, colour(gs.board.get(s)));
@@ -376,6 +378,7 @@ bool is_unsafe_piece(const Gamestate & gs, const Square s) {
 
 /**
  * Returns the same as is_unsafe_piece, but after the given move has been played.
+ * Not suitable for kings (use eg is_safe_for_king).
  */
 bool would_be_unsafe_after(const Gamestate & gs, const Square s, const Move m) {
     return (gs.board.get(s) != EMPTY || equal(s, m.to)) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
