@@ -9,7 +9,7 @@
  * -conf1: unused
  * -conf2: unused
  */
-void find_checks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     // find the enemy king
     Square k_sq;

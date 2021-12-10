@@ -16,7 +16,7 @@ using std::setw;
 
 struct BenchHookParam {
     const Hook * h;
-    const Gamestate & gs;
+    Gamestate & gs;
 };
 
 bool run_hook(const BenchHookParam & b_h_p) {

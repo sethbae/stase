@@ -64,7 +64,7 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
  * conf_1: the x delta passing from the second piece to the first piece
  * conf_2: the y delta passing from the second piece to the first piece
  */
-void find_pin_skewer_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     bool check_ortho;
     bool check_diag;
@@ -198,7 +198,7 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
  * conf_1: dx of the pin direction
  * conf_2: dy of the pin direction
  */
-void identify_king_pinned_pieces_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+void identify_king_pinned_pieces_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     Piece king = gs.board.get(s);
 

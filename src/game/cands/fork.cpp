@@ -251,7 +251,7 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
  * -conf1: unused
  * -conf2: unused
  */
-void find_forks_hook(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+void find_forks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     switch (type(gs.board.get(s))) {
         case KNIGHT:

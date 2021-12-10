@@ -61,7 +61,7 @@ struct IndexCounter {
 struct Hook {
     const std::string name;
     const int id;
-    void (*hook)(const Gamestate &, const Square centre, std::vector<FeatureFrame> & frames);
+    void (*hook)(Gamestate &, const Square centre, std::vector<FeatureFrame> & frames);
 };
 
 struct Responder {
@@ -69,8 +69,8 @@ struct Responder {
     void (*resp)(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 };
 
-void discover_feature_frames(const Gamestate &, const Hook *);
-void record_hook_features(const Gamestate &, const Hook *, FeatureFrame *, int);
+void discover_feature_frames(Gamestate &, const Hook *);
+void record_hook_features(Gamestate &, const Hook *, FeatureFrame *, int);
 
 struct FeatureHandler {
     const Hook * hook;
@@ -78,12 +78,12 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-void is_unsafe_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-void is_undeveloped_piece_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_forks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_checks_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_pin_skewer_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
-void identify_king_pinned_pieces_hook(const Gamestate &, const Square, std::vector<FeatureFrame> &);
+void is_unsafe_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void is_undeveloped_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void find_forks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void find_checks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void find_pin_skewer_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void identify_king_pinned_pieces_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);

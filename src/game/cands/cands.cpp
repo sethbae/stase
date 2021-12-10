@@ -11,7 +11,7 @@ using std::cout;
  * Records the feature frames in the right place on the gamestate (allocating memory for them).
  * Also adds a sentinel to the end of the list.
  */
-void record_hook_features(const Gamestate & gs, const Hook * h, FeatureFrame * ff, int n) {
+void record_hook_features(Gamestate & gs, const Hook * h, FeatureFrame * ff, int n) {
 
     gs.feature_frames[h->id] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (n + 1)));
     for (int i = 0; i < n; ++i) {
@@ -24,7 +24,7 @@ void record_hook_features(const Gamestate & gs, const Hook * h, FeatureFrame * f
 /**
  * Runs the given hook over every square on the board and records any successes in feature frames.
  */
-void discover_feature_frames(const Gamestate & gs, const Hook * hook) {
+void discover_feature_frames(Gamestate & gs, const Hook * hook) {
 
     std::vector<FeatureFrame> frames;
     frames.reserve(64);
