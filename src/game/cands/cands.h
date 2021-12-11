@@ -84,6 +84,7 @@ void find_forks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 void find_checks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 void find_pin_skewer_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 void identify_king_pinned_pieces_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
+void can_promote_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
 void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -95,6 +96,7 @@ void retreat_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter
 void desperado_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void play_check(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void pin_or_skewer_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void promote_pawn(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
 const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
@@ -103,6 +105,7 @@ const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 const Hook check_hook = Hook{"check", 3, &find_checks_hook};
 const Hook pin_skewer_hook = Hook{"pin-skewer", 4, &find_pin_skewer_hook};
 const Hook king_pinned_pieces_hook = Hook{"king-pinned-piece", 5, &identify_king_pinned_pieces_hook};
+const Hook promotion_hook = Hook{"promotion", 6, &can_promote_hook};
 
 // the actual responders
 const Responder defend_resp = Responder{"defend", &defend_square};
@@ -114,6 +117,7 @@ const Responder retreat_resp = Responder{"retreat", &retreat_piece};
 const Responder desperado_resp = Responder{"desperado", &desperado_piece};
 const Responder play_check_resp = Responder{"check", &play_check};
 const Responder pin_skewer_resp = Responder{"pin-skewer", &pin_or_skewer_piece};
+const Responder promotion_resp = Responder{"promotion", &promote_pawn};
 
 const std::vector<const Hook *> ALL_HOOKS {
         &king_pinned_pieces_hook,
@@ -121,7 +125,8 @@ const std::vector<const Hook *> ALL_HOOKS {
         &develop_hook,
         &fork_hook,
         &check_hook,
-        &pin_skewer_hook
+        &pin_skewer_hook,
+        &promotion_hook
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
@@ -133,7 +138,8 @@ const std::vector<const Responder *> ALL_RESPONDERS = {
         &retreat_resp,
         &desperado_resp,
         &play_check_resp,
-        &pin_skewer_resp
+        &pin_skewer_resp,
+        &promotion_resp
 };
 
 const std::vector<FeatureHandler> feature_handlers = {
@@ -141,6 +147,11 @@ const std::vector<FeatureHandler> feature_handlers = {
           &king_pinned_pieces_hook,
           { &defend_resp },
           { &capture_resp, &defend_resp }
+        },
+        FeatureHandler{
+            &promotion_hook,
+            { &promotion_resp, &defend_resp },
+            { &defend_resp }
         },
         FeatureHandler{
           &develop_hook,

@@ -51,6 +51,7 @@ set(SOURCE_FILES
         src/game/cands/trade_retreat_desperado.cpp
         src/game/cands/checks.cpp
         src/game/cands/pin_skewer.cpp
+        src/game/cands/promote.cpp
 
         src/utils/utils.h
         src/utils/print.cpp)
