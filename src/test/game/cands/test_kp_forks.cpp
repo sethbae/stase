@@ -126,8 +126,8 @@ bool evaluate_test_case_kp_fork_hook(const StringTestCase *tc) {
 
     for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at king/pawn forks for these tests!
-        if (type(gs.board.get(ff->centre)) == KING || type(gs.board.get(ff->centre)) == PAWN) {
-            strings.push_back(sqtos(ff->secondary));
+        if (type(gs.board.get(ff->secondary)) == KING || type(gs.board.get(ff->secondary)) == PAWN) {
+            strings.push_back(sqtos(ff->centre));
         }
     }
 
