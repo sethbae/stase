@@ -16,8 +16,8 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
         return;
     }
 
-    if ((p == W_PAWN && s.y < 6)
-            || (p == B_PAWN && s.y > 1)) {
+    if ((p == W_PAWN && s.y < 5)
+            || (p == B_PAWN && s.y > 2)) {
         return;
     }
 
@@ -29,7 +29,7 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
         return;
     }
 
-    frames.push_back(FeatureFrame{mksq(s.x, s.y + FORWARD), s});
+    frames.push_back(FeatureFrame{mksq(s.x, s.y + FORWARD), s, 0, 0});
 
 }
 

@@ -124,6 +124,7 @@ bool test_check_hook();
 bool test_pin_skewer_hook();
 bool test_pin_skewer_resp();
 bool test_king_pinned_pieces_hook();
+bool test_promotion_hook();
 
 bool stress_test_main();
 
