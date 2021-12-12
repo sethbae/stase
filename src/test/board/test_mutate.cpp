@@ -1,5 +1,6 @@
 #include "../test.h"
 #include "board.h"
+#include "../../utils/utils.h"
 
 struct MutationTestCase {
     const std::string start;

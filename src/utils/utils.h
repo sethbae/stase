@@ -1,7 +1,7 @@
 #ifndef STASE_UTILS_H
 #define STASE_UTILS_H
 
-#include "../board/move.h"
+#include "board.h"
 
 // converts floating point to two decimal places
 std::string dp_2(double);
