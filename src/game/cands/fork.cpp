@@ -37,7 +37,7 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
         }
 
         if (forked_count >= 2) {
-            frames.push_back(FeatureFrame{fork_square, s, 0, 0});
+            frames.push_back(FeatureFrame{s, fork_square, 0, 0});
         }
     }
 
@@ -163,7 +163,7 @@ void find_forks(
                 }
 
                 if (forked_pieces >= 2) {
-                    frames.push_back(FeatureFrame{temp, forker_sq, 0, 0});
+                    frames.push_back(FeatureFrame{forker_sq, temp, 0, 0});
                 }
 
             }
@@ -199,7 +199,7 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);
 
             if (val(l_sq) && val(r_sq) && forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
-                frames.push_back(FeatureFrame{ m.to, s, 0 , 0});
+                frames.push_back(FeatureFrame{s, m.to, 0 , 0});
             }
         }
     }
@@ -236,7 +236,7 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             }
 
             if (count >= 2) {
-                frames.push_back(FeatureFrame{forker_sq, s});
+                frames.push_back(FeatureFrame{s, forker_sq});
             }
         }
     }
@@ -246,8 +246,8 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
 /**
  * Finds forks which can be played in the given gamestate. Adds feature frames to the given vector to
  * record the ones it does find. The format of the FeatureFrames is this:
- * -centre: the square on which it can play a fork
- * -secondary: the current square of a piece which can play a fork
+ * -centre: the current square of a piece which can play a fork
+ * -secondary: the square on which it can play a fork
  * -conf1: unused
  * -conf2: unused
  */
@@ -276,7 +276,7 @@ void find_forks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> &
  * Responder which takes fork FeatureFrames and plays the fork described.
  */
 void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
-    if (counter.has_space() && !gs.is_kpinned_piece(ff->secondary)) {
-        m[counter.inc()] = Move{ff->secondary, ff->centre, 0};
+    if (counter.has_space() && !gs.is_kpinned_piece(ff->centre)) {
+        m[counter.inc()] = Move{ff->centre, ff->secondary, 0};
     }
 }
