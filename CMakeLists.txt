@@ -36,6 +36,7 @@ set(SOURCE_FILES
 
         src/puzzle/puzzle.cpp
         src/puzzle/read_formats.cpp
+        src/puzzle/evaluate_rating.cpp
 
         src/search/search.cpp
         src/search/thread.cpp
@@ -103,7 +104,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_king_pinned_pieces_hook.cpp src/test/game/cands/test_promotion.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
-set(BENCH_MAIN src/bench/bench_main.cpp src/puzzle/evaluate_rating.cpp)
+set(BENCH_MAIN src/bench/bench_main.cpp)
 set(SCRATCH_MAIN scratch.cpp)
 set(STASE_MAIN src/main.cpp)
 

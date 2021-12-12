@@ -1,6 +1,10 @@
 #ifndef STASE_PUZZLE_H
 #define STASE_PUZZLE_H
 
+#include <string>
+#include <vector>
+#include "board.h"
+
 /**
  * The puzzle class represents complete puzzles with solutions from the lichess database.
  * The list of moves start with the "setup" move, ie the first move which you have to play
@@ -29,5 +33,8 @@ void retrieve_all_puzzle_fens(std::vector<std::string> &);
 void puzzle_gamestates(std::vector<Gamestate> &);
 void puzzle_boards(std::vector<Board> &);
 void retrieve_all_puzzles(std::vector<Puzzle> &);
+
+bool score_puzzle_against_cands(const Puzzle &);
+void test_cands_against_puzzles();
 
 #endif //STASE_PUZZLE_H
