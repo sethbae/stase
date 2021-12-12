@@ -3,8 +3,8 @@
 /**
  * Checks for a pawn on the given square which can promote. Also checks for 3rd / 6th rank
  * pawns which can safely move forward. Writes a feature frame for each one it finds. Format is:
- * -centre: promotion square
- * -secondary: current square of pawn
+ * -centre: current square of pawn
+ * -secondary: promotion square
  * -conf1: unused
  * -conf2: unused
  */
@@ -29,7 +29,7 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
         return;
     }
 
-    frames.push_back(FeatureFrame{mksq(s.x, s.y + FORWARD), s, 0, 0});
+    frames.push_back(FeatureFrame{s, mksq(s.x, s.y + FORWARD), 0, 0});
 
 }
 
@@ -38,6 +38,6 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
  */
 void promote_pawn(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
     if (counter.has_space()) {
-        m[counter.inc()] = Move{ff->secondary, ff->centre};
+        m[counter.inc()] = Move{ff->centre, ff->secondary};
     }
 }
