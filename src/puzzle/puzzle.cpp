@@ -26,6 +26,27 @@ using std::time;
  *       https://database.lichess.org/#puzzles
  ******************************************************************/   
 
+bool read_lines(std::vector<std::string> & vec) {
+
+    ifstream file;
+
+    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
+    if (!file) {
+        cout << "WARNING: could not read puzzle csv\n";
+        return false;
+    }
+
+    string s;
+
+    // before reading the required number of puzzles
+    while (getline(file, s)) {
+        vec.push_back(s);
+    }
+
+    return true;
+
+}
+
 /* fill the given vector with [num] randomly selected puzzles 
     these puzzles will always differ since they are selected using a random seed */
 bool read_fens(unsigned num, vector<string> & vec) {

@@ -1,9 +1,11 @@
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "board.h"
 #include "game.h"
 #include "puzzle.h"
+#include "../utils/utils.h"
 
 /**
  * Reads and returns every FEN from the lichess puzzle database. This uses caching - it's cheap!
@@ -58,6 +60,59 @@ void puzzle_boards(std::vector<Board> & vec) {
         for (std::string fen : fens) {
             cache.push_back(fen_to_board(fen));
         }
+    }
+
+    vec = cache;
+
+}
+
+void retrieve_all_puzzles(std::vector<Puzzle> & vec) {
+
+    static std::vector<Puzzle> cache;
+
+    if (cache.empty()) {
+        std::vector<std::string> csv_lines;
+        csv_lines.reserve(2500000);
+
+        read_lines(csv_lines);
+
+        for (std::string csv_line : csv_lines) {
+
+            // skip first field of csv
+            csv_line = csv_line.substr(csv_line.find_first_of(',') + 1);
+
+            int first_comma = csv_line.find(',', 0);
+            int second_comma = csv_line.find(',', first_comma + 1);
+
+            const std::string fen = csv_line.substr(0, first_comma);
+            const std::string move_str = csv_line.substr(first_comma + 1, second_comma - first_comma - 1);
+
+            std::vector<Move> moves;
+
+            int n = 0;
+            while (n < move_str.size()) {
+
+                int i;
+                for (i = n; i < move_str.size() && move_str[i] != ' '; ++i)
+                    ;
+
+                // n ... i is now a substring containing a move description
+
+                // this is bounds-safe iff the moves are all at least 4 chars, which should be the case
+                std::string four_char_san = move_str.substr(n, 4);
+                moves.push_back(unpack_four_char_san(four_char_san));
+                if (i == n + 5) {
+                    // promotion char was included
+                    Piece prom_piece = ctop(move_str[n + 5]);
+                    moves[moves.size() - 1].set_prom_piece(type(prom_piece));
+                }
+
+                n = i + 1;
+            }
+
+            cache.emplace_back(fen, moves);
+        }
+
     }
 
     vec = cache;
