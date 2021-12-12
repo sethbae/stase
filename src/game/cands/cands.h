@@ -87,7 +87,8 @@ void identify_king_pinned_pieces_hook(Gamestate &, const Square, std::vector<Fea
 void can_promote_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 
 // functions used by responders
-void defend_square(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void defend_centre(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+void defend_secondary(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void capture_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void develop_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void play_fork(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -108,7 +109,8 @@ const Hook king_pinned_pieces_hook = Hook{"king-pinned-piece", 5, &identify_king
 const Hook promotion_hook = Hook{"promotion", 6, &can_promote_hook};
 
 // the actual responders
-const Responder defend_resp = Responder{"defend", &defend_square};
+const Responder defend_centre_resp = Responder{"defend-centre", &defend_centre};
+const Responder defend_secondary_resp = Responder{"defend-secondary", &defend_secondary};
 const Responder capture_resp = Responder{"capture", &capture_piece};
 const Responder develop_resp = Responder{"develop", &develop_piece};
 const Responder play_fork_resp = Responder{"fork", &play_fork};
@@ -130,7 +132,8 @@ const std::vector<const Hook *> ALL_HOOKS {
 };
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
-        &defend_resp,
+        &defend_centre_resp,
+        &defend_secondary_resp,
         &capture_resp,
         &develop_resp,
         &play_fork_resp,
@@ -145,13 +148,13 @@ const std::vector<const Responder *> ALL_RESPONDERS = {
 const std::vector<FeatureHandler> feature_handlers = {
         FeatureHandler{
           &king_pinned_pieces_hook,
-          { &defend_resp },
-          { &capture_resp, &defend_resp }
+          { &defend_centre_resp },
+          { &capture_resp, &defend_centre_resp }
         },
         FeatureHandler{
             &promotion_hook,
-            { &promotion_resp, &defend_resp },
-            { &defend_resp }
+            { &promotion_resp, &defend_centre_resp },
+            { &defend_centre_resp }
         },
         FeatureHandler{
           &develop_hook,
@@ -160,13 +163,13 @@ const std::vector<FeatureHandler> feature_handlers = {
         },
         FeatureHandler{
             &unsafe_piece_hook,
-            { &defend_resp, &trade_resp, &retreat_resp, &desperado_resp },
+            { &defend_centre_resp, &trade_resp, &retreat_resp, &desperado_resp },
             { &capture_resp }
         },
         FeatureHandler{
             &fork_hook,
             { &play_fork_resp },
-            { &defend_resp }
+            { &defend_secondary_resp }
         },
         FeatureHandler{
             &check_hook,

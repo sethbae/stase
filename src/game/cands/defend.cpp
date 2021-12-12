@@ -7,9 +7,8 @@
  * Walks out from the piece looking for other pieces which can move to the squares encountered
  * and therefore can defend the piece. Does not consider discovered defences or promotions.
  */
-void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & move_counter) {
+void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCounter & move_counter) {
 
-    const Square s = ff->centre;
     const Board & b = gs.board;
     const Colour defending_colour = b.get_white() ? WHITE : BLACK;
 
@@ -179,4 +178,18 @@ void defend_square(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     return;
 
+}
+
+/**
+ * Responder which tries to defend the centre square of the given feature frame.
+ */
+void defend_centre(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+    defend_square(gs, ff->centre, moves, counter);
+}
+
+/**
+ * Responder which tries to defend the secondary square of the given feature frame.
+ */
+void defend_secondary(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+    defend_square(gs, ff->secondary, moves, counter);
 }
