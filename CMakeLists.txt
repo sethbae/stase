@@ -54,7 +54,8 @@ set(SOURCE_FILES
         src/game/cands/promote.cpp
 
         src/utils/utils.h
-        src/utils/print.cpp)
+        src/utils/print.cpp
+        src/utils/san.cpp)
 
 set(STASE_SOURCE_FILES)
 
@@ -102,7 +103,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_king_pinned_pieces_hook.cpp src/test/game/cands/test_promotion.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
-set(BENCH_MAIN src/bench/bench_main.cpp)
+set(BENCH_MAIN src/bench/bench_main.cpp src/puzzle/evaluate_rating.cpp)
 set(SCRATCH_MAIN scratch.cpp)
 set(STASE_MAIN src/main.cpp)
 

@@ -52,7 +52,6 @@ template <typename T> struct TestSet {
 };
 
 
-Move unpack_four_char_san(const std::string &);
 bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
 bool expected_frame_matches_actual(const ExpectedFeatureFrame &, const FeatureFrame &);
 bool evaluate_responder_test_case(const Responder *p, const ResponderTestCase *);
