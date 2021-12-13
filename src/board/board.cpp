@@ -347,6 +347,8 @@ void Board::mutate_hard(const Move m) {
 /**
  * Updates the config information for the given board, assuming the move m has just been moved.
  * This updates castling rights, en-passant, turn etc.
+ * This must be called after the board has been updated to the new position. If it is called
+ * beforehand, it will not work correctly.
  */
 void update_config_after_move(Board & b, const Move m) {
     
@@ -354,33 +356,33 @@ void update_config_after_move(Board & b, const Move m) {
     if (b.get_white() && (b.get_cas_ws() || b.get_cas_wl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || b.get(m.from) == W_KING) {
+        if (m.is_cas() || b.get(m.to) == W_KING) {
             b.set_cas_ws(false);
             b.set_cas_wl(false);
         }
-        
+
         // castling rights from rook move
-        if (b.get(m.from) == W_ROOK) {
+        if (b.get(m.to) == W_ROOK) {
             if (equal(m.from, Square{7, 0})) {
                 b.set_cas_ws(false);
             } else if (equal(m.from, Square{0, 0})) {
                 b.set_cas_wl(false);
             }
         }
-    
+
     }
     
     // if black and there are castling rights to lose
     if (!b.get_white() && (b.get_cas_bs() || b.get_cas_bl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || b.get(m.from) == B_KING) {
+        if (m.is_cas() || b.get(m.to) == B_KING) {
             b.set_cas_bs(false);
             b.set_cas_bl(false);
         }
         
         // castling rights from rook move
-        if (b.get(m.from) == B_ROOK) {
+        if (b.get(m.to) == B_ROOK) {
             if (equal(m.from, Square{7, 7})) {
                 b.set_cas_bs(false);
             } else if (equal(m.from, Square{0, 7})) {
@@ -391,7 +393,7 @@ void update_config_after_move(Board & b, const Move m) {
     }
     
     // en-passant
-    if (type(b.get(m.from)) == PAWN) {
+    if (type(b.get(m.to)) == PAWN) {
         if ((b.get_white() && get_y(m.to) - get_y(m.from) == 2)
                 || (!b.get_white() && get_y(m.to) - get_y(m.from) == -2)) {
             b.set_ep_exists(true);
@@ -404,12 +406,12 @@ void update_config_after_move(Board & b, const Move m) {
     }
 
     // half moves
-    if (m.is_cap() || type(b.get(m.from)) == PAWN) {
+    if (m.is_cap() || type(b.get(m.to)) == PAWN) {
         b.set_halfmoves(0);
     } else {
         b.inc_halfmoves();
     }
-    
+
     // whole moves
     if (!b.get_white())
         b.inc_wholemoves();
