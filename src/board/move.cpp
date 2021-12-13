@@ -261,15 +261,16 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 // checks the kings castling squares are empty and check-free: nothing more
 bool castle_checks(Board b, const Colour col, const bool kingside) {
     
-    Square s1, s2, s3; // intermediate squares
+    Square s1, s2, s3, s4; // intermediate squares
     Square k = (col == WHITE) ? mksq(4, 0) : mksq(4, 7); // king starting square
         
     if (col == WHITE && kingside) {
         
         s1 = mksq(5, 0);
         s2 = mksq(6, 0);
+        s3 = mksq(7, 0);
         
-        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY) {
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s4) == W_ROOK) {
             
             b.set(k, EMPTY);
             b.set(s1, W_KING);
@@ -288,8 +289,9 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
         s1 = mksq(3, 0);
         s2 = mksq(2, 0);
         s3 = mksq(1, 0);
+        s4 = mksq(0, 0);
         
-        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY) {
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY && b.get(s4) == W_ROOK) {
             
             b.set(k, EMPTY);
             b.set(s1, W_KING);
@@ -307,8 +309,9 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
         
         s1 = mksq(5, 7);
         s2 = mksq(6, 7);
+        s3 = mksq(7, 7);
         
-        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY) {
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == B_ROOK) {
             
             b.set(k, EMPTY);
             b.set(s1, B_KING);
@@ -323,36 +326,37 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
         }
                   
     } else { // BLACK and !kingside
-        
+
         s1 = mksq(3, 7);
         s2 = mksq(2, 7);
         s3 = mksq(1, 7);
-        
-        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY) {
-            
+        s4 = mksq(0, 7);
+
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY && b.get(s4) == B_ROOK) {
+
             b.set(k, EMPTY);
             b.set(s1, B_KING);
-            
+
             if (!in_check_hard(b, BLACK)) {
                 b.set(s1, EMPTY);
                 b.set(s2, B_KING);
-                
+
                 return !in_check_hard(b, BLACK);
             }
             
         }
     }
-    
+
     return false;
 }
 
 void king_moves(const Board & b, const Square s, vector<Move> & moves) {
-    
+
     Colour kingcol = colour(b.get(s));
     Square sq;
     Move m = empty_move();
     m.from = s;
-    
+
     // check castle for white
     if (kingcol == WHITE && !in_check_hard(b, WHITE)) {
         
