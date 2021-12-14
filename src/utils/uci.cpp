@@ -1,3 +1,4 @@
+#include <iostream>
 #include "utils.h"
 
 /**
@@ -11,7 +12,8 @@ Move uci2move(const std::string & s) {
     }
     Move m{
             stosq(s.substr(0, 2)),
-            stosq(s.substr(2, 4))
+            stosq(s.substr(2, 4)),
+            0
     };
     if (s.size() == 5) {
         m.set_prom_piece(type(ctop(s[4])));
