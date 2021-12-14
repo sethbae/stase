@@ -6,13 +6,18 @@ using std::cin;
 using std::vector;
 #include <string>
 using std::string;
+#include <cstring>
 #include <unistd.h>
 
 #include <execinfo.h>
 #include <signal.h>
+#include <fstream>
 
 #include "board.h"
 #include "search.h"
+#include "utils/utils.h"
+
+const std::string GAME_FILE_DIR = "/home/seth/Documents/stase_lichess";
 
 void print_stack_trace(int sig) {
 
@@ -162,13 +167,72 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
 }
 
-int main() {
+void handle_analysis_request(const std::string & game_id) {
 
-    cout << welcome_message;
+    std::cout << game_id << "\n";
+
+    std::ifstream file;
+
+    file.open(GAME_FILE_DIR + "/" + game_id + ".game", std::ios::in | std::ios::binary | std::ios::ate);
+
+    if (!file) {
+        std::cout << "Could not open file: " << GAME_FILE_DIR + "/" + game_id + ".game\n";
+        return;
+    }
+
+    std::ifstream::pos_type file_size = file.tellg();
+    std::vector<char> bytes(file_size);
+
+    // read all the bytes into a string
+    file.seekg(0, std::ios::beg);
+    file.read(bytes.data(), file_size);
+    const std::string moves_played(bytes.data(), file_size);
+
+    std::cout << moves_played << "\n";
+
+    // read the UCI into a vec of moves
+    std::vector<Move> moves;
+
+    int i = 0;
+    while (i < moves_played.size()) {
+        int j;
+        for (j = i; j < moves_played.size() && moves_played[j] != ' '; ++j)
+            ;
+
+        // i...j is now a substring containing a single UCI move
+        std::string uci = moves_played.substr(i, j-i);
+        std::cout << "uci: " << uci << "\n";
+        moves.push_back(unpack_four_char_san(uci));
+
+        i = j + 1;
+    }
+
+    for (const Move & move : moves) {
+        std::cout << sqtos(move.from) << sqtos(move.to) << "\n";
+    }
+
+}
+
+int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
 
-    play_game(false, 10);
+    bool interactive = true;
+
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-g") == 0) {
+            const std::string game_id(argv[++i]);
+            handle_analysis_request(game_id);
+            interactive = false;
+        } else {
+            cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
+        }
+    }
+
+    if (interactive) {
+        cout << welcome_message;
+        play_game(false, 10);
+    }
 
     pthread_exit(nullptr);
 
