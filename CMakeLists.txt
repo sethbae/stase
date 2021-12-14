@@ -57,7 +57,7 @@ set(SOURCE_FILES
 
         src/utils/utils.h
         src/utils/print.cpp
-        src/utils/san.cpp)
+        src/utils/uci.cpp)
 
 set(STASE_SOURCE_FILES)
 

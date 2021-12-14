@@ -6,6 +6,7 @@
 // converts floating point to two decimal places
 std::string dp_2(double);
 
-Move unpack_four_char_san(const std::string &);
+Move uci2move(const std::string &);
+std::string move2uci(const Move);
 
 #endif //STASE_UTILS_H
