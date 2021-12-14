@@ -167,14 +167,19 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
 }
 
-void handle_analysis_request(const std::string & game_id) {
+/**
+ * Designed for handling a request which can be sent to the lichess API. This looks for
+ * a file in the GAME_FILE_DIR called [game_id].game and reads in UCI moves from it.
+ * Then it analyses the given position and replaces the file contents with the UCI for that move.
+ * @param game_id the id of the game, used in the file name
+ * @param seconds_per_move number of seconds to think for
+ */
+void handle_analysis_request(const std::string & game_id, const int seconds_per_move) {
 
-    std::cout << game_id << "\n";
-
+    // open the file and read in the moves played
     std::ifstream file;
-
-    file.open(GAME_FILE_DIR + "/" + game_id + ".game", std::ios::in | std::ios::binary | std::ios::ate);
-
+    const std::string file_path = GAME_FILE_DIR + "/" + game_id + ".game";
+    file.open(file_path, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file) {
         std::cout << "Could not open file: " << GAME_FILE_DIR + "/" + game_id + ".game\n";
         return;
@@ -186,9 +191,8 @@ void handle_analysis_request(const std::string & game_id) {
     // read all the bytes into a string
     file.seekg(0, std::ios::beg);
     file.read(bytes.data(), file_size);
+    file.close();
     const std::string moves_played(bytes.data(), file_size);
-
-    std::cout << moves_played << "\n";
 
     // read the UCI into a vec of moves
     std::vector<Move> moves;
@@ -201,15 +205,29 @@ void handle_analysis_request(const std::string & game_id) {
 
         // i...j is now a substring containing a single UCI move
         std::string uci = moves_played.substr(i, j-i);
-        std::cout << "uci: " << uci << "\n";
-        moves.push_back(unpack_four_char_san(uci));
+        moves.push_back(uci2move(uci));
 
         i = j + 1;
     }
 
-    for (const Move & move : moves) {
-        std::cout << sqtos(move.from) << sqtos(move.to) << "\n";
+    // pull out the FEN of the position after all moves have been played
+    Gamestate gs(starting_pos());
+    for (const Move & m : moves) {
+        gs.board = gs.board.successor_hard(m);
     }
+    const std::string fen = board_to_fen(gs.board);
+
+    // analyse the position
+    run_in_background(fen);
+    sleep(seconds_per_move);
+    stop_engine();
+    const Move move = fetch_best_move();
+
+    // write the UCI back into the file
+    std::ofstream file_out;
+    file_out.open(file_path, std::fstream::out);
+    file_out << move2uci(move);
+    file_out.close();
 
 }
 
@@ -222,7 +240,7 @@ int main(int argc, char** argv) {
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-g") == 0) {
             const std::string game_id(argv[++i]);
-            handle_analysis_request(game_id);
+            handle_analysis_request(game_id, 10);
             interactive = false;
         } else {
             cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
