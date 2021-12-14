@@ -100,7 +100,7 @@ void retrieve_all_puzzles(std::vector<Puzzle> & vec) {
 
                 // this is bounds-safe iff the moves are all at least 4 chars, which should be the case
                 std::string four_char_san = move_str.substr(n, 4);
-                moves.push_back(unpack_four_char_san(four_char_san));
+                moves.push_back(uci2move(four_char_san));
                 if (i == n + 5) {
                     // promotion char was included
                     Piece prom_piece = ctop(move_str[n + 5]);

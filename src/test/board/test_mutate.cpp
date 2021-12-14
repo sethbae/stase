@@ -184,7 +184,7 @@ TestSet<MutationTestCase> mutation_test_set{
 bool evaluate_mutation_test_case(const MutationTestCase * tc, bool hard) {
 
     Board start = fen_to_board(tc->start);
-    Move m = unpack_four_char_san(tc->move);
+    Move m = uci2move(tc->move);
 
     if (is_sentinel(m)) {
         return false;
