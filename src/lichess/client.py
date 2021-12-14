@@ -107,7 +107,20 @@ def stream_game_events(token: str, game_id: str):
     Creates a stream of incoming events in the given game. This is a generator, iterating over
     which will proceed only as new events arrive. Events include challenges, games starting etc.
     """
-    url = f"{API_BASE}/board/game/stream/{game_id}"
+    url = f"{API_BASE}/bot/game/stream/{game_id}"
 
     for event in _open_stream(token, url):
         yield event
+
+
+def resign_game(token: str, game_id: str) -> bool:
+    """
+    Resigns the game with the given id. Returns true if the request was successful
+    and false otherwise.
+    """
+    r = requests.post(
+        f"{API_BASE}/bot/game/{game_id}/resign",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    return r.status_code == 200
