@@ -356,7 +356,7 @@ void update_config_after_move(Board & b, const Move m) {
     if (b.get_white() && (b.get_cas_ws() || b.get_cas_wl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || b.get(m.to) == W_KING) {
+        if (b.get(m.to) == W_KING) {
             b.set_cas_ws(false);
             b.set_cas_wl(false);
         }
@@ -376,7 +376,7 @@ void update_config_after_move(Board & b, const Move m) {
     if (!b.get_white() && (b.get_cas_bs() || b.get_cas_bl())) {
         
         // castling rights (from king move)
-        if (m.is_cas() || b.get(m.to) == B_KING) {
+        if (b.get(m.to) == B_KING) {
             b.set_cas_bs(false);
             b.set_cas_bl(false);
         }
