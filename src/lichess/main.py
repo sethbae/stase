@@ -5,6 +5,7 @@ from client import (
     respond_to_challenge,
     stream_incoming_events,
     make_move,
+    register_account_as_bot
 )
 from play import play_game
 
@@ -37,22 +38,23 @@ def play_single_games():
     tk: str = read_access_token()
 
     for event in stream_incoming_events(tk):
-        if event["type"] == "challenge":
+        if "error" in event:
+            print(f"Received error: {event}")
+        elif event["type"] == "challenge":
             challenge_id = event["challenge"]["id"]
             challenger_name = event["challenge"]["challenger"]["name"]
             respond_to_challenge(tk, challenge_id)
             print(f"Accepted challenge from {challenger_name}")
         elif event["type"] == "gameStart":
             print(f"Starting game {event['game']['id']}")
-            game_id = event["id"]
-            engine_plays_white = (event["white"]["id"] == "queen_stase_approx")
-            play_game(tk, game_id, engine_plays_white)
+            game_id = event["game"]["id"]
+            play_game(tk, game_id)
         else:
             print(f"Ignoring event of type: {event['type']}")
 
 
 def main():
-    repl_game()
+    play_single_games()
 
 
 if __name__ == "__main__":
