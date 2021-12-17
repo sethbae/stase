@@ -7,10 +7,10 @@ STASE_EXEC_DIR = "/home/seth/CLionProjects/stase2"
 ENGINE_USERNAME = "queen_stase_approx"
 
 
-def play_game(token: str, game_id: str, timeout: int = 15):
+def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
 
     def play_a_move(game_so_far: str) -> bool:
-        move: str = _get_move(game_id, game_so_far, timeout)
+        move: str = _get_move(game_id, game_so_far, time=time, timeout=timeout)
         if move == "ERROR":
             return False
         else:
@@ -49,14 +49,14 @@ def play_game(token: str, game_id: str, timeout: int = 15):
             print(f"Received event of type {event['type']}")
 
 
-def _get_move(game_id: str, moves_played: str, timeout: int = 15) -> str:
+def _get_move(game_id: str, moves_played: str, time: int = 10, timeout: int = 15) -> str:
 
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "w") as file:
         file.write(moves_played)
 
     print("Fetching move...", end="")
 
-    exec_stase_command: str = f"./stase -g {game_id}"
+    exec_stase_command: str = f"./stase -t {time} -g {game_id}"
     engine_process = subprocess.Popen(
         exec_stase_command.split(),
         cwd=STASE_EXEC_DIR,
