@@ -34,7 +34,6 @@ def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
 
         elif event["type"] == "gameState":
 
-            print("Received game update")
             moves_played: str = event["moves"].strip()
             half_move_count = moves_played.count(' ') + 1
 
