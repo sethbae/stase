@@ -236,12 +236,16 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
 
     bool interactive = true;
+    int t = 10;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-g") == 0) {
             const std::string game_id(argv[++i]);
-            handle_analysis_request(game_id, 10);
+            handle_analysis_request(game_id, t);
             interactive = false;
+        } else if (strcmp(argv[i], "-t") == 0) {
+            const std::string time(argv[++i]);
+            t = stoi(time);
         } else {
             cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
         }
@@ -249,7 +253,7 @@ int main(int argc, char** argv) {
 
     if (interactive) {
         cout << welcome_message;
-        play_game(false, 10);
+        play_game(false, t);
     }
 
     pthread_exit(nullptr);
