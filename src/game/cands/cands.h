@@ -157,9 +157,9 @@ const std::vector<FeatureHandler> feature_handlers = {
             { &defend_centre_resp }
         },
         FeatureHandler{
-          &develop_hook,
-          { &develop_resp },
-          { }
+            &check_hook,
+            { &play_check_resp },
+            { }
         },
         FeatureHandler{
             &unsafe_piece_hook,
@@ -172,14 +172,14 @@ const std::vector<FeatureHandler> feature_handlers = {
             { &defend_secondary_resp }
         },
         FeatureHandler{
-            &check_hook,
-            { &play_check_resp },
-            { }
-        },
-        FeatureHandler{
             &pin_skewer_hook,
             { &retreat_resp, &trade_resp },
             { &pin_skewer_resp }
+        },
+        FeatureHandler{
+                &develop_hook,
+                { &develop_resp },
+                { }
         }
 };
 
