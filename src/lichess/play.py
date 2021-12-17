@@ -57,17 +57,26 @@ def _get_move(game_id: str, moves_played: str) -> str:
     print("Fetching move...", end="")
 
     exec_stase_command: str = f"./stase -g {game_id}"
-    engine_process = subprocess.Popen(exec_stase_command.split(), cwd=STASE_EXEC_DIR, stdout=subprocess.PIPE)
-    engine_process.wait()
+    engine_process = subprocess.Popen(
+        exec_stase_command.split(),
+        cwd=STASE_EXEC_DIR,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    try:
+        engine_process.wait(timeout=15)
+        engine_failed = False
+    except subprocess.TimeoutExpired:
+        engine_failed = True
+
+    output, error = engine_process.communicate()
 
     print("done")
 
-    engine_output = [line for line in engine_process.stdout]
-
-    if engine_output:
+    if output or error or engine_failed:
         print("Received error from engine:")
-        for line in engine_output:
-            print(line)
+        print(f"Output: {output}")
+        print(f"Error: {error}")
         return "ERROR"
 
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "r") as file:
