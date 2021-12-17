@@ -7,7 +7,7 @@ using std::string;
 #include <iomanip>
 #include <cmath>
 
-typedef int_fast32_t Eval;
+typedef int32_t Eval;
 
 const Eval BLACK_GIVES_MATE = 0x80000000;
 const Eval WHITE_GIVES_MATE = 0x7FFFFFFF;
@@ -92,7 +92,9 @@ constexpr int int_eval(const Eval eval) {
 inline std::string etos(const Eval e) {
 
     // handle checkmates
-    if (e == white_has_been_mated() || e == black_has_been_mated()) {
+    if (e == white_has_been_mated()) {
+        return "-#";
+    } else if (e == black_has_been_mated()) {
         return "#";
     } else if (e & WHITE_MATE_MASK) {
         return "#" + std::to_string(WHITE_GIVES_MATE - e);
