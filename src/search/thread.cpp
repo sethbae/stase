@@ -1,8 +1,8 @@
 #include <pthread.h>
 #include <string>
 #include <search.h>
-#include <csignal>
 #include "metrics.h"
+#include "thread.h"
 
 struct EngineParams {
     pthread_t t_id;
@@ -20,21 +20,19 @@ EngineParams current_running_config =
         };
 
 /**
- * Signal handler for being interrupted. Immediately exits with no cleanup.
+ * Interrupts the calling thread. Immediately exits with no cleanup.
  */
 void interrupt_execution(int) {
     pthread_exit(nullptr);
 }
 
 /**
- * Entry point for the background thread. Method will not exit - interrupt
- * with SIGINT to stop it!
+ * Entry point for the background thread. Stop using abort_analysis().
  */
 void * start(void *) {
 
-    signal(SIGINT, &interrupt_execution);
-
     reset_node_count();
+    reset_abort_flag();
     search_indefinite(current_running_config.root);
 
     return nullptr;
@@ -75,7 +73,7 @@ void run_in_background(const std::string & fen) {
 void stop_engine() {
 
     // kill the thread and wait for it to exit
-    pthread_kill(current_running_config.t_id, SIGINT);
+    abort_analysis();
     pthread_join(current_running_config.t_id, nullptr);
 
     // retrieve info from the run

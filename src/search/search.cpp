@@ -1,5 +1,6 @@
 #include "game.h"
 #include "search.h"
+#include "thread.h"
 
 #include <vector>
 using std::vector;
@@ -10,13 +11,20 @@ using std::ofstream;
 #include <ostream>
 using std::ostream;
 
+// global kill switch to gracefully exit
+bool engine_abort = false;
+void abort_analysis() {
+    engine_abort = true;
+}
+void reset_abort_flag() {
+    engine_abort = false;
+}
+
 // hacky way to count the number of nodes we create
 int COUNT = 0;
-
 int node_count() {
     return COUNT;
 }
-
 void reset_node_count() {
     COUNT = 0;
 }
@@ -245,6 +253,10 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
     }
 
     update_score(node);
+
+    if (engine_abort) {
+        interrupt_execution(0);
+    }
 
 }
 

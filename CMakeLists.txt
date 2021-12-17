@@ -42,6 +42,7 @@ set(SOURCE_FILES
         src/search/search.cpp
         src/search/thread.cpp
         src/search/metrics.h
+        src/search/thread.h
 
         src/game/cands/cands.h
         src/game/cands/cands.cpp

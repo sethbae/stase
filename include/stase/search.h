@@ -27,7 +27,6 @@ void delete_tree(SearchNode *);
 int subtree_size(SearchNode *);
 void write_to_file(SearchNode*, std::ostream &);
 
-
 void run_in_background(const std::string & fen);
 void stop_engine();
 Move fetch_best_move();
