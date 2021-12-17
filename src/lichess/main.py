@@ -31,7 +31,7 @@ def repl_game():
                     print("Move failed!")
 
 
-def play_single_games():
+def play_single_games(timeout: int = 15):
     """
     Accepts all challenges but only plays one game at a time.
     """
@@ -48,13 +48,13 @@ def play_single_games():
         elif event["type"] == "gameStart":
             print(f"Starting game {event['game']['id']}")
             game_id = event["game"]["id"]
-            play_game(tk, game_id)
+            play_game(tk, game_id, timeout=timeout)
         else:
             print(f"Ignoring event of type: {event['type']}")
 
 
 def main():
-    play_single_games()
+    play_single_games(timeout=15)
 
 
 if __name__ == "__main__":
