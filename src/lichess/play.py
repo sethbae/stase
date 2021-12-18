@@ -20,8 +20,11 @@ def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15)
         if move == "ERROR":
             print("Encountered engine error")
             return False
+        elif move == "`0`0":
+            print("No move possible")
+            return True
         else:
-            print(f"Playing move {move}")
+            print(f"{move}")
             return make_move(token, game_id, move)
 
     as_white: bool = False
@@ -80,7 +83,7 @@ def _get_move(game_id: str, moves_played: str, think_time: int = 10, timeout: in
 
     while time.time() < stop_time:
         time.sleep(0.2)
-        if engine_process.poll():
+        if engine_process.poll() is not None:
             engine_failed = False
             break
 
