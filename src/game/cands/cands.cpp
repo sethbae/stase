@@ -122,6 +122,10 @@ vector<Move> cands(Gamestate & gs) {
         vec.push_back(all_moves[j]);
     }
 
+    if (m == 0) {
+        vec = legal_moves(gs.board);
+    }
+
     return vec;
 
 }
