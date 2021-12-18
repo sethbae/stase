@@ -5,6 +5,7 @@
 
 void abort_analysis();
 void reset_abort_flag();
+void check_abort();
 
 void interrupt_execution(int);
 

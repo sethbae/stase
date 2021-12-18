@@ -172,6 +172,8 @@ void update_score(SearchNode * node) {
         return;
     }
 
+    check_abort();
+
     // find the best score among children
     node->score = node->children[0]->score;
     node->best_child = node->children[0];
@@ -205,6 +207,8 @@ void update_score(SearchNode * node) {
  * all nodes are updated accordingly.
  */
 void deepen_tree(SearchNode * node, int alpha, int beta) {
+
+    check_abort();
 
     bool white = node->gs->board.get_white();
 
@@ -254,9 +258,7 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
 
     update_score(node);
 
-    if (engine_abort) {
-        interrupt_execution(0);
-    }
+    check_abort();
 
 }
 
@@ -315,7 +317,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         }
     }
 
-    // record_tree_in_file("stase_tree", &root);
+     record_tree_in_file("stase_tree", &root);
 
     return moves;
 }
@@ -342,4 +344,13 @@ void delete_tree(SearchNode * node) {
     }
     delete node->gs;
     delete node;
+}
+
+/**
+ * Checks whether the engine abort flag has been set and gracefully exits if so.
+ */
+void check_abort() {
+    if (engine_abort) {
+        interrupt_execution(0);
+    }
 }
