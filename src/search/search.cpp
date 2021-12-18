@@ -317,7 +317,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         }
     }
 
-     record_tree_in_file("stase_tree", &root);
+//     record_tree_in_file("stase_tree", &root);
 
     return moves;
 }
