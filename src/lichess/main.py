@@ -1,3 +1,4 @@
+import subprocess
 import sys
 from client import (
     read_access_token,
@@ -8,6 +9,11 @@ from client import (
     register_account_as_bot
 )
 from play import play_game
+
+
+def rebuild_stase() -> None:
+    subprocess.Popen("cmake .".split(), cwd="/home/seth/CLionProjects/stase2", stdout=subprocess.PIPE).wait()
+    subprocess.Popen("make stase".split(), cwd="/home/seth/CLionProjects/stase2", stdout=subprocess.PIPE).wait()
 
 
 def repl_game():
@@ -37,6 +43,8 @@ def play_single_games(time: int = 10, timeout: int = 15):
     """
     tk: str = read_access_token()
 
+    print("Waiting for incoming challenges.")
+
     for event in stream_incoming_events(tk):
         if "error" in event:
             print(f"Received error: {event}")
@@ -54,7 +62,10 @@ def play_single_games(time: int = 10, timeout: int = 15):
 
 
 def main():
-    play_single_games(time=10, timeout=15)
+    print("Building engine...", end="")
+    rebuild_stase()
+    print("done!")
+    play_single_games(time=5, timeout=10)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
     def play_a_move(game_so_far: str) -> bool:
         move: str = _get_move(game_id, game_so_far, time=time, timeout=timeout)
         if move == "ERROR":
+            print("Encountered engine error")
             return False
         else:
             print(f"Playing move {move}")
@@ -40,7 +41,7 @@ def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
             if (as_white and half_move_count % 2 == 0)\
                     or (not as_white and half_move_count % 2 == 1):
                 if not play_a_move(moves_played):
-                    print("Error encountered")
+                    print("Error encountered: resigning the game")
                     resign_game(token, game_id)
                     return
 
@@ -59,8 +60,8 @@ def _get_move(game_id: str, moves_played: str, time: int = 10, timeout: int = 15
     engine_process = subprocess.Popen(
         exec_stase_command.split(),
         cwd=STASE_EXEC_DIR,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stdout=subprocess.STDOUT,
+        stderr=subprocess.STDOUT
     )
     try:
         engine_process.wait(timeout=timeout)
