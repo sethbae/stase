@@ -1,16 +1,22 @@
 import subprocess
+import time
 
-from lichess.client import stream_game_events, make_move, resign_game
+from client import (
+    stream_game_events,
+    make_move,
+    resign_game
+)
+from info import (
+    GAME_FILE_DIR,
+    STASE_SRC_DIR,
+    ENGINE_USERNAME
+)
 
-GAME_FILE_DIR = "/home/seth/Documents/stase_lichess"
-STASE_EXEC_DIR = "/home/seth/CLionProjects/stase2"
-ENGINE_USERNAME = "queen_stase_approx"
 
-
-def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
+def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15):
 
     def play_a_move(game_so_far: str) -> bool:
-        move: str = _get_move(game_id, game_so_far, time=time, timeout=timeout)
+        move: str = _get_move(game_id, game_so_far, think_time=think_time, timeout=timeout)
         if move == "ERROR":
             print("Encountered engine error")
             return False
@@ -49,34 +55,32 @@ def play_game(token: str, game_id: str, time: int = 10, timeout: int = 15):
             print(f"Received event of type {event['type']}")
 
 
-def _get_move(game_id: str, moves_played: str, time: int = 10, timeout: int = 15) -> str:
+def _get_move(game_id: str, moves_played: str, think_time: int = 10, timeout: int = 15) -> str:
 
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "w") as file:
         file.write(moves_played)
 
     print("Fetching move...", end="")
 
-    exec_stase_command: str = f"./stase -t {time} -g {game_id}"
+    exec_stase_command: str = f"./stase -t {think_time} -g {game_id}"
     engine_process = subprocess.Popen(
         exec_stase_command.split(),
-        cwd=STASE_EXEC_DIR,
-        stdout=subprocess.STDOUT,
-        stderr=subprocess.STDOUT
+        cwd=STASE_SRC_DIR,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
     )
-    try:
-        engine_process.wait(timeout=timeout)
-        engine_failed = False
-    except subprocess.TimeoutExpired:
-        engine_failed = True
 
-    output, error = engine_process.communicate()
+    engine_failed = True
+    stop_time = time.time() + timeout
 
-    print("done")
+    while time.time() < stop_time:
+        time.sleep(0.2)
+        if engine_process.poll():
+            engine_failed = False
+            break
 
-    if output or error or engine_failed:
-        print("Received error from engine:")
-        print(f"Output: {output}")
-        print(f"Error: {error}")
+    if engine_failed:
+        engine_process.kill()
         return "ERROR"
 
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "r") as file:

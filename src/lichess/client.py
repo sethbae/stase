@@ -1,19 +1,7 @@
 import json
 import requests
 from typing import Dict, List
-
-
-API_BASE: str = "https://lichess.org/api"
-
-
-def read_access_token() -> str:
-    """
-    Reads the lichess personal access token required to access stase's account.
-    """
-    with open(".env", "r") as file:
-        token = file.read()
-
-    return token.strip()
+from info import API_BASE
 
 
 def register_account_as_bot(token: str) -> bool:

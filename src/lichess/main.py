@@ -1,19 +1,21 @@
 import subprocess
 import sys
 from client import (
-    read_access_token,
-    get_incoming_challenges,
     respond_to_challenge,
     stream_incoming_events,
     make_move,
-    register_account_as_bot
 )
 from play import play_game
+from info import (
+    read_access_token,
+    STASE_SRC_DIR,
+)
 
 
 def rebuild_stase() -> None:
-    subprocess.Popen("cmake .".split(), cwd="/home/seth/CLionProjects/stase2", stdout=subprocess.PIPE).wait()
-    subprocess.Popen("make stase".split(), cwd="/home/seth/CLionProjects/stase2", stdout=subprocess.PIPE).wait()
+    subprocess.Popen("git pull".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
+    subprocess.Popen("cmake .".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
+    subprocess.Popen("make stase".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
 
 
 def repl_game():
@@ -37,7 +39,7 @@ def repl_game():
                     print("Move failed!")
 
 
-def play_single_games(time: int = 10, timeout: int = 15):
+def play_single_games(think_time: int = 10, timeout: int = 15):
     """
     Accepts all challenges but only plays one game at a time.
     """
@@ -56,7 +58,7 @@ def play_single_games(time: int = 10, timeout: int = 15):
         elif event["type"] == "gameStart":
             print(f"Starting game {event['game']['id']}")
             game_id = event["game"]["id"]
-            play_game(tk, game_id, time=time, timeout=timeout)
+            play_game(tk, game_id, think_time=think_time, timeout=timeout)
         else:
             print(f"Ignoring event of type: {event['type']}")
 
@@ -65,7 +67,7 @@ def main():
     print("Building engine...", end="")
     rebuild_stase()
     print("done!")
-    play_single_games(time=5, timeout=10)
+    play_single_games(think_time=5, timeout=10)
 
 
 if __name__ == "__main__":
