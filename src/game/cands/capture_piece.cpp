@@ -1,3 +1,4 @@
+#include <iostream>
 #include "../heur/heur.h"
 #include "cands.h"
 #include "game.h"
@@ -43,7 +44,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                     && !gs.is_kpinned_piece(temp)) {
                 // piece of the right colour which can move in the right dir: check value
                 int val = piece_value(p);
-                if (val <= weakest_defender) {
+                if (val < piece_value(b.get(s)) || val <= weakest_defender) {
                     if (val < min_value_seen) {
                         // new lowest value; reset and add to the list
                         min_value_seen = val;
@@ -79,21 +80,24 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
     // knights
     int kn_val = piece_value(W_KNIGHT);
-    if (min_value_seen >= kn_val && weakest_defender >= kn_val) {
-        for (int i = 0; i < 8; ++i) {
-            if (val(temp = mksq(x + XKN[i], y + YKN[i]))
-                && (type(b.get(temp)) == KNIGHT)
-                && (colour(b.get(temp)) == capturing_colour)
-                && !gs.is_kpinned_piece(temp)) {
-                if (kn_val < min_value_seen) {
-                    // new lowest value; reset and add to the list
-                    min_value_seen = kn_val;
-                    counter.current_index = local_reset_point;
-                    moves[counter.current_index++] = Move{temp, s, 0};
-                } else if (kn_val == min_value_seen) {
-                    // equal lowest value; append
-                    if (counter.has_space()) {
-                        moves[counter.inc()] = Move{temp, s, 0};
+    if (min_value_seen >= kn_val) {
+        if (kn_val < piece_value(b.get(s)) || weakest_defender >= kn_val) {
+            for (int i = 0; i < 8; ++i) {
+                if (val(temp = mksq(x + XKN[i], y + YKN[i]))
+                    && (type(b.get(temp)) == KNIGHT)
+                    && (colour(b.get(temp)) == capturing_colour)
+                    && !gs.is_kpinned_piece(temp)) {
+
+                    if (kn_val < min_value_seen) {
+                        // new lowest value; reset and add to the list
+                        min_value_seen = kn_val;
+                        counter.current_index = local_reset_point;
+                        moves[counter.current_index++] = Move{temp, s, 0};
+                    } else if (kn_val == min_value_seen) {
+                        // equal lowest value; append
+                        if (counter.has_space()) {
+                            moves[counter.inc()] = Move{temp, s, 0};
+                        }
                     }
                 }
             }

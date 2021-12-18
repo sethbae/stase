@@ -84,11 +84,27 @@ const TestSet<ResponderTestCase> cap_test_set = {
                 },
                 // takes better but defended piece
                 ResponderTestCase{
-                        "8/8/8/8/1k2K3/1rqR3R/8/8 w - - 0 1",
+                        "8/8/8/8/1b2K3/1rqR3R/8/8 w - - 0 1",
                         std::vector<FeatureFrame>{
-                                FeatureFrame{stosq("c3"), SQUARE_SENTINEL, r, r}
+                                FeatureFrame{stosq("c3"), SQUARE_SENTINEL, r, b}
                         },
                         {"d3c3"}
+                },
+                // takes better but defended piece #2
+                ResponderTestCase{
+                        "8/8/8/8/7p/6q1/7P/4B3 w - - 0 1",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("g3"), SQUARE_SENTINEL, b, p}
+                        },
+                        {"h2g3"}
+                },
+                // takes better but defended piece #3
+                ResponderTestCase{
+                        "rnb1kbnr/ppp2p1p/4p3/3p2p1/3PP2q/5N2/PPPN1PPP/R1BQKB1R w KQkq - 0 5",
+                        std::vector<FeatureFrame>{
+                                FeatureFrame{stosq("h4"), SQUARE_SENTINEL, kn, p}
+                        },
+                        {"f3h4"}
                 },
                 // has two options #1
                 ResponderTestCase{
