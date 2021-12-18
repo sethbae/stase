@@ -6,6 +6,7 @@
 
 const int MAX_TOTAL_CANDS = 15;
 const int MAX_MOVES_PER_HOOK = 10;
+const int MAX_MOVES_PER_FRAME = 4;
 
 struct FeatureFrame {
     Square centre;
@@ -47,6 +48,7 @@ struct IndexCounter {
      */
     inline void add_allowance(int limit) {
         soft_limit = current_index + limit;
+        if (soft_limit > hard_limit) { soft_limit = hard_limit; }
     }
 
     /**

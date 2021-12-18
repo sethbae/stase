@@ -66,7 +66,7 @@ vector<Move> cands(Gamestate & gs) {
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
-    for (int i = 0; i < feature_handlers.size(); ++i) {
+    for (int i = 0; i < feature_handlers.size() && m < MAX_TOTAL_CANDS; ++i) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
@@ -86,10 +86,14 @@ vector<Move> cands(Gamestate & gs) {
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
+            counter.clear_soft_limit();
+            counter.add_allowance(MAX_MOVES_PER_FRAME);
+
             for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
                 responders[k]->resp(gs, &ff, moves, counter);
             }
 
+            counter.clear_soft_limit();
             if (!counter.has_space()) {
                 break;
             }
@@ -156,7 +160,7 @@ vector<Move> cands_report(Gamestate & gs) {
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 
-    for (int i = 0; i < feature_handlers.size(); ++i) {
+    for (int i = 0; i < feature_handlers.size() && m < MAX_TOTAL_CANDS; ++i) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
@@ -194,6 +198,9 @@ vector<Move> cands_report(Gamestate & gs) {
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
+            counter.clear_soft_limit();
+            counter.add_allowance(MAX_MOVES_PER_FRAME);
+
             for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
                 cout << "   Applying " << responders[k]->name << "\n";
                 int prev_num = counter.idx();
@@ -209,6 +216,7 @@ vector<Move> cands_report(Gamestate & gs) {
                 }
             }
 
+            counter.clear_soft_limit();
             if (!counter.has_space()) {
                 break;
             }
