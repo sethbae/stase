@@ -51,6 +51,11 @@ def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15)
                     resign_game(token, game_id)
                     return
 
+        elif event["type"] == "gameFinish":
+
+            print(f"Game {event['game']['id']} has ended")
+            return
+
         else:
             print(f"Received event of type {event['type']}")
 

@@ -59,6 +59,9 @@ def play_single_games(think_time: int = 10, timeout: int = 15):
             print(f"Starting game {event['game']['id']}")
             game_id = event["game"]["id"]
             play_game(tk, game_id, think_time=think_time, timeout=timeout)
+        elif event["type"] == "gameFinish":
+            # no action required
+            pass
         else:
             print(f"Ignoring event of type: {event['type']}")
 
