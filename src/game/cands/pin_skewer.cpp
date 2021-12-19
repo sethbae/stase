@@ -142,11 +142,6 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                 continue;
             }
 
-            // don't use a piece which is already pinned
-            if (gs.is_kpinned_piece(mksq(x, y))) {
-                continue;
-            }
-
             // if we are pinning with a queen, then there may be multiple squares to check
             if (type(p) == QUEEN) {
 
@@ -155,7 +150,8 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
 
                 for (int i = 0; i < squares_on_line.size(); ++i) {
                     Move pin_move = Move{mksq(x, y), squares_on_line[i]};
-                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)) {
+                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
+                            && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
                         if (counter.has_space()) {
                             moves[counter.inc()] = Move{mksq(x, y), squares_on_line[i]};
                         } else {
@@ -176,7 +172,8 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                 }
 
                 Move pin_move = Move{mksq(x, y), pin_from_square};
-                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)) {
+                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
+                        && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
                     if (counter.has_space()) {
                         moves[counter.inc()] = Move{mksq(x, y), pin_from_square};
                     } else {
@@ -227,6 +224,6 @@ void identify_king_pinned_pieces_hook(Gamestate & gs, const Square s, std::vecto
         }
 
         frames.push_back(FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
-        gs.add_kpinned_piece(pinned_sq);
+        gs.add_kpinned_piece(pinned_sq, d);
     }
 }

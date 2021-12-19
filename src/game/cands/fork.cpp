@@ -276,7 +276,7 @@ void find_forks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> &
  * Responder which takes fork FeatureFrames and plays the fork described.
  */
 void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
-    if (counter.has_space() && !gs.is_kpinned_piece(ff->centre)) {
+    if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
         m[counter.inc()] = Move{ff->centre, ff->secondary, 0};
     }
 }

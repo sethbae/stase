@@ -12,7 +12,7 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
 
     Piece p = gs.board.get(s);
 
-    if (type(p) != PAWN || gs.is_kpinned_piece(s)) {
+    if (type(p) != PAWN) {
         return;
     }
 
@@ -25,7 +25,8 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
     Square temp = mksq(s.x, s.y + FORWARD);
 
     if (gs.board.get(temp) != EMPTY
-        || would_be_unsafe_after(gs, temp, Move{s, temp})) {
+        || would_be_unsafe_after(gs, temp, Move{s, temp})
+        || gs.is_kpinned_piece(s, get_delta_between(s, temp))) {
         return;
     }
 

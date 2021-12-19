@@ -18,8 +18,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
         for (int y = 0; y < 8; ++y) {
             Square temp = mksq(x, y);
             if (colour(b.get(temp)) == defending_colour
-                    && !equal(temp, s)
-                    && !gs.is_kpinned_piece(temp)) {
+                    && !equal(temp, s)) {
                 piece_squares[pieces_point++] = temp;
             }
         }
@@ -54,9 +53,12 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                         continue;
                     }
 
+                    Delta mov_dir = get_delta_between(temp, piece_squares[j]);
+
                     if (can_move_to_square(b, piece_squares[j], temp)
                             && can_move_in_direction(b.get(piece_squares[j]), dir)
-                            && !would_be_unsafe_after(gs, temp, Move{piece_squares[j], temp})) {
+                            && !would_be_unsafe_after(gs, temp, Move{piece_squares[j], temp})
+                            && !gs.is_kpinned_piece(piece_squares[j], mov_dir)) {
                         if (move_counter.has_space()) {
                             moves[move_counter.inc()] = {piece_squares[j], temp, 0};
                         } else {
@@ -93,7 +95,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                         && (type(b.get(temp)) == KNIGHT)
                         && (colour(b.get(temp)) == defending_colour)
                         && !equal(temp, s)
-                        && !gs.is_kpinned_piece(temp)
+                        && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)
                         && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square})) {
                     if (move_counter.has_space()) {
                         moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
@@ -149,35 +151,33 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                     && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)
                     && !would_be_unsafe_after(gs, left_pawn_defence_square,
                                             Move{piece_squares[i], left_pawn_defence_square})) {
-                if (move_counter.has_space()) {
-                    moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
-                } else {
-                    // no space remaining
-                    return;
+                Delta mov_dir = get_delta_between(left_pawn_defence_square, piece_squares[i]);
+                if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
+                    if (move_counter.has_space()) {
+                        moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
+                    } else {
+                        // no space remaining
+                        return;
+                    }
                 }
             } else if (val(right_pawn_defence_square)
                         && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)
                         && !would_be_unsafe_after(gs, right_pawn_defence_square,
                                                 Move{piece_squares[i], right_pawn_defence_square})) {
-                if (move_counter.has_space()) {
-                    moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
-                } else {
-                    // no space remaining
-                    return;
+                Delta mov_dir = get_delta_between(right_pawn_defence_square, piece_squares[i]);
+                if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
+                    if (move_counter.has_space()) {
+                        moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
+                    } else {
+                        // no space remaining
+                        return;
+                    }
                 }
             }
-
         }
     }
 
-//    cout << "All moves(" << sqtos(s) << "):\n";
-//    for (int i = 0; i < move_counter; ++i) {
-//        Move move = m->moves[i];
-//        cout << "Move from " << sqtos(move.from) << " to " << sqtos(move.to) << "\n";
-//    }
-
     return;
-
 }
 
 /**

@@ -54,7 +54,7 @@ const int YKN_LEGAL_W[] = {2, 1, 2, 1};
 const int XKN_LEGAL_B[] = {1, 2, -1, -2};
 const int YKN_LEGAL_B[] = {-2, -1, -2, -1};
 
-Square best_square(const Board & b, Square s, const int xd, const int yd, const int * scores) {
+Square best_square(const Gamestate & gs, Square s, const int xd, const int yd, const int * scores) {
 
     Square best_sq;
     int best_val = 0;
@@ -62,9 +62,13 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
     int x = get_x(s) + xd, y = get_y(s) + yd;
     Square temp;
 
+    if (gs.is_kpinned_piece(s, Delta{(SignedByte) xd, (SignedByte) yd})) {
+        return SQUARE_SENTINEL;
+    }
+
     while (val(temp = mksq(x, y))) {
 
-        Piece p = b.get(temp);
+        Piece p = gs.board.get(temp);
 
         if (p == EMPTY) {
             if (scores[y*8 + x] > best_val) {
@@ -72,7 +76,7 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
                 best_sq = temp;
                 best_val = scores[y * 8 + x];
             }
-        } else if (colour(p) != colour(b.get(s))) {
+        } else if (colour(p) != colour(gs.board.get(s))) {
             // piece which can be captured
             if (scores[y*8 + x] > best_val) {
                 best_sq = temp;
@@ -96,18 +100,18 @@ Square best_square(const Board & b, Square s, const int xd, const int yd, const 
 
 }
 
-void best_diag_squares(const Board & b, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
+void best_diag_squares(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
 
-    int yd = b.get_white() ? 1 : -1;
+    int yd = gs.board.get_white() ? 1 : -1;
 
     // negative diagonal
-    Square sq = best_square(b, s, -1, yd, scores);
+    Square sq = best_square(gs, s, -1, yd, scores);
     if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // positive diagonal
-    sq = best_square(b, s, 1, yd, scores);
+    sq = best_square(gs, s, 1, yd, scores);
     if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
@@ -115,24 +119,24 @@ void best_diag_squares(const Board & b, Square s, Move * moves, IndexCounter & m
     return;
 }
 
-void best_ortho_squares(const Board & b, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
+void best_ortho_squares(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
 
-    int yd = b.get_white() ? 1 : -1;
+    int yd = gs.board.get_white() ? 1 : -1;
 
     // vertical
-    Square sq = best_square(b, s, 0, yd, scores);
+    Square sq = best_square(gs, s, 0, yd, scores);
     if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // left
-    sq = best_square(b, s, -1, 0, scores);
+    sq = best_square(gs, s, -1, 0, scores);
     if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
 
     // right
-    sq = best_square(b, s, 1, 0, scores);
+    sq = best_square(gs, s, 1, 0, scores);
     if (!is_sentinel(sq) && move_counter.has_space()) {
         moves[move_counter.inc()] = Move{s, sq, 0};
     }
@@ -140,19 +144,23 @@ void best_ortho_squares(const Board & b, Square s, Move * moves, IndexCounter & 
     return;
 }
 
-void best_knight_square(const Board & b, Square s, Move * moves, IndexCounter & move_counter) {
+void best_knight_square(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter) {
 
-    const bool white = (colour(b.get(s)) == WHITE);
+    const bool white = (colour(gs.board.get(s)) == WHITE);
     const int * xd = white ? XKN_LEGAL_W : XKN_LEGAL_B;
     const int * yd = white ? YKN_LEGAL_W : YKN_LEGAL_B;
 
     Square best_sq;
     int best_val = 0;
+    
+    if (gs.is_kpinned_piece(s, KNIGHT_DELTA)) {
+        return;
+    }
 
     for (int i = 0; i < 4; ++i) {
         Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
         int score = KNIGHTS[get_y(temp)*8 + get_x(temp)];
-        if (val(temp) && score > best_val && colour(b.get(temp)) != colour(b.get(s))) {
+        if (val(temp) && score > best_val && colour(gs.board.get(temp)) != colour(gs.board.get(s))) {
             best_sq = temp;
             best_val = score;
         }
@@ -238,18 +246,21 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
     int
         x = get_x(sq),
         y = get_y(sq);
-
+    Square temp;
     const int FORWARD = gs.board.get_white() ? 1 : -1;
 
     // check one square in front; if it would be supported, move there
-    if (gs.board.get(mksq(x, y + FORWARD)) == EMPTY) {
-        if ((gs.board.get_white() && w_pawn_defence_count(gs, mksq(x, y + FORWARD)) > 0)
-                || (!gs.board.get_white() && b_pawn_defence_count(gs, mksq(x, y + FORWARD)) > 0)) {
-            if (counter.has_space()) {
-                moves[counter.inc()] = Move{sq, mksq(x, y + FORWARD)};
-            } else {
-                // no more space, all done
-                return;
+    if (gs.board.get(temp = mksq(x, y + FORWARD)) == EMPTY) {
+        if ((gs.board.get_white() && w_pawn_defence_count(gs, temp) > 0)
+                || (!gs.board.get_white() && b_pawn_defence_count(gs, temp) > 0)) {
+            // check it's not pinned
+            if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
+                if (counter.has_space()) {
+                    moves[counter.inc()] = Move{sq, temp};
+                } else {
+                    // no more space, all done
+                    return;
+                }
             }
         }
     } else {
@@ -261,11 +272,13 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
     if (x < 2 || x > 5) { return; }
 
     bool first_rank = gs.board.get_white() ? (y == 1) : (y == 6);
-    if (first_rank && gs.board.get(mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
-        if (counter.has_space()) {
-            moves[counter.inc()] = Move{sq, mksq(x, y + FORWARD + FORWARD)};
-        } else {
-            return;
+    if (first_rank && gs.board.get(temp = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
+        if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
+            if (counter.has_space()) {
+                moves[counter.inc()] = Move{sq, temp};
+            } else {
+                return;
+            }
         }
     }
 
@@ -278,30 +291,24 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
  */
 void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & move_counter) {
 
-    const Board & b = gs.board;
-
-    bool is_white_piece = colour(b.get(ff->centre)) == WHITE;
-    if (b.get_white() != is_white_piece) {
+    bool is_white_piece = colour(gs.board.get(ff->centre)) == WHITE;
+    if (gs.board.get_white() != is_white_piece) {
         return;
     }
 
-    if (gs.is_kpinned_piece(ff->centre)) {
-        return;
-    }
-
-    switch (type(b.get(ff->centre))) {
+    switch (type(gs.board.get(ff->centre))) {
         case BISHOP:
-            best_diag_squares(b, ff->centre, moves, move_counter, BISHOPS);
+            best_diag_squares(gs, ff->centre, moves, move_counter, BISHOPS);
             return;
         case KNIGHT:
-            best_knight_square(b, ff->centre, moves, move_counter);
+            best_knight_square(gs, ff->centre, moves, move_counter);
             return;
         case ROOK:
-            best_ortho_squares(b, ff->centre, moves, move_counter, ROOKS);
+            best_ortho_squares(gs, ff->centre, moves, move_counter, ROOKS);
             return;
         case QUEEN:
-            best_diag_squares(b, ff->centre, moves, move_counter, QUEENS);
-            best_ortho_squares(b, ff->centre, moves, move_counter, QUEENS);
+            best_diag_squares(gs, ff->centre, moves, move_counter, QUEENS);
+            best_ortho_squares(gs, ff->centre, moves, move_counter, QUEENS);
             return;
         case KING:
             castling_moves(gs, ff->centre, moves, move_counter);

@@ -7,10 +7,6 @@
  */
 void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
-    if (gs.is_kpinned_piece(ff->centre)) {
-        return;
-    }
-
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -20,7 +16,8 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
     int max_val = 0;
     for (int i = 0; i < piece_moves.size(); ++i) {
         Piece p = gs.board.get(piece_moves[i].to);
-        if (p != EMPTY && piece_value(p) > max_val) {
+        if (p != EMPTY && piece_value(p) > max_val
+                && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             max_val = piece_value(p);
         }
     }
@@ -31,7 +28,8 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
 
     // return a trade with all pieces of this maximum value
     for (int i = 0; i < piece_moves.size(); ++i) {
-        if (piece_value(gs.board.get(piece_moves[i].to)) == max_val) {
+        if (piece_value(gs.board.get(piece_moves[i].to)) == max_val
+                && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             if (counter.has_space()) {
                 moves[counter.inc()] = piece_moves[i];
             } else {
@@ -47,10 +45,6 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
  * it is safe.
  */
 void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-
-    if (gs.is_kpinned_piece(ff->centre)) {
-        return;
-    }
 
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
@@ -70,7 +64,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             would_be_unsafe = would_be_unsafe_after(gs, piece_moves[i].to, piece_moves[i]);
         }
 
-        if (!would_be_unsafe) {
+        if (!would_be_unsafe && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             if (counter.has_space()) {
                 moves[counter.inc()] = piece_moves[i];
             } else {
@@ -85,10 +79,6 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
  */
 void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
-    if (gs.is_kpinned_piece(ff->centre)) {
-        return;
-    }
-
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -100,7 +90,8 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
 
     for (int i = 0; i < piece_moves.size(); ++i) {
         Piece p = gs.board.get(piece_moves[i].to);
-        if (p != EMPTY && piece_value(p) > max_val) {
+        if (p != EMPTY && piece_value(p) > max_val
+                && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             max_val = piece_value(p);
             max_move = piece_moves[i];
         }
