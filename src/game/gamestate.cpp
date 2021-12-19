@@ -158,7 +158,9 @@ bool Gamestate::is_kpinned_piece(const Square s, const Delta d) const {
         // check that the square matches
         if (equal(s, *pieces)) {
             // check it can move in the direction requested
-            if (can_move_in_direction(board.get(s), d)) {
+            Piece p = board.get(s);
+            MoveType move_type = direction_of_delta(d);
+            if (can_move_in_direction(p, move_type) || (type(p) == PAWN && move_type == DIAG)) {
                 Delta dir1 = *dirs;
                 Delta dir2 = {(SignedByte) -dir1.dx, (SignedByte) -dir1.dy };
                 // and check that it is pinned in that direction or its diametric opposite

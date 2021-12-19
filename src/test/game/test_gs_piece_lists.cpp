@@ -70,6 +70,11 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
     // try adding them
     for (Square s : squares) {
         gs.add_kpinned_piece(s, DIR_USED);
+
+        // NOTE: using can_move_in_direction here does not account for pawns in the same way as inside
+        // Gamestate::is_kpinned_piece. This might cause problems if more test cases are introduced,
+        // but currently is fine. This misalignment is in the manner of testing, not in can_move_in_direction.
+
         if (can_move_in_direction(gs.board.get(s), DIR_USED)) {
             // piece can move in this direction, so it shouldn't be pinned in the direction we used,
             // but should be pinned in any other direction
