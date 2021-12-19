@@ -73,11 +73,13 @@ struct Gamestate {
     }
 
     Square * w_kpinned_pieces;
+    Delta * w_kpin_dirs;
     Square * b_kpinned_pieces;
+    Delta * b_kpin_dirs;
 
-    void add_kpinned_piece(const Square);
+    void add_kpinned_piece(const Square, const Delta);
     void remove_kpinned_piece(const Square);
-    bool is_kpinned_piece(const Square) const;
+    bool is_kpinned_piece(const Square, const Delta) const;
 
     Move last_move;
     Piece last_capture;

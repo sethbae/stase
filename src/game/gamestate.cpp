@@ -1,3 +1,4 @@
+#include <iostream>
 #include "game.h"
 #include "cands/cands.h"
 
@@ -14,7 +15,9 @@ void alloc(Gamestate * gs) {
     gs->wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->w_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
+    gs->w_kpin_dirs = static_cast<Delta*> (operator new(sizeof(Delta) * 16));
     gs->b_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
+    gs->b_kpin_dirs = static_cast<Delta*> (operator new(sizeof(Delta) * 16));
 
     // set all pointers to null
     for (int i = 0; i < ALL_HOOKS.size(); ++i) {
@@ -42,12 +45,16 @@ Gamestate::Gamestate(Gamestate && o) {
     this->wpieces = o.wpieces;
     this->bpieces = o.bpieces;
     this->w_kpinned_pieces = o.w_kpinned_pieces;
+    this->w_kpin_dirs = o.w_kpin_dirs;
     this->b_kpinned_pieces = o.b_kpinned_pieces;
+    this->b_kpin_dirs = o.b_kpin_dirs;
     o.feature_frames = nullptr;
     o.wpieces = nullptr;
     o.bpieces = nullptr;
     o.w_kpinned_pieces = nullptr;
+    o.w_kpin_dirs = nullptr;
     o.b_kpinned_pieces = nullptr;
+    o.b_kpin_dirs = nullptr;
 }
 
 /**
@@ -87,7 +94,9 @@ Gamestate::~Gamestate() {
     delete wpieces;
     delete bpieces;
     delete w_kpinned_pieces;
+    delete w_kpin_dirs;
     delete b_kpinned_pieces;
+    delete b_kpin_dirs;
 }
 
 /**
@@ -101,36 +110,60 @@ void Gamestate::repopulate_caches() {
  * Records that the piece on the given square is pinned to its king and is therefore
  * not able to move.
  */
-void Gamestate::add_kpinned_piece(const Square s) {
+void Gamestate::add_kpinned_piece(const Square s, const Delta dir) {
 
-
-    Square * list_start = colour(board.get(s)) == WHITE
-                            ? w_kpinned_pieces
-                            : b_kpinned_pieces;
+    Square * pieces;
+    Delta * dirs;
+    if (colour(board.get(s)) == WHITE) {
+        pieces = w_kpinned_pieces;
+        dirs = w_kpin_dirs;
+    } else {
+        pieces = b_kpinned_pieces;
+        dirs = b_kpin_dirs;
+    }
 
     // find the sentinel
-    Square * sq = list_start;
-    for (; !is_sentinel(*sq); ++sq)
+    for (; !is_sentinel(*pieces); ++pieces, ++dirs)
         ;
 
-    // add a piece
-    *sq++ = s;
-    *sq = SQUARE_SENTINEL;
+    // add a piece and delta
+    *pieces++ = s;
+    *dirs = dir;
+    *pieces = SQUARE_SENTINEL;
 
 }
 
 /**
  * Checks whether the given square contains a piece which is pinned to its king,
- * and is therefore not able to move.
+ * and is therefore not able to move. The delta given should be the direction it
+ * would putatively be moving in, and a return value of *true* indicates that it
+ * is indeed pinned in that direction, ie it cannot be moved. False indicates that
+ * it is not pinned with regards to that direction, and can move.
+ * If the piece on the square cannot move in the direction passed, true will be
+ * returned regardless of the pin direction.
  */
-bool Gamestate::is_kpinned_piece(const Square s) const {
+bool Gamestate::is_kpinned_piece(const Square s, const Delta d) const {
 
-    Square * list_start = colour(board.get(s)) == WHITE
-                            ? w_kpinned_pieces
-                            : b_kpinned_pieces;
+    Square * pieces;
+    Delta * dirs;
+    if (colour(board.get(s)) == WHITE) {
+        pieces = w_kpinned_pieces;
+        dirs = w_kpin_dirs;
+    } else {
+        pieces = b_kpinned_pieces;
+        dirs = b_kpin_dirs;
+    }
 
-    for (Square * sq = list_start; !is_sentinel(*sq); ++sq) {
-        if (equal(s, *sq)) {
+    for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
+        // check that the square matches
+        if (equal(s, *pieces)) {
+            // check it can move in the direction requested
+            if (can_move_in_direction(board.get(s), d)) {
+                Delta dir1 = *dirs;
+                Delta dir2 = {(SignedByte) -dir1.dx, (SignedByte) -dir1.dy };
+                // and check that it is pinned in that direction or its diametric opposite
+                return !equal(d, dir1) && !equal(d, dir2);
+            }
             return true;
         }
     }
@@ -143,25 +176,31 @@ bool Gamestate::is_kpinned_piece(const Square s) const {
  */
 void Gamestate::remove_kpinned_piece(const Square s) {
 
-    Square * list_start = colour(board.get(s)) == WHITE
-                            ? w_kpinned_pieces
-                            : b_kpinned_pieces;
+    Square * pieces;
+    Delta * dirs;
+    if (colour(board.get(s)) == WHITE) {
+        pieces = w_kpinned_pieces;
+        dirs = w_kpin_dirs;
+    } else {
+        pieces = b_kpinned_pieces;
+        dirs = b_kpin_dirs;
+    }
 
     // iterate up to the piece
-    Square * sq;
-    for (sq = list_start; !is_sentinel(*sq) && !equal(*sq, s); ++sq)
+    for ( ; !is_sentinel(*pieces) && !equal(*pieces, s); ++pieces, ++dirs)
         ;
 
-    if (is_sentinel(*sq)) {
+    if (is_sentinel(*pieces)) {
         // piece was not found: return
         return;
     } else {
         // piece was found: move the remainder of the list left one
-        sq++;
-        for (; !is_sentinel(*sq); ++sq) {
-            *(sq - 1) = *sq;
+        pieces++;
+        dirs++;
+        for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
+            *(pieces - 1) = *pieces;
+            *(dirs - 1) = *dirs;
         }
-        *(sq - 1) = SQUARE_SENTINEL;
+        *(pieces - 1) = SQUARE_SENTINEL;
     }
-
 }
