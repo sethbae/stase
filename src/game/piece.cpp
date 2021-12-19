@@ -23,7 +23,7 @@ using std::cout;
  */
 
 /*
- * Performs a linear search on the board according to the given step and val functions.
+ * Performs a linear search on the board according to the given delta.
  * returns the alpha count of the walk
  */
 inline int alpha_walk(const Board & b, const Square s, Delta d) {
@@ -100,7 +100,7 @@ int alpha_control(const Board & b, const Square s) {
 
 }
 
-// performs a linear search on the board according to the given step and val functions.
+// performs a linear search on the board according to the given delta.
 // returns the beta count of the walk
 inline int beta_walk(const Board & b, const Square s, Delta d) {
     
@@ -175,7 +175,7 @@ int beta_control(const Board & b, const Square s) {
 
 }
 
-// performs a linear search on the board according to the given step and val functions.
+// performs a linear search on the board according to the given delta.
 // returns the gamma count of the walk
 inline int gamma_walk(const Board & b, const Square s, Delta d, MoveType dir) {
     
