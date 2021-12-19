@@ -30,7 +30,7 @@ bool read_lines(std::vector<std::string> & vec) {
 
     ifstream file;
 
-    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
@@ -53,7 +53,7 @@ bool read_fens(unsigned num, vector<string> & vec) {
        
     ifstream file;
     
-    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
@@ -87,7 +87,7 @@ bool read_all_fens(vector<string> & vec) {
 
     ifstream file;
     
-    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
@@ -112,7 +112,7 @@ bool read_all_fens(vector<string> & vec) {
 std::string random_fen() {
     ifstream file;
 
-    file.open("../src/puzzle/lichess_db_puzzle.csv", ios::in);
+    file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return "";
