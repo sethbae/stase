@@ -55,6 +55,9 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
     std::vector<Square> squares;
     Gamestate gs(fen_to_board(tc->fen));
 
+    const Delta DIR_USED = Delta{0, 1};
+    const Delta DIR_NOT_USED = Delta{1, 1};
+
     // find all squares with pieces on
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
@@ -66,8 +69,17 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
 
     // try adding them
     for (Square s : squares) {
-        gs.add_kpinned_piece(s);
-        if (!gs.is_kpinned_piece(s)) {
+        gs.add_kpinned_piece(s, DIR_USED);
+        if (can_move_in_direction(gs.board.get(s), DIR_USED)) {
+            // piece can move in this direction, so it shouldn't be pinned in the direction we used,
+            // but should be pinned in any other direction
+            if (gs.is_kpinned_piece(s, DIR_USED)) {
+                return false;
+            } else if (!gs.is_kpinned_piece(s, DIR_NOT_USED)) {
+                return false;
+            }
+        } else if (!gs.is_kpinned_piece(s, INVALID_DELTA)) {
+            // piece can't move in that direction, so pinned should definitely return true
             return false;
         }
     }
@@ -77,7 +89,7 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
     // and removing them
     for (Square s : squares) {
         gs.remove_kpinned_piece(s);
-        if (gs.is_kpinned_piece(s)) {
+        if (gs.is_kpinned_piece(s, DIR_USED) || gs.is_kpinned_piece(s, DIR_NOT_USED)) {
             return false;
         }
     }
