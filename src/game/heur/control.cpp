@@ -4,7 +4,7 @@
 
 /**
  * Open files: return the number of squares controlled on the given file (which is presumed
- * to contain no pawns - tho  this is not checked).
+ * to contain no pawns - though this is not checked).
  * Essentially this is just 7 squares for whoever controls the file.
  */
 int open_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
@@ -14,7 +14,7 @@ int open_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
     while (val(s)) {
 
         Piece p = b.get(s);
-        if (can_move_in_direction(p, dir)) {
+        if (p != EMPTY && can_move_in_direction(p, dir)) {
             control += ((colour(p) == WHITE) ? 1 : -1);
         }
         s.x += d.dx;
@@ -52,8 +52,8 @@ int half_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
         ++squares_before_pawn;  // counting squares
 
         Piece p = b.get(s);
-        if (can_move_in_direction(p, dir)) { // and control
-            control += (colour(p) == WHITE) ? 1 : -1;
+        if (p != EMPTY && can_move_in_direction(p, dir)) { // and control
+            control += ((colour(p) == WHITE) ? 1 : -1);
         }
         s.x += d.dx;
         s.y += d.dy;
@@ -72,7 +72,7 @@ int half_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
     s.y += d.dy;
     while (val(s)) {
         Piece p = b.get(s);
-        if (can_move_in_direction(p, dir)) {
+        if (p != EMPTY && can_move_in_direction(p, dir)) {
             control += (colour(p) == WHITE) ? 1 : -1;
         }
         s.x += d.dx;
@@ -92,7 +92,7 @@ int half_line_walk(const Board & b, Square s, Delta d, MoveType dir) {
 }
 
 /**
- * Counts the number of pawns reachable from the given square according to the step func,
+ * Counts the number of pawns reachable from the given square according to the delta,
  * ie the number which are on a certain rank or file.
  */
 int count_pawns(const Board & b, Square s, Delta d) {
