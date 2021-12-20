@@ -23,7 +23,9 @@ using std::cout;
  *  - bit 4:        is_enpassant
  *  - bit 5:        is_capture
  *  - bit 6:        castle side
- *  - bit 7-10:      captured piece
+ *  - bit 7-10:     captured piece
+ *  - bit 11:       unused
+ *  - bit 12-15:    score
  */
 
 // masks for reading flags etc
@@ -37,6 +39,8 @@ const int PROM_PIECE_OFFSET = 0;
 const int PROM_PIECE_MASK = 3 << PROM_PIECE_OFFSET;
 const int CAP_PIECE_OFFSET = 6;
 const int CAP_PIECE_MASK = 15 << CAP_PIECE_OFFSET;
+
+const int SCORE_MASK = 0xF000;
 
 /**
  * Values for the move diffs (cannot be defined in header).
@@ -95,6 +99,18 @@ Piece Move::get_cap_piece() const {
 void Move::set_cap_piece(Piece p) {
     flags &= ~CAP_PIECE_MASK;
     flags |= (p << CAP_PIECE_OFFSET);
+}
+
+int Move::get_score() const {
+    return flags & SCORE_MASK;
+}
+
+void Move::set_score(int score) {
+    flags = (flags & ~SCORE_MASK) | (score << 12);
+}
+
+void Move::inc_score(int inc) {
+    set_score(get_score() + inc);
 }
 
 /*************************************************************************
