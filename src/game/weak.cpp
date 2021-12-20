@@ -75,8 +75,31 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
         while (val(temp = mksq(x, y)) && cont) {
 
             Piece p = b.get(temp);
+            bool moves_in_right_dir = (p != EMPTY) && can_move_in_direction(p, dir);
 
-            if ((p != EMPTY) && can_move_in_direction(p, dir)) {
+            if (!moves_in_right_dir && type(p) == PAWN && dir == DIAG) {
+
+                // pawns need special care
+
+                // they can only contribute from the very first square along the diagonal, because that's
+                // the only square they can capture the target from
+                if (x == get_x(s) + x_inc && y == get_y(s) + y_inc) {
+
+                    // the diagonal has to be going in the right direction for their colour
+
+                    if (colour(p) == WHITE && y_inc == -1) {
+                        // white pawns can capture up the board, so if we are working out from
+                        // the target and moving down the board, a white pawn is able to take
+                        moves_in_right_dir = true;
+                    } else if (colour(p) == BLACK && y_inc == 1) {
+                        // vice versa
+                        moves_in_right_dir = true;
+                    }
+
+                }
+            }
+
+            if (moves_in_right_dir) {
 
                 // attacking piece found: update (poly) x-ray info and balances
 
@@ -177,41 +200,6 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
             }
             ++directions_attacked_from;
         }
-    }
-
-    // pawns
-    int pawn_val = piece_value(W_PAWN);
-    if (val(temp = mksq(x + 1, y + 1)) && (b.get(temp) == B_PAWN)) {
-        --basic_balance;
-        --poly_x_ray_balance;
-        if (min_value_b > pawn_val) {
-            min_value_b = pawn_val;
-        }
-        ++directions_attacked_from;
-    }
-    if (val(temp = mksq(x - 1, y + 1)) && (b.get(temp) == B_PAWN)) {
-        --basic_balance;
-        --poly_x_ray_balance;
-        if (min_value_b > pawn_val) {
-            min_value_b = pawn_val;
-        }
-        ++directions_attacked_from;
-    }
-    if (val(temp = mksq(x + 1, y - 1)) && (b.get(temp) == W_PAWN)) {
-        ++basic_balance;
-        ++poly_x_ray_balance;
-        if (min_value_w > pawn_val) {
-            min_value_w = pawn_val;
-        }
-        ++directions_attacked_from;
-    }
-    if (val(temp = mksq(x - 1, y - 1)) && (b.get(temp) == W_PAWN)) {
-        ++basic_balance;
-        ++poly_x_ray_balance;
-        if (min_value_w > pawn_val) {
-            min_value_w = pawn_val;
-        }
-        ++directions_attacked_from;
     }
 
 //    cout << "attacked from " << directions_attacked_from << " directions\n";

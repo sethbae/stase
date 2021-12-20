@@ -55,6 +55,38 @@ const TestSet<WeakTestCase> weak_test_cases = {
             {"white", "black"},
             {false, false}
         },
+        // pawns in x-rays do count #1
+        WeakTestCase{
+            "8/8/2R5/4b3/3p4/2P5/8/8 w - - 0 1",
+            {"c3"},
+            {"none"},
+            {"white"},
+            {true}
+        },
+        // pawns in x-rays do count #2
+        WeakTestCase{
+            "3q4/8/8/5n2/3b4/2P5/8/Q2R4 w - - 0 1",
+            {"d4"},
+            {"none"},
+            {"white"},
+            {true}
+        },
+        // pawns in x-rays don't count #1
+        WeakTestCase{
+            "4r3/2q5/3b4/4p3/8/4nQn1/8/8 w - - 0 1",
+            {"e3", "g3"},
+            {"none", "none"},
+            {"black", "black"},
+            {true, true}
+        },
+        // pawns in x-rays don't count #2
+        WeakTestCase{
+            "6n1/4r1p1/8/4P3/3B4/8/8/6R1 w - - 0 1",
+            {"g7", "g8"},
+            {"none", "none"},
+            {"black", "black"},
+            {false, false}
+        },
         // x-ray #1
         WeakTestCase{
             "8/8/8/3Q4/1RR2rr1/8/8/8 w - - 0 1",
