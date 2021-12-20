@@ -14,7 +14,11 @@ using std::ofstream;
 #include "src/test/test.h"
 #include <unistd.h>
 
-void number_of_cands() {
+/**
+ * Runs cands on the first hundred thousand puzzles. Prints out a histogram showing for each decile,
+ * how many pyzzles fell into that bin (for number of candidates generated).
+ */
+void number_of_cands_hist() {
 
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
@@ -75,6 +79,102 @@ void number_of_cands() {
 
 }
 
+void number_of_cands() {
+
+    std::vector<Gamestate> states;
+    puzzle_gamestates(states);
+
+    cout << "loaded states\n";
+
+    int N = 100000;
+
+    double num_cands[N];
+
+    int max_size = 0;
+    for (int i = 0; i < N; ++i) {
+        int size = cands(states[i]).size();
+        max_size = std::max(size, max_size);
+        num_cands[i] = (double)size;
+    }
+
+    cout << "found cands\n";
+
+    double sum = 0.0;
+    for (int i = 0; i < N; ++i) {
+        sum += num_cands[i];
+    }
+
+    int n = max_size + 1;
+
+    int hist_bins[n];
+    for (int i = 0; i < n; ++i) {
+        hist_bins[i] = 0;
+    }
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < N;  ++j) {
+            if (num_cands[j] == i) {
+                hist_bins[i]++;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        cout << "     " << i;
+    }
+    cout << "\n";
+
+    for (int i = 0; i < n; ++i) {
+        cout << hist_bins[i] << "  ";
+    }
+    cout << "\n";
+
+    cout << "MAX: " << max_size << "\n";
+    cout << "MEAN: " << sum / ((double)N) << "\n";
+
+}
+
+/**
+ * Runs cands on the first 100k puzzles, and then prints out the FENs of puzzles which generate either the
+ * maximum number of candidates, or the maximum minus one.
+ */
+void find_cands_outliers() {
+
+    std::vector<Gamestate> states;
+    puzzle_gamestates(states);
+
+    cout << "loaded states\n";
+
+    int N = 100000;
+
+    double num_cands[N];
+
+    int max_size = 0;
+    for (int i = 0; i < N; ++i) {
+
+        if (!is_safe_king(states[i], states[i].board.get_white() ? WHITE : BLACK)) {
+            // skip positions which are in check, they get handled differently
+            continue;
+        }
+
+        int size = cands(states[i]).size();
+        max_size = std::max(size, max_size);
+        num_cands[i] = (double)size;
+
+    }
+
+    cout << "found cands\n";
+
+    cout << "Max was: " << max_size << "\n";
+
+    for (int i = 0; i < N; ++i) {
+        if (num_cands[i] >= max_size - 1) {
+            cout << "(" << num_cands[i] << ") " << board_to_fen(states[i].board) << "\n";
+        }
+    }
+
+}
+
 /**
  * Runs the responder on the given board, using a feature frame centred on the
  * given square
@@ -117,16 +217,18 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
 
 int main(int argc, char** argv) {
 
-    const std::string fen = std::string("Q7/8/8/K7/8/6k1/8/3q4 w - - 0 1");
-    const FeatureFrame ff{stosq("a5"), stosq("a8"), 0, -1};
-
-    show_responder_moves(fen, pin_skewer_resp, ff);
+    const std::string fen = std::string("r2q1rk1/3n1ppp/b1pb1n2/p3p1Q1/2P1N3/3PpN1P/P3PPP1/R3KB1R w - - 0 15");
 
     Gamestate gs(fen_to_board(fen));
+    pr_board(gs.board);
 
-//    pr_board_conf(gs.board);
+//    cands_report(gs);
+
+//    heur_with_description(gs);
 //
-//    iterative_deepening_search(fen, 10);
+    iterative_deepening_search(fen, 12);
+
+//    find_cands_outliers();
 
     return 0;
 

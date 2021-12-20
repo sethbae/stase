@@ -258,7 +258,8 @@ bool evaluate_weak_test_case(const WeakTestCase * tc) {
         } else {
             m = Move{
                     stosq(tc->moves[i].substr(0,2)),
-                    stosq(tc->moves[i].substr(2,4))
+                    stosq(tc->moves[i].substr(2,4)),
+                    0
             };
         }
 
@@ -295,7 +296,8 @@ bool evaluate_unsafe_test_case(const UnsafeTestCase * tc) {
         } else {
             m = Move{
                 stosq(tc->moves[i].substr(0,2)),
-                stosq(tc->moves[i].substr(2,4))
+                stosq(tc->moves[i].substr(2,4)),
+                0
             };
         }
 

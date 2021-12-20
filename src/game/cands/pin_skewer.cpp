@@ -149,7 +149,7 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                         squares_piece_can_reach_on_line(gs.board, mksq(x, y), ff->centre, line_end);
 
                 for (int i = 0; i < squares_on_line.size(); ++i) {
-                    Move pin_move = Move{mksq(x, y), squares_on_line[i]};
+                    Move pin_move = Move{mksq(x, y), squares_on_line[i], 0};
                     if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
                             && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
                         if (counter.has_space()) {
@@ -173,7 +173,7 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                     continue;
                 }
 
-                Move pin_move = Move{mksq(x, y), pin_from_square};
+                Move pin_move = Move{mksq(x, y), pin_from_square, 0};
                 if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
                         && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
                     if (counter.has_space()) {
