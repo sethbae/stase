@@ -29,7 +29,7 @@ bool test_move_scores() {
     }
 
     TestSet<MoveScoreTestCase> set{
-        "game-board-move-scores",
+        "board-move-scores",
         cases
     };
 
