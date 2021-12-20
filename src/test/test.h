@@ -57,6 +57,11 @@ bool expected_frame_matches_actual(const ExpectedFeatureFrame &, const FeatureFr
 bool evaluate_responder_test_case(const Responder *p, const ResponderTestCase *);
 bool evaluate_hook_test_case(const Hook *, const HookTestCase *);
 
+Piece random_piece();
+Piece random_piece(Colour);
+Square random_square();
+Move random_move();
+
 template <typename T>
 inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*)) {
 
@@ -99,6 +104,7 @@ bool test_in_check();
 bool test_castling();
 bool test_mutate_hard();
 bool test_mutate();
+bool test_move_scores();
 
 bool test_unsafe_piece_hook();
 bool test_development_hook();

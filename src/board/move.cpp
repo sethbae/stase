@@ -102,7 +102,7 @@ void Move::set_cap_piece(Piece p) {
 }
 
 int Move::get_score() const {
-    return flags & SCORE_MASK;
+    return (flags & SCORE_MASK) >> 12;
 }
 
 void Move::set_score(int score) {

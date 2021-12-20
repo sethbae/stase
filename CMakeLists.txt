@@ -96,6 +96,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_checks_hook.cpp
         src/test/game/cands/test_pin_skewer_hook.cpp
         src/test/game/cands/test_pin_skewer_resp.cpp
+        src/test/game/cands/test_king_pinned_pieces_hook.cpp
+        src/test/game/cands/test_promotion.cpp
 
         src/test/board/test_pieces.cpp
         src/test/board/test_square.cpp
@@ -103,7 +105,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_in_check.cpp
         src/test/board/test_castling.cpp
         src/test/board/test_mutate.cpp
-        src/test/game/cands/test_king_pinned_pieces_hook.cpp src/test/game/cands/test_promotion.cpp)
+        src/test/board/test_move.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

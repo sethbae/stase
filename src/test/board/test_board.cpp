@@ -11,6 +11,7 @@ bool test_board(void) {
     passed = test_castling() && passed;
     passed = test_mutate() && passed;
     passed = test_mutate_hard() && passed;
+    passed = test_move_scores() && passed;
 
     return passed;
 }
