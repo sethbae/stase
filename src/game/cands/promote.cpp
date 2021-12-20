@@ -39,6 +39,8 @@ void can_promote_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
  */
 void promote_pawn(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
     if (counter.has_space()) {
-        m[counter.inc()] = Move{ff->centre, ff->secondary};
+        Move move{ff->centre, ff->secondary};
+        move.set_score(promotion_score());
+        m[counter.inc()] = move;
     }
 }

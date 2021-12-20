@@ -45,6 +45,7 @@ set(SOURCE_FILES
         src/search/thread.h
 
         src/game/cands/cands.h
+        src/game/cands/score.h
         src/game/cands/cands.cpp
         src/game/cands/unsafe_piece.cpp
         src/game/cands/defend.cpp
