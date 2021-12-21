@@ -14,7 +14,6 @@ set(SOURCE_FILES
         src/board/board.cpp
         src/board/helper.cpp
         src/board/move.cpp
-        src/board/piece.cpp
 
         src/display/display.cpp
 
