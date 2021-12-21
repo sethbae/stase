@@ -6,6 +6,7 @@
 using std::vector;
 #include <iostream>
 using std::cout;
+#include <iomanip>
 
 /**
  * Records the feature frames in the right place on the gamestate (allocating memory for them).
@@ -42,9 +43,9 @@ void discover_feature_frames(Gamestate & gs, const Hook * hook) {
  * Computes and returns a set of candidate moves specifically for positions when the
  * side to move is in check.
  */
-vector<Move> cands_in_check(const Gamestate & gs) {
+CandSet cands_in_check(const Gamestate & gs) {
     // currently, there is no special logic.
-    return legal_moves(gs.board);
+    return CandSet{legal_moves(gs.board)};
 }
 
 /**
@@ -52,11 +53,11 @@ vector<Move> cands_in_check(const Gamestate & gs) {
  * MAX_TOTAL_CANDS moves which are guaranteed to be unique. No guarantee is made as to
  * the minimum number of moves returned.
  */
-vector<Move> cands(Gamestate & gs) {
+CandSet cands(Gamestate & gs) {
 
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
-        std::vector<Move> cands = cands_in_check(gs);
+        CandSet cands = cands_in_check(gs);
         if (cands.empty()) {
             gs.has_been_mated = true;
         }
@@ -105,6 +106,8 @@ vector<Move> cands(Gamestate & gs) {
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {
                     present = true;
+                    // combine the scores: 1 + max
+                    all_moves[k].set_score(max(1 + all_moves[k].get_score(), moves[j].get_score()));
                     break;
                 }
             }
@@ -117,16 +120,31 @@ vector<Move> cands(Gamestate & gs) {
 
     }
 
-    vector<Move> vec;
+    int best_score = 0;
+    for (int i = 0; i < m; ++i) {
+        if (all_moves[i].get_score() > best_score) {
+            best_score = all_moves[i].get_score();
+        }
+    }
+
+    CandSet cands{};
+
     for (int j = 0; j < m; ++j) {
-        vec.push_back(all_moves[j]);
+        int score = all_moves[j].get_score();
+        if (score > 1 && score >= best_score / 2) {
+            cands.critical.push_back(all_moves[j]);
+        } else if (score > 0) {
+            cands.medial.push_back(all_moves[j]);
+        } else {
+            cands.final.push_back(all_moves[j]);
+        }
     }
 
     if (m == 0) {
-        vec = legal_moves(gs.board);
+        cands.legal = legal_moves(gs.board);
     }
 
-    return vec;
+    return cands;
 
 }
 
@@ -134,7 +152,7 @@ vector<Move> cands(Gamestate & gs) {
  * Generates candidate moves for the gamestate, while printing information to stdout.
  * Useful for debugging (keep up to date with real implementation).
  */
-vector<Move> cands_report(Gamestate & gs) {
+CandSet cands_report(Gamestate & gs) {
 
     cout << "********************************\n"
             "* Generating candidate moves\n"
@@ -145,14 +163,14 @@ vector<Move> cands_report(Gamestate & gs) {
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
 
-        std::vector<Move> cands = cands_in_check(gs);
+        CandSet cands = cands_in_check(gs);
 
         if (cands.empty()) {
             gs.has_been_mated = true;
             cout << "The position is checkmate - no candidates\n";
         } else{
             cout << "In check. Returning legal moves:\n";
-            for (const Move & m : cands) {
+            for (const Move & m : cands.critical) {
                 cout << mtos(gs.board, m);
             }
             cout << "\n";
@@ -245,14 +263,56 @@ vector<Move> cands_report(Gamestate & gs) {
 
     }
 
-    pr_board(gs.board);
-    cout << "Candidates generated:\n";
-    vector<Move> vec;
-    for (int j = 0; j < m; ++j) {
-        cout << "Move from " << sqtos(all_moves[j].from) << " to " << sqtos(all_moves[j].to) << " (" << mtos(gs.board, all_moves[j]) << ")\n";
-        vec.push_back(all_moves[j]);
+    int best_score = 0;
+    for (int i = 0; i < m; ++i) {
+        if (all_moves[i].get_score() > best_score) {
+            best_score = all_moves[i].get_score();
+        }
     }
 
-    return vec;
+    CandSet cands{};
+
+    for (int j = 0; j < m; ++j) {
+        int score = all_moves[j].get_score();
+        if (score > 1 && score >= best_score / 2) {
+            cands.critical.push_back(all_moves[j]);
+        } else if (score > 0) {
+            cands.medial.push_back(all_moves[j]);
+        } else {
+            cands.final.push_back(all_moves[j]);
+        }
+    }
+
+    if (m == 0) {
+        cands.legal = legal_moves(gs.board);
+    }
+
+    pr_board(gs.board);
+    cout << "Candidates generated:\n";
+    cout << std::setw(10) << "Critical: ";
+    for (const Move & move : cands.critical) {
+        cout << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+    }
+    cout << "\n";
+
+    cout << std::setw(10) << "Medial: ";
+    for (const Move & move : cands.medial) {
+        cout <<  std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+    }
+    cout << "\n";
+
+    cout << std::setw(10) << "Final: ";
+    for (const Move & move : cands.final) {
+        cout  << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+    }
+    cout << "\n";
+
+    cout << std::setw(10) << "Legal: ";
+    for (const Move & move : cands.legal) {
+        cout << std::setw(5) << mtos(gs.board, move);
+    }
+    cout << "\n";
+
+    return cands;
 
 }

@@ -41,6 +41,14 @@ Square first_piece_encountered(const Board &, const Square, const Delta);
 // forward declaration: see cands.h
 struct FeatureFrame;
 
+struct CandSet {
+    std::vector<Move> critical;
+    std::vector<Move> medial;
+    std::vector<Move> final;
+    std::vector<Move> legal;
+    inline bool empty() { return critical.empty() && medial.empty() && final.empty() && legal.empty(); }
+};
+
 struct Gamestate {
 
     // The enclosed board
@@ -91,8 +99,8 @@ Eval heur(const Gamestate &);
 Eval heur_with_description(const Gamestate &);
 
 // candidate moves
-std::vector<Move> cands(Gamestate &);
-std::vector<Move> cands_report(Gamestate &);
+CandSet cands(Gamestate &);
+CandSet cands_report(Gamestate &);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);
