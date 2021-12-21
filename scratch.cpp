@@ -12,13 +12,19 @@ using std::ofstream;
 #include "src/game/cands/cands.h"
 #include "src/bench/bench.h"
 #include "src/test/test.h"
-#include <unistd.h>
+
+enum CandList {
+    CRITICAL,
+    MEDIAL,
+    FINAL,
+    LEGAL
+};
 
 /**
  * Runs cands on the first hundred thousand puzzles. Prints out a histogram showing for each decile,
  * how many pyzzles fell into that bin (for number of candidates generated).
  */
-void number_of_cands_hist() {
+void number_of_cands_hist(CandList cand_list) {
 
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
@@ -31,12 +37,25 @@ void number_of_cands_hist() {
 
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
-        int size = cands(states[i]).size();
+        int size;
+        switch (cand_list) {
+            case CRITICAL: size = cands(states[i]).critical.size(); break;
+            case MEDIAL: size = cands(states[i]).medial.size(); break;
+            case FINAL: size = cands(states[i]).final.size(); break;
+            case LEGAL: size = cands(states[i]).legal.size(); break;
+        }
         max_size = std::max(size, max_size);
         num_cands[i] = (double)size;
     }
 
     cout << "found cands\n";
+
+    switch (cand_list) {
+        case CRITICAL: cout << "CRITICAL\n"; break;
+        case MEDIAL: cout << "MEDIAL\n"; break;
+        case FINAL: cout << "FINAL\n"; break;
+        case LEGAL: cout << "LEGAL\n"; break;
+    }
 
     double sum = 0.0;
     for (int i = 0; i < N; ++i) {
@@ -79,7 +98,7 @@ void number_of_cands_hist() {
 
 }
 
-void number_of_cands() {
+void number_of_cands(CandList cand_list) {
 
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
@@ -92,12 +111,25 @@ void number_of_cands() {
 
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
-        int size = cands(states[i]).size();
-        max_size = std::max(size, max_size);
+        int size;
+        switch (cand_list) {
+            case CRITICAL: size = cands(states[i]).critical.size(); break;
+            case MEDIAL: size = cands(states[i]).medial.size(); break;
+            case FINAL: size = cands(states[i]).final.size(); break;
+            case LEGAL: size = cands(states[i]).legal.size(); break;
+        }
+        max_size = max(size, max_size);
         num_cands[i] = (double)size;
     }
 
     cout << "found cands\n";
+
+    switch (cand_list) {
+        case CRITICAL: cout << "CRITICAL\n"; break;
+        case MEDIAL: cout << "MEDIAL\n"; break;
+        case FINAL: cout << "FINAL\n"; break;
+        case LEGAL: cout << "LEGAL\n"; break;
+    }
 
     double sum = 0.0;
     for (int i = 0; i < N; ++i) {
@@ -138,7 +170,7 @@ void number_of_cands() {
  * Runs cands on the first 100k puzzles, and then prints out the FENs of puzzles which generate either the
  * maximum number of candidates, or the maximum minus one.
  */
-void find_cands_outliers() {
+void find_cands_outliers(CandList cand_list) {
 
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
@@ -157,13 +189,27 @@ void find_cands_outliers() {
             continue;
         }
 
-        int size = cands(states[i]).size();
-        max_size = std::max(size, max_size);
+        int size;
+        switch (cand_list) {
+            case CRITICAL: size = cands(states[i]).critical.size(); break;
+            case MEDIAL: size = cands(states[i]).medial.size(); break;
+            case FINAL: size = cands(states[i]).final.size(); break;
+            case LEGAL: size = cands(states[i]).legal.size(); break;
+        }
+
+        max_size = max(size, max_size);
         num_cands[i] = (double)size;
 
     }
 
     cout << "found cands\n";
+
+    switch (cand_list) {
+        case CRITICAL: cout << "CRITICAL\n"; break;
+        case MEDIAL: cout << "MEDIAL\n"; break;
+        case FINAL: cout << "FINAL\n"; break;
+        case LEGAL: cout << "LEGAL\n"; break;
+    }
 
     cout << "Max was: " << max_size << "\n";
 
@@ -226,9 +272,16 @@ int main(int argc, char** argv) {
 
 //    heur_with_description(gs);
 //
-    iterative_deepening_search(fen, 12);
+//    iterative_deepening_search(fen, 12);
 
-//    find_cands_outliers();
+    number_of_cands(CRITICAL);
+    number_of_cands(MEDIAL);
+    number_of_cands(FINAL);
+    number_of_cands(LEGAL);
+
+//    for (const Move & move : cands(gs)) {
+//        cout << mtos(gs.board, move) << ": " << move.get_score() << "\n";
+//    }
 
     return 0;
 
