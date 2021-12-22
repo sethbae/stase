@@ -217,7 +217,24 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
     if (node->num_children == 0) {
 
         // get candidate moves and initialise the score counter
-        vector<Move> moves = cands(*node->gs).critical;
+        vector<Move> moves;
+        moves.reserve(64);
+
+        CandSet cand_set = cands(*node->gs);
+
+        if (cand_set.legal.size() > 0) {
+            moves = cand_set.legal;
+        } else {
+            for (const Move & m : cand_set.critical) {
+                moves.push_back(m);
+            }
+            for (const Move & m : cand_set.medial) {
+                moves.push_back(m);
+            }
+            for (const Move & m : cand_set.final) {
+                moves.push_back(m);
+            }
+        }
 
         if (node->gs->has_been_mated) {
             node->score = node->gs->board.get_white()
