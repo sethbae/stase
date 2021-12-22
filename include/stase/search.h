@@ -11,7 +11,8 @@ using std::chrono::duration_cast;
 
 struct SearchNode {
 
-    Gamestate *gs;
+    Gamestate * gs;
+    CandSet cand_set;
     Eval score;
     Move move;
     unsigned short num_children;
@@ -21,6 +22,7 @@ struct SearchNode {
 };
 
 std::vector<Move> iterative_deepening_search(const std::string &, int);
+std::vector<Move> greedy_search(const std::string &);
 void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);
 

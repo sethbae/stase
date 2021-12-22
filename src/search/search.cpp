@@ -1,6 +1,7 @@
 #include "game.h"
 #include "search.h"
 #include "thread.h"
+#include "search_tools.h"
 
 #include <vector>
 using std::vector;
@@ -290,7 +291,14 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 
     // initialise with root only
     Gamestate root_gs(fen_to_board(fen));
-    SearchNode root = { &root_gs, (Eval) 0, MOVE_SENTINEL, 0, nullptr };
+    SearchNode root = {
+            &root_gs,
+            {},
+            (Eval) 0,
+            MOVE_SENTINEL,
+            0,
+            nullptr
+    };
 
     auto start = std::chrono::high_resolution_clock::now();
 
