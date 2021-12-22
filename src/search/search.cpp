@@ -149,10 +149,11 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
 
     Gamestate *new_gs = new Gamestate;
     new_gs->board = gs.board.successor_hard(m);
+    new_gs->last_move = m;
 
     SearchNode *new_node = new SearchNode;
     new_node->gs = new_gs;
-    new_node->score = (Eval) 0;
+    new_node->score = zero();
     new_node->move = m;
     new_node->num_children = 0;
     new_node->children = nullptr;
