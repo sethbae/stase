@@ -3,6 +3,8 @@ using std::cout;
 #include <vector>
 using std::vector;
 #include <fstream>
+#include <csignal>
+
 using std::ofstream;
 
 #include "include/stase/board.h"
@@ -12,6 +14,8 @@ using std::ofstream;
 #include "src/game/cands/cands.h"
 #include "src/bench/bench.h"
 #include "src/test/test.h"
+
+
 
 /**
  * Runs cands on the first hundred thousand puzzles. Prints out a histogram showing for each decile,
@@ -115,14 +119,7 @@ void number_of_cands(CandList cand_list) {
         num_cands[i] = (double)size;
     }
 
-    cout << "found cands\n";
-
-    switch (cand_list) {
-        case CRITICAL: cout << "CRITICAL\n"; break;
-        case MEDIAL: cout << "MEDIAL\n"; break;
-        case FINAL: cout << "FINAL\n"; break;
-        case LEGAL: cout << "LEGAL\n"; break;
-    }
+    cout << "found cands: " << name(cand_list) << "\n";
 
     double sum = 0.0;
     for (int i = 0; i < N; ++i) {
@@ -256,6 +253,8 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
 
 int main(int argc, char** argv) {
 
+    signal(SIGSEGV, print_stack_trace);
+
     const std::string fen = std::string("r2q1rk1/3n1ppp/b1pb1n2/p3p1Q1/2P1N3/3PpN1P/P3PPP1/R3KB1R w - - 0 15");
 
     Gamestate gs(fen_to_board(fen));
@@ -267,7 +266,14 @@ int main(int argc, char** argv) {
 //
 //    iterative_deepening_search(fen, 12);
 
-    std::vector<Move> best_line = greedy_search(fen);
+    std::vector<Move> best_line = greedy_search(fen, 2000);
+
+//    number_of_cands(CRITICAL);
+
+//    const std::string fen2 = "r2q1rk1/3n1pp1/b1pN1n1p/p3p1Q1/2P5/3PpN1P/P3PPP1/R3KB1R w - - 0 16";
+//    Gamestate gs2(fen_to_board(fen2));
+//
+//    cands_report(gs2);
 
     return 0;
 
