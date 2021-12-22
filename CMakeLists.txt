@@ -60,7 +60,8 @@ set(SOURCE_FILES
 
         src/utils/utils.h
         src/utils/print.cpp
-        src/utils/uci.cpp)
+        src/utils/uci.cpp
+        src/utils/signal.cpp)
 
 set(STASE_SOURCE_FILES)
 

@@ -21,4 +21,6 @@ constexpr T min(const T a, const T b) {
 Move uci2move(const std::string &);
 std::string move2uci(const Move);
 
+void print_stack_trace(int sig);
+
 #endif //STASE_UTILS_H
