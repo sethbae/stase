@@ -20,6 +20,8 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles) {
             nullptr
     };
 
+    return greedy_search(&root, cycles);
+
 }
 
 std::vector<Move> greedy_search(SearchNode * root, int cycles) {
