@@ -353,9 +353,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
  * is intended to be used in a multi-threaded context only.
  */
 void search_indefinite(SearchNode * root) {
-    while (true) {
-        deepen_tree(root);
-    }
+    greedy_search(root, -1);
 }
 
 /**
