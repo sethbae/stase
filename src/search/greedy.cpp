@@ -3,46 +3,71 @@
 #include "game.h"
 #include "search_tools.h"
 
-bool expand_list(SearchNode *, CandList, bool);
-bool expand_node(SearchNode *, CandList, bool);
+bool expand_list(SearchNode *, CandList, int);
+bool expand_node(SearchNode *, CandList, int);
 
-std::vector<Move> greedy_search(const std::string & fen) {
+std::vector<Move> greedy_search(const std::string & fen, int cycles) {
 
     // set up the root node
     Gamestate root_gs(fen_to_board(fen));
     SearchNode root{
-        &root_gs,
-        cands(root_gs),
-        zero(),
-        MOVE_SENTINEL,
-        0,
-        nullptr,
-        nullptr
+            &root_gs,
+            cands(root_gs),
+            heur(root_gs),
+            MOVE_SENTINEL,
+            0,
+            nullptr,
+            nullptr
     };
+
+}
+
+std::vector<Move> greedy_search(SearchNode * root, int cycles) {
+
+    if (root->score == zero()) {
+        root->score = heur(*root->gs);
+    }
+    if (root->cand_set.empty()) {
+        root->cand_set = cands(*root->gs);
+    }
 
     int i = 0;
 
-    while (i++ < 3) {
+    while (cycles < 0 || i++ < cycles) {
 
-        if (expand_list(&root, CRITICAL, true)) { continue; }
+//        std::vector<SearchNode *> best_line = retrieve_best_line(&root);
+//        print_line(best_line);
 
-        if (expand_list(&root, MEDIAL, false)) { continue; }
+//        std::cout << "critical!\n";
 
-        if (expand_list(&root, FINAL, false)) { continue; }
+        expand_list(root, CRITICAL, 5);
 
-        if (expand_list(&root, LEGAL, false)) { continue; }
+//        std::cout << "medial!\n";
+
+        if (expand_list(root, MEDIAL, 1)) { continue; }
+
+//        std::cout << "final!\n";
+
+        if (expand_list(root, FINAL, 1)) { continue; }
+
+//        std::cout << "legal!\n";
+
+        if (expand_list(root, LEGAL, 1)) { continue; }
 
     }
 
-    std::vector<SearchNode *> best_line = retrieve_best_line(&root);
+    std::vector<SearchNode *> best_line = retrieve_best_line(root);
     print_line(best_line);
 
     std::vector<Move> moves;
     for (SearchNode * s : best_line) {
-        if (s != &root) {
+        if (s != root) {
             moves.push_back(s->move);
         }
     }
+
+    std::string name = "stase_tree";
+    // record_tree_in_file(name, &root);
 
     return moves;
 }
@@ -51,24 +76,32 @@ std::vector<Move> greedy_search(const std::string & fen) {
  * Follows the best child pointers from the given node until a leaf is reached. For each
  * node, it expands it according to the list and recursive flag given.
  */
-bool expand_list(SearchNode * node, CandList cand_list, bool recursive) {
+//bool expand_list(SearchNode * node, CandList cand_list, int max_depth) {
+//
+////    std::cout << "Expanding list: " << name(cand_list) << "\n";
+//
+//    bool changes = false;
+//    while (node != nullptr) {
+////        std::cout << "Taking node from list\n";
+//        changes = expand_node(node, cand_list, max_depth) || changes;
+//        node = node->best_child;
+//    }
+//
+//    return changes;
+//}
 
-    std::cout << "Expanding list: " << name(cand_list) << "\n";
+bool expand_list(SearchNode * node, CandList cand_list, int max_depth) {
 
-    if (recursive) {
-        // if recursive, there's no need for us to work down the path: that will occur naturally.
-        return expand_node(node, cand_list, recursive);
+    if (node == nullptr) {
+        return false;
     }
 
-    std::cout << "here\n";
+    bool changes_made = expand_list(node->best_child, cand_list, max_depth);
+    changes_made = expand_node(node, cand_list, max_depth) || changes_made;
 
-    bool changes = false;
-    while (node != nullptr) {
-        changes = expand_list(node, cand_list, recursive) || changes;
-        node = node->best_child;
-    }
+    update_score(node);
 
-    return changes;
+    return changes_made;
 }
 
 /**
@@ -77,18 +110,19 @@ bool expand_list(SearchNode * node, CandList cand_list, bool recursive) {
  * If given recursive=true, then it will also do this for each new node expanded (this option may
  * cause endless recursion - be careful).
  */
-bool expand_node(SearchNode * node, CandList cand_list, bool recursive) {
+bool expand_node(SearchNode * node, CandList cand_list, int max_depth) {
     check_abort();
 
-    std::cout << "Expanding node: " << name(cand_list) << "\n";
-
-    bool changes = false;
-
-    // fetch cands
-    if (!node->gs->has_been_mated && node->cand_set.empty()) {
-        node->cand_set = cands(*node->gs);
-        changes = true;
+    if (max_depth == 0) {
+        return false;
     }
+
+//    std::cout << "Expanding node: " << name(cand_list) << "\n";
+
+//    std::cout << "Critical: " << node->cand_set.critical.size() << "\n";
+//    std::cout << "Medial: " << node->cand_set.medial.size() << "\n";
+//    std::cout << "Final: " << node->cand_set.final.size() << "\n";
+//    std::cout << "Legal: " << node->cand_set.legal.size() << "\n";
 
     // check for mate
     if (node->gs->has_been_mated) {
@@ -96,7 +130,7 @@ bool expand_node(SearchNode * node, CandList cand_list, bool recursive) {
                       ? white_has_been_mated()
                       : black_has_been_mated();
         node->best_child = nullptr;
-        return changes;
+        return false;
     }
 
     const std::vector<Move> & list = node->cand_set.get_list(cand_list);
@@ -113,11 +147,12 @@ bool expand_node(SearchNode * node, CandList cand_list, bool recursive) {
     }
 
     // create child for each move in the list
-    for (int i = node->num_children; i < node->num_children + list.size(); ++i) {
-        node->children[i] = new_node(*node->gs, list[i]);
-        if (recursive) {
-            expand_node(node->children[i], cand_list, recursive);
-        }
+    int c = node->num_children;
+    for (int i = 0; i < list.size(); ++i) {
+        node->children[c + i] = new_node(*node->gs, list[i]);
+        node->children[c + i]->score = heur(*node->children[c + i]->gs);
+        node->children[c + i]->cand_set = cands(*node->children[c + i]->gs);
+        expand_node(node->children[c + i], cand_list, max_depth - 1);
     }
     node->num_children += list.size();
     node->cand_set.clear_list(cand_list);
