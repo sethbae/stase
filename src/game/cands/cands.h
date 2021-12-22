@@ -3,10 +3,11 @@
 
 #include "game.h"
 #include "board.h"
+#include "score.h"
 
-const int MAX_TOTAL_CANDS = 15;
+const int MAX_TOTAL_CANDS = 30;
 const int MAX_MOVES_PER_HOOK = 10;
-const int MAX_MOVES_PER_FRAME = 4;
+const int MAX_MOVES_PER_FRAME = 5;
 
 struct FeatureFrame {
     Square centre;

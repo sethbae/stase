@@ -10,11 +10,13 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
 
         if (!val(fork_square)
             || colour(gs.board.get(fork_square)) == colour(gs.board.get(s))
-            || would_be_unsafe_after(gs, fork_square, Move{s, fork_square})) {
+            || would_be_unsafe_after(gs, fork_square, Move{s, fork_square, 0})) {
             continue;
         }
 
         int forked_count = 0;
+        int val_a;
+        int val_b;
 
         for (int k = 0; k < 8; ++k) {
 
@@ -30,14 +32,19 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
             if (p != EMPTY
                 && colour(p) != colour(gs.board.get(s))
                 && type(p) != KNIGHT
-                && (would_be_unsafe_after(gs, forked_square, Move{s, fork_square})
+                && (would_be_unsafe_after(gs, forked_square, Move{s, fork_square, 0})
                     || piece_value(p) > piece_value(KNIGHT))) {
+                if (forked_count % 2 == 0) {
+                    val_a = piece_value(p);
+                } else {
+                    val_b = piece_value(p);
+                }
                 ++forked_count;
             }
         }
 
         if (forked_count >= 2) {
-            frames.push_back(FeatureFrame{s, fork_square, 0, 0});
+            frames.push_back(FeatureFrame{s, fork_square, val_a, val_b});
         }
     }
 
@@ -93,7 +100,7 @@ bool forkable(const Gamestate &gs, const Move m, const Square forked_piece_sq) {
  * - on an unsafe square after the [move]
  * This function will not consider movements
  */
-int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType dir) {
+inline int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType dir, int & val_a, int & val_b) {
 
     int idx_start, idx_stop;
     int count = 0;
@@ -113,6 +120,11 @@ int count_forkable_pieces_after(const Gamestate & gs, const Move move, MoveType 
 
         if (!is_sentinel(forked_piece_square)
                 && forkable(gs, move, forked_piece_square)) {
+            if (count % 2 == 0) {
+                val_a = piece_value(gs.board.get(forked_piece_square));
+            } else {
+                val_b = piece_value(gs.board.get(forked_piece_square));
+            }
             ++count;
         }
 
@@ -151,19 +163,21 @@ void find_forks(
             // - there isn't a piece on the square of the queen's colour (illegal move)
             // - the square is safe
             if (colour(gs.board.get(temp)) != colour(gs.board.get(forker_sq))
-                    && !would_be_unsafe_after(gs, temp, Move{forker_sq, temp})) {
+                    && !would_be_unsafe_after(gs, temp, Move{forker_sq, temp, 0})) {
 
                 int forked_pieces = 0;
+                int val_a;
+                int val_b;
 
                 if (ortho) {
-                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, ORTHO);
+                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp, 0}, ORTHO, val_a, val_b);
                 }
                 if (diag) {
-                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp}, DIAG);
+                    forked_pieces += count_forkable_pieces_after(gs, Move{forker_sq, temp, 0}, DIAG, val_a, val_b);
                 }
 
                 if (forked_pieces >= 2) {
-                    frames.push_back(FeatureFrame{forker_sq, temp, 0, 0});
+                    frames.push_back(FeatureFrame{forker_sq, temp, val_a, val_b});
                 }
 
             }
@@ -199,7 +213,14 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);
 
             if (val(l_sq) && val(r_sq) && forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
-                frames.push_back(FeatureFrame{s, m.to, 0 , 0});
+                frames.push_back(
+                    FeatureFrame{
+                    s,
+                    m.to,
+                    piece_value(gs.board.get(l_sq)),
+                    piece_value(gs.board.get(r_sq))
+                    }
+                );
             }
         }
     }
@@ -218,6 +239,8 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
                 && would_be_safe_king_square(gs, forker_sq, king_col)) {
 
             int count = 0;
+            int val_a;
+            int val_b;
 
             for (int j = 0; j < 8; ++j) {
 
@@ -229,14 +252,19 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
                 int xd = get_x(forked_sq) - get_x(s), yd = get_y(forked_sq) - get_y(s);
                 if ((-1 <= xd && xd <= 1) && (-1 <= yd && yd <= 1)) { continue; }
 
-                if (val(forked_sq) && forkable(gs, Move{s, forker_sq}, forked_sq)) {
+                if (val(forked_sq) && forkable(gs, Move{s, forker_sq, 0}, forked_sq)) {
+                    if (count % 2 == 0) {
+                        val_a = piece_value(gs.board.get(forked_sq));
+                    } else {
+                        val_b = piece_value(gs.board.get(forked_sq));
+                    }
                     ++count;
                 }
 
             }
 
             if (count >= 2) {
-                frames.push_back(FeatureFrame{s, forker_sq});
+                frames.push_back(FeatureFrame{s, forker_sq, val_a, val_b});
             }
         }
     }
@@ -277,6 +305,8 @@ void find_forks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> &
  */
 void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
     if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
-        m[counter.inc()] = Move{ff->centre, ff->secondary, 0};
+        Move move{ff->centre, ff->secondary, 0};
+        move.set_score(fork_score(ff->conf_1, ff->conf_2));
+        m[counter.inc()] = move;
     }
 }

@@ -44,6 +44,10 @@ struct Move {
     Piece get_cap_piece() const;
     void set_cap_piece(Piece p);
 
+    int get_score() const;
+    void set_score(int);
+    void inc_score(int);
+
 };
 
 /**

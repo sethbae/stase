@@ -46,6 +46,16 @@ void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
 
 void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
     if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
-        moves[counter.inc()] = Move{ff->centre, ff->secondary, 0};
+
+        Move m{ff->centre, ff->secondary, 0};
+        int score;
+        if (would_be_weak_after(gs, m.to, colour(gs.board.get(m.from)), m)) {
+            score = unsafe_check_score(gs.board.get(m.from));
+        } else {
+            score = safe_check_score(gs.board.get(m.from));
+        }
+        m.set_score(score);
+
+        moves[counter.inc()] = m;
     }
 }

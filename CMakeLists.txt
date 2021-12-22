@@ -14,7 +14,6 @@ set(SOURCE_FILES
         src/board/board.cpp
         src/board/helper.cpp
         src/board/move.cpp
-        src/board/piece.cpp
 
         src/display/display.cpp
 
@@ -41,10 +40,13 @@ set(SOURCE_FILES
 
         src/search/search.cpp
         src/search/thread.cpp
+        src/search/greedy.cpp
         src/search/metrics.h
         src/search/thread.h
+        src/search/search_tools.h
 
         src/game/cands/cands.h
+        src/game/cands/score.h
         src/game/cands/cands.cpp
         src/game/cands/unsafe_piece.cpp
         src/game/cands/defend.cpp
@@ -58,7 +60,8 @@ set(SOURCE_FILES
 
         src/utils/utils.h
         src/utils/print.cpp
-        src/utils/uci.cpp)
+        src/utils/uci.cpp
+        src/utils/signal.cpp)
 
 set(STASE_SOURCE_FILES)
 
@@ -96,6 +99,8 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_checks_hook.cpp
         src/test/game/cands/test_pin_skewer_hook.cpp
         src/test/game/cands/test_pin_skewer_resp.cpp
+        src/test/game/cands/test_king_pinned_pieces_hook.cpp
+        src/test/game/cands/test_promotion.cpp
 
         src/test/board/test_pieces.cpp
         src/test/board/test_square.cpp
@@ -103,7 +108,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_in_check.cpp
         src/test/board/test_castling.cpp
         src/test/board/test_mutate.cpp
-        src/test/game/cands/test_king_pinned_pieces_hook.cpp src/test/game/cands/test_promotion.cpp)
+        src/test/board/test_move.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

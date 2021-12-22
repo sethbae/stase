@@ -256,7 +256,7 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
             // check it's not pinned
             if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
                 if (counter.has_space()) {
-                    moves[counter.inc()] = Move{sq, temp};
+                    moves[counter.inc()] = Move{sq, temp, 0};
                 } else {
                     // no more space, all done
                     return;
@@ -275,7 +275,7 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
     if (first_rank && gs.board.get(temp = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
         if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
             if (counter.has_space()) {
-                moves[counter.inc()] = Move{sq, temp};
+                moves[counter.inc()] = Move{sq, temp, 0};
             } else {
                 return;
             }

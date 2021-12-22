@@ -82,3 +82,37 @@ bool expected_frame_matches_actual(const ExpectedFeatureFrame & expected, const 
            && expected.conf_1 == actual.conf_1
            && expected.conf_2 == actual.conf_2;
 }
+
+/**
+ * Returns a random but valid piece of either colour, not EMPTY or INVALID.
+ */
+Piece random_piece() {
+    if (rand() % 2) {
+        return (Piece) (B_KING + (rand() % 7));
+    }
+    return (Piece) (W_KING + (rand() % 7));
+}
+
+/**
+ * Returns a random piece of the given colour, not EMPTY or INVALID.
+ */
+Piece random_piece(Colour c) {
+    if (c == BLACK) {
+        return (Piece) (B_KING + (rand() % 7));
+    }
+    return (Piece) (W_KING + (rand() % 7));
+}
+
+/**
+ * Returns a random but valid square.
+ */
+Square random_square() {
+    return mksq(rand() % 8, rand() % 8);
+}
+
+/**
+ * Returns a random move from any square to any square, with the flags set to zero.
+ */
+Move random_move() {
+    return Move{random_square(), random_square(), 0};
+}

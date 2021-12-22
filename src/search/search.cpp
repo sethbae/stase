@@ -1,6 +1,7 @@
 #include "game.h"
 #include "search.h"
 #include "thread.h"
+#include "search_tools.h"
 
 #include <vector>
 using std::vector;
@@ -148,10 +149,11 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
 
     Gamestate *new_gs = new Gamestate;
     new_gs->board = gs.board.successor_hard(m);
+    new_gs->last_move = m;
 
     SearchNode *new_node = new SearchNode;
     new_node->gs = new_gs;
-    new_node->score = (Eval) 0;
+    new_node->score = zero();
     new_node->move = m;
     new_node->num_children = 0;
     new_node->children = nullptr;
@@ -215,7 +217,24 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
     if (node->num_children == 0) {
 
         // get candidate moves and initialise the score counter
-        vector<Move> moves = cands(*node->gs);
+        vector<Move> moves;
+        moves.reserve(64);
+
+        CandSet cand_set = cands(*node->gs);
+
+        if (cand_set.legal.size() > 0) {
+            moves = cand_set.legal;
+        } else {
+            for (const Move & m : cand_set.critical) {
+                moves.push_back(m);
+            }
+            for (const Move & m : cand_set.medial) {
+                moves.push_back(m);
+            }
+            for (const Move & m : cand_set.final) {
+                moves.push_back(m);
+            }
+        }
 
         if (node->gs->has_been_mated) {
             node->score = node->gs->board.get_white()
@@ -290,7 +309,14 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 
     // initialise with root only
     Gamestate root_gs(fen_to_board(fen));
-    SearchNode root = { &root_gs, (Eval) 0, MOVE_SENTINEL, 0, nullptr };
+    SearchNode root = {
+            &root_gs,
+            {},
+            (Eval) 0,
+            MOVE_SENTINEL,
+            0,
+            nullptr
+    };
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -327,9 +353,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
  * is intended to be used in a multi-threaded context only.
  */
 void search_indefinite(SearchNode * root) {
-    while (true) {
-        deepen_tree(root);
-    }
+    greedy_search(root, -1);
 }
 
 /**

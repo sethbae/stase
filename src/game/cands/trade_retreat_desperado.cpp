@@ -31,6 +31,9 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
         if (piece_value(gs.board.get(piece_moves[i].to)) == max_val
                 && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             if (counter.has_space()) {
+                Piece trade_this = gs.board.get(ff->centre);
+                Piece for_this = gs.board.get(piece_moves[i].to);
+                piece_moves[i].set_score(trade_score(trade_this, for_this));
                 moves[counter.inc()] = piece_moves[i];
             } else {
                 return;
@@ -66,6 +69,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
         if (!would_be_unsafe && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             if (counter.has_space()) {
+                piece_moves[i].set_score(retreat_score());
                 moves[counter.inc()] = piece_moves[i];
             } else {
                 return;
@@ -99,6 +103,7 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
 
     // return a trade with the piece of maximum value
     if (counter.has_space() && !is_sentinel(max_move)) {
+        max_move.set_score(desperado_score(max_val));
         moves[counter.inc()] = max_move;
     } else {
         return;

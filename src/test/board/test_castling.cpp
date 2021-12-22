@@ -62,10 +62,10 @@ bool evaluate_castle_test_case(const CastleTestCase * tc) {
     Board b = fen_to_board(tc->fen);
 
     // these are the moves representing each of four castles
-    Move ws = Move{stosq("e1"), stosq("g1")};
-    Move wl = Move{stosq("e1"), stosq("c1")};
-    Move bs = Move{stosq("e8"), stosq("g8")};
-    Move bl = Move{stosq("e8"), stosq("c8")};
+    Move ws = Move{stosq("e1"), stosq("g1"), 0};
+    Move wl = Move{stosq("e1"), stosq("c1"), 0};
+    Move bs = Move{stosq("e8"), stosq("g8"), 0};
+    Move bl = Move{stosq("e8"), stosq("c8"), 0};
 
     // create a list which is all the legal moves for either player
     std::vector<Move> legals = legal_moves(b);

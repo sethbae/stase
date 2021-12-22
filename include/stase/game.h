@@ -41,6 +41,54 @@ Square first_piece_encountered(const Board &, const Square, const Delta);
 // forward declaration: see cands.h
 struct FeatureFrame;
 
+enum CandList {
+    CRITICAL,
+    MEDIAL,
+    FINAL,
+    LEGAL
+};
+inline std::string name(CandList cand_list) {
+    switch (cand_list) {
+        case CRITICAL: return "CRITICAL";
+        case MEDIAL: return "MEDIAL";
+        case FINAL: return "FINAL";
+        case LEGAL: return "LEGAL";
+    }
+    return "INVALID";
+}
+
+struct CandSet {
+    std::vector<Move> critical;
+    std::vector<Move> medial;
+    std::vector<Move> final;
+    std::vector<Move> legal;
+    inline bool empty() { return critical.empty() && medial.empty() && final.empty() && legal.empty(); }
+    inline int size() {
+        if (legal.size()) {
+            return legal.size();
+        }
+        return critical.size() + medial.size() + final.size();
+    }
+    inline std::vector<Move> get_list(CandList cand_list) {
+        switch (cand_list) {
+            case CRITICAL: return critical;
+            case MEDIAL: return medial;
+            case FINAL: return final;
+            case LEGAL: return legal;
+        }
+        // impossible
+        return {};
+    }
+    inline void clear_list(CandList cand_list) {
+        switch (cand_list) {
+            case CRITICAL: critical.clear(); break;
+            case MEDIAL: medial.clear(); break;
+            case FINAL: final.clear(); break;
+            case LEGAL: legal.clear(); break;
+        }
+    }
+};
+
 struct Gamestate {
 
     // The enclosed board
@@ -91,8 +139,8 @@ Eval heur(const Gamestate &);
 Eval heur_with_description(const Gamestate &);
 
 // candidate moves
-std::vector<Move> cands(Gamestate &);
-std::vector<Move> cands_report(Gamestate &);
+CandSet cands(Gamestate &);
+CandSet cands_report(Gamestate &);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);

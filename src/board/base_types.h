@@ -87,9 +87,35 @@ constexpr Colour colour(const Piece p) {
 /**
  * Other helpers: minor/major pieces
  */
-constexpr bool is_minor_piece(Piece);
-constexpr bool is_major_piece(Piece);
-constexpr bool is_not_pk(Piece);
+constexpr bool is_minor_piece(Piece p) {
+    switch (type(p)) {
+        case KNIGHT:
+        case BISHOP:
+            return true;
+        default:
+            return false;
+    }
+}
+constexpr bool is_major_piece(Piece p) {
+    switch (type(p)) {
+        case QUEEN:
+        case ROOK:
+            return true;
+        default:
+            return false;
+    }
+}
+constexpr bool is_not_pk(Piece p) {
+    switch (type(p)) {
+        case QUEEN:
+        case ROOK:
+        case KNIGHT:
+        case BISHOP:
+            return true;
+        default:
+            return false;
+    }
+}
 
 /**
  * Conversion to and from chars.
