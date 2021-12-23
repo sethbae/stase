@@ -18,6 +18,7 @@ struct SearchNode {
     unsigned short num_children;
     SearchNode ** children;
     SearchNode * best_child;
+    unsigned short visit_count;
 
 };
 

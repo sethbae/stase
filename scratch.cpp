@@ -255,10 +255,12 @@ int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
 
-    const std::string fen = std::string("r2q1rk1/3n1ppp/b1pb1n2/p3p1Q1/2P1N3/3PpN1P/P3PPP1/R3KB1R w - - 0 15");
+    const std::string fen = std::string("r4rk1/1p1n1ppp/1qp5/3p4/1b2pP1N/1P1PP1P1/nBPQN2P/1K1R1R2 w - - 2 19");
 
     Gamestate gs(fen_to_board(fen));
     pr_board(gs.board);
+
+//    show_hook_frames(fen, &check_hook);
 
 //    cands_report(gs);
 
@@ -266,7 +268,7 @@ int main(int argc, char** argv) {
 //
 //    iterative_deepening_search(fen, 12);
 
-    std::vector<Move> best_line = greedy_search(fen, 2000);
+    std::vector<Move> best_line = greedy_search(fen, 20);
 
 //    number_of_cands(CRITICAL);
 

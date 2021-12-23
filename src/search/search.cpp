@@ -156,6 +156,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
     new_node->num_children = 0;
     new_node->children = nullptr;
     new_node->best_child = nullptr;
+    new_node->visit_count = 0;
 
     return new_node;
 
