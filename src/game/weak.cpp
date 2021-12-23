@@ -50,8 +50,6 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
     int x, y;
     Square temp;
 
-    SquareControlStatus sq_status;
-
     // go through the delta pairs entailing each sliding direction
     MoveType dir = DIAG;
     for (int i = 0; i < 8; ++i) {
@@ -213,35 +211,41 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
     if (directions_attacked_from > 1) {
 
         // attacking from multiple directions, poly x-rays do not count
-        sq_status.balance = basic_balance;
-        sq_status.min_w = min_value_w;
-        sq_status.min_b = min_value_b;
+        return {
+            basic_balance,
+            min_value_w,
+            min_value_b
+        };
 
     } else {
 
         // attacking from one route only, poly x-rays do count
-        sq_status.balance = poly_x_ray_balance;
 
         // we also need to check for poly x-ray pieces that are the only or weakest defender
         if (colour(b.get(s)) == WHITE) {
 
             // if the weak piece is white, its defenders are white
             int min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
-            sq_status.min_w = min_defender;
-            sq_status.min_b = min_value_b;
+
+            return {
+              poly_x_ray_balance,
+              min_defender,
+              min_value_b
+            };
 
         } else {
 
             // if the weak piece is black, its defenders are black
             int min_defender = (min_poly_x_ray_defender < min_value_b) ? min_poly_x_ray_defender : min_value_b;
-            sq_status.min_w = min_value_w;
-            sq_status.min_b = min_defender;
 
+            return {
+                poly_x_ray_balance,
+                min_value_w,
+                min_defender
+            };
         }
 
     }
-
-    return sq_status;
 
 }
 
