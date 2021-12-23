@@ -55,7 +55,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
 
                     Delta mov_dir = get_delta_between(temp, piece_squares[j]);
 
-                    if (can_move_to_square(b, piece_squares[j], temp)
+                    if (beta_covers(b, piece_squares[j], temp)
                             && can_move_in_direction(b.get(piece_squares[j]), dir)
                             && !would_be_unsafe_after(gs, temp, Move{piece_squares[j], temp, 0})
                             && !gs.is_kpinned_piece(piece_squares[j], mov_dir)) {
