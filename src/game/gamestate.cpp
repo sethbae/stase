@@ -35,7 +35,7 @@ void alloc(Gamestate * gs) {
  * Updates the given gamestate's w_king and b_king fields to refer to the correct
  * squares of the kings.
  */
-void Gamestate::find_kings() {
+void Gamestate::find_kings() const {
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
             Piece p = board.get(mksq(x, y));

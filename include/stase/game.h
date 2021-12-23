@@ -135,16 +135,19 @@ struct Gamestate {
     Move last_move;
     Piece last_capture;
 
-    Square w_king;
-    Square b_king;
-    void find_kings();
-    inline Square w_ksq() {
+private:
+    mutable Square w_king;
+    mutable Square b_king;
+    void find_kings() const;
+
+public:
+    inline Square w_ksq() const {
         if (is_sentinel(w_king)) {
             find_kings();
         }
         return w_king;
     }
-    inline Square b_ksq() {
+    inline Square b_ksq() const {
         if (is_sentinel(b_king)) {
             find_kings();
         }
