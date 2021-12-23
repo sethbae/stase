@@ -113,9 +113,9 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colou
         k_sq = gs.b_ksq();
     }
 
-    Piece sneaked_piece = gs.board.sneak(Move{k_sq, s, 0});
+    Piece sneaked = gs.sneak(Move{k_sq, s, 0});
     bool result = is_safe_for_king(gs, s);
-    gs.board.unsneak(Move{k_sq, s, 0}, sneaked_piece);
+    gs.unsneak(Move{k_sq, s, 0}, sneaked);
 
     return result;
 
@@ -128,9 +128,9 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colou
  */
 bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Colour colour) {
 
-    Piece sneaked_piece = gs.board.sneak(m);
+    Piece sneaked = gs.sneak(m);
     bool result = would_be_safe_king_square(gs, s, colour);
-    gs.board.unsneak(m, sneaked_piece);
+    gs.unsneak(m, sneaked);
 
     return result;
 }

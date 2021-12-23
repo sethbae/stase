@@ -154,6 +154,27 @@ public:
         return b_king;
     }
 
+public:
+    inline Piece sneak(const Move m) const {
+        Piece sneaked = board.sneak(m);
+        Piece p = board.get(m.to);
+        if (p == W_KING) {
+            w_king = m.to;
+        } else if (p == B_KING) {
+            b_king = m.to;
+        }
+        return sneaked;
+    }
+    inline void unsneak(const Move m, const Piece sneaked) const {
+        board.unsneak(m, sneaked);
+        Piece p = board.get(m.from);
+        if (p == W_KING) {
+            w_king = m.from;
+        } else if (p == B_KING) {
+            b_king = m.from;
+        }
+    }
+
 };
 
 // heuristic evaluation

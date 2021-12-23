@@ -347,9 +347,9 @@ bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
  */
 bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, const Move m) {
 
-    Piece sneaked_piece = gs.board.sneak(m);
+    Piece sneaked = gs.sneak(m);
     bool weak = is_weak_square(gs, s, c);
-    gs.board.unsneak(m, sneaked_piece);
+    gs.unsneak(m, sneaked);
 
     return weak;
 
