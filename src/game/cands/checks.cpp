@@ -12,14 +12,12 @@
 void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
     // find the enemy king
+    Piece p = gs.board.get(s);
     Square k_sq;
-    Piece enemy_king = colour(gs.board.get(s)) == WHITE ? B_KING : W_KING;
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == enemy_king) {
-                k_sq = mksq(x, y);
-            }
-        }
+    if (colour(p) == WHITE) {
+        k_sq = gs.w_ksq();
+    } else {
+        k_sq = gs.b_ksq();
     }
 
     // find the squares this piece can move to

@@ -106,15 +106,11 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
  */
 bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colour colour) {
 
-    Piece king = (colour == WHITE) ? W_KING : B_KING;
     Square k_sq;
-
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == king) {
-                k_sq = mksq(x, y);
-            }
-        }
+    if (colour == WHITE) {
+        k_sq = gs.w_ksq();
+    } else {
+        k_sq = gs.b_ksq();
     }
 
     Piece sneaked_piece = gs.board.sneak(Move{k_sq, s, 0});
@@ -146,15 +142,12 @@ bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Mo
  * performance-critical version.
  */
 bool is_safe_king(const Gamestate & gs, const Colour king_colour) {
-    Piece king = (king_colour == WHITE) ? W_KING : B_KING;
-    Square k_sq;
 
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == king) {
-                k_sq = mksq(x, y);
-            }
-        }
+    Square k_sq;
+    if (king_colour == WHITE) {
+        k_sq = gs.w_ksq();
+    } else {
+        k_sq = gs.b_ksq();
     }
 
     return is_safe_for_king(gs, k_sq);
