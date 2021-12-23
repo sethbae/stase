@@ -35,7 +35,7 @@ int supporting_pawns(const Board & b, Square s) {
     Assesses how well defended pawns are. You score a point for every time a pawn defends
     another, and lose a point every time a pawn is undefended (unless it hasn't yet moved)
 */
-float defended_pawns_metric(const Board & b) {
+float defended_pawns_metric(const Gamestate & gs) {
 
     Square sq;
     int score = 0;
@@ -47,13 +47,13 @@ float defended_pawns_metric(const Board & b) {
 
         // find white pawn in this file
         sq = mksq(x, 1);
-        while (val(sq) && b.get(sq) != W_PAWN) {
+        while (val(sq) && gs.board.get(sq) != W_PAWN) {
             ++sq.y;
         }
 
         if (val(sq)) {
             // count pawns supporting this pawn
-            supporters = supporting_pawns(b, sq);
+            supporters = supporting_pawns(gs.board, sq);
             if (supporters)
                 score += supporters;    // if there are some, score points
 
@@ -61,12 +61,12 @@ float defended_pawns_metric(const Board & b) {
 
         // find black pawn in this file
         sq = mksq(x, 6);
-        while (val(sq) && b.get(sq) != B_PAWN) {
+        while (val(sq) && gs.board.get(sq) != B_PAWN) {
             --sq.y;
         }
 
         if (val(sq)) {
-            supporters = supporting_pawns(b, sq);
+            supporters = supporting_pawns(gs.board, sq);
             if (supporters)
                 score -= supporters;    // same as above, but counting the other way
         }
@@ -77,7 +77,7 @@ float defended_pawns_metric(const Board & b) {
 
 }
 
-float isolated_pawns_metric(const Board & b) {
+float isolated_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 
@@ -88,9 +88,9 @@ float isolated_pawns_metric(const Board & b) {
     // compute the above arrays
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 7; ++y) {
-            if (b.get(mksq(x, y)) == W_PAWN) {
+            if (gs.board.get(mksq(x, y)) == W_PAWN) {
                 wpawns[x] = true;
-            } else if (b.get(mksq(x, y)) == B_PAWN) {
+            } else if (gs.board.get(mksq(x, y)) == B_PAWN) {
                 bpawns[x] = true;
             }
         }
@@ -126,7 +126,7 @@ float isolated_pawns_metric(const Board & b) {
 
 }
 
-float central_pawns_metric(const Board & b) {
+float central_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 
@@ -137,9 +137,9 @@ float central_pawns_metric(const Board & b) {
     // compute the above arrays
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 7; ++y) {
-            if (b.get(mksq(x, y)) == W_PAWN) {
+            if (gs.board.get(mksq(x, y)) == W_PAWN) {
                 wpawns[x] = true;
-            } else if (b.get(mksq(x, y)) == B_PAWN) {
+            } else if (gs.board.get(mksq(x, y)) == B_PAWN) {
                 bpawns[x] = true;
             }
         }
@@ -167,7 +167,7 @@ float central_pawns_metric(const Board & b) {
 
 }
 
-float far_advanced_pawns_metric(const Board & b) {
+float far_advanced_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 
@@ -176,7 +176,7 @@ float far_advanced_pawns_metric(const Board & b) {
     for (int y = 6; y > 0; --y) {
         for (int x = 0; x < 8; ++x) {
 
-            Piece p = b.get(mksq(x, y));
+            Piece p = gs.board.get(mksq(x, y));
 
             if (y > 3 && p == W_PAWN) {
                 score += value[y];

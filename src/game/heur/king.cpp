@@ -76,7 +76,7 @@ int pk_count(const Board & b, const Square s) {
 
 }
 
-float pawns_defend_king_metric(const Board & b) {
+float pawns_defend_king_metric(const Gamestate & gs) {
 
     Square wking = Square{0, 0};
     Square bking = Square{0, 0};
@@ -84,9 +84,9 @@ float pawns_defend_king_metric(const Board & b) {
     // find kings
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (b.get(mksq(x, y)) == W_KING) {
+            if (gs.board.get(mksq(x, y)) == W_KING) {
                 wking = mksq(x, y);
-            } else if (b.get(mksq(x, y)) == B_KING) {
+            } else if (gs.board.get(mksq(x, y)) == B_KING) {
                 bking = mksq(x, y);
             }
         }
@@ -96,14 +96,14 @@ float pawns_defend_king_metric(const Board & b) {
 //    cout << "Black: " << pk_count(b, bking) << "\n";
 
     // delegate to the pawn-king-counter (pk-count)
-    return ((float)(pk_count(b, wking) - pk_count(b, bking))) / 8.0f;
+    return ((float)(pk_count(gs.board, wking) - pk_count(gs.board, bking))) / 8.0f;
 }
 
 /*
  * Returns a score representing the balance of control near the king.
  * sums gamma control count on all adjacent squares to each king.
  */
-float control_near_king_metric(const Board & b) {
+float control_near_king_metric(const Gamestate & gs) {
 
     int score = 0;
     int wx = 0, wy = 0, bx = 0, by = 0;
@@ -111,10 +111,10 @@ float control_near_king_metric(const Board & b) {
     // find kings
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (b.get(mksq(x, y)) == W_KING) {
+            if (gs.board.get(mksq(x, y)) == W_KING) {
                 wx = x;
                 wy = y;
-            } else if (b.get(mksq(x, y)) == B_KING) {
+            } else if (gs.board.get(mksq(x, y)) == B_KING) {
                 bx = x;
                 by = y;
             }
@@ -125,39 +125,39 @@ float control_near_king_metric(const Board & b) {
 
     // white king
     if (val(sq = mksq(wx + 1, wy + 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx + 1, wy + 0)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx + 1, wy - 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx + 0, wy + 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx + 0, wy - 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx - 1, wy + 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx - 1, wy + 0)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
     if (val(sq = mksq(wx - 1, wy - 1)))
-        score += gamma_control(b, sq);
+        score += gamma_control(gs.board, sq);
 
-    // black king
+    // gs.boardlack king
     if (val(sq = mksq(bx + 1, by + 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx + 1, by + 0)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx + 1, by - 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx + 0, by + 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx + 0, by - 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx - 1, by + 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx - 1, by + 0)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx - 1, by - 1)))
-        score -= gamma_control(b, sq);
+        score -= gamma_control(gs.board, sq);
 
     if (score > 15) { score = 15; }
     else if (score < -15) { score = -15; }
@@ -174,13 +174,13 @@ float control_near_king_metric(const Board & b) {
  * if this is unfavourable for the colour given, ie x > 0 for BLACK and x < 0 for WHITE,
  * then it is returned - otherwise 0 is returned
  */
-int exposure_count(const Board & b, const Square s, Delta d, MoveType dir, Colour col) {
+int exposure_count(const Gamestate & gs, const Square s, Delta d, MoveType dir, Colour col) {
 
     Square sq = s;
     int control_count = 0, length = 0;
     Piece p;
 
-    while (val(sq) && type(p = b.get(sq)) != PAWN) {
+    while (val(sq) && type(p = gs.board.get(sq)) != PAWN) {
         if (can_move_in_direction(p, dir)) {
             control_count += (colour(p) == WHITE ? 1 : -1);
         }
@@ -210,9 +210,9 @@ int exposure_count(const Board & b, const Square s, Delta d, MoveType dir, Colou
  * Only returns an unfavourable score, as per exposure_count
  * Pass the king's square!
  */
-int one_king_exposure(const Board & b, const Square s) {
+int one_king_exposure(const Gamestate & gs, const Square s) {
 
-    Colour col = colour(b.get(s));
+    Colour col = colour(gs.board.get(s));
     int score = 0;
 
     Square ahead = mksq(get_x(s), get_y(s) + 1);
@@ -224,17 +224,17 @@ int one_king_exposure(const Board & b, const Square s) {
     Square start_points[] = { ahead, behind, centre, left, right };
 
     for (int i = 0; i < 3; ++i) {
-        score += exposure_count(b, start_points[i], Delta{1, 0}, ORTHO, col);
-        score += exposure_count(b, start_points[i], Delta{-1, 0}, ORTHO, col);
-        score += exposure_count(b, start_points[i], Delta{1, 1}, DIAG, col);
-        score += exposure_count(b, start_points[i], Delta{-1, 1}, DIAG, col);
-        score += exposure_count(b, start_points[i], Delta{1, -1}, DIAG, col);
-        score += exposure_count(b, start_points[i], Delta{-1, -1}, DIAG, col);
+        score += exposure_count(gs, start_points[i], Delta{1, 0}, ORTHO, col);
+        score += exposure_count(gs, start_points[i], Delta{-1, 0}, ORTHO, col);
+        score += exposure_count(gs, start_points[i], Delta{1, 1}, DIAG, col);
+        score += exposure_count(gs, start_points[i], Delta{-1, 1}, DIAG, col);
+        score += exposure_count(gs, start_points[i], Delta{1, -1}, DIAG, col);
+        score += exposure_count(gs, start_points[i], Delta{-1, -1}, DIAG, col);
     }
 
     for (int i = 3; i < 5; ++i) {
-        score += exposure_count(b, start_points[i], Delta{0, 1}, ORTHO, col);
-        score += exposure_count(b, start_points[i], Delta{0, -1}, ORTHO, col);
+        score += exposure_count(gs, start_points[i], Delta{0, 1}, ORTHO, col);
+        score += exposure_count(gs, start_points[i], Delta{0, -1}, ORTHO, col);
     }
 
     return score;
@@ -243,16 +243,16 @@ int one_king_exposure(const Board & b, const Square s) {
 /**
  * Combines two calls to one_king_exposure into a metric.
  */
-float king_exposure_metric(const Board & b) {
+float king_exposure_metric(const Gamestate & gs) {
 
     Square wking = Square{0, 0}, bking = Square{0, 0};
 
     // find kings
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (b.get(mksq(x, y)) == W_KING) {
+            if (gs.board.get(mksq(x, y)) == W_KING) {
                 wking = mksq(x, y);
-            } else if (b.get(mksq(x, y)) == B_KING) {
+            } else if (gs.board.get(mksq(x, y)) == B_KING) {
                 bking = mksq(x, y);
             }
         }
@@ -261,6 +261,6 @@ float king_exposure_metric(const Board & b) {
     // cout << "White scores: " << one_king_exposure(b, wking) << "\n";
     // cout << "Black scores: " << one_king_exposure(b, bking) << "\n";
 
-    return (((float)one_king_exposure(b, wking)) + ((float)one_king_exposure(b, bking))) / 6.0f;
+    return (((float)one_king_exposure(gs, wking)) + ((float)one_king_exposure(gs, bking))) / 6.0f;
 
 }

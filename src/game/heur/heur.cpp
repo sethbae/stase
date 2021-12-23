@@ -65,7 +65,7 @@ Eval heur(const Gamestate & gs) {
     Eval ev = zero();
     
     for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
-        int score = (int)(ALL_METRICS[i]->metric(gs.board) * (float)ALL_METRICS[i]->weight);
+        int score = (int)(ALL_METRICS[i]->metric(gs) * (float)ALL_METRICS[i]->weight);
         ev += score;
     }
     
@@ -86,7 +86,7 @@ Eval heur_with_description(const Gamestate & gs) {
 
     Eval ev = zero();
     for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
-        float score = ALL_METRICS[i]->metric(gs.board);
+        float score = ALL_METRICS[i]->metric(gs);
         int weighted_score = (int)(score * (float)ALL_METRICS[i]->weight);
         ev += weighted_score;
         

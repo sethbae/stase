@@ -20,7 +20,7 @@
 struct Metric {
     const std::string name;
     const int weight;
-    float (*metric)(const Board &);
+    float (*metric)(const Gamestate &);
 };
 
 /*
@@ -78,27 +78,27 @@ int half_line_walk(const Board &, Square, Delta, MoveType);
 int count_pawns(const Board &, Square, Delta);
 
 // piece activity
-float piece_activity_alpha_metric(const Board &);
-float piece_activity_beta_metric(const Board &);
-float piece_activity_gamma_metric(const Board &);
+float piece_activity_alpha_metric(const Gamestate &);
+float piece_activity_beta_metric(const Gamestate &);
+float piece_activity_gamma_metric(const Gamestate &);
 
 // line control
-float open_line_control_metric(const Board &);
-float centre_control_metric(const Board &);
+float open_line_control_metric(const Gamestate &);
+float centre_control_metric(const Gamestate &);
 
 // pawn structure metrics
-float defended_pawns_metric(const Board &);
-float isolated_pawns_metric(const Board &);
-float central_pawns_metric(const Board &);
-float far_advanced_pawns_metric(const Board &);
+float defended_pawns_metric(const Gamestate &);
+float isolated_pawns_metric(const Gamestate &);
+float central_pawns_metric(const Gamestate &);
+float far_advanced_pawns_metric(const Gamestate &);
 
 // opening metrics
-float development_metric(const Board &);
+float development_metric(const Gamestate &);
 
 // king safety metrics
-float pawns_defend_king_metric(const Board &);
-float control_near_king_metric(const Board &);
-float king_exposure_metric(const Board &);
+float pawns_defend_king_metric(const Gamestate &);
+float control_near_king_metric(const Gamestate &);
+float king_exposure_metric(const Gamestate &);
 
 const Metric __piece_activity_alpha_metric{
     "piece-activity-alpha",

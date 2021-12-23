@@ -20,9 +20,9 @@ void bench_heuristic_evaluation() {
 }
 
 double bench_metric(const Metric *m) {
-    vector<Board> boards;
-    puzzle_boards(boards);
-    double time = bench(m->name, MICROS, boards.data(), boards.size(), m->metric);
+    vector<Gamestate> states;
+    puzzle_gamestates(states);
+    double time = bench(m->name, MICROS, states.data(), states.size(), m->metric);
     return time;
 }
 

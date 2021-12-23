@@ -3,7 +3,7 @@
 #include "heur.h"
 
 
-float piece_activity_alpha_metric(const Board & b) {
+float piece_activity_alpha_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;
@@ -13,12 +13,12 @@ float piece_activity_alpha_metric(const Board & b) {
         for (int y = 0; y < 8; ++y) {
 
             sq = mksq(x, y);
-            Piece p = b.get(sq);
+            Piece p = gs.board.get(sq);
 
             if (colour(p) == WHITE) {
-                w_control += alpha_control(b, sq);
+                w_control += alpha_control(gs.board, sq);
             } else if (colour(p) == BLACK) {
-                b_control += alpha_control(b, sq);
+                b_control += alpha_control(gs.board, sq);
             }
         }
     }
@@ -32,7 +32,7 @@ float piece_activity_alpha_metric(const Board & b) {
 
 }
 
-float piece_activity_beta_metric(const Board & b) {
+float piece_activity_beta_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;
@@ -42,12 +42,12 @@ float piece_activity_beta_metric(const Board & b) {
         for (int y = 0; y < 8; ++y) {
 
             sq = mksq(x, y);
-            Piece p = b.get(sq);
+            Piece p = gs.board.get(sq);
 
             if (colour(p) == WHITE) {
-                w_control += beta_control(b, sq);
+                w_control += beta_control(gs.board, sq);
             } else if (colour(p) == BLACK) {
-                b_control += beta_control(b, sq);
+                b_control += beta_control(gs.board, sq);
             }
         }
     }
@@ -61,7 +61,7 @@ float piece_activity_beta_metric(const Board & b) {
 
 }
 
-float piece_activity_gamma_metric(const Board & b) {
+float piece_activity_gamma_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;
@@ -71,12 +71,12 @@ float piece_activity_gamma_metric(const Board & b) {
         for (int y = 0; y < 8; ++y) {
 
             sq = mksq(x, y);
-            Piece p = b.get(sq);
+            Piece p = gs.board.get(sq);
 
             if (colour(p) == WHITE) {
-                w_control += gamma_control(b, sq);
+                w_control += gamma_control(gs.board, sq);
             } else if (colour(p) == BLACK) {
-                b_control += gamma_control(b, sq);
+                b_control += gamma_control(gs.board, sq);
             }
         }
     }
