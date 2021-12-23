@@ -69,7 +69,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
         if (!would_be_unsafe && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
             if (counter.has_space()) {
-                piece_moves[i].set_score(retreat_score());
+                piece_moves[i].set_score(retreat_score(gs.board.get(piece_moves[i].from)));
                 moves[counter.inc()] = piece_moves[i];
             } else {
                 return;
