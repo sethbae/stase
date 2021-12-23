@@ -1,7 +1,7 @@
 #include "board.h"
 #include "heur.h"
 
-float development_metric(const Board & b) {
+float development_metric(const Gamestate & gs) {
 
     int count = 0;
 
@@ -10,10 +10,10 @@ float development_metric(const Board & b) {
     };
 
     for (int x = 0; x < 8; ++x) {
-        if (type(b.get(x, 7)) == BACK_RANK[x]) {
+        if (type(gs.board.get(x, 7)) == BACK_RANK[x]) {
             ++count;
         }
-        if (type(b.get(x, 0)) == BACK_RANK[x]) {
+        if (type(gs.board.get(x, 0)) == BACK_RANK[x]) {
             --count;
         }
     }

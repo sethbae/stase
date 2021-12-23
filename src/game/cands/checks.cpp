@@ -15,9 +15,9 @@ void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
     Piece p = gs.board.get(s);
     Square k_sq;
     if (colour(p) == WHITE) {
-        k_sq = gs.w_ksq();
-    } else {
         k_sq = gs.b_ksq();
+    } else {
+        k_sq = gs.w_ksq();
     }
 
     // find the squares this piece can move to
@@ -33,7 +33,7 @@ void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
             continue;
         }
 
-        if (!would_be_safe_for_king_after(gs, k_sq, m, colour(enemy_king))) {
+        if (!would_be_safe_for_king_after(gs, k_sq, m, colour(gs.board.get(k_sq)))) {
             frames.push_back(
               FeatureFrame{s, m.to, 0, 0 }
             );
