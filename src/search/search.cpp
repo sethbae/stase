@@ -287,14 +287,14 @@ void deepen_tree(SearchNode * root) {
 
 /**
  * Given a pointer to the root of a tree, retrieves the best line of play as indicated
- * by the scores on the nodes.
+ * by the scores on the nodes. This includes the given root, as the first element.
  */
 std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
     std::vector<SearchNode *> line{root};
     SearchNode * current = root;
 
-    while (current->best_child) {
-        line.push_back(current->best_child);
+    while (current != nullptr) {
+        line.push_back(current);
         current = current->best_child;
     }
 
