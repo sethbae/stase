@@ -38,8 +38,8 @@ constexpr int trade_score(const Piece trade_this, const Piece for_this) {
     return 1 + (diff / 1000);
 }
 
-constexpr int retreat_score() {
-    return 0;
+constexpr int retreat_score(Piece p) {
+    return is_major_piece(p) ? 5 : 3;
 }
 
 constexpr int desperado_score(int piece_val) {
