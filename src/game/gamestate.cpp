@@ -31,12 +31,33 @@ void alloc(Gamestate * gs) {
     *gs->b_kpinned_pieces = SQUARE_SENTINEL;
 }
 
+/**
+ * Updates the given gamestate's w_king and b_king fields to refer to the correct
+ * squares of the kings.
+ */
+void Gamestate::find_kings() {
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            Piece p = board.get(mksq(x, y));
+            if (p == W_KING) {
+                w_king = mksq(x, y);
+            } else if (p == B_KING) {
+                b_king = mksq(x, y);
+            }
+        }
+    }
+}
+
 Gamestate::Gamestate() {
     alloc(this);
+    w_king = SQUARE_SENTINEL;
+    b_king = SQUARE_SENTINEL;
 }
 
 Gamestate::Gamestate(const Board & b) : board(b) {
     alloc(this);
+    w_king = SQUARE_SENTINEL;
+    b_king = SQUARE_SENTINEL;
 }
 
 Gamestate::Gamestate(Gamestate && o) {
@@ -48,6 +69,8 @@ Gamestate::Gamestate(Gamestate && o) {
     this->w_kpin_dirs = o.w_kpin_dirs;
     this->b_kpinned_pieces = o.b_kpinned_pieces;
     this->b_kpin_dirs = o.b_kpin_dirs;
+    this->w_king = o.w_king;
+    this->b_king = o.b_king;
     o.feature_frames = nullptr;
     o.wpieces = nullptr;
     o.bpieces = nullptr;
@@ -104,6 +127,46 @@ Gamestate::~Gamestate() {
  */
 void Gamestate::repopulate_caches() {
     // for each square, pieces
+}
+
+/**
+ * Allocates and returns a *new* Gamestate representing the position after the
+ * move has been played.
+ */
+Gamestate * Gamestate::next(const Move m) const {
+
+    Gamestate * new_gs = new Gamestate;
+
+    new_gs->board = board.successor_hard(m);
+    new_gs->last_move = m;
+    if (board.get(m.from) == W_KING) {
+        new_gs->w_king = m.to;
+        new_gs->b_king = b_king;
+    } else if (board.get(m.from) == B_KING) {
+        new_gs->w_king = w_king;
+        new_gs->b_king = m.to;
+    } else {
+        new_gs->w_king = w_king;
+        new_gs->b_king = b_king;
+    }
+
+    return new_gs;
+}
+
+/**
+ * Updates the current gamestate such that it now represents the position resulting
+ * from the given move being played.
+ */
+void Gamestate::next_in_place(const Move m) {
+
+    if (board.get(m.from) == W_KING) {
+        w_king = m.to;
+    } else if (board.get(m.from) == B_KING) {
+        b_king = m.to;
+    }
+    last_move = m;
+    board = board.successor_hard(m);
+
 }
 
 /**

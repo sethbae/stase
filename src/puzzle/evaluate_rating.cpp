@@ -27,7 +27,7 @@ bool score_puzzle_against_cands(const Puzzle & puzzle) {
             }
         }
 
-        gs.board = gs.board.successor_hard(puzzle.solution_moves[i]);
+        gs.next_in_place(puzzle.solution_moves[i]);
 
     }
 

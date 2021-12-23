@@ -147,9 +147,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
 
     COUNT++;
 
-    Gamestate *new_gs = new Gamestate;
-    new_gs->board = gs.board.successor_hard(m);
-    new_gs->last_move = m;
+    Gamestate *new_gs = gs.next(m);
 
     SearchNode *new_node = new SearchNode;
     new_node->gs = new_gs;

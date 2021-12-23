@@ -108,6 +108,9 @@ struct Gamestate {
 
     void repopulate_caches();
 
+    Gamestate * next(const Move) const;
+    void next_in_place(const Move);
+
     // TODO (GM-25): as and when required add these to the copy constructor
 
     // store a cache of squares on which pieces fall
@@ -131,6 +134,22 @@ struct Gamestate {
 
     Move last_move;
     Piece last_capture;
+
+    Square w_king;
+    Square b_king;
+    void find_kings();
+    inline Square w_ksq() {
+        if (is_sentinel(w_king)) {
+            find_kings();
+        }
+        return w_king;
+    }
+    inline Square b_ksq() {
+        if (is_sentinel(b_king)) {
+            find_kings();
+        }
+        return b_king;
+    }
 
 };
 
