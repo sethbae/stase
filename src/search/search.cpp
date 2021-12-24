@@ -307,7 +307,7 @@ std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
 std::vector<Move> iterative_deepening_search(const std::string & fen, int max_depth) {
 
     // initialise with root only
-    Gamestate root_gs(fen_to_board(fen));
+    Gamestate root_gs = Gamestate::fresh(fen);
     SearchNode root = {
             &root_gs,
             {},

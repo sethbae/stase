@@ -97,8 +97,11 @@ struct Gamestate {
 
     FeatureFrame ** feature_frames;
 
+private:
     explicit Gamestate();
     explicit Gamestate(const Board &);
+
+public:
     explicit Gamestate(const Gamestate &);
     explicit Gamestate(Gamestate &&);
     ~Gamestate();
@@ -108,6 +111,8 @@ struct Gamestate {
 
     void repopulate_caches();
 
+    static Gamestate fresh(const std::string &);
+    static Gamestate * new_gs(const std::string &);
     Gamestate * next(const Move) const;
     void next_in_place(const Move);
 

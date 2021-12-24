@@ -217,7 +217,7 @@ void find_cands_outliers(CandList cand_list) {
  */
 void show_responder_moves(const std::string & fen, const Responder & resp, const FeatureFrame ff) {
 
-    Gamestate gs(fen_to_board(fen));
+    Gamestate gs = Gamestate::fresh(fen);
 
     pr_board(gs.board);
 
@@ -238,7 +238,7 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
  */
 void show_hook_frames(const std::string & fen, const Hook * h) {
 
-    Gamestate gs(fen_to_board(fen));
+    Gamestate gs = Gamestate::fresh(fen);
 
     discover_feature_frames(gs, h);
 
@@ -257,7 +257,7 @@ int main(int argc, char** argv) {
 
     const std::string fen = std::string("r4rk1/1p1n1ppp/1qp5/3p4/1b2pP1N/1P1PP1P1/nBPQN2P/1K1R1R2 w - - 2 19");
 
-    Gamestate gs(fen_to_board(fen));
+    Gamestate gs = Gamestate::fresh(fen);
     pr_board(gs.board);
 
 //    show_hook_frames(fen, &check_hook);

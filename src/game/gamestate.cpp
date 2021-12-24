@@ -130,6 +130,20 @@ void Gamestate::repopulate_caches() {
 }
 
 /**
+ * Creates and returns a brand new game state for the given position.
+ */
+Gamestate Gamestate::fresh(const std::string & fen) {
+    return Gamestate(fen_to_board(fen));
+}
+
+/**
+ * Allocates a new gamestate for the given position and returns a pointer to it.
+ */
+Gamestate * Gamestate::new_gs(const std::string & fen) {
+    return new Gamestate(fen_to_board(fen));
+}
+
+/**
  * Allocates and returns a *new* Gamestate representing the position after the
  * move has been played.
  */

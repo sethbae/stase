@@ -58,7 +58,7 @@ const TestSet<StringTestCase> hook_test_set{
 
 bool evaluate_test_case_development_hook(const StringTestCase *tc) {
 
-    Gamestate gs(fen_to_board(tc->fen));
+    Gamestate gs = Gamestate::fresh(tc->fen);
 
     discover_feature_frames(gs, &develop_hook);
 
