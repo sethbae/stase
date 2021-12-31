@@ -103,7 +103,7 @@ void pin_or_skewer_piece(const Gamestate &, const FeatureFrame *, Move *, IndexC
 void promote_pawn(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 
 // the actual hooks
-const Hook unsafe_piece_hook = Hook{"weak", 0, &is_unsafe_piece_hook};
+const Hook unsafe_piece_hook = Hook{"unsafe-piece", 0, &is_unsafe_piece_hook};
 const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
 const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
 const Hook check_hook = Hook{"check", 3, &find_checks_hook};
@@ -166,7 +166,7 @@ const std::vector<FeatureHandler> feature_handlers = {
         },
         FeatureHandler{
             &unsafe_piece_hook,
-            { &defend_centre_resp, &trade_resp, &retreat_resp, &desperado_resp },
+            { &trade_resp, &retreat_resp, &defend_centre_resp, &desperado_resp },
             { &capture_resp }
         },
         FeatureHandler{
