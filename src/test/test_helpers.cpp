@@ -3,7 +3,7 @@
 
 bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCase * tc) {
 
-    Gamestate gs = Gamestate::fresh(tc->fen);
+    Gamestate gs(tc->fen);
     Move moves[MAX_MOVES_PER_HOOK];
     IndexCounter move_counter(MAX_MOVES_PER_HOOK);
 
@@ -24,7 +24,7 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
 
 bool evaluate_hook_test_case(const Hook * h, const HookTestCase * tc) {
 
-    Gamestate gs = Gamestate::fresh(tc->fen);
+    Gamestate gs(tc->fen);
 
     discover_feature_frames(gs, h);
 

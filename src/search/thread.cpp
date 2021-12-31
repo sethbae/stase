@@ -46,7 +46,7 @@ void run_in_background(const std::string & fen) {
 
     current_running_config.root =
             new SearchNode{
-                    Gamestate::new_gs(fen),
+                    new Gamestate(fen),
                     {},
                     zero(),
                     MOVE_SENTINEL,

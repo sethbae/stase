@@ -5,7 +5,7 @@
 
 bool score_puzzle_against_cands(const Puzzle & puzzle) {
 
-    Gamestate gs = Gamestate::fresh(puzzle.fen);
+    Gamestate gs(puzzle.fen);
 
     for (int i = 0; i < puzzle.solution_moves.size(); ++i) {
 

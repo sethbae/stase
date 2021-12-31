@@ -53,7 +53,7 @@ const TestSet<StringTestCase> kpinned_piece_test_set{
 bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
 
     std::vector<Square> squares;
-    Gamestate gs = Gamestate::fresh(tc->fen);
+    Gamestate gs(tc->fen);
 
     const Delta DIR_USED = Delta{0, 1};
     const Delta DIR_NOT_USED = Delta{1, 1};

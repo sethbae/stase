@@ -97,12 +97,11 @@ struct Gamestate {
 
     FeatureFrame ** feature_frames;
 
-private:
     explicit Gamestate();
+    explicit Gamestate(const std::string &);
     explicit Gamestate(const Board &);
-
-public:
     explicit Gamestate(const Gamestate &);
+    explicit Gamestate(const Gamestate &, const Move);
     explicit Gamestate(Gamestate &&);
     ~Gamestate();
 
@@ -111,9 +110,6 @@ public:
 
     void repopulate_caches();
 
-    static Gamestate fresh(const std::string &);
-    static Gamestate * new_gs(const std::string &);
-    Gamestate * next(const Move) const;
     void next_in_place(const Move);
 
     // TODO (GM-25): as and when required add these to the copy constructor
@@ -140,26 +136,9 @@ public:
     Move last_move;
     Piece last_capture;
 
-private:
     mutable Square w_king;
     mutable Square b_king;
-    void find_kings() const;
 
-public:
-    inline Square w_ksq() const {
-        if (is_sentinel(w_king)) {
-            find_kings();
-        }
-        return w_king;
-    }
-    inline Square b_ksq() const {
-        if (is_sentinel(b_king)) {
-            find_kings();
-        }
-        return b_king;
-    }
-
-public:
     inline Piece sneak(const Move m) const {
         Piece sneaked = board.sneak(m);
         Piece p = board.get(m.to);

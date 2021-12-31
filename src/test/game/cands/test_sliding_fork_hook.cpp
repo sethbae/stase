@@ -128,7 +128,7 @@ TestSet<StringTestCase> sliding_fork_hook_test_cases = {
 
 bool evaluate_test_case_sliding_fork_hook(const StringTestCase *tc) {
 
-    Gamestate gs = Gamestate::fresh(tc->fen);
+    Gamestate gs(tc->fen);
 
     discover_feature_frames(gs, &fork_hook);
 

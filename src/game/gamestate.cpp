@@ -3,11 +3,6 @@
 #include "cands/cands.h"
 
 /**
- *  This is the Gamestate object which is used to reduce calculations by storing some flags about the game.
- *  Each of those attributes should be updated or re-calculated every move.
- */
-
-/**
  * Allocates memory for all the fields in a gamestate which need it.
  */
 void alloc(Gamestate * gs) {
@@ -35,29 +30,52 @@ void alloc(Gamestate * gs) {
  * Updates the given gamestate's w_king and b_king fields to refer to the correct
  * squares of the kings.
  */
-void Gamestate::find_kings() const {
+void find_kings(Gamestate * gs) {
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            Piece p = board.get(mksq(x, y));
+            Piece p = gs->board.get(mksq(x, y));
             if (p == W_KING) {
-                w_king = mksq(x, y);
+                gs->w_king = mksq(x, y);
             } else if (p == B_KING) {
-                b_king = mksq(x, y);
+                gs->b_king = mksq(x, y);
             }
         }
     }
 }
 
-Gamestate::Gamestate() {
+Gamestate::Gamestate()
+    : w_king(SQUARE_SENTINEL), b_king(SQUARE_SENTINEL) {
     alloc(this);
-    w_king = SQUARE_SENTINEL;
-    b_king = SQUARE_SENTINEL;
 }
 
-Gamestate::Gamestate(const Board & b) : board(b) {
+Gamestate::Gamestate(const Board & b)
+    : board(b) {
     alloc(this);
-    w_king = SQUARE_SENTINEL;
-    b_king = SQUARE_SENTINEL;
+    find_kings(this);
+}
+
+Gamestate::Gamestate(const Gamestate & o, const Move m)
+    : board(o.board.successor_hard(m)), last_move(m) {
+
+    alloc(this);
+
+    if (o.board.get(m.from) == W_KING) {
+        w_king = m.to;
+        b_king = o.b_king;
+    } else if (board.get(m.from) == B_KING) {
+        w_king = o.w_king;
+        b_king = m.to;
+    } else {
+        w_king = o.w_king;
+        b_king = o.b_king;
+    }
+
+}
+
+Gamestate::Gamestate(const std::string & fen)
+    : board(fen_to_board(fen)) {
+    alloc(this);
+    find_kings(this);
 }
 
 Gamestate::Gamestate(Gamestate && o) {
@@ -107,6 +125,10 @@ Gamestate::Gamestate(const Gamestate & o) {
             *this->feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
         }
     }
+    w_king = o.w_king;
+    b_king = o.b_king;
+    last_move = o.last_move;
+    last_capture = o.last_capture;
 }
 
 Gamestate::~Gamestate() {
@@ -127,44 +149,6 @@ Gamestate::~Gamestate() {
  */
 void Gamestate::repopulate_caches() {
     // for each square, pieces
-}
-
-/**
- * Creates and returns a brand new game state for the given position.
- */
-Gamestate Gamestate::fresh(const std::string & fen) {
-    return Gamestate(fen_to_board(fen));
-}
-
-/**
- * Allocates a new gamestate for the given position and returns a pointer to it.
- */
-Gamestate * Gamestate::new_gs(const std::string & fen) {
-    return new Gamestate(fen_to_board(fen));
-}
-
-/**
- * Allocates and returns a *new* Gamestate representing the position after the
- * move has been played.
- */
-Gamestate * Gamestate::next(const Move m) const {
-
-    Gamestate * new_gs = new Gamestate;
-
-    new_gs->board = board.successor_hard(m);
-    new_gs->last_move = m;
-    if (board.get(m.from) == W_KING) {
-        new_gs->w_king = m.to;
-        new_gs->b_king = b_king;
-    } else if (board.get(m.from) == B_KING) {
-        new_gs->w_king = w_king;
-        new_gs->b_king = m.to;
-    } else {
-        new_gs->w_king = w_king;
-        new_gs->b_king = b_king;
-    }
-
-    return new_gs;
 }
 
 /**

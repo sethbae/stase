@@ -246,7 +246,7 @@ const TestSet<UnsafeTestCase> unsafe_test_cases = {
 
 bool evaluate_weak_test_case(const WeakTestCase * tc) {
 
-    const Gamestate gs = Gamestate::fresh(tc->fen);
+    const Gamestate gs(tc->fen);
 
     for (int i = 0; i < tc->squares.size(); ++i) {
 
@@ -284,7 +284,7 @@ bool evaluate_weak_test_case(const WeakTestCase * tc) {
 
 bool evaluate_unsafe_test_case(const UnsafeTestCase * tc) {
 
-    const Gamestate gs = Gamestate::fresh(tc->fen);
+    const Gamestate gs(tc->fen);
 
     for (int i = 0; i < tc->squares.size(); ++i) {
 

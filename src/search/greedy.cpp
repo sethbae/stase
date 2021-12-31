@@ -82,7 +82,7 @@ void visit_best_line(SearchNode * node) {
 std::vector<Move> greedy_search(const std::string & fen, int cycles) {
 
     // set up the root node
-    Gamestate root_gs = Gamestate::fresh(fen);
+    Gamestate root_gs(fen);
     SearchNode root{
             &root_gs,
             cands(root_gs),
