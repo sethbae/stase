@@ -30,6 +30,9 @@ constexpr int promotion_score() {
 }
 
 constexpr int pin_skewer_score(const Piece p) {
+    if (type(p) == QUEEN){
+        return 4;
+    }
     return max((piece_value(p) / 1000) - 2, 1);
 }
 
