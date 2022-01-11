@@ -176,8 +176,8 @@ const std::vector<FeatureHandler> feature_handlers = {
         },
         FeatureHandler{
             &pin_skewer_hook,
-            { &retreat_resp, &trade_resp },
-            { &pin_skewer_resp }
+            { &pin_skewer_resp },
+            { &defend_secondary_resp },
         },
         FeatureHandler{
                 &develop_hook,

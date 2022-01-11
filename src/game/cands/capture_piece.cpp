@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../heur/heur.h"
 #include "cands.h"
 #include "game.h"
