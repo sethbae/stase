@@ -250,6 +250,8 @@ CandSet cands_report(Gamestate & gs) {
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {
                     present = true;
+                    // combine the scores: 1 + max
+                    all_moves[k].set_score(max(1 + all_moves[k].get_score(), moves[j].get_score()));
                     break;
                 }
             }
@@ -288,31 +290,35 @@ CandSet cands_report(Gamestate & gs) {
     }
 
     pr_board(gs.board);
+    print_cand_set(gs, cands);
+
+    return cands;
+
+}
+
+void print_cand_set(const Gamestate & gs, const CandSet & cand_set) {
     cout << "Candidates generated:\n";
     cout << std::setw(10) << "Critical: ";
-    for (const Move & move : cands.critical) {
+    for (const Move & move : cand_set.critical) {
         cout << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
     cout << "\n";
 
     cout << std::setw(10) << "Medial: ";
-    for (const Move & move : cands.medial) {
+    for (const Move & move : cand_set.medial) {
         cout <<  std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
     cout << "\n";
 
     cout << std::setw(10) << "Final: ";
-    for (const Move & move : cands.final) {
+    for (const Move & move : cand_set.final) {
         cout  << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
     cout << "\n";
 
     cout << std::setw(10) << "Legal: ";
-    for (const Move & move : cands.legal) {
+    for (const Move & move : cand_set.legal) {
         cout << std::setw(5) << mtos(gs.board, move);
     }
     cout << "\n";
-
-    return cands;
-
 }
