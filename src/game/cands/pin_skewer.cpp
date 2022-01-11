@@ -1,12 +1,28 @@
 #include "cands.h"
-#include "../heur/heur.h"
+
+/**
+ * Returns the final empty square on the trajectory and board given.
+ */
+inline Square find_line_end(const Gamestate & gs, int x, int y, Delta d) {
+    int line_end_x = x, line_end_y = y;
+    while (val(line_end_x - d.dx, line_end_y - d.dy)
+           && gs.board.get(line_end_x - d.dx, line_end_y - d.dy) == EMPTY) {
+        line_end_x -= d.dx;
+        line_end_y -= d.dy;
+    }
+    return mksq(line_end_x, line_end_y);
+}
 
 /**
  * This method contains the logical checks of whether a second piece can be discovered
  * which can either be pinned or skewered from the second piece back to the first.
- * It checks, for example:
- *  - type, colour
- *  - pawns: weakly defended
+ * It checks, type, colour etc and notably that a pawn is not defended by any other pawn.
+ * Passing these, an enemy piece is then sought which can actually pin the piece from a safe square.
+ * If so, FeatureFrames are written (per piece) with the following format:
+ * - centre: the square of a piece able to play a pin or skewer
+ * - secondary: the square on which it can play it
+ * - conf1: the value of the piece which is being pinned or skewered
+ * - conf2: the value of the piece which it is being pinned or skewered to
  */
 inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta d, std::vector<FeatureFrame> & frames) {
 
@@ -36,33 +52,87 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
     }
 
     /*
-     * Here, we have found a pair of pieces: --k---r-
-     * We already checked the first piece encountered for whether it can move in
-     * the current direction or not (k, here). So a pin/skewer from that piece
-     * to this piece is definitely on.
-     * The reverse direction will be checked from the rook, not here. Those checks
-     * should not pass!
-     * The delta we want to put on the frame is the one coming back from the piece
-     * we've found to the original piece, which is the opposite of the direction
-     * we came in. So we flip dx and dy. The centre of the frame is the piece first
-     * encountered - s - and the secondary is the other piece: other_p_sq.
+     * Here, we have found a prospective pair of pieces, eg --k---r-
+     * Next, we find enemy pieces which could in fact pin or skewer what we've found.
      */
 
-    frames.push_back(FeatureFrame{s, other_p_sq, -d.dx, -d.dy});
+    MoveType dir = direction_of_delta(d);
+    Square line_end = find_line_end(gs, s.x, s.y, d);
+
+    // check for pieces which can move onto the line of empty squares
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+
+            Piece p = gs.board.get(x, y);
+
+            if (colour(p) == colour(gs.board.get(s))
+                || !can_move_in_direction(p, dir)) {
+                continue;
+            }
+
+            // if we are pinning with a queen, then there may be multiple squares to check
+            if (type(p) == QUEEN) {
+
+                std::vector<Square> squares_on_line =
+                        squares_piece_can_reach_on_line(gs.board, mksq(x, y), s, line_end);
+
+                for (int i = 0; i < squares_on_line.size(); ++i) {
+                    Move pin_move = Move{mksq(x, y), squares_on_line[i], 0};
+                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
+                            && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
+
+                        frames.push_back(
+                                FeatureFrame{
+                                    mksq(x,y),
+                                    squares_on_line[i],
+                                    piece_value(gs.board.get(s)),
+                                    piece_value(other_p)
+                                }
+                        );
+
+                    }
+                }
+
+            } else {
+
+                // bishop / rook has at most one square available to it
+
+                Square pin_from_square =
+                        square_piece_can_reach_on_line(gs.board, mksq(x, y), s, line_end);
+
+                if (is_sentinel(pin_from_square)) {
+                    continue;
+                }
+
+                Move pin_move = Move{mksq(x, y), pin_from_square, 0};
+                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
+                        && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
+
+                    frames.push_back(
+                            FeatureFrame{
+                                mksq(x, y),
+                                pin_from_square,
+                                piece_value(gs.board.get(s)),
+                                piece_value(other_p)
+                            }
+                    );
+
+                }
+            }
+
+        }
+    }
+
 }
 
 /**
  * Detects whether or not the given square contains a piece which can either be pinned or
- * be skewered. The centre of the frame will always be the first piece encountered during
- * the putative pin or skewer - in pins, that is the less valuable piece, in skewers it is
- * the more valuable. The frames will also contain a delta, which describes the line taken
- * from the second piece hit, back to the first piece.
- *
+ * be skewered.
  * The format of the FeatureFrames is this:
- * centre: the square of the pinned/skewered piece
- * secondary: the square of the piece it could be pinned to / skewered against
- * conf_1: the x delta passing from the second piece to the first piece
- * conf_2: the y delta passing from the second piece to the first piece
+ * - centre: the square of a piece able to play a pin or skewer
+ * - secondary: the square on which it can play it
+ * - conf1: the value of the piece which is being pinned or skewered
+ * - conf2: the value of the piece which it is being pinned or skewered to
  */
 void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
@@ -113,80 +183,19 @@ void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFra
 }
 
 /**
- * This responder attempts to pin or skewer the piece as described in the feature frame. It does not
- * do this using unsafe squares.
+ * This responder plays the move as described in the given FeatureFrame.
  */
 void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-
-    const Delta d{(SignedByte)ff->conf_1, (SignedByte)ff->conf_2};
-    MoveType dir = direction_of_delta(d);
-
-    // find the line of empty squares along which we can pin/skewer
-    int line_end_x = ff->centre.x, line_end_y = ff->centre.y;
-    while (val(line_end_x + d.dx, line_end_y + d.dy)
-            && gs.board.get(line_end_x + d.dx, line_end_y + d.dy) == EMPTY) {
-        line_end_x += d.dx;
-        line_end_y += d.dy;
-    }
-
-    Square line_end = mksq(line_end_x, line_end_y);
-
-    // check for pieces which can move onto the line of empty squares
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-
-            Piece p = gs.board.get(x, y);
-
-            if (colour(p) == colour(gs.board.get(ff->centre))
-                || !can_move_in_direction(p, dir)) {
-                continue;
-            }
-
-            // if we are pinning with a queen, then there may be multiple squares to check
-            if (type(p) == QUEEN) {
-
-                std::vector<Square> squares_on_line =
-                        squares_piece_can_reach_on_line(gs.board, mksq(x, y), ff->centre, line_end);
-
-                for (int i = 0; i < squares_on_line.size(); ++i) {
-                    Move pin_move = Move{mksq(x, y), squares_on_line[i], 0};
-                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
-                            && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
-                        if (counter.has_space()) {
-                            Move m{mksq(x, y), squares_on_line[i], 0};
-                            m.set_score(pin_skewer_score(gs.board.get(ff->centre)));
-                            moves[counter.inc()] = m;
-                        } else {
-                            return;
-                        }
-                    }
-                }
-
-            } else {
-
-                // bishop / rook has at most one square available to it
-
-                Square pin_from_square =
-                        square_piece_can_reach_on_line(gs.board, mksq(x, y), ff->centre, line_end);
-
-                if (is_sentinel(pin_from_square)) {
-                    continue;
-                }
-
-                Move pin_move = Move{mksq(x, y), pin_from_square, 0};
-                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
-                        && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
-                    if (counter.has_space()) {
-                        Move m{mksq(x, y), pin_from_square, 0};
-                        m.set_score(pin_skewer_score(gs.board.get(ff->centre)));
-                        moves[counter.inc()] = m;
-                    } else {
-                        return;
-                    }
-                }
-            }
-
-        }
+    if (counter.has_space()){
+        Move m = Move{ff->centre, ff->secondary};
+        m.set_score(
+            pin_skewer_score(
+                piece_value(gs.board.get(ff->centre)),
+                ff->conf_1,
+                ff->conf_2
+            )
+        );
+        moves[counter.inc()] = m;
     }
 }
 

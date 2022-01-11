@@ -29,11 +29,9 @@ constexpr int promotion_score() {
     return 8;
 }
 
-constexpr int pin_skewer_score(const Piece p) {
-    if (type(p) == QUEEN){
-        return 4;
-    }
-    return max((piece_value(p) / 1000) - 2, 1);
+constexpr int pin_skewer_score(const int value_of_pinner, const int value_of_pinned, const int value_of_pinned_to) {
+    int value_putatively_lost = min(value_of_pinned, value_of_pinned_to) - value_of_pinner;
+    return max(value_putatively_lost / 1000, 2);
 }
 
 constexpr int trade_score(const Piece trade_this, const Piece for_this) {
