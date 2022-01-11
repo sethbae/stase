@@ -161,6 +161,8 @@ struct Gamestate {
 
 };
 
+void print_cand_set(const Gamestate &, const CandSet &);
+
 // heuristic evaluation
 Eval heur(const Gamestate &);
 Eval heur_with_description(const Gamestate &);
