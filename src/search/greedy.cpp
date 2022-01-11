@@ -16,16 +16,24 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
     check_abort();
     if (depth == 0) { return; }
     if (node->gs->has_been_mated) {
-        node->score = node->gs->board.get_white()
-                      ? white_has_been_mated()
-                      : black_has_been_mated();
+        node->score =
+            node->gs->board.get_white()
+              ? white_has_been_mated()
+              : black_has_been_mated();
         node->best_child = nullptr;
         return;
     }
 
     // fetch list to extend
     const std::vector<Move> & list = node->cand_set.get_list(cand_list);
-    if (list.empty()) { return; }
+    if (list.empty()) {
+        // we still need to recurse up to the given depth
+        for (int i = 0; i < node->num_children; ++i) {
+            deepen(node->children[i], cand_list, depth - 1);
+        }
+        update_score(node);
+        return;
+    }
 
     // if the node hasn't yet been extended at all, allocate *all* its children pointers
     if (node->num_children == 0) {
@@ -63,8 +71,10 @@ void visit_node(SearchNode * node) {
             break;
         case 32:
             // extend legal just once (STUB)
+            update_score(node);
             break;
         default:
+            update_score(node);
             break;
     }
 
@@ -134,7 +144,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     }
 
     std::string name = "stase_tree";
-    // record_tree_in_file(name, &root);
+    // record_tree_in_file(name, root);
 
     return moves;
 }

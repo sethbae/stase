@@ -97,6 +97,7 @@ void write_to_file(SearchNode *node, ostream & output) {
         output << "Has no children.\n";
     } else {
         output << "Children:\n";
+        output << node->num_children << " children\n";
 
         // list of children and names
         for (int i = 0; i < node->num_children; ++i) {
