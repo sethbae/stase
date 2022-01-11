@@ -1,6 +1,5 @@
 #include "game.h"
 #include "cands.h"
-#include "../heur/heur.h"
 
 void find_knight_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 
