@@ -62,6 +62,14 @@ struct CandSet {
     std::vector<Move> medial;
     std::vector<Move> final;
     std::vector<Move> legal;
+
+    CandSet() :
+        critical(std::vector<Move>()),
+        medial(std::vector<Move>()),
+        final(std::vector<Move>()),
+        legal(std::vector<Move>())
+        {}
+
     inline bool empty() { return critical.empty() && medial.empty() && final.empty() && legal.empty(); }
     inline int size() {
         if (legal.size()) {
@@ -168,8 +176,9 @@ Eval heur(const Gamestate &);
 Eval heur_with_description(const Gamestate &);
 
 // candidate moves
-CandSet cands(Gamestate &);
-CandSet cands_report(Gamestate &);
+CandSet * cands(Gamestate &);
+CandSet * cands(Gamestate &, CandSet *);
+CandSet * cands_report(Gamestate &);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);

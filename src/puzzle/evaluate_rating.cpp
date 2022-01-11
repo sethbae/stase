@@ -12,7 +12,7 @@ bool score_puzzle_against_cands(const Puzzle & puzzle) {
         // the solver only has to find the odd moves
         if (i % 2 == 1) {
 
-            std::vector<Move> candidates = cands(gs).critical;
+            std::vector<Move> candidates = cands(gs)->critical;
 
             bool found = false;
             for (const Move & cand_move: candidates) {

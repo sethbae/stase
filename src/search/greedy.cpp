@@ -4,6 +4,52 @@
 #include "search_tools.h"
 #include "metrics.h"
 
+inline bool is_present_in_list(const std::vector<Move> & list, const Move m) {
+    for (int i = 0; i < list.size(); ++i) {
+        if (equal(list[i], m)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Extends the CandSet of the given node to include legal moves. It removes from this list
+ * all legal moves which (i) are already present in another list (ii) belong to an existing
+ * child of this node.
+ */
+void add_legal_moves(SearchNode * node) {
+
+    std::vector<Move> legals = legal_moves(node->gs->board);
+    std::vector<Move> approved;
+    approved.reserve(legals.size());
+
+    for (int i = 0; i < legals.size(); ++i) {
+
+        // check in existing lists
+        if (is_present_in_list(node->cand_set->critical, legals[i])
+            || is_present_in_list(node->cand_set->medial, legals[i])
+            || is_present_in_list(node->cand_set->final, legals[i])) {
+            continue;
+        }
+
+        // check in children
+        bool already_created = false;
+        for (int j = 0; j < node->num_children; ++j) {
+            if (equal(node->children[j]->move, legals[i])) {
+                already_created = true;
+                break;
+            }
+        }
+
+        if (!already_created) {
+            approved.push_back(legals[i]);
+        }
+    }
+
+    node->cand_set->legal = approved;
+}
+
 /**
  * For each node in the given candidate list of the given node, this creates a new node
  * in the tree. If the depth given is greater than 1, then this will be done recursively
@@ -25,7 +71,7 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
     }
 
     // fetch list to extend
-    const std::vector<Move> & list = node->cand_set.get_list(cand_list);
+    const std::vector<Move> & list = node->cand_set->get_list(cand_list);
     if (list.empty()) {
         // we still need to recurse up to the given depth
         for (int i = 0; i < node->num_children; ++i) {
@@ -37,7 +83,7 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
 
     // if the node hasn't yet been extended at all, allocate *all* its children pointers
     if (node->num_children == 0) {
-        node->children = new SearchNode *[node->cand_set.size()];
+        node->children = new SearchNode *[node->cand_set->size()];
     }
 
     // create child for each move in the list (appending)
@@ -50,11 +96,15 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
         deepen(node->children[c + i], cand_list, depth - 1);
     }
     node->num_children += list.size();
-    node->cand_set.clear_list(cand_list);
+    node->cand_set->clear_list(cand_list);
     update_score(node);
 }
 
 void visit_node(SearchNode * node) {
+
+    if (node->gs->has_been_mated) {
+        return;
+    }
 
     switch (node->visit_count++) {
         case 0:
@@ -70,7 +120,11 @@ void visit_node(SearchNode * node) {
             deepen(node, FINAL, 1);
             break;
         case 32:
-            // extend legal just once (STUB)
+            // extend legal just once
+            if (node->cand_set->legal.empty()) {
+                add_legal_moves(node);
+            }
+            deepen(node, LEGAL, 1);
             update_score(node);
             break;
         default:
@@ -113,8 +167,8 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     if (root->score == zero()) {
         root->score = heur(*root->gs);
     }
-    if (root->cand_set.empty()) {
-        root->cand_set = cands(*root->gs);
+    if (root->cand_set->empty()) {
+        root->cand_set = cands(*root->gs, new CandSet);
     }
 
     int i = 0;

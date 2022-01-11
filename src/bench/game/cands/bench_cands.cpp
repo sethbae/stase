@@ -130,7 +130,7 @@ void bench_individual_responders() {
 /* bench the whole candidates function */
 
 int wrap_cands(Gamestate & gs) {
-    return cands(gs).critical.size();
+    return cands(gs)->critical.size();
 }
 //
 //int piece_fork(const Gamestate & gs) {

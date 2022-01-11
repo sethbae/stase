@@ -52,7 +52,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
 
         Gamestate & gs = states[i];
 
-        std::vector<Move> moves = cands(gs).critical;
+        std::vector<Move> moves = cands(gs)->critical;
         std::vector<Move> legals = legal_moves(gs.board);
 
         if (moves.size() > MAX_TOTAL_CANDS) {

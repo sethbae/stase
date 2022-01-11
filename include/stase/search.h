@@ -12,7 +12,7 @@ using std::chrono::duration_cast;
 struct SearchNode {
 
     Gamestate * gs;
-    CandSet cand_set;
+    CandSet * cand_set;
     Eval score;
     Move move;
     unsigned short num_children;

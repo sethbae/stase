@@ -43,9 +43,14 @@ void discover_feature_frames(Gamestate & gs, const Hook * hook) {
  * Computes and returns a set of candidate moves specifically for positions when the
  * side to move is in check.
  */
-CandSet cands_in_check(const Gamestate & gs) {
+CandSet * cands_in_check(const Gamestate & gs, CandSet * cand_set) {
     // currently, there is no special logic.
-    return CandSet{legal_moves(gs.board)};
+    cand_set->critical = legal_moves(gs.board);
+    return cand_set;
+}
+
+CandSet * cands(Gamestate & gs) {
+    return cands(gs, new CandSet);
 }
 
 /**
@@ -53,15 +58,15 @@ CandSet cands_in_check(const Gamestate & gs) {
  * MAX_TOTAL_CANDS moves which are guaranteed to be unique. No guarantee is made as to
  * the minimum number of moves returned.
  */
-CandSet cands(Gamestate & gs) {
+CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
-        CandSet cands = cands_in_check(gs);
-        if (cands.empty()) {
+        cands_in_check(gs, cand_set);
+        if (cand_set->empty()) {
             gs.has_been_mated = true;
         }
-        return cands;
+        return cand_set;
     }
 
     Move all_moves[MAX_TOTAL_CANDS];
@@ -127,24 +132,22 @@ CandSet cands(Gamestate & gs) {
         }
     }
 
-    CandSet cands{};
-
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
         if (score > 1 && score >= best_score / 2) {
-            cands.critical.push_back(all_moves[j]);
+            cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
-            cands.medial.push_back(all_moves[j]);
+            cand_set->medial.push_back(all_moves[j]);
         } else {
-            cands.final.push_back(all_moves[j]);
+            cand_set->final.push_back(all_moves[j]);
         }
     }
 
     if (m == 0) {
-        cands.legal = legal_moves(gs.board);
+        cand_set->legal = legal_moves(gs.board);
     }
 
-    return cands;
+    return cand_set;
 
 }
 
@@ -152,31 +155,32 @@ CandSet cands(Gamestate & gs) {
  * Generates candidate moves for the gamestate, while printing information to stdout.
  * Useful for debugging (keep up to date with real implementation).
  */
-CandSet cands_report(Gamestate & gs) {
+CandSet * cands_report(Gamestate & gs) {
 
     cout << "********************************\n"
             "* Generating candidate moves\n"
             "********************************\n\n";
 
     pr_board_conf(gs.board);
+    CandSet * cand_set = new CandSet;
 
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
 
-        CandSet cands = cands_in_check(gs);
+        cands_in_check(gs, cand_set);
 
-        if (cands.empty()) {
+        if (cand_set->empty()) {
             gs.has_been_mated = true;
             cout << "The position is checkmate - no candidates\n";
         } else{
             cout << "In check. Returning legal moves:\n";
-            for (const Move & m : cands.critical) {
+            for (const Move & m : cand_set->critical) {
                 cout << mtos(gs.board, m);
             }
             cout << "\n";
         }
 
-        return cands;
+        return cand_set;
     }
 
     Move all_moves[MAX_TOTAL_CANDS];
@@ -272,27 +276,25 @@ CandSet cands_report(Gamestate & gs) {
         }
     }
 
-    CandSet cands{};
-
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
         if (score > 1 && score >= best_score / 2) {
-            cands.critical.push_back(all_moves[j]);
+            cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
-            cands.medial.push_back(all_moves[j]);
+            cand_set->medial.push_back(all_moves[j]);
         } else {
-            cands.final.push_back(all_moves[j]);
+            cand_set->final.push_back(all_moves[j]);
         }
     }
 
     if (m == 0) {
-        cands.legal = legal_moves(gs.board);
+        cand_set->legal = legal_moves(gs.board);
     }
 
     pr_board(gs.board);
-    print_cand_set(gs, cands);
+    print_cand_set(gs, *cand_set);
 
-    return cands;
+    return cand_set;
 
 }
 

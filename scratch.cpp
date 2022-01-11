@@ -36,10 +36,10 @@ void number_of_cands_hist(CandList cand_list) {
     for (int i = 0; i < N; ++i) {
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i]).critical.size(); break;
-            case MEDIAL: size = cands(states[i]).medial.size(); break;
-            case FINAL: size = cands(states[i]).final.size(); break;
-            case LEGAL: size = cands(states[i]).legal.size(); break;
+            case CRITICAL: size = cands(states[i])->critical.size(); break;
+            case MEDIAL: size = cands(states[i])->medial.size(); break;
+            case FINAL: size = cands(states[i])->final.size(); break;
+            case LEGAL: size = cands(states[i])->legal.size(); break;
         }
         max_size = std::max(size, max_size);
         num_cands[i] = (double)size;
@@ -110,10 +110,10 @@ void number_of_cands(CandList cand_list) {
     for (int i = 0; i < N; ++i) {
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i]).critical.size(); break;
-            case MEDIAL: size = cands(states[i]).medial.size(); break;
-            case FINAL: size = cands(states[i]).final.size(); break;
-            case LEGAL: size = cands(states[i]).legal.size(); break;
+            case CRITICAL: size = cands(states[i])->critical.size(); break;
+            case MEDIAL: size = cands(states[i])->medial.size(); break;
+            case FINAL: size = cands(states[i])->final.size(); break;
+            case LEGAL: size = cands(states[i])->legal.size(); break;
         }
         max_size = max(size, max_size);
         num_cands[i] = (double)size;
@@ -181,10 +181,10 @@ void find_cands_outliers(CandList cand_list) {
 
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i]).critical.size(); break;
-            case MEDIAL: size = cands(states[i]).medial.size(); break;
-            case FINAL: size = cands(states[i]).final.size(); break;
-            case LEGAL: size = cands(states[i]).legal.size(); break;
+            case CRITICAL: size = cands(states[i])->critical.size(); break;
+            case MEDIAL: size = cands(states[i])->medial.size(); break;
+            case FINAL: size = cands(states[i])->final.size(); break;
+            case LEGAL: size = cands(states[i])->legal.size(); break;
         }
 
         max_size = max(size, max_size);
@@ -249,6 +249,13 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
         cout << " c1: " << ff->conf_1 << " c2: " << ff->conf_2 << "\n";
     }
 
+}
+
+Move run_engine(const std::string & fen, const double seconds) {
+    run_in_background(fen);
+    sleep(seconds);
+    stop_engine();
+    return fetch_best_move();
 }
 
 int main(int argc, char** argv) {

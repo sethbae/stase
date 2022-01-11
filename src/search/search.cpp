@@ -220,18 +220,18 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
         vector<Move> moves;
         moves.reserve(64);
 
-        CandSet cand_set = cands(*node->gs);
+        CandSet * cand_set = cands(*node->gs);
 
-        if (cand_set.legal.size() > 0) {
-            moves = cand_set.legal;
+        if (cand_set->legal.size() > 0) {
+            moves = cand_set->legal;
         } else {
-            for (const Move & m : cand_set.critical) {
+            for (const Move & m : cand_set->critical) {
                 moves.push_back(m);
             }
-            for (const Move & m : cand_set.medial) {
+            for (const Move & m : cand_set->medial) {
                 moves.push_back(m);
             }
-            for (const Move & m : cand_set.final) {
+            for (const Move & m : cand_set->final) {
                 moves.push_back(m);
             }
         }
