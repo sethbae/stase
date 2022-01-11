@@ -2,6 +2,7 @@
 #include "search.h"
 #include "game.h"
 #include "search_tools.h"
+#include "metrics.h"
 
 /**
  * For each node in the given candidate list of the given node, this creates a new node
@@ -42,6 +43,7 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
     }
     node->num_children += list.size();
     node->cand_set.clear_list(cand_list);
+    update_score(node);
 }
 
 void visit_node(SearchNode * node) {
@@ -66,7 +68,6 @@ void visit_node(SearchNode * node) {
             break;
     }
 
-    update_score(node);
 }
 
 void visit_best_line(SearchNode * node) {
@@ -108,10 +109,18 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
 
     int i = 0;
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     while (cycles < 0 || i++ < cycles) {
         visit_best_line(root);
-//        std::vector<SearchNode *> best_line = retrieve_best_line(root);
-//        print_line(best_line);
+
+        auto stop = std::chrono::high_resolution_clock::now();
+        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
+        double seconds = ((double)duration) / 1000000.0;
+
+        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
+        std::vector<SearchNode *> best_line = retrieve_best_line(root);
+        print_line(best_line);
     }
 
     std::vector<SearchNode *> best_line = retrieve_best_line(root);
