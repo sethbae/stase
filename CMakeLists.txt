@@ -98,7 +98,6 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_desperado_resp.cpp
         src/test/game/cands/test_checks_hook.cpp
         src/test/game/cands/test_pin_skewer_hook.cpp
-        src/test/game/cands/test_pin_skewer_resp.cpp
         src/test/game/cands/test_king_pinned_pieces_hook.cpp
         src/test/game/cands/test_promotion.cpp
 
