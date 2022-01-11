@@ -124,13 +124,13 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     while (cycles < 0 || i++ < cycles) {
         visit_best_line(root);
 
-        auto stop = std::chrono::high_resolution_clock::now();
-        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
-        double seconds = ((double)duration) / 1000000.0;
-
-        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
-        std::vector<SearchNode *> best_line = retrieve_best_line(root);
-        print_line(best_line);
+//        auto stop = std::chrono::high_resolution_clock::now();
+//        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
+//        double seconds = ((double)duration) / 1000000.0;
+//
+//        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
+//        std::vector<SearchNode *> best_line = retrieve_best_line(root);
+//        print_line(best_line);
     }
 
     std::vector<SearchNode *> best_line = retrieve_best_line(root);
