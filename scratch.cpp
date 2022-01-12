@@ -4,6 +4,7 @@ using std::cout;
 using std::vector;
 #include <fstream>
 #include <csignal>
+#include <unistd.h>
 
 using std::ofstream;
 
@@ -261,21 +262,30 @@ Move run_engine(const std::string & fen, const double seconds) {
 int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
+    signal(SIGABRT, print_stack_trace);
 
-    const std::string fen = std::string("r4rk1/1p1n1ppp/1qp5/3p4/1b2pP1N/1P1PP1P1/nBPQN2P/1K1R1R2 w - - 2 19");
+    const std::string fen =
+            std::string(
+            "4rrk1/1pqb1ppp/p2bpn2/3p4/3Q3N/1PN3P1/PBP2PBP/2R2RK1 w - - 1 16"
+            );
 
     Gamestate gs(fen);
     pr_board(gs.board);
 
-//    show_hook_frames(fen, &check_hook);
+//    run_engine(fen, 10);
 
-//    cands_report(gs);
+//    show_hook_frames(fen, &pin_skewer_hook);
+
+    cands_report(gs);
+//
+//    CandSet c = cands(gs);
+//    print_cand_set(gs, c);
 
 //    heur_with_description(gs);
 //
 //    iterative_deepening_search(fen, 12);
 
-    std::vector<Move> best_line = greedy_search(fen, 20);
+//    std::vector<Move> best_line = greedy_search(fen, 100);
 
 //    number_of_cands(CRITICAL);
 

@@ -86,6 +86,19 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
         node->children = new SearchNode *[node->cand_set->size()];
     }
 
+    // if we're extending legal moves, we need to re-allocate and copy the child pointers
+    if (cand_list == LEGAL) {
+        int all_kids = node->num_children + list.size();
+        SearchNode ** new_ptr = new SearchNode *[all_kids];
+
+        for (int i = 0; i < node->num_children; ++i) {
+            new_ptr[i] = node->children[i];
+        }
+
+        delete node->children;
+        node->children = new_ptr;
+    }
+
     // create child for each move in the list (appending)
     int c = node->num_children;
     for (int i = 0; i < list.size(); ++i) {
@@ -198,7 +211,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     }
 
     std::string name = "stase_tree";
-    // record_tree_in_file(name, root);
+    //record_tree_in_file(name, root);
 
     return moves;
 }

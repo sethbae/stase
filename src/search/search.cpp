@@ -367,6 +367,7 @@ void delete_tree(SearchNode * node) {
         delete_tree(node->children[i]);
     }
     delete node->gs;
+    delete node->cand_set;
     delete node;
 }
 
