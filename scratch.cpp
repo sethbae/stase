@@ -5,6 +5,7 @@ using std::vector;
 #include <fstream>
 #include <csignal>
 #include <unistd.h>
+#include <cstring>
 
 using std::ofstream;
 
@@ -262,6 +263,88 @@ Move run_engine(const std::string & fen, const double seconds) {
     return fetch_best_move();
 }
 
+void repl(const std::string & fen) {
+
+    cout << "Enter number of cycles to analyse for: ";
+    std::string input;
+    std::cin >> input;
+    int cycles = std::stoi(input);
+    cout << "\nAnalysing...";
+
+    Gamestate root_gs(fen);
+    SearchNode root{
+        &root_gs,
+        cands(root_gs),
+        heur(root_gs),
+        MOVE_SENTINEL,
+        0,
+        nullptr,
+        nullptr
+    };
+
+    greedy_search(&root, cycles);
+    cout << "done\n";
+
+    bool cont = true;
+    SearchNode * current = &root;
+    std::vector<SearchNode *> current_line{current};
+
+    while (cont) {
+
+        // print out a summary of the current position
+        write_to_file(current, cout);
+        cout << "\nCurrent line is: ";
+        for (int i = 1; i < current_line.size(); ++i) {
+            cout << mtos(current_line[i]->gs->board, current_line[i]->move) << " ";
+        }
+        if (current_line.size() == 1) {
+            cout << "-";
+        }
+        cout << "\n";
+
+        // get the next instruction
+        bool read_input = false;
+        while (!read_input) {
+
+            cout << "\n>> ";
+            std::cin >> input;
+
+            if (input == "back" || input == "b") {
+                if (current_line.size() <= 1) {
+                    break;
+                }
+                current = current_line[current_line.size() - 2];
+                current_line.pop_back();
+                read_input = true;
+            } else if (input == "quit" || input == "q") {
+                cont = false;
+                read_input = true;
+            } else if (input == "cands" || input == "c") {
+                cands_report(*current->gs);
+                read_input = true;
+            } else {
+
+                bool found = false;
+                for (int i = 0; i < current->num_children; ++i) {
+                    Move m = current->children[i]->move;
+                    if (mtos(current->gs->board, m) == input) {
+                        found = true;
+                        current_line.push_back(current->children[i]);
+                        current = current->children[i];
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    cout << "\nCould not find move";
+                } else {
+                    read_input = true;
+                }
+            }
+        }
+    }
+}
+
 int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
@@ -269,33 +352,25 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-            "4rrk1/1pqb1ppp/p2bpn2/3p4/3Q3N/1PN3P1/PBP2PBP/2R2RK1 w - - 1 16"
+            "r7/1p3pkp/4b1p1/Pp6/1n6/3p1PP1/r7/R5KR w - - 2 28"
             );
 
-    Gamestate gs(fen);
-    pr_board(gs.board);
+//    Gamestate gs(fen);
+//    pr_board(gs.board);
+
+    repl(fen);
 
 //    run_engine(fen, 10);
 
-//    show_hook_frames(fen, &pin_skewer_hook);
+//    show_hook_frames(gs, &unsafe_piece_hook);
 
-    cands_report(gs);
-//
-//    CandSet c = cands(gs);
-//    print_cand_set(gs, c);
+//    cands_report(gs);
 
 //    heur_with_description(gs);
-//
-//    iterative_deepening_search(fen, 12);
 
-//    std::vector<Move> best_line = greedy_search(fen, 100);
+//    std::vector<Move> best_line = greedy_search(fen, 50000);
 
 //    number_of_cands(CRITICAL);
-
-//    const std::string fen2 = "r2q1rk1/3n1pp1/b1pN1n1p/p3p1Q1/2P5/3PpN1P/P3PPP1/R3KB1R w - - 0 16";
-//    Gamestate gs2(fen_to_board(fen2));
-//
-//    cands_report(gs2);
 
     return 0;
 

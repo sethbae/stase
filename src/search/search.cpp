@@ -113,6 +113,9 @@ void write_to_file(SearchNode *node, ostream & output) {
         output << "Best child: " << node->best_child << "\n";
     }
 
+    output << "Candidates:\n";
+    print_cand_set(*node->gs, *node->cand_set, output);
+
     output << "\n";
 
     return;
