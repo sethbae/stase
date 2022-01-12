@@ -169,7 +169,7 @@ struct Gamestate {
 
 };
 
-void print_cand_set(const Gamestate &, const CandSet &);
+void print_cand_set(const Gamestate &, const CandSet &, std::ostream &);
 
 // heuristic evaluation
 Eval heur(const Gamestate &);

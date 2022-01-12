@@ -292,35 +292,35 @@ CandSet * cands_report(Gamestate & gs) {
     }
 
     pr_board(gs.board);
-    print_cand_set(gs, *cand_set);
+    print_cand_set(gs, *cand_set, cout);
 
     return cand_set;
 
 }
 
-void print_cand_set(const Gamestate & gs, const CandSet & cand_set) {
-    cout << "Candidates generated:\n";
-    cout << std::setw(10) << "Critical: ";
+void print_cand_set(const Gamestate & gs, const CandSet & cand_set, std::ostream & o) {
+    o << "Candidates generated:\n";
+    o << std::setw(10) << "Critical: ";
     for (const Move & move : cand_set.critical) {
-        cout << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+        o << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
-    cout << "\n";
+    o << "\n";
 
-    cout << std::setw(10) << "Medial: ";
+    o << std::setw(10) << "Medial: ";
     for (const Move & move : cand_set.medial) {
-        cout <<  std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+        o <<  std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
-    cout << "\n";
+    o << "\n";
 
-    cout << std::setw(10) << "Final: ";
+    o << std::setw(10) << "Final: ";
     for (const Move & move : cand_set.final) {
-        cout  << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
+        o  << std::setw(5) << mtos(gs.board, move) << "[" << move.get_score() << "] ";
     }
-    cout << "\n";
+    o << "\n";
 
-    cout << std::setw(10) << "Legal: ";
+    o << std::setw(10) << "Legal: ";
     for (const Move & move : cand_set.legal) {
-        cout << std::setw(5) << mtos(gs.board, move);
+        o << std::setw(5) << mtos(gs.board, move);
     }
-    cout << "\n";
+    o << "\n";
 }
