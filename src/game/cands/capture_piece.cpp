@@ -17,6 +17,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     const int local_reset_point = counter.idx();
     const Colour capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
     const int weakest_defender = (capturing_colour == WHITE) ? ff->conf_2 : ff->conf_1;
+    const bool totally_undefended = weakest_defender > piece_value(W_KING);
     const Piece captured_piece = gs.board.get(s);
     const int cap_val = piece_value(captured_piece);
 
@@ -55,7 +56,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         counter.current_index = local_reset_point;
 
                         Move m{temp, s, 0};
-                        m.set_score(capture_piece_score(p, captured_piece));
+                        m.set_score(capture_piece_score(totally_undefended, p, captured_piece));
                         moves[counter.current_index++] = m;
 
                     } else if (val == min_value_seen) {
@@ -63,7 +64,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         // equal lowest value; append
                         if (counter.has_space()) {
                             Move m{temp, s, 0};
-                            m.set_score(capture_piece_score(p, captured_piece));
+                            m.set_score(capture_piece_score(totally_undefended, p, captured_piece));
                             moves[counter.inc()] = m;
                         }
                         // note that here and below, we cannot shortcut and return early. We
@@ -104,13 +105,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                         min_value_seen = kn_val;
                         counter.current_index = local_reset_point;
                         Move m{temp, s, 0};
-                        m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                        m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                         moves[counter.inc()] = m;
                     } else if (kn_val == min_value_seen) {
                         // equal lowest value; append
                         if (counter.has_space()) {
                             Move m{temp, s, 0};
-                            m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                            m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                             moves[counter.inc()] = m;
                         }
                     }
@@ -132,13 +133,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
                     min_value_seen = k_val;
                     counter.current_index = local_reset_point;
                     Move m{temp, s, 0};
-                    m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                    m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                     moves[counter.inc()] = m;
                 } else if (k_val == min_value_seen) {
                     // equal lowest value; append
                     if (counter.has_space()) {
                         Move m{temp, s, 0};
-                        m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                        m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                         moves[counter.inc()] = m;
                     }
                 }
@@ -156,13 +157,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             min_value_seen = pawn_val;
             counter.current_index = local_reset_point;
             Move m{temp, s, 0};
-            m.set_score(capture_piece_score(b.get(temp), captured_piece));
+            m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
             moves[counter.inc()] = m;;
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
             if (counter.has_space()) {
                 Move m{temp, s, 0};
-                m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                 moves[counter.inc()] = m;
             }
         }
@@ -175,13 +176,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             min_value_seen = pawn_val;
             counter.current_index = local_reset_point;
             Move m{temp, s, 0};
-            m.set_score(capture_piece_score(b.get(temp), captured_piece));
+            m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
             moves[counter.inc()] = m;
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
             if (counter.has_space()) {
                 Move m{temp, s, 0};
-                m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                 moves[counter.inc()] = m;
             }
         }
@@ -194,13 +195,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             min_value_seen = pawn_val;
             counter.current_index = local_reset_point;
             Move m{temp, s, 0};
-            m.set_score(capture_piece_score(b.get(temp), captured_piece));
+            m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
             moves[counter.inc()] = m;
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
             if (counter.has_space()) {
                 Move m{temp, s, 0};
-                m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                 moves[counter.inc()] = m;
             }
         }
@@ -213,13 +214,13 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             min_value_seen = pawn_val;
             counter.current_index = local_reset_point;
             Move m{temp, s, 0};
-            m.set_score(capture_piece_score(b.get(temp), captured_piece));
+            m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
             moves[counter.inc()] = m;
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
             if (counter.has_space()) {
                 Move m{temp, s, 0};
-                m.set_score(capture_piece_score(b.get(temp), captured_piece));
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                 moves[counter.inc()] = m;
             }
         }

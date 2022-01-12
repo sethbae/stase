@@ -16,7 +16,10 @@ constexpr int unsafe_check_score(const Piece p) {
     }
 }
 
-constexpr int capture_piece_score(const Piece capturing, const Piece captured) {
+constexpr int capture_piece_score(const bool totally_undefended, const Piece capturing, const Piece captured) {
+    if (totally_undefended) {
+        return piece_value(captured) / 1000;
+    }
     int diff = piece_value(captured) - piece_value(capturing);
     return max(2 + (diff / 1000), 0);
 }
