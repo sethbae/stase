@@ -60,7 +60,9 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                             && !would_be_unsafe_after(gs, temp, Move{piece_squares[j], temp, 0})
                             && !gs.is_kpinned_piece(piece_squares[j], mov_dir)) {
                         if (move_counter.has_space()) {
-                            moves[move_counter.inc()] = {piece_squares[j], temp, 0};
+                            Move m{piece_squares[j], temp, 0};
+                            m.set_score(defend_score(b.get(s)));
+                            moves[move_counter.inc()] = m;
                         } else {
                             // no space remaining
                             return;
@@ -98,7 +100,9 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                         && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)
                         && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square, 0})) {
                     if (move_counter.has_space()) {
-                        moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
+                        Move m{temp, defend_from_square, 0};
+                        m.set_score(defend_score(b.get(s)));
+                        moves[move_counter.inc()] = m;
                     } else {
                         // no space remaining
                         return;
@@ -123,7 +127,9 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                         && !equal(temp, s)
                         && would_be_safe_for_king_after(gs, defend_from_square, Move{temp, defend_from_square, 0}, defending_colour)) {
                     if (move_counter.has_space()) {
-                        moves[move_counter.inc()] = Move{temp, defend_from_square, 0};
+                        Move m{temp, defend_from_square, 0};
+                        m.set_score(defend_score(b.get(s)));
+                        moves[move_counter.inc()] = m;
                     } else {
                         // no space remaining
                         return;
@@ -154,7 +160,9 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                 Delta mov_dir = get_delta_between(left_pawn_defence_square, piece_squares[i]);
                 if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
                     if (move_counter.has_space()) {
-                        moves[move_counter.inc()] = Move{piece_squares[i], left_pawn_defence_square, 0};
+                        Move m{piece_squares[i], left_pawn_defence_square, 0};
+                        m.set_score(defend_score(b.get(s)));
+                        moves[move_counter.inc()] = m;
                     } else {
                         // no space remaining
                         return;
@@ -167,7 +175,9 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                 Delta mov_dir = get_delta_between(right_pawn_defence_square, piece_squares[i]);
                 if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
                     if (move_counter.has_space()) {
-                        moves[move_counter.inc()] = Move{piece_squares[i], right_pawn_defence_square, 0};
+                        Move m{piece_squares[i], right_pawn_defence_square, 0};
+                        m.set_score(defend_score(b.get(s)));
+                        moves[move_counter.inc()] = m;
                     } else {
                         // no space remaining
                         return;

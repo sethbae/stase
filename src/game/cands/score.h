@@ -34,6 +34,16 @@ constexpr int pin_skewer_score(const int value_of_pinner, const int value_of_pin
     return max(value_putatively_lost / 1000, 2);
 }
 
+constexpr int defend_score(const Piece defended_piece) {
+    if (is_major_piece(defended_piece)) {
+        return 3;
+    } else if (type(defended_piece) != PAWN) {
+        return 2;
+    } else {
+        return 1;
+    }
+}
+
 constexpr int trade_score(const Piece trade_this, const Piece for_this) {
     int diff = piece_value(for_this) - piece_value(trade_this);
     return 1 + (diff / 1000);
