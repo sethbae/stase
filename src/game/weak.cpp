@@ -11,7 +11,7 @@ using std::cout;
  * Includes more complicated logic regarding x-rays including those of mixed colour.
  * @return a summary of the information found, a SquareControlStatus.
  */
-SquareControlStatus capture_walk(const Board & b, Square s) {
+SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
 
     /*
      *                  X-RAYS and POLY X-RAYS
@@ -72,7 +72,17 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
         // work outwards in that direction
         while (val(temp = mksq(x, y)) && cont) {
 
-            Piece p = b.get(temp);
+            Piece p = gs.board.get(temp);
+            if (p == EMPTY) {
+                x += x_inc;
+                y += y_inc;
+                continue;
+            }
+            if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                cont = false;
+                continue;
+            }
+
             bool moves_in_right_dir = (p != EMPTY) && can_move_in_direction(p, dir);
 
             if (!moves_in_right_dir && type(p) == PAWN && dir == DIAG) {
@@ -130,7 +140,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
 
                 // is this piece a poly-x-ray defender?
                 if (poly_x_ray
-                    && (colour(p) == colour(b.get(s)))
+                    && (colour(p) == colour(gs.board.get(s)))
                     && piece_value(p) < min_poly_x_ray_defender) {
                     min_poly_x_ray_defender = piece_value(p);
                 }
@@ -161,8 +171,10 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
     // knights
     int kn_val = piece_value(W_KNIGHT);
     for (int i = 0; i < 8; ++i) {
-        if (val(temp = mksq(x + XKN[i], y + YKN[i])) && (type(b.get(temp)) == KNIGHT)) {
-            if (colour(b.get(temp)) == WHITE) {
+        if (val(temp = mksq(x + XKN[i], y + YKN[i]))
+                && (type(gs.board.get(temp)) == KNIGHT)
+                && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+            if (colour(gs.board.get(temp)) == WHITE) {
                 ++basic_balance;
                 ++poly_x_ray_balance;
                 if (min_value_w > kn_val) {
@@ -182,8 +194,8 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
     // kings
     int k_val = piece_value(W_KING);
     for (int i = 0; i < 8; ++i) {
-        if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(b.get(temp)) == KING)) {
-            if (colour(b.get(temp)) == WHITE) {
+        if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(gs.board.get(temp)) == KING)) {
+            if (colour(gs.board.get(temp)) == WHITE) {
                 ++basic_balance;
                 ++poly_x_ray_balance;
                 if (min_value_w > k_val) {
@@ -222,7 +234,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
         // attacking from one route only, poly x-rays do count
 
         // we also need to check for poly x-ray pieces that are the only or weakest defender
-        if (colour(b.get(s)) == WHITE) {
+        if (colour(gs.board.get(s)) == WHITE) {
 
             // if the weak piece is white, its defenders are white
             int min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
@@ -254,7 +266,7 @@ SquareControlStatus capture_walk(const Board & b, Square s) {
  * applying any logic or interpretation to the result.
  */
 SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s) {
-    return capture_walk(gs.board, s);
+    return capture_walk(gs, s);
 }
 
 /**
@@ -341,7 +353,7 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
  * on the same diagonal/orthogonal line.
  */
 bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
-    return is_weak_status(gs, s, c, capture_walk(gs.board, s));
+    return is_weak_status(gs, s, c, capture_walk(gs, s));
 }
 
 /**
