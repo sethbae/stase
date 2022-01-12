@@ -67,8 +67,8 @@ void print_line(std::vector<SearchNode *> & line) {
 }
 
 /**
- * Writes the given tree or subtree to file. May produce extremely large output!
- * A pre-order traversal is used.
+ * Writes a summary of the given node to the output. This acts on a single node
+ * only and does not recurse.
  */
 void write_to_file(SearchNode *node, ostream & output) {
 
@@ -115,13 +115,19 @@ void write_to_file(SearchNode *node, ostream & output) {
 
     output << "\n";
 
-    // recurse for each child
-    for (int i = 0; i < node->num_children; ++i) {
-        write_to_file(node->children[i], output);
-    }
-
     return;
 
+}
+
+/**
+ * Writes the given node to the file. Then, calls this function recursively on each
+ * child of the node. A pre-order traversal is used.
+ */
+void write_to_file_recursively(SearchNode *node, ostream & output) {
+    write_to_file(node, output);
+    for (int i = 0; i < node->num_children; ++i) {
+        write_to_file_recursively(node->children[i], output);
+    }
 }
 
 void record_tree_in_file(const std::string & filename, SearchNode * root) {
@@ -135,7 +141,7 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
 
     file << "\nHere are the nodes:\n";
 
-    write_to_file(root, file);
+    write_to_file_recursively(root, file);
     file.close();
 
 }

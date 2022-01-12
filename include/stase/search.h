@@ -31,6 +31,7 @@ void delete_tree(SearchNode *);
 
 int subtree_size(SearchNode *);
 void write_to_file(SearchNode*, std::ostream &);
+void write_to_file_recursively(SearchNode*, std::ostream &);
 
 void run_in_background(const std::string & fen);
 void stop_engine();
