@@ -237,9 +237,7 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
 /**
  * Shows the feature frames discovered by the given hook on the gamestate
  */
-void show_hook_frames(const std::string & fen, const Hook * h) {
-
-    Gamestate gs(fen);
+void show_hook_frames(Gamestate & gs, const Hook * h) {
 
     discover_feature_frames(gs, h);
 
@@ -250,6 +248,11 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
         cout << " c1: " << ff->conf_1 << " c2: " << ff->conf_2 << "\n";
     }
 
+}
+
+void show_hook_frames(const std::string & fen, const Hook * h) {
+    Gamestate gs(fen);
+    show_hook_frames(gs, h);
 }
 
 Move run_engine(const std::string & fen, const double seconds) {

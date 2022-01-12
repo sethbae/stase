@@ -86,6 +86,7 @@ const Delta INVALID_DELTA = { 127, 127 };
 const Delta KNIGHT_DELTA = { 1, 2 };
 inline bool is_valid_delta(const Delta d) { return d.dx != 127 && d.dy != 127; }
 inline bool equal(const Delta d, const Delta d2) { return d.dx == d2.dx && d.dy == d2.dy; }
+inline Delta delta(int x, int y) { return Delta{(SignedByte) x, (SignedByte) y}; }
 inline MoveType direction_of_delta(const Delta d) {
     return (d.dx == 0 || d.dy == 0) ? ORTHO : DIAG;
 }
