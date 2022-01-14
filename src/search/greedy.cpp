@@ -129,7 +129,7 @@ void visit_node(SearchNode * node) {
             // recursively extend critical until depth reached
             deepen(node, CRITICAL, 5);
             break;
-        case 4:
+        case 2:
             // extend medial just once
             deepen(node, MEDIAL, 1);
             break;
@@ -137,7 +137,7 @@ void visit_node(SearchNode * node) {
             // extend final just once
             deepen(node, FINAL, 1);
             break;
-        case 32:
+        case 128:
             // extend legal just once
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
