@@ -21,6 +21,8 @@ const Eval WHITE_MATE_MASK = 0x40000000;
 //      N.B. for correct behaviour, the offset must be half the total range
 const Eval OFFSET = 0x2000000; // 2^13
 
+const Eval SWING_THRESHOLD = 2000;
+
 constexpr Eval zero() {
     return OFFSET;
 }
@@ -84,6 +86,13 @@ inline float human_eval(const int eval) {
 
 constexpr int int_eval(const Eval eval) {
     return eval - OFFSET;
+}
+
+constexpr bool is_swing(const Eval a, const Eval b) {
+    if (is_mate(a) || is_mate(b)) {
+        return !is_mate(a) || !is_mate(b);
+    }
+    return abs(a - b) > SWING_THRESHOLD;
 }
 
 /**

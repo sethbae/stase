@@ -113,6 +113,11 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
     update_score(node);
 }
 
+/**
+ * Visits a node. Depending on how many times the node in question has been visited,
+ * a different candidate list will be expanded. In many cases, nothing will change
+ * about the node except to update its score.
+ */
 void visit_node(SearchNode * node) {
 
     if (node->gs->has_been_mated) {
@@ -147,13 +152,26 @@ void visit_node(SearchNode * node) {
 
 }
 
-void visit_best_line(SearchNode * node) {
+/**
+ * Follows the best line from root to leaf, visiting each node in reverse (first
+ * the leaf node, then back up to the root. If a swing is detected at any point,
+ * then the path from the leaf back up to the current node is visited again, at
+ * most once.
+ * The in_swing flag should be set to false.
+ */
+void visit_best_line(SearchNode * node, bool in_swing) {
 
     if (node == nullptr) { return; }
 
+    Eval prior = node->score;
+
     // recurse first so that the line is visited bottom (deepest) first
-    visit_best_line(node->best_child);
+    visit_best_line(node->best_child, in_swing);
     visit_node(node);
+
+    if (!in_swing && is_swing(prior, node->score)) {
+        visit_best_line(node, true);
+    }
 
 }
 
@@ -181,6 +199,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
         root->score = heur(*root->gs);
     }
     if (root->cand_set->empty()) {
+        delete root->cand_set;
         root->cand_set = cands(*root->gs, new CandSet);
     }
 
@@ -188,8 +207,8 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    while (cycles < 0 || i++ < cycles) {
-        visit_best_line(root);
+    while (i++ < cycles || cycles < 0) {
+        visit_best_line(root, false);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
 //        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
