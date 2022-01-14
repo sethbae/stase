@@ -71,7 +71,7 @@ void run_in_background(const std::string & fen) {
  * Cancels the given thread and fetches the best move it found. Responsible for cleaning up
  * the memory the engine was using etc.
  */
-void stop_engine() {
+void stop_engine(bool cleanup) {
 
     // kill the thread and wait for it to exit
     abort_analysis();
@@ -84,8 +84,9 @@ void stop_engine() {
     }
 
     // and delete the search tree
-    delete_tree(current_running_config.root);
+    if (cleanup) { delete_tree(current_running_config.root); }
 
+    reset_abort_flag();
 }
 
 /**
@@ -103,4 +104,8 @@ Move fetch_best_move() {
  */
 int fetch_node_count() {
     return current_running_config.nodes;
+}
+
+SearchNode * fetch_root() {
+    return current_running_config.root;
 }

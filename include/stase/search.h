@@ -30,12 +30,14 @@ void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);
 
 int subtree_size(SearchNode *);
+int subtree_depth(SearchNode *);
 void write_to_file(SearchNode*, std::ostream &);
 void write_to_file_recursively(SearchNode*, std::ostream &);
 
 void run_in_background(const std::string & fen);
-void stop_engine();
+void stop_engine(bool cleanup=true);
 Move fetch_best_move();
 int fetch_node_count();
+SearchNode * fetch_root();
 
 #endif //STASE_SEARCH_H

@@ -46,6 +46,24 @@ int subtree_size(SearchNode *node) {
 
 }
 
+int subtree_depth(SearchNode *node) {
+
+    if (node == nullptr || node->num_children == 0) {
+        return 0;
+    }
+
+    int max = 0;
+
+    for (int i = 0; i < node->num_children; ++i) {
+        int depth = subtree_depth(node->children[i]);
+        if (depth > max) {
+            max = depth;
+        }
+    }
+
+    return max + 1;
+}
+
 /**
  * Prints out a single line of text to cout, for example:
  * [3.086] Ka1 Rf8 Ra4 Be5 Rxd4
@@ -103,7 +121,8 @@ void write_to_file(SearchNode *node, ostream & output) {
         for (int i = 0; i < node->num_children; ++i) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->gs->board, node->children[i]->move)
-                   << ") (" << etos(node->children[i]->score) << ")\n";
+                   << ") (" << etos(node->children[i]->score)
+                   << ") (" << subtree_depth(node->children[i]) << ")\n";
         }
     }
 
@@ -115,6 +134,12 @@ void write_to_file(SearchNode *node, ostream & output) {
 
     output << "Candidates:\n";
     print_cand_set(*node->gs, *node->cand_set, output);
+
+    std::vector<SearchNode *> best_line = retrieve_best_line(node);
+    output << "Best line of play from here: (" << etos(node->score) << ")";
+    for (int i = 1; i < best_line.size(); ++i) {
+        output << " " << mtos(best_line[i-1]->gs->board, best_line[i]->move);
+    }
 
     output << "\n";
 
@@ -304,6 +329,7 @@ std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
 
     while (current != nullptr) {
         line.push_back(current);
+        update_score(current);
         current = current->best_child;
     }
 
