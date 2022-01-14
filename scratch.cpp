@@ -256,37 +256,82 @@ void show_hook_frames(const std::string & fen, const Hook * h) {
     show_hook_frames(gs, h);
 }
 
-Move run_engine(const std::string & fen, const double seconds) {
+void run_engine(const std::string & fen, const double seconds) {
     run_in_background(fen);
     sleep(seconds);
-    stop_engine();
-    return fetch_best_move();
+    stop_engine(false);
+    Move m = fetch_best_move();
+    cout << "Engine played: " << mtos(fen_to_board(fen), m) << "\n";
+}
+
+SearchNode * repl_cycles(const std::string & fen) {
+
+    std::string input;
+
+    cout << "Enter number of cycles to analyse for: ";
+    std::cin >> input;
+    int cycles = std::stoi(input);
+
+    cout << "\nAnalysing...";
+    cout.flush();
+
+    Gamestate * root_gs = new Gamestate(fen);
+    SearchNode * root = new SearchNode{
+            root_gs,
+            cands(*root_gs),
+            heur(*root_gs),
+            MOVE_SENTINEL,
+            0,
+            nullptr,
+            nullptr
+    };
+
+    greedy_search(root, cycles);
+    cout << "done\n";
+
+    return root;
+
+}
+
+SearchNode * repl_seconds(const std::string & fen) {
+
+    std::string input;
+
+    cout << "Enter number of seconds to analyse for: ";
+    std::cin >> input;
+    int secs = std::stoi(input);
+
+    cout << "\nAnalysing...";
+    cout.flush();
+
+    run_in_background(fen);
+    sleep(secs);
+    stop_engine(false);
+
+    cout << "done\n";
+
+    return fetch_root();
+
 }
 
 void repl(const std::string & fen) {
 
-    cout << "Enter number of cycles to analyse for: ";
     std::string input;
+
+    cout << "Run engine for cycles or for seconds (c/s)? ";
     std::cin >> input;
-    int cycles = std::stoi(input);
-    cout << "\nAnalysing...";
+    bool use_seconds = (input == "s");
 
-    Gamestate root_gs(fen);
-    SearchNode root{
-        &root_gs,
-        cands(root_gs),
-        heur(root_gs),
-        MOVE_SENTINEL,
-        0,
-        nullptr,
-        nullptr
-    };
+    SearchNode * root;
 
-    greedy_search(&root, cycles);
-    cout << "done\n";
+    if (use_seconds) {
+        root = repl_seconds(fen);
+    } else {
+        root = repl_cycles(fen);
+    }
 
     bool cont = true;
-    SearchNode * current = &root;
+    SearchNode * current = root;
     std::vector<SearchNode *> current_line{current};
 
     while (cont) {
@@ -295,7 +340,7 @@ void repl(const std::string & fen) {
         write_to_file(current, cout);
         cout << "\nCurrent line is: ";
         for (int i = 1; i < current_line.size(); ++i) {
-            cout << mtos(current_line[i]->gs->board, current_line[i]->move) << " ";
+            cout << mtos(current_line[i-1]->gs->board, current_line[i]->move) << " ";
         }
         if (current_line.size() == 1) {
             cout << "-";
@@ -321,6 +366,9 @@ void repl(const std::string & fen) {
                 read_input = true;
             } else if (input == "cands" || input == "c") {
                 cands_report(*current->gs);
+                read_input = true;
+            } else if (input == "heur" || input == "h") {
+                heur_with_description(*current->gs);
                 read_input = true;
             } else {
 
@@ -352,7 +400,7 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-            "r7/1p3pkp/4b1p1/Pp6/1n6/3p1PP1/r7/R5KR w - - 2 28"
+                "r2q1rk1/pp1bbppp/n3pn2/1Npp2N1/5B2/3P4/PPPQPPPP/2KR1B1R w - - 4 9"
             );
 
 //    Gamestate gs(fen);
