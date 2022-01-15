@@ -70,6 +70,9 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
         return;
     }
 
+    // if no early exit, this counts as a visit
+    ++node->visit_count;
+
     // fetch list to extend
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
     if (list.empty()) {
@@ -124,7 +127,7 @@ void visit_node(SearchNode * node) {
         return;
     }
 
-    switch (node->visit_count++) {
+    switch (node->visit_count) {
         case 0:
             // recursively extend critical until depth reached
             deepen(node, CRITICAL, 5);
@@ -146,6 +149,7 @@ void visit_node(SearchNode * node) {
             update_score(node);
             break;
         default:
+            ++node->visit_count;
             update_score(node);
             break;
     }
