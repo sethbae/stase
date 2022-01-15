@@ -129,7 +129,12 @@ void write_to_file(SearchNode *node, ostream & output) {
     if (node->best_child == nullptr) {
         output << "Best child: nullptr\n";
     } else {
-        output << "Best child: " << node->best_child << "\n";
+        output << "Best child: " << node->best_child << "(" << etos(node->best_child->score) << ")\n";
+    }
+    if (node->best_trust_child == nullptr) {
+        output << "Trust child: nullptr\n";
+    } else {
+        output << "Trust child: " << node->best_child << "(" << etos(node->best_trust_child->score) << ")\n";
     }
 
     output << "Candidates:\n";
@@ -341,6 +346,23 @@ std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
         line.push_back(current);
         update_score(current);
         current = current->best_child;
+    }
+
+    return line;
+}
+
+/**
+ * Given a pointer to the root of a tree, retrieves the most trustworthy line of play
+ * as indicated by the trust_score for each node. This includes the given root, as the first element.
+ */
+std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
+    std::vector<SearchNode *> line{root};
+    SearchNode * current = root;
+
+    while (current != nullptr) {
+        line.push_back(current);
+        update_score(current);
+        current = current->best_trust_child;
     }
 
     return line;

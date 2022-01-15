@@ -77,6 +77,7 @@ void stop_engine(bool cleanup) {
     // kill the thread and wait for it to exit
     abort_analysis();
     pthread_join(current_running_config.t_id, nullptr);
+    reset_abort_flag();
 
     // retrieve info from the run
     if (current_running_config.root) {
@@ -87,7 +88,6 @@ void stop_engine(bool cleanup) {
     // and delete the search tree
     if (cleanup) { delete_tree(current_running_config.root); }
 
-    reset_abort_flag();
 }
 
 /**

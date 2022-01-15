@@ -221,7 +221,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
 //        print_line(best_line);
     }
 
-    std::vector<SearchNode *> best_line = retrieve_best_line(root);
+    std::vector<SearchNode *> best_line = retrieve_trust_line(root);
     print_line(best_line);
 
     std::vector<Move> moves;
