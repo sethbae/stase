@@ -5,6 +5,7 @@ SearchNode *new_node(const Gamestate & gs, Move m);
 
 void update_score(SearchNode *);
 std::vector<SearchNode *> retrieve_best_line(SearchNode *);
+Eval trust_score(SearchNode *, bool is_white);
 
 void check_abort();
 

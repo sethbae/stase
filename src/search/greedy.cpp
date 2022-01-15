@@ -186,7 +186,9 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles) {
             MOVE_SENTINEL,
             0,
             nullptr,
-            nullptr
+            nullptr,
+            nullptr,
+            0
     };
 
     return greedy_search(&root, cycles);
@@ -233,4 +235,20 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     //record_tree_in_file(name, root);
 
     return moves;
+}
+
+Eval trust_score(SearchNode * node, bool is_white) {
+
+    if (is_mate(node->score)) {
+        return node->score;
+    }
+
+    int penalty = 0;
+    if (node->visit_count <= 1) { penalty = 3000; }
+    else if (node->visit_count == 2) { penalty = 1500; }
+    else if (node->visit_count < 4) { penalty = 400; }
+    else if (node->visit_count < 8) { penalty = 100; }
+
+    if (is_white) { return node->score - penalty; }
+    else { return node->score + penalty; }
 }

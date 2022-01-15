@@ -52,6 +52,7 @@ void run_in_background(const std::string & fen) {
                     MOVE_SENTINEL,
                     0,
                     nullptr,
+                    nullptr,
                     nullptr
             };
 

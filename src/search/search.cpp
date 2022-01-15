@@ -179,22 +179,18 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
  * gamestate will represent the position after the given move has been played.
  */
 SearchNode *new_node(const Gamestate & gs, Move m) {
-
     COUNT++;
-
-    Gamestate * new_gs = new Gamestate(gs, m);
-
-    SearchNode *new_node = new SearchNode;
-    new_node->gs = new_gs;
-    new_node->score = zero();
-    new_node->move = m;
-    new_node->num_children = 0;
-    new_node->children = nullptr;
-    new_node->best_child = nullptr;
-    new_node->visit_count = 0;
-
-    return new_node;
-
+    return new SearchNode{
+        new Gamestate(gs, m),
+        new CandSet,
+        zero(),
+        m,
+        0,
+        nullptr,
+        nullptr,
+        nullptr,
+        0
+    };
 }
 
 /**
@@ -205,6 +201,7 @@ void update_score(SearchNode * node) {
 
     if (node->num_children == 0) {
         node->best_child = nullptr;
+        node->best_trust_child = nullptr;
         return;
     }
 
@@ -215,9 +212,7 @@ void update_score(SearchNode * node) {
     node->best_child = node->children[0];
 
     for (int i = 1; i < node->num_children; ++i) {
-
         Eval score = node->children[i]->score;
-
         if (node->gs->board.get_white() && score > node->score) {
             node->score = score;
             node->best_child = node->children[i];
@@ -233,6 +228,21 @@ void update_score(SearchNode * node) {
             node->score = mate_in_one_more(node->score);
         } else if (black_is_mated(node->score) && node->gs->board.get_white()) {
             node->score = mate_in_one_more(node->score);
+        }
+    }
+
+    // now find the most trusted score among children
+    Eval best_trust_score = trust_score(node->children[0], node->gs->board.get_white());
+    node->best_trust_child = node->children[0];
+
+    for (int i = 1; i < node->num_children; ++i) {
+        Eval score = trust_score(node->children[i], node->gs->board.get_white());
+        if (node->gs->board.get_white() && score > best_trust_score) {
+            best_trust_score = score;
+            node->best_trust_child = node->children[i];
+        } else if (!node->gs->board.get_white() && score < best_trust_score) {
+            best_trust_score = score;
+            node->best_trust_child = node->children[i];
         }
     }
 }
@@ -344,13 +354,16 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
 
     // initialise with root only
     Gamestate root_gs(fen);
-    SearchNode root = {
+    SearchNode root{
             &root_gs,
             {},
-            (Eval) 0,
+            zero(),
             MOVE_SENTINEL,
             0,
-            nullptr
+            nullptr,
+            nullptr,
+            nullptr,
+            0
     };
 
     auto start = std::chrono::high_resolution_clock::now();
