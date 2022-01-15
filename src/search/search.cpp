@@ -109,7 +109,8 @@ void write_to_file(SearchNode *node, ostream & output) {
     wr_board_conf(node->gs->board, output);
 
     output << "\nScore: " << etos(node->score) << "\n";
-    output << "Has been mated? " << (node->gs->has_been_mated ? "true\n\n" : "false\n\n");
+    output << "Has been mated? " << (node->gs->has_been_mated ? "true\n" : "false\n");
+    output << "Visit count: " << node->visit_count << "\n\n";
 
     if (node->num_children == 0) {
         output << "Has no children.\n";
@@ -122,6 +123,8 @@ void write_to_file(SearchNode *node, ostream & output) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->gs->board, node->children[i]->move)
                    << ") (" << etos(node->children[i]->score)
+                   << ") (w" << etos(trust_score(node->children[i], true))
+                   << ") (b" << etos(trust_score(node->children[i], false))
                    << ") (" << subtree_depth(node->children[i]) << ")\n";
         }
     }
@@ -134,7 +137,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     if (node->best_trust_child == nullptr) {
         output << "Trust child: nullptr\n";
     } else {
-        output << "Trust child: " << node->best_child << "(" << etos(node->best_trust_child->score) << ")\n";
+        output << "Trust child: " << node->best_trust_child << "(" << etos(node->best_trust_child->score) << ")\n";
     }
 
     output << "Candidates:\n";
