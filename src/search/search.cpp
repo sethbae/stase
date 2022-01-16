@@ -123,8 +123,6 @@ void write_to_file(SearchNode *node, ostream & output) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->gs->board, node->children[i]->move)
                    << ") (" << etos(node->children[i]->score)
-                   << ") (w" << etos(trust_score(node->children[i], true))
-                   << ") (b" << etos(trust_score(node->children[i], false))
                    << ") (" << subtree_depth(node->children[i]) << ")\n";
         }
     }
@@ -342,7 +340,7 @@ void deepen_tree(SearchNode * root) {
  * by the scores on the nodes. This includes the given root, as the first element.
  */
 std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
-    std::vector<SearchNode *> line{root};
+    std::vector<SearchNode *> line;
     SearchNode * current = root;
 
     while (current != nullptr) {
@@ -359,7 +357,7 @@ std::vector<SearchNode *> retrieve_best_line(SearchNode * root) {
  * as indicated by the trust_score for each node. This includes the given root, as the first element.
  */
 std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
-    std::vector<SearchNode *> line{root};
+    std::vector<SearchNode *> line;
     SearchNode * current = root;
 
     while (current != nullptr) {

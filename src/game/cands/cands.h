@@ -6,7 +6,7 @@
 #include "score.h"
 
 const int MAX_TOTAL_CANDS = 30;
-const int MAX_MOVES_PER_HOOK = 10;
+const int MAX_MOVES_PER_HOOK = 20;
 const int MAX_MOVES_PER_FRAME = 5;
 
 struct FeatureFrame {
