@@ -248,7 +248,7 @@ Eval trust_score(SearchNode * node, bool is_white) {
     }
 
     int penalty = 0;
-    if (node->visit_count <= 1) { penalty = 3000; }
+    if (node->visit_count <= 1) { penalty = 5000; }
     else if (node->visit_count == 2) { penalty = 1500; }
     else if (node->visit_count < 4) { penalty = 400; }
     else if (node->visit_count < 8) { penalty = 100; }

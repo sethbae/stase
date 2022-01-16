@@ -143,7 +143,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "Candidates:\n";
     print_cand_set(*node->gs, *node->cand_set, output);
 
-    std::vector<SearchNode *> best_line = retrieve_best_line(node);
+    std::vector<SearchNode *> best_line = retrieve_trust_line(node);
     output << "Best line of play from here: (" << etos(node->score) << ")";
     for (int i = 1; i < best_line.size(); ++i) {
         output << " " << mtos(best_line[i-1]->gs->board, best_line[i]->move);
