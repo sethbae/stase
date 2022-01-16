@@ -5,48 +5,46 @@ using std::cout;
 #include "game.h"
 #include "heur.h"
 
-/*
+/**
  * Returns a score of how well the pawns defend the king on the given square.
- * no checking on king beyond colour
  */
-int pk_count(const Board & b, const Square s) {
+int pk_count(const Gamestate & gs, const bool use_white) {
 
     int score = 0;
-    int x = get_x(s);
-    int y = get_y(s);
-    Colour king_col = colour(b.get(s));
-    int delta = (king_col == WHITE) ? 1 : -1;
+    Square ksq = use_white ? gs.w_king : gs.b_king;
+    Colour king_col = use_white ? WHITE : BLACK;
+    int delta = use_white ? 1 : -1;
+    int x = ksq.x;
+    int y = ksq.y;
 
     // check for unusual king locations and return 0
-    if (king_col == WHITE) {
+    if (use_white) {
         if (x == 3 || x == 4 || y > 1) {
             return 0;
         }
-    } else if (king_col == BLACK) {
+    } else {
         if (x == 3 || x == 4 || y < 6) {
             return 0;
         }
-    } else {
-        return 0;
     }
 
     Piece p;
 
     // pawns directly in front of the king
     if (x > 0) {
-        p = b.get(mksq(x - 1 , y + delta));
+        p = gs.board.get(mksq(x - 1 , y + delta));
         if (type(p) == PAWN && colour(p) == king_col) {
             score += 5;
         }
     }
 
-    p = b.get(mksq(x, y + delta));
+    p = gs.board.get(mksq(x, y + delta));
     if (type(p) == PAWN && colour(p) == king_col) {
         score += 5;
     }
 
     if (x < 7) {
-        p = b.get(mksq(x + 1 , y + delta));
+        p = gs.board.get(mksq(x + 1 , y + delta));
         if (type(p) == PAWN && colour(p) == king_col) {
             score += 5;
         }
@@ -54,19 +52,19 @@ int pk_count(const Board & b, const Square s) {
 
     // pawns a square away
     if (x > 0) {
-        p = b.get(mksq(x - 1 , y + 2*delta));
+        p = gs.board.get(mksq(x - 1 , y + 2*delta));
         if (type(p) == PAWN && colour(p) == king_col) {
             score += 2;
         }
     }
 
-    p = b.get(mksq(x, y + 2*delta));
+    p = gs.board.get(mksq(x, y + 2*delta));
     if (type(p) == PAWN && colour(p) == king_col) {
         score += 2;
     }
 
     if (x < 7) {
-        p = b.get(mksq(x + 1 , y + 2*delta));
+        p = gs.board.get(mksq(x + 1 , y + 2*delta));
         if (type(p) == PAWN && colour(p) == king_col) {
             score += 2;
         }
@@ -77,49 +75,18 @@ int pk_count(const Board & b, const Square s) {
 }
 
 float pawns_defend_king_metric(const Gamestate & gs) {
-
-    Square wking = Square{0, 0};
-    Square bking = Square{0, 0};
-
-    // find kings
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == W_KING) {
-                wking = mksq(x, y);
-            } else if (gs.board.get(mksq(x, y)) == B_KING) {
-                bking = mksq(x, y);
-            }
-        }
-    }
-
-//    cout << "White: " << pk_count(b, wking) << "\n";
-//    cout << "Black: " << pk_count(b, bking) << "\n";
-
     // delegate to the pawn-king-counter (pk-count)
-    return ((float)(pk_count(gs.board, wking) - pk_count(gs.board, bking))) / 8.0f;
+    return ((float)(pk_count(gs, true) - pk_count(gs, false))) / 8.0f;
 }
 
-/*
+/**
  * Returns a score representing the balance of control near the king.
- * sums gamma control count on all adjacent squares to each king.
+ * Sums gamma control count on all adjacent squares to each king.
  */
 float control_near_king_metric(const Gamestate & gs) {
 
     int score = 0;
-    int wx = 0, wy = 0, bx = 0, by = 0;
-
-    // find kings
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == W_KING) {
-                wx = x;
-                wy = y;
-            } else if (gs.board.get(mksq(x, y)) == B_KING) {
-                bx = x;
-                by = y;
-            }
-        }
-    }
+    int wx = gs.w_king.x, wy = gs.w_king.y, bx = gs.b_king.x, by = gs.b_king.y;
 
     Square sq;
 
@@ -166,7 +133,7 @@ float control_near_king_metric(const Gamestate & gs) {
 
 }
 
-/*
+/**
  * for the given location and movement, this returns the control count along the path
  * traced until a pawn is reach, subject to:
  *      - the path having length >= 2
