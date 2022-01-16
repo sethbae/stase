@@ -141,7 +141,7 @@ float control_near_king_metric(const Gamestate & gs) {
     if (val(sq = mksq(wx - 1, wy - 1)))
         score += gamma_control(gs.board, sq);
 
-    // gs.boardlack king
+    // black king
     if (val(sq = mksq(bx + 1, by + 1)))
         score -= gamma_control(gs.board, sq);
     if (val(sq = mksq(bx + 1, by + 0)))
@@ -181,7 +181,7 @@ int exposure_count(const Gamestate & gs, const Square s, Delta d, MoveType dir, 
     Piece p;
 
     while (val(sq) && type(p = gs.board.get(sq)) != PAWN) {
-        if (can_move_in_direction(p, dir)) {
+        if ( p != EMPTY && can_move_in_direction(p, dir)) {
             control_count += (colour(p) == WHITE ? 1 : -1);
         }
         ++length;
@@ -196,7 +196,7 @@ int exposure_count(const Gamestate & gs, const Square s, Delta d, MoveType dir, 
             - the control count is unfavourable
     */
     if (length >= 2 &&
-    ((control_count > 0 && col == BLACK) || (control_count < 0 && col == WHITE))) {
+            ((control_count > 0 && col == BLACK) || (control_count < 0 && col == WHITE))) {
         return control_count;
     } else {
         return 0;
@@ -244,23 +244,5 @@ int one_king_exposure(const Gamestate & gs, const Square s) {
  * Combines two calls to one_king_exposure into a metric.
  */
 float king_exposure_metric(const Gamestate & gs) {
-
-    Square wking = Square{0, 0}, bking = Square{0, 0};
-
-    // find kings
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(mksq(x, y)) == W_KING) {
-                wking = mksq(x, y);
-            } else if (gs.board.get(mksq(x, y)) == B_KING) {
-                bking = mksq(x, y);
-            }
-        }
-    }
-
-    // cout << "White scores: " << one_king_exposure(b, wking) << "\n";
-    // cout << "Black scores: " << one_king_exposure(b, bking) << "\n";
-
-    return (((float)one_king_exposure(gs, wking)) + ((float)one_king_exposure(gs, bking))) / 6.0f;
-
+    return (((float)one_king_exposure(gs, gs.w_king)) + ((float)one_king_exposure(gs, gs.b_king))) / 6.0f;
 }
