@@ -45,9 +45,9 @@ enum GamePhase : uint8_t {
 };
 inline std::string name(GamePhase phase) {
     switch (phase) {
-        case OPENING: return "CRITICAL";
-        case MIDGAME: return "MEDIAL";
-        case ENDGAME: return "FINAL";
+        case OPENING: return "OPENING";
+        case MIDGAME: return "MIDGAME";
+        case ENDGAME: return "ENDGAME";
         default: return "INVALID";
     }
 }
