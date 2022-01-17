@@ -175,102 +175,18 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 
     int x = get_x(s), y = get_y(s);
     Colour knightcol = colour(b.get(s));
-    Square sq;
-    
-    Move m = empty_move();
-    m.from = s;
+    Square temp;
 
-    // for (int i = 0; i < 8; ++i) {
-    //     if (val(sq = mksq(x + knight_dirs[i][0], y + knight_dirs[i][1])) && colour(b.get(sq)) != knightcol) {
-    //         m.to = sq;
-    //         if (b.get(sq) != EMPTY) {
-    //             m.set_cap();
-    //             m.set_cap_piece(b.get(sq));
-    //         }
-    //         moves.push_back(m);
-    //         m.unset_cap();
-    //     }
-    // }
-    
-    if (val(sq = mksq(x + 1, y + 2)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x + 1, y - 2)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x + 2, y + 1)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x + 2, y - 1)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 1, y + 2)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 1, y - 2)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 2, y + 1)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 2, y - 1)) && colour(b.get(sq)) != knightcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
+     for (int i = 0; i < 8; ++i) {
+         if (val(temp = mksq(x + XKN[i], y + YKN[i])) && colour(b.get(temp)) != knightcol) {
+             Move m{s, temp, 0};
+             if (b.get(temp) != EMPTY) {
+                 m.set_cap();
+                 m.set_cap_piece(b.get(temp));
+             }
+             moves.push_back(m);
+         }
+     }
 
 }
 
@@ -278,17 +194,17 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
 bool castle_checks(Board b, const Colour col, const bool kingside) {
     
     Square s1, s2, s3, s4; // intermediate squares
-    Square k = (col == WHITE) ? mksq(4, 0) : mksq(4, 7); // king starting square
-        
+    Square k_sq = (col == WHITE) ? stosq("e1") : stosq("e8");
+
     if (col == WHITE && kingside) {
         
-        s1 = mksq(5, 0);
-        s2 = mksq(6, 0);
-        s3 = mksq(7, 0);
+        s1 = stosq("f1");
+        s2 = stosq("g1");
+        s3 = stosq("h1");
         
-        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s4) == W_ROOK) {
+        if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == W_ROOK) {
             
-            b.set(k, EMPTY);
+            b.set(k_sq, EMPTY);
             b.set(s1, W_KING);
             
             if (!in_check_hard(b, WHITE)) {
@@ -301,15 +217,15 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
         }           
         
     } else if (col == WHITE && !kingside) {
-        
-        s1 = mksq(3, 0);
-        s2 = mksq(2, 0);
-        s3 = mksq(1, 0);
-        s4 = mksq(0, 0);
-        
+
+        s1 = stosq("d1");
+        s2 = stosq("c1");
+        s3 = stosq("b1");
+        s4 = stosq("a1");
+
         if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY && b.get(s4) == W_ROOK) {
             
-            b.set(k, EMPTY);
+            b.set(k_sq, EMPTY);
             b.set(s1, W_KING);
             
             if (!in_check_hard(b, WHITE)) {
@@ -322,14 +238,14 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
         }   
                 
     } else if (col == BLACK && kingside) {
-        
-        s1 = mksq(5, 7);
-        s2 = mksq(6, 7);
-        s3 = mksq(7, 7);
-        
+
+        s1 = stosq("f8");
+        s2 = stosq("g8");
+        s3 = stosq("h8");
+
         if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == B_ROOK) {
             
-            b.set(k, EMPTY);
+            b.set(k_sq, EMPTY);
             b.set(s1, B_KING);
             
             if (!in_check_hard(b, BLACK)) {
@@ -343,14 +259,14 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
                   
     } else { // BLACK and !kingside
 
-        s1 = mksq(3, 7);
-        s2 = mksq(2, 7);
-        s3 = mksq(1, 7);
-        s4 = mksq(0, 7);
+        s1 = stosq("d8");
+        s2 = stosq("c8");
+        s3 = stosq("b8");
+        s4 = stosq("a8");
 
         if (b.get(s1) == EMPTY && b.get(s2) == EMPTY && b.get(s3) == EMPTY && b.get(s4) == B_ROOK) {
 
-            b.set(k, EMPTY);
+            b.set(k_sq, EMPTY);
             b.set(s1, B_KING);
 
             if (!in_check_hard(b, BLACK)) {
@@ -369,150 +285,55 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
 void king_moves(const Board & b, const Square s, vector<Move> & moves) {
 
     Colour kingcol = colour(b.get(s));
-    Square sq;
-    Move m = empty_move();
-    m.from = s;
+    Square temp;
 
     // check castle for white
     if (kingcol == WHITE && !in_check_hard(b, WHITE)) {
         
-        Move c = empty_move();
-        c.from = s;
-        
         if (b.get_cas_ws() && castle_checks(b, WHITE, true)) {
-            c.to = mksq(6, 0);
-            c.set_cas();
-            c.set_cas_short();
-            moves.push_back(c);
+            Move m{s, stosq("g1"), 0};
+            m.set_cas();
+            m.set_cas_short();
+            moves.push_back(m);
         }
         
         if (b.get_cas_wl() && castle_checks(b, WHITE, false)) {
-            c.to = mksq(2, 0);
-            c.set_cas();
-            c.unset_cas_short();
-            moves.push_back(c);
+            Move m{s, stosq("c1"), 0};
+            m.set_cas();
+            m.unset_cas_short();
+            moves.push_back(m);
         }
     
     // and for black
     } else if (kingcol == BLACK && !in_check_hard(b, BLACK)) {
-        
-        Move c = empty_move();
-        c.from = s;
-        
+
         if (b.get_cas_bs() && castle_checks(b, BLACK, true)) {
-            c.to = mksq(6, 7);
-            c.set_cas();
-            c.set_cas_short();
-            moves.push_back(c);
+            Move m{s, stosq("g8"), 0};
+            m.set_cas();
+            m.set_cas_short();
+            moves.push_back(m);
         }
-        
+
         if (b.get_cas_bl() && castle_checks(b, BLACK, false)) {
-            c.to = mksq(2, 7);
-            c.set_cas();
-            c.unset_cas_short();
-            moves.push_back(c);
+            Move m{s, stosq("c8"), 0};
+            m.set_cas();
+            m.unset_cas_short();
+            moves.push_back(m);
         }
-        
+
     }
-    
+
     // check all adjacent squares
-
-    // int adj[] = {-1, 0, 1};
-    // for (int i = 0; i < 3; ++i) {
-    //     for (int j = 0; j < 3; ++j) {
-    //         if (val(sq = mksq(adj[i], adj[j])) && colour(b.get(sq)) != kingcol) {
-    //             m.to = sq;
-    //             if (b.get(sq) != EMPTY) {
-    //                 m.set_cap();
-    //                 m.set_cap_piece(b.get(sq));
-    //             }
-    //             moves.push_back(m);
-    //             m.unset_cap();
-    //         }
-    //     }
-    // }
-
-
-
     int x = get_x(s), y = get_y(s);
-    if (val(sq = mksq(x + 1, y + 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
+    for (int i = 0; i < 8; ++i) {
+        if (val(temp = mksq(x + XD[i], y + YD[i])) && colour(b.get(temp)) != kingcol) {
+            Move m{s, temp, 0};
+            if (b.get(temp) != EMPTY) {
+                m.set_cap();
+                m.set_cap_piece(b.get(temp));
+            }
+            moves.push_back(m);
         }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x + 1, y)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x + 1, y - 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x, y + 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x, y - 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 1, y + 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 1, y)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
-    }
-    
-    if (val(sq = mksq(x - 1, y - 1)) && colour(b.get(sq)) != kingcol) {
-        m.to = sq;
-        if (b.get(sq) != EMPTY) {
-            m.set_cap();
-            m.set_cap_piece(b.get(sq));
-        }
-        moves.push_back(m);
-        m.unset_cap();
     }
 
 }
@@ -667,30 +488,29 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
     sq.y += d.dy;
 
     while (val(sq)) {
-
         Piece otherp = b.get(sq);
-        
         if (otherp != EMPTY) {
             return otherp == p1 || otherp == p2;
         }
-
         sq.x += d.dx;
         sq.y += d.dy;
     }
-    
-    return false;                        
-                        
+    return false;
 }
 
-/* returns true iff the player of the given colour is in check */
+/**
+ * Returns true iff the player of the given colour is in check. If no king of the given
+ * colour is found, then false is returned.
+ */
 bool in_check_hard(const Board & b, Colour col) {
-    
+
+    Square temp;
     bool white = (col == WHITE);
     Piece king = (white) ? W_KING : B_KING;
     Square ksq{0, 0};
     int king_x = 0, king_y = 0;
     bool king_found = false;
-    
+
     // find king square
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -704,88 +524,33 @@ bool in_check_hard(const Board & b, Colour col) {
     }
 
     if (!king_found) { return false; }
-    
+
     // check pawns
     if (white) {
-        
-        if (king_x > 0 && king_y < 7 && b.get(mksq(king_x - 1, king_y + 1)) == B_PAWN) {
-            return true;
-        }
-        if (king_x < 7 && king_y < 7 && b.get(mksq(king_x + 1, king_y + 1)) == B_PAWN) {
-           return true;
-        }
-        
+        if (king_x > 0 && king_y < 7 && b.get(mksq(king_x - 1, king_y + 1)) == B_PAWN) { return true; }
+        if (king_x < 7 && king_y < 7 && b.get(mksq(king_x + 1, king_y + 1)) == B_PAWN) { return true; }
     } else {
-        
-        if (king_x > 0 && king_y > 0 && b.get(mksq(king_x - 1, king_y - 1)) == W_PAWN) {
-            return true;
-        }
-        if (king_x < 7 && king_y > 0 && b.get(mksq(king_x + 1, king_y - 1)) == W_PAWN) {
-           return true;
-        }
-    
+        if (king_x > 0 && king_y > 0 && b.get(mksq(king_x - 1, king_y - 1)) == W_PAWN) { return true; }
+        if (king_x < 7 && king_y > 0 && b.get(mksq(king_x + 1, king_y - 1)) == W_PAWN) { return true; }
     }
-    
+
     // check knight
     Piece enemy_knight = white ? B_KNIGHT : W_KNIGHT;
-    Square sq;
-
-    // for (int i = 0; i < 8; ++i) {
-    //     if (val(sq = mksq(king_x + knight_dirs[i][0], king_y + knight_dirs[i][1])) && b.get(sq) == enemy_knight) {
-    //         return true;
-    //     }
-    // }
-
-
-    if (val(sq = mksq(king_x + 1, king_y + 2)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x + 1, king_y - 2)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x + 2, king_y + 1)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x + 2, king_y - 1)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x - 1, king_y + 2)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x - 1, king_y - 2)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x - 2, king_y + 1)) && b.get(sq) == enemy_knight)
-        return true;
-    if (val(sq = mksq(king_x - 2, king_y - 1)) && b.get(sq) == enemy_knight)
-        return true;
+    for (int i = 0; i < 8; ++i) {
+        if (val(temp = mksq(king_x + XKN[i], king_y + YKN[i])) && b.get(temp) == enemy_knight) {
+            return true;
+        }
+    }
 
     // check king (daft but thorough - stops legal_moves letting kings move next to each other)
     Piece enemy_king = white ? B_KING : W_KING;
+    for (int i = 0; i < 8; ++i) {
+        if (val(temp = mksq(king_x + XD[i], king_y + YD[i])) && b.get(temp) == enemy_king){
+            return true;
+        }
+    }
 
-    // int adj[] = {-1, 0, 1};
-    // for (int i = 0; i < 3; ++i) {
-    //     for (int j = 0; j < 3; ++j) {
-    //         if (val(sq = mksq(king_x + adj[i], king_y + adj[j]))  && b.get(sq) == enemy_king){
-    //             return true;
-    //         }
-    //     }
-    // }
-
-
-    if (val(sq = mksq(king_x + 1, king_y + 1))  && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x + 1, king_y))      && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x + 1, king_y - 1))  && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x,     king_y + 1))  && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x,     king_y - 1))  && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x - 1, king_y + 1))  && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x - 1, king_y))      && b.get(sq) == enemy_king)
-        return true;
-    if (val(sq = mksq(king_x - 1, king_y - 1))  && b.get(sq) == enemy_king)
-        return true;
-        
     // search out from king
-
     Piece queen, bishop, rook;
     if (white) {
         queen = B_QUEEN;
