@@ -38,6 +38,12 @@ Square square_piece_can_reach_on_line(const Board & b, const Square, const Squar
 std::vector<Square> squares_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
 Square first_piece_encountered(const Board &, const Square, const Delta);
 
+enum GamePhase : uint8_t {
+    OPENING = 0,
+    MIDGAME = 1,
+    ENDGAME = 2
+};
+
 // forward declaration: see cands.h
 struct FeatureFrame;
 
@@ -102,11 +108,17 @@ struct Gamestate {
     // The enclosed board
     Board board;
     bool has_been_mated = false;
+    Move last_move;
+    Piece last_capture;
+    mutable Square w_king;
+    mutable Square b_king;
+    GamePhase phase;
 
     FeatureFrame ** feature_frames;
 
     explicit Gamestate();
     explicit Gamestate(const std::string &);
+    explicit Gamestate(const std::string &, GamePhase);
     explicit Gamestate(const Board &);
     explicit Gamestate(const Gamestate &);
     explicit Gamestate(const Gamestate &, const Move);
@@ -140,12 +152,6 @@ struct Gamestate {
     void add_kpinned_piece(const Square, const Delta);
     void remove_kpinned_piece(const Square);
     bool is_kpinned_piece(const Square, const Delta) const;
-
-    Move last_move;
-    Piece last_capture;
-
-    mutable Square w_king;
-    mutable Square b_king;
 
     inline Piece sneak(const Move m) const {
         Piece sneaked = board.sneak(m);

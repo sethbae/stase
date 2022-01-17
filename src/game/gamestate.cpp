@@ -43,13 +43,36 @@ void find_kings(Gamestate * gs) {
     }
 }
 
+/**
+ * Transitions the Gamestate's phase according to certain conditions, based on the Gamestate and
+ * the given move which creates the new gamestate. This move shouldn't have been played yet: this
+ * needs to look at the board prior to the update step.
+ */
+void update_phase(Gamestate * gs, const Move m) {
+    switch (gs->phase) {
+        case OPENING:
+            if (gs->board.get_wholemoves() >= 10) {
+                gs->phase = MIDGAME;
+            }
+            break;
+        case MIDGAME:
+            if (type(gs->board.get(m.from)) == QUEEN && type(gs->board.get(m.to)) == QUEEN) {
+                gs->phase = ENDGAME;
+            }
+            break;
+        case ENDGAME:
+            break;
+    }
+}
+
 Gamestate::Gamestate()
-    : w_king(SQUARE_SENTINEL), b_king(SQUARE_SENTINEL) {
+    : w_king(SQUARE_SENTINEL), b_king(SQUARE_SENTINEL), phase(OPENING) {
     alloc(this);
 }
 
 Gamestate::Gamestate(const Board & b)
-    : board(b) {
+    : board(b),
+      phase(OPENING) {
     alloc(this);
     find_kings(this);
 }
@@ -58,6 +81,7 @@ Gamestate::Gamestate(const Gamestate & o, const Move m)
     : board(o.board.successor_hard(m)), last_move(m) {
 
     alloc(this);
+    update_phase(this, m);
 
     if (o.board.get(m.from) == W_KING) {
         w_king = m.to;
@@ -73,7 +97,15 @@ Gamestate::Gamestate(const Gamestate & o, const Move m)
 }
 
 Gamestate::Gamestate(const std::string & fen)
-    : board(fen_to_board(fen)) {
+    : board(fen_to_board(fen)),
+      phase(OPENING){
+    alloc(this);
+    find_kings(this);
+}
+
+Gamestate::Gamestate(const std::string & fen, GamePhase phase)
+    : board(fen_to_board(fen)),
+      phase(phase){
     alloc(this);
     find_kings(this);
 }
@@ -89,6 +121,7 @@ Gamestate::Gamestate(Gamestate && o) {
     this->b_kpin_dirs = o.b_kpin_dirs;
     this->w_king = o.w_king;
     this->b_king = o.b_king;
+    this->phase = o.phase;
     o.feature_frames = nullptr;
     o.wpieces = nullptr;
     o.bpieces = nullptr;
@@ -129,6 +162,7 @@ Gamestate::Gamestate(const Gamestate & o) {
     b_king = o.b_king;
     last_move = o.last_move;
     last_capture = o.last_capture;
+    phase = o.phase;
 }
 
 Gamestate::~Gamestate() {
