@@ -203,26 +203,38 @@ bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCou
     if (gs.board.get_white() && equal(s, stosq("e1"))) {
         if (gs.board.get_cas_ws() && check_squares_for_castling(gs, stosq("f1"), stosq("g1"), SQUARE_SENTINEL)) {
             if (counter.has_space()) {
-                moves[counter.inc()] = Move{stosq("e1"), stosq("g1"), 0};
+                Move m{stosq("e1"), stosq("g1"), 0};
+                m.set_cas();
+                m.set_cas_short();
+                moves[counter.inc()] = m;
                 found = true;
             }
         }
         if (gs.board.get_cas_wl() && check_squares_for_castling(gs, stosq("d1"), stosq("c1"), stosq("b1"))) {
             if (counter.has_space()) {
-                moves[counter.inc()] = Move{stosq("e1"), stosq("c1"), 0};
+                Move m{stosq("e1"), stosq("c1"), 0};
+                m.set_cas();
+                m.unset_cas_short();
+                moves[counter.inc()] = m;
                 found = true;
             }
         }
     } else if (!gs.board.get_white() && equal(s, stosq("e8"))) {
         if (gs.board.get_cas_bs() && check_squares_for_castling(gs, stosq("f8"), stosq("g8"), SQUARE_SENTINEL)) {
             if (counter.has_space()) {
-                moves[counter.inc()] = Move{stosq("e8"), stosq("g8"), 0};
+                Move m{stosq("e8"), stosq("g8"), 0};
+                m.set_cas();
+                m.set_cas_short();
+                moves[counter.inc()] = m;
                 found = true;
             }
         }
         if (gs.board.get_cas_bl() && check_squares_for_castling(gs, stosq("d8"), stosq("c8"), stosq("b8"))) {
             if (counter.has_space()) {
-                moves[counter.inc()] = Move{stosq("e8"), stosq("c8"), 0};
+                Move m{stosq("e8"), stosq("c8"), 0};
+                m.set_cas();
+                m.unset_cas_short();
+                moves[counter.inc()] = m;
                 found = true;
             }
         }

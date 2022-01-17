@@ -66,13 +66,19 @@ void update_phase(Gamestate * gs, const Move m) {
 }
 
 Gamestate::Gamestate()
-    : w_king(SQUARE_SENTINEL), b_king(SQUARE_SENTINEL), phase(OPENING) {
+    : w_king(SQUARE_SENTINEL),
+      b_king(SQUARE_SENTINEL),
+      phase(OPENING),
+      w_cas(false),
+      b_cas(false) {
     alloc(this);
 }
 
 Gamestate::Gamestate(const Board & b)
     : board(b),
-      phase(OPENING) {
+      phase(OPENING),
+      w_cas(false),
+      b_cas(false) {
     alloc(this);
     find_kings(this);
 }
@@ -94,18 +100,33 @@ Gamestate::Gamestate(const Gamestate & o, const Move m)
         b_king = o.b_king;
     }
 
+    if (m.is_cas() && colour(board.get(m.from)) == WHITE) {
+        w_cas = true;
+        b_cas = o.b_cas;
+    } else if (m.is_cas() && colour(board.get(m.from)) == BLACK) {
+        w_cas = o.w_cas;
+        b_cas = true;
+    } else {
+        w_cas = o.w_cas;
+        b_cas = o.b_cas;
+    }
+
 }
 
 Gamestate::Gamestate(const std::string & fen)
     : board(fen_to_board(fen)),
-      phase(OPENING){
+      phase(OPENING),
+      w_cas(false),
+      b_cas(false) {
     alloc(this);
     find_kings(this);
 }
 
 Gamestate::Gamestate(const std::string & fen, GamePhase phase)
     : board(fen_to_board(fen)),
-      phase(phase){
+      phase(phase),
+      w_cas(false),
+      b_cas(false) {
     alloc(this);
     find_kings(this);
 }
@@ -119,6 +140,8 @@ Gamestate::Gamestate(Gamestate && o) {
     this->w_kpin_dirs = o.w_kpin_dirs;
     this->b_kpinned_pieces = o.b_kpinned_pieces;
     this->b_kpin_dirs = o.b_kpin_dirs;
+    this->w_cas = o.w_cas;
+    this->b_cas = o.b_cas;
     this->w_king = o.w_king;
     this->b_king = o.b_king;
     this->phase = o.phase;
@@ -158,6 +181,8 @@ Gamestate::Gamestate(const Gamestate & o) {
             *this->feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
         }
     }
+    w_cas = o.w_cas;
+    b_cas = o.b_cas;
     w_king = o.w_king;
     b_king = o.b_king;
     last_move = o.last_move;
@@ -191,10 +216,17 @@ void Gamestate::repopulate_caches() {
  */
 void Gamestate::next_in_place(const Move m) {
 
+    update_phase(this, m);
     if (board.get(m.from) == W_KING) {
         w_king = m.to;
+        if (m.is_cas()) {
+            w_cas = true;
+        }
     } else if (board.get(m.from) == B_KING) {
         b_king = m.to;
+        if (m.is_cas()) {
+            b_cas = true;
+        }
     }
     last_move = m;
     board = board.successor_hard(m);
