@@ -43,6 +43,14 @@ enum GamePhase : uint8_t {
     MIDGAME = 1,
     ENDGAME = 2
 };
+inline std::string name(GamePhase phase) {
+    switch (phase) {
+        case OPENING: return "CRITICAL";
+        case MIDGAME: return "MEDIAL";
+        case ENDGAME: return "FINAL";
+        default: return "INVALID";
+    }
+}
 
 // forward declaration: see cands.h
 struct FeatureFrame;
@@ -59,8 +67,8 @@ inline std::string name(CandList cand_list) {
         case MEDIAL: return "MEDIAL";
         case FINAL: return "FINAL";
         case LEGAL: return "LEGAL";
+        default: return "INVALID";
     }
-    return "INVALID";
 }
 
 struct CandSet {

@@ -19,7 +19,8 @@
  */
 struct Metric {
     const std::string name;
-    const int weight;
+    // [0]: OPENING [1]: MIDGAME [2]: ENDGAME
+    const int weights[3];
     float (*metric)(const Gamestate &);
 };
 
@@ -104,77 +105,77 @@ float king_exposure_metric(const Gamestate &);
 
 const Metric __piece_activity_alpha_metric{
     "piece-activity-alpha",
-    600,
+    {600, 600, 600 },
     &piece_activity_alpha_metric
 };
 const Metric __piece_activity_beta_metric{
     "piece-activity-beta",
-    600,
+    {600, 600, 600 },
     &piece_activity_beta_metric
 };
 const Metric __piece_activity_gamma_metric{
     "piece-activity-gamma",
-    600,
+    {600, 600, 600 },
     &piece_activity_gamma_metric
 };
 const Metric __open_line_control_metric{
     "open-line-control",
-    1000,
+    {800, 1000, 1200 },
     &open_line_control_metric
 };
 const Metric __centre_control_metric{
     "centre-control",
-    1500,
+    {2000, 1500, 1250 },
     &centre_control_metric
 };
 const Metric __defended_pawns_metric{
     "defended-pawns",
-    500,
+    {400, 500, 750 },
     &defended_pawns_metric
 };
 const Metric __isolated_pawns_metric{
     "isolated-pawns",
-    400,
+    {300, 400, 600 },
     &isolated_pawns_metric
 };
 const Metric __central_pawns_metric{
     "central-pawns",
-    400,
+    {600, 500, 400 },
     &central_pawns_metric
 };
 const Metric __far_advanced_pawns_metric{
     "far-advanced-pawns",
-    400,
+    {100, 400, 1000 },
     &far_advanced_pawns_metric
 };
 const Metric __development_metric{
     "development",
-    500,
+    {1000, 500, 0 },
     &development_metric
 };
 const Metric __castling_metric{
     "castling",
-    200,
+    {300, 200, 0 },
     &castling_metric
 };
 const Metric __castling_rights_metric{
     "castling-rights",
-    300,
+    {400, 300, 0 },
     &castling_rights_metric
 };
 const Metric __pawns_defend_king_metric{
     "pawns-defend-king",
-    750,
+    {500, 1000, 400 },
     &pawns_defend_king_metric
 };
 const Metric __control_near_king_metric{
     "control-near-king",
-    750,
+    {500, 1000, 400},
     &control_near_king_metric
 };
 const Metric __king_exposure_metric{
     "king-exposure",
-    750,
+    {500, 1000, 400 },
     &king_exposure_metric
 };
 
