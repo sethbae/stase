@@ -6,6 +6,39 @@ using std::cout;
 #include "heur.h"
 
 /**
+ * Returns zero if both sides have either castled or not castled, otherwise
+ * +1 or -1 to indicate that only one side has castled.
+ */
+float castling_metric(const Gamestate & gs) {
+    if (gs.b_cas == gs.w_cas) { return 0.0f; }
+    return (gs.w_cas) ? 1.0f : -1.0f;
+}
+
+/**
+ * Returns a score comparing the castling rights available to each side.
+ */
+float castling_rights_metric(const Gamestate & gs) {
+
+    float w_score = 0.0f, b_score = 0.0f;
+
+    if (gs.w_cas) {
+        w_score = 2.0f;
+    } else {
+        if (gs.board.get_cas_ws()) { w_score += 0.85f; }
+        if (gs.board.get_cas_wl()) { w_score += 0.65f; }
+    }
+
+    if (gs.b_cas) {
+        b_score = 2.0f;
+    } else {
+        if (gs.board.get_cas_bs()) { b_score += 0.85f; }
+        if (gs.board.get_cas_bl()) { b_score += 0.65f; }
+    }
+
+    return 0.5f * (w_score - b_score);
+}
+
+/**
  * Returns a score of how well the pawns defend the king on the given square.
  */
 int pk_count(const Gamestate & gs, const bool use_white) {

@@ -94,6 +94,8 @@ float far_advanced_pawns_metric(const Gamestate &);
 
 // opening metrics
 float development_metric(const Gamestate &);
+float castling_metric(const Gamestate &);
+float castling_rights_metric(const Gamestate &);
 
 // king safety metrics
 float pawns_defend_king_metric(const Gamestate &);
@@ -150,6 +152,16 @@ const Metric __development_metric{
     500,
     &development_metric
 };
+const Metric __castling_metric{
+    "castling",
+    200,
+    &castling_metric
+};
+const Metric __castling_rights_metric{
+    "castling-rights",
+    300,
+    &castling_rights_metric
+};
 const Metric __pawns_defend_king_metric{
     "pawns-defend-king",
     750,
@@ -178,6 +190,8 @@ const std::vector<const Metric *> ALL_METRICS{
     &__central_pawns_metric,
     &__far_advanced_pawns_metric,
     &__development_metric,
+    &__castling_metric,
+    &__castling_rights_metric,
     &__pawns_defend_king_metric,
     &__control_near_king_metric,
     &__king_exposure_metric
