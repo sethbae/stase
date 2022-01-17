@@ -10,9 +10,9 @@ constexpr int safe_check_score(const Piece p) {
 }
 constexpr int unsafe_check_score(const Piece p) {
     if (is_major_piece(p)) {
-        return 1;
+        return 0;
     } else {
-        return 2;
+        return 1;
     }
 }
 

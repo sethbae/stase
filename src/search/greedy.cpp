@@ -130,7 +130,7 @@ void visit_node(SearchNode * node) {
     switch (node->visit_count) {
         case 0:
             // recursively extend critical until depth reached
-            deepen(node, CRITICAL, 5);
+            deepen(node, CRITICAL, 7);
             break;
         case 2:
             // extend medial just once
