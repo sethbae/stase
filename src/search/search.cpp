@@ -99,6 +99,8 @@ void write_to_file(SearchNode *node, ostream & output) {
      * children title
      * list of children and names
      */
+    std::vector<SearchNode *> best_line = retrieve_best_line(node);
+    std::vector<SearchNode *> trust_line = retrieve_trust_line(node);
 
     output << "######################\n";
 
@@ -108,7 +110,8 @@ void write_to_file(SearchNode *node, ostream & output) {
 
     wr_board_conf(node->gs->board, output);
 
-    output << "\nScore: " << etos(node->score) << "\n";
+    output << "\nScore: " << etos(best_line[best_line.size() - 1]->score) << "\n";
+    output << "Trust score: " << etos(trust_line[trust_line.size() - 1]->score) << "\n";
     output << "Has been mated? " << (node->gs->has_been_mated ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
 
@@ -141,10 +144,15 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "Candidates:\n";
     print_cand_set(*node->gs, *node->cand_set, output);
 
-    std::vector<SearchNode *> best_line = retrieve_trust_line(node);
-    output << "Best line of play from here: (" << etos(node->score) << ")";
+    output << "Best line from here: (" << etos(best_line[best_line.size() - 1]->score) << ")";
     for (int i = 1; i < best_line.size(); ++i) {
         output << " " << mtos(best_line[i-1]->gs->board, best_line[i]->move);
+    }
+    output << "\n";
+
+    output << "Trust line from here: (" << etos(trust_line[trust_line.size() - 1]->score) << ")";
+    for (int i = 1; i < trust_line.size(); ++i) {
+        output << " " << mtos(trust_line[i-1]->gs->board, trust_line[i]->move);
     }
 
     output << "\n";
