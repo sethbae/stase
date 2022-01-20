@@ -32,6 +32,7 @@ struct ControlCache {
 
     inline void put(const Square s, SquareControlStatus status) {
         cache[index(s)] = status;
+        squares |= (1l << index(s));
     }
 
 private:
