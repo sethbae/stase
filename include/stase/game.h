@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include "../../src/game/eval.hpp"
+#include "../../src/game/control_cache.hpp"
 
 // and a lookup table (indexed by numeric value of Ptype enumeration) for which of
 // the above movesets to use.
@@ -126,6 +127,8 @@ struct Gamestate {
 
     FeatureFrame ** feature_frames;
 
+    ControlCache * control_cache;
+
     explicit Gamestate();
     explicit Gamestate(const std::string &);
     explicit Gamestate(const std::string &, GamePhase);
@@ -137,8 +140,6 @@ struct Gamestate {
 
     Gamestate & operator=(const Gamestate &) = default;
     Gamestate & operator=(Gamestate &&) = default;
-
-    void repopulate_caches();
 
     void next_in_place(const Move);
 
@@ -221,14 +222,6 @@ int w_pawn_defence_count(const Gamestate &, const Square);
 int b_pawn_defence_count(const Gamestate &, const Square);
 int pawn_defence_count(const Gamestate &, const Square);
 
-/**
- * Used to pass information about the pieces attacking and controlling a certain square.
- */
-struct SquareControlStatus {
-    int balance = 0;
-    int min_w = 0;
-    int min_b = 0;
-};
 SquareControlStatus evaluate_square_status(const Gamestate &, const Square);
 bool is_weak_status(const Gamestate &, const Square, const Colour colour, SquareControlStatus);
 

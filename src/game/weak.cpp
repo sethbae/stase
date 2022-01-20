@@ -41,12 +41,12 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
      * from one direction however, then poly x-rays affect the balance and min-defender.
      */
 
-    int basic_balance = 0;
-    int poly_x_ray_balance = 0;
+    int16_t basic_balance = 0;
+    int16_t poly_x_ray_balance = 0;
     int directions_attacked_from = 0;
-    int min_value_w = piece_value(W_KING)*10;
-    int min_value_b = piece_value(W_KING)*10;
-    int min_poly_x_ray_defender = piece_value(W_KING) * 10;
+    uint16_t min_value_w = piece_value(W_KING) + 1;
+    uint16_t min_value_b = piece_value(W_KING) + 1;
+    uint16_t min_poly_x_ray_defender = piece_value(W_KING) + 1;
     int x, y;
     Square temp;
 
@@ -237,7 +237,7 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
         if (colour(gs.board.get(s)) == WHITE) {
 
             // if the weak piece is white, its defenders are white
-            int min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
+            uint16_t min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
 
             return {
               poly_x_ray_balance,
@@ -248,7 +248,7 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
         } else {
 
             // if the weak piece is black, its defenders are black
-            int min_defender = (min_poly_x_ray_defender < min_value_b) ? min_poly_x_ray_defender : min_value_b;
+            uint16_t min_defender = (min_poly_x_ray_defender < min_value_b) ? min_poly_x_ray_defender : min_value_b;
 
             return {
                 poly_x_ray_balance,

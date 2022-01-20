@@ -18,6 +18,7 @@ set(SOURCE_FILES
         src/display/display.cpp
 
         src/game/eval.hpp
+        src/game/control_cache.hpp
         src/game/gamestate.cpp
         src/game/geometry.cpp
         src/game/piece.cpp

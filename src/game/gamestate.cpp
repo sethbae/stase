@@ -7,6 +7,7 @@
  */
 void alloc(Gamestate * gs) {
     gs->feature_frames = new FeatureFrame*[ALL_HOOKS.size()];
+    gs->control_cache = new ControlCache;
     gs->wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
     gs->w_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
@@ -134,6 +135,7 @@ Gamestate::Gamestate(const std::string & fen, GamePhase phase)
 Gamestate::Gamestate(Gamestate && o) {
     this->board = o.board;
     this->feature_frames = o.feature_frames;
+    this->control_cache = o.control_cache;
     this->wpieces = o.wpieces;
     this->bpieces = o.bpieces;
     this->w_kpinned_pieces = o.w_kpinned_pieces;
@@ -146,6 +148,7 @@ Gamestate::Gamestate(Gamestate && o) {
     this->b_king = o.b_king;
     this->phase = o.phase;
     o.feature_frames = nullptr;
+    o.control_cache = nullptr;
     o.wpieces = nullptr;
     o.bpieces = nullptr;
     o.w_kpinned_pieces = nullptr;
@@ -195,19 +198,13 @@ Gamestate::~Gamestate() {
         delete feature_frames[i];
     }
     delete[] feature_frames;
+    delete control_cache;
     delete wpieces;
     delete bpieces;
     delete w_kpinned_pieces;
     delete w_kpin_dirs;
     delete b_kpinned_pieces;
     delete b_kpin_dirs;
-}
-
-/**
- * Populate all the information in the caches completely from scratch.
- */
-void Gamestate::repopulate_caches() {
-    // for each square, pieces
 }
 
 /**
