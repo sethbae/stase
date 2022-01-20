@@ -266,7 +266,12 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
  * applying any logic or interpretation to the result.
  */
 SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s) {
-    return capture_walk(gs, s);
+    if (gs.control_cache->contains(s)) {
+        return gs.control_cache->get(s);
+    }
+    SquareControlStatus status = capture_walk(gs, s);
+    gs.control_cache->put(s, status);
+    return status;
 }
 
 /**
@@ -352,8 +357,16 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
  * However, there is more complicated logic regarding the interaction of x-rays when pieces are
  * on the same diagonal/orthogonal line.
  */
-bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
-    return is_weak_status(gs, s, c, capture_walk(gs, s));
+bool is_weak_square(const Gamestate & gs, const Square s, const Colour c, const bool use_caches) {
+    if (!use_caches) {
+        return is_weak_status(gs, s, c, capture_walk(gs, s));
+    }
+    if (gs.control_cache->contains(s)) {
+        return is_weak_status(gs, s, c, gs.control_cache->get(s));
+    }
+    SquareControlStatus status = capture_walk(gs, s);
+    gs.control_cache->put(s, status);
+    return is_weak_status(gs, s, c, status);
 }
 
 /**
@@ -364,7 +377,7 @@ bool is_weak_square(const Gamestate & gs, const Square s, const Colour c) {
 bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, const Move m) {
 
     Piece sneaked = gs.sneak(m);
-    bool weak = is_weak_square(gs, s, c);
+    bool weak = is_weak_square(gs, s, c, false);
     gs.unsneak(m, sneaked);
 
     return weak;
