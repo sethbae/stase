@@ -2,7 +2,11 @@
 #include "search.h"
 #include "game.h"
 #include "search_tools.h"
-#include "metrics.h"
+
+const int CRITICAL_THRESHOLD = 0;
+const int MEDIAL_THRESHOLD = 2;
+const int FINAL_THRESHOLD = 8;
+const int LEGAL_THRESHOLD = 128;
 
 inline bool is_present_in_list(const std::vector<Move> & list, const Move m) {
     for (int i = 0; i < list.size(); ++i) {
@@ -55,19 +59,21 @@ void add_legal_moves(SearchNode * node) {
  * in the tree. If the depth given is greater than 1, then this will be done recursively
  * to create a new subtree of size equal to the depth.
  * If given a depth of 0, nothing will happen.
+ * Returns true if new nodes are created, false otherwise.
  */
-void deepen(SearchNode * node, CandList cand_list, int depth) {
+bool deepen(SearchNode * node, CandList cand_list, int depth) {
 
     // exit conditions
     check_abort();
-    if (depth == 0) { return; }
+    if (depth == 0) { return false; }
     if (node->gs->has_been_mated) {
         node->score =
             node->gs->board.get_white()
               ? white_has_been_mated()
               : black_has_been_mated();
         node->best_child = nullptr;
-        return;
+        node->best_trust_child = nullptr;
+        return false;
     }
 
     // if no early exit, this counts as a visit
@@ -77,11 +83,14 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
     if (list.empty()) {
         // we still need to recurse up to the given depth
-        for (int i = 0; i < node->num_children; ++i) {
-            deepen(node->children[i], cand_list, depth - 1);
+        bool changes = false;
+        if (depth > 1) {
+            for (int i = 0; i < node->num_children; ++i) {
+                changes = changes || deepen(node->children[i], cand_list, depth - 1);
+            }
         }
         update_score(node);
-        return;
+        return changes;
     }
 
     // if the node hasn't yet been extended at all, allocate *all* its children pointers
@@ -108,52 +117,97 @@ void deepen(SearchNode * node, CandList cand_list, int depth) {
         node->children[c + i] = new_node(*node->gs, list[i]);
         node->children[c + i]->score = heur(*node->children[c + i]->gs);
         node->children[c + i]->cand_set = cands(*node->children[c + i]->gs);
-        // recurse as appropriate
-        deepen(node->children[c + i], cand_list, depth - 1);
     }
     node->num_children += list.size();
     node->cand_set->clear_list(cand_list);
+
+    // recurse as appropriate
+    bool changes = (node->num_children != c);
+    if (depth > 1) {
+        for (int i = 0; i < node->num_children; ++i) {
+            changes = changes || deepen(node->children[i], cand_list, depth - 1);
+        }
+    }
+
     update_score(node);
+
+    return changes;
 }
 
 /**
  * Visits a node. Depending on how many times the node in question has been visited,
  * a different candidate list will be expanded. In many cases, nothing will change
  * about the node except to update its score.
+ * Returns true if new nodes were deepened and false otherwise.
  */
-void visit_node(SearchNode * node) {
+bool visit_node(SearchNode * node) {
 
     if (node->gs->has_been_mated) {
-        return;
+        return false;
     }
 
     switch (node->visit_count) {
-        case 0:
-            // recursively extend critical until depth reached
-            deepen(node, CRITICAL, 7);
-            break;
-        case 2:
-            // extend medial just once
-            deepen(node, MEDIAL, 1);
-            break;
-        case 8:
-            // extend final just once
-            deepen(node, FINAL, 1);
-            break;
-        case 128:
-            // extend legal just once
+        case CRITICAL_THRESHOLD:
+            return deepen(node, CRITICAL, 5);
+        case MEDIAL_THRESHOLD:
+            return deepen(node, MEDIAL, 1);
+        case FINAL_THRESHOLD:
+            return deepen(node, FINAL, 1);
+        case LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
-            deepen(node, LEGAL, 1);
-            update_score(node);
-            break;
+            return deepen(node, LEGAL, 1);
         default:
             ++node->visit_count;
             update_score(node);
-            break;
+            return false;
     }
 
+}
+
+/**
+ * Visits a node and forces the next unexplored list to be extended, excluding
+ * legal moves. If that list is empty, it moves on to the next one, still
+ * excluding legal moves.
+ * Returns true if any new nodes were in fact extended.
+ */
+bool force_visit(SearchNode * node) {
+
+    bool changes = false;
+
+    if (node->visit_count <= CRITICAL_THRESHOLD) {
+        changes = deepen(node, CRITICAL, 5);
+        node->visit_count = CRITICAL_THRESHOLD + 1;
+    }
+
+    if (!changes && node->visit_count < MEDIAL_THRESHOLD) {
+        changes = deepen(node, MEDIAL, 1);
+        node->visit_count = MEDIAL_THRESHOLD + 1;
+    }
+
+    if (!changes && node->visit_count < FINAL_THRESHOLD) {
+        changes = deepen(node, FINAL, 1);
+        node->visit_count = FINAL_THRESHOLD + 1;
+    }
+
+    return changes;
+}
+
+/**
+ * Follows the best line from root to leaf, force-visiting each node in order
+ * from the leaf back up to the root. The scores are updated after the extension,
+ * so the line visited is that which is the best line in the initial position.
+ * Returns true if any changes were made, false otherwise.
+ */
+bool force_visit_best_line(SearchNode * node) {
+
+    if (node == nullptr) { return false; }
+
+    bool changes = force_visit(node->best_child);
+    changes = force_visit(node) || changes;
+
+    return changes;
 }
 
 /**
@@ -162,20 +216,24 @@ void visit_node(SearchNode * node) {
  * then the path from the leaf back up to the current node is visited again, at
  * most once.
  * The in_swing flag should be set to false.
+ * Returns true if any descendant of the given node was materially updated (ie new
+ * moves + nodes), and false otherwise.
  */
-void visit_best_line(SearchNode * node, bool in_swing) {
+bool visit_best_line(SearchNode * node, bool in_swing) {
 
-    if (node == nullptr) { return; }
+    if (node == nullptr) { return false; }
 
     Eval prior = node->score;
 
     // recurse first so that the line is visited bottom (deepest) first
-    visit_best_line(node->best_child, in_swing);
-    visit_node(node);
+    bool changes = visit_best_line(node->best_child, in_swing);
+    changes = visit_node(node) || changes;
 
     if (!in_swing && is_swing(prior, node->score)) {
-        visit_best_line(node, true);
+        changes = force_visit_best_line(node) || changes;
     }
+
+    return changes;
 
 }
 
