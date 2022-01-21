@@ -9,6 +9,8 @@ const int MAX_TOTAL_CANDS = 30;
 const int MAX_MOVES_PER_HOOK = 20;
 const int MAX_MOVES_PER_FRAME = 5;
 
+float quiess(const Gamestate &);
+
 struct FeatureFrame {
     Square centre;
     Square secondary;

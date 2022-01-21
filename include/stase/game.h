@@ -187,6 +187,8 @@ struct Gamestate {
 
 };
 
+float quiess(const Gamestate &);
+
 void print_cand_set(const Gamestate &, const CandSet &, std::ostream &);
 
 // heuristic evaluation

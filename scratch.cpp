@@ -158,6 +158,68 @@ void number_of_cands(CandList cand_list) {
 
 }
 
+void q_scores() {
+
+    std::vector<Gamestate> states;
+    puzzle_gamestates(states);
+
+    cout << "loaded states\n";
+
+    int N = 100000;
+
+    int q_score[N];
+
+    int max_size = 0;
+    for (int i = 0; i < N; ++i) {
+
+        CandSet cs = *cands(states[i]);
+        if (cs.size() == 1000) {
+            exit(1);
+        }
+
+        q_score[i] = (int) quiess(states[i]);
+        if (q_score[i] > max_size) {
+            max_size = q_score[i];
+        }
+    }
+
+    cout << "got q scores\n";
+
+    int sum = 0;
+    for (int i = 0; i < N; ++i) {
+        sum += q_score[i];
+    }
+
+    int n = max_size + 1;
+
+    int hist_bins[n];
+    for (int i = 0; i < n; ++i) {
+        hist_bins[i] = 0;
+    }
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < N;  ++j) {
+            if (q_score[j] == i) {
+                hist_bins[i]++;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        cout << "     " << i;
+    }
+    cout << "\n";
+
+    for (int i = 0; i < n; ++i) {
+        cout << hist_bins[i] << "  ";
+    }
+    cout << "\n";
+
+    cout << "MAX: " << max_size << "\n";
+    cout << "MEAN: " << sum / ((double)N) << "\n";
+
+}
+
 /**
  * Runs cands on the first 100k puzzles, and then prints out the FENs of puzzles which generate either the
  * maximum number of candidates, or the maximum minus one.
@@ -283,7 +345,9 @@ SearchNode * repl_cycles(const std::string & fen) {
             MOVE_SENTINEL,
             0,
             nullptr,
-            nullptr
+            nullptr,
+            nullptr,
+            0
     };
 
     greedy_search(root, cycles);
@@ -346,6 +410,7 @@ void repl(const std::string & fen) {
             cout << "-";
         }
         cout << "\n";
+        cout << "Total nodes in tree: " << subtree_size(root) << "\n";
 
         // get the next instruction
         bool read_input = false;
@@ -393,6 +458,16 @@ void repl(const std::string & fen) {
     }
 }
 
+inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
+    int sum = 0;
+    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
+        if (colour(gs.board.get(ff->centre)) == c) {
+            ++sum;
+        }
+    }
+    return sum;
+}
+
 int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
@@ -400,15 +475,17 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "r2q1rk1/pp1bbppp/n3pn2/1Npp2N1/5B2/3P4/PPPQPPPP/2KR1B1R w - - 4 9"
+                "5r1k/pp4pp/5p2/1BbQp1r1/6K1/7P/1PP3P1/3R3R w - - 2 26"
             );
 
-//    Gamestate gs(fen);
+    Gamestate gs(fen);
 //    pr_board(gs.board);
 
-    repl(fen);
+//    q_scores();
 
-//    run_engine(fen, 10);
+//    repl(fen);
+
+//    run_engine(fen, 3);
 
 //    show_hook_frames(gs, &unsafe_piece_hook);
 
