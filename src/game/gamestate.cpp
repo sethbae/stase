@@ -90,6 +90,8 @@ Gamestate::Gamestate(const Gamestate & o, const Move m)
     : board(o.board.successor_hard(m)), last_move(m) {
 
     alloc(this);
+
+    phase = o.phase;
     update_phase(this, m);
 
     // this may not be true: it gets set by cands()
