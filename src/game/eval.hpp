@@ -19,7 +19,7 @@ const Eval WHITE_MATE_MASK = 0x40000000;
 // 14 bits are used to represent actual evaluations; these are the positive numbers 0-16384
 // We then use an offset when needed to map these to -8192 <= x <= 8191
 //      N.B. for correct behaviour, the offset must be half the total range
-const Eval OFFSET = 0x2000000; // 2^13
+const Eval OFFSET = 0x20000000; // 2^13
 
 const Eval SWING_THRESHOLD = 2000;
 

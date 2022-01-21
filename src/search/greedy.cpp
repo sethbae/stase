@@ -8,6 +8,15 @@ const int MEDIAL_THRESHOLD = 2;
 const int FINAL_THRESHOLD = 8;
 const int LEGAL_THRESHOLD = 128;
 
+// the point at which a position will be considered not quiescent
+const float QUIESS_THRESHOLD = 2.0f;
+
+const int BURST_DEPTH = 10;
+const int CRITICAL_DEPTH = 4;
+const int MEDIAL_DEPTH = 1;
+const int FINAL_DEPTH = 1;
+const int LEGAL_DEPTH = 1;
+
 inline bool is_present_in_list(const std::vector<Move> & list, const Move m) {
     for (int i = 0; i < list.size(); ++i) {
         if (equal(list[i], m)) {
@@ -61,11 +70,25 @@ void add_legal_moves(SearchNode * node) {
  * If given a depth of 0, nothing will happen.
  * Returns true if new nodes are created, false otherwise.
  */
-bool deepen(SearchNode * node, CandList cand_list, int depth) {
+bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) {
 
     // exit conditions
     check_abort();
-    if (depth == 0) { return false; }
+    if (depth == 0) {
+
+        if (burst) { return false; }
+
+        if (quiess(*node->gs) >= QUIESS_THRESHOLD) {
+            return deepen(node, CRITICAL, BURST_DEPTH, true);
+        } else {
+            return false;
+        }
+    }
+
+    if (burst && quiess(*node->gs) < QUIESS_THRESHOLD) {
+        return false;
+    }
+
     if (node->gs->has_been_mated) {
         node->score =
             node->gs->board.get_white()
@@ -84,10 +107,9 @@ bool deepen(SearchNode * node, CandList cand_list, int depth) {
     if (list.empty()) {
         // we still need to recurse up to the given depth
         bool changes = false;
-        if (depth > 1) {
-            for (int i = 0; i < node->num_children; ++i) {
-                changes = changes || deepen(node->children[i], cand_list, depth - 1);
-            }
+        for (int i = 0; i < node->num_children; ++i) {
+            changes = changes ||
+                        deepen(node->children[i], cand_list, depth - 1, burst);
         }
         update_score(node);
         return changes;
@@ -115,18 +137,23 @@ bool deepen(SearchNode * node, CandList cand_list, int depth) {
     int c = node->num_children;
     for (int i = 0; i < list.size(); ++i) {
         node->children[c + i] = new_node(*node->gs, list[i]);
-        node->children[c + i]->score = heur(*node->children[c + i]->gs);
+        Eval score = heur(*node->children[c + i]->gs);
+        node->children[c + i]->score = score;
         node->children[c + i]->cand_set = cands(*node->children[c + i]->gs);
+        if (score > (Eval) OFFSET + 100000 || score < (Eval) OFFSET - 100000) {
+            std::cout << board_to_fen(node->children[c + i]->gs->board) << "\n";
+            heur_with_description(*node->children[c + i]->gs);
+            exit(1);
+        }
     }
     node->num_children += list.size();
     node->cand_set->clear_list(cand_list);
 
     // recurse as appropriate
     bool changes = (node->num_children != c);
-    if (depth > 1) {
-        for (int i = 0; i < node->num_children; ++i) {
-            changes = changes || deepen(node->children[i], cand_list, depth - 1);
-        }
+    for (int i = 0; i < node->num_children; ++i) {
+        changes = changes ||
+                    deepen(node->children[i], cand_list, depth - 1, burst);
     }
 
     update_score(node);
@@ -148,16 +175,16 @@ bool visit_node(SearchNode * node) {
 
     switch (node->visit_count) {
         case CRITICAL_THRESHOLD:
-            return deepen(node, CRITICAL, 5);
+            return deepen(node, CRITICAL, CRITICAL_DEPTH);
         case MEDIAL_THRESHOLD:
-            return deepen(node, MEDIAL, 1);
+            return deepen(node, MEDIAL, MEDIAL_DEPTH);
         case FINAL_THRESHOLD:
-            return deepen(node, FINAL, 1);
+            return deepen(node, FINAL, FINAL_DEPTH);
         case LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
-            return deepen(node, LEGAL, 1);
+            return deepen(node, LEGAL, LEGAL_DEPTH);
         default:
             ++node->visit_count;
             update_score(node);
@@ -177,17 +204,17 @@ bool force_visit(SearchNode * node) {
     bool changes = false;
 
     if (node->visit_count <= CRITICAL_THRESHOLD) {
-        changes = deepen(node, CRITICAL, 5);
+        changes = deepen(node, CRITICAL, CRITICAL_DEPTH);
         node->visit_count = CRITICAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < MEDIAL_THRESHOLD) {
-        changes = deepen(node, MEDIAL, 1);
+        changes = deepen(node, MEDIAL, MEDIAL_DEPTH);
         node->visit_count = MEDIAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < FINAL_THRESHOLD) {
-        changes = deepen(node, FINAL, 1);
+        changes = deepen(node, FINAL, FINAL_DEPTH);
         node->visit_count = FINAL_THRESHOLD + 1;
     }
 

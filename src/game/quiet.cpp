@@ -4,6 +4,14 @@ const float UNSAFE_WEIGHT = 1.0f;
 const float FORK_WEIGHT = 1.0f;
 const float PROMOTION_WEIGHT = 1.0f;
 
+inline int count_frames(const Gamestate & gs, int hook_id) {
+    int sum = 0;
+    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
+        ++sum;
+    }
+    return sum;
+}
+
 inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
     int sum = 0;
     for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
@@ -25,7 +33,7 @@ float quiess(const Gamestate & gs) {
 
     Colour colour_to_move = gs.board.get_white() ? WHITE : BLACK;
 
-    int unsafe = count_frames(gs, unsafe_piece_hook.id, colour_to_move),
+    int unsafe = count_frames(gs, unsafe_piece_hook.id),
         forks = count_frames(gs, fork_hook.id, colour_to_move),
         proms = count_frames(gs, promotion_hook.id, colour_to_move);
 
