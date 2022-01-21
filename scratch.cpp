@@ -426,7 +426,7 @@ void repl(const std::string & fen) {
                 current = current_line[current_line.size() - 2];
                 current_line.pop_back();
                 read_input = true;
-            } else if (input == "quit" || input == "q") {
+            } else if (input == "quit" || input == "exit") {
                 cont = false;
                 read_input = true;
             } else if (input == "cands" || input == "c") {
@@ -434,6 +434,9 @@ void repl(const std::string & fen) {
                 read_input = true;
             } else if (input == "heur" || input == "h") {
                 heur_with_description(*current->gs);
+                read_input = true;
+            } else if (input == "quiess" || input == "q") {
+                cout << "Quiess: " << quiess(*current->gs) << "\n";
                 read_input = true;
             } else {
 
@@ -475,15 +478,15 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "5r1k/pp4pp/5p2/1BbQp1r1/6K1/7P/1PP3P1/3R3R w - - 2 26"
+                "rnb2rk1/ppppbppp/1n2p3/4P3/2PP4/1PqB1N2/P2N1PPP/R1BQ1RK1 w - - 1 10"
             );
 
-    Gamestate gs(fen);
-//    pr_board(gs.board);
+    Gamestate gs(fen, MIDGAME);
+    pr_board(gs.board);
 
 //    q_scores();
 
-//    repl(fen);
+    repl(fen);
 
 //    run_engine(fen, 3);
 
@@ -491,11 +494,17 @@ int main(int argc, char** argv) {
 
 //    cands_report(gs);
 
-//    heur_with_description(gs);
+    Eval score = heur_with_description(gs);
 
 //    std::vector<Move> best_line = greedy_search(fen, 50000);
 
 //    number_of_cands(CRITICAL);
+
+    if (score > (Eval) OFFSET + 100000 || score < (Eval) OFFSET - 100000) {
+        cout << "True\n";
+    } else {
+        cout << "False\n";
+    }
 
     return 0;
 
