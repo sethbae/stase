@@ -71,7 +71,8 @@ Gamestate::Gamestate()
       b_king(SQUARE_SENTINEL),
       phase(OPENING),
       w_cas(false),
-      b_cas(false) {
+      b_cas(false),
+      in_check(false) {
     alloc(this);
 }
 
@@ -79,7 +80,8 @@ Gamestate::Gamestate(const Board & b)
     : board(b),
       phase(OPENING),
       w_cas(false),
-      b_cas(false) {
+      b_cas(false),
+      in_check(false) {
     alloc(this);
     find_kings(this);
 }
@@ -89,6 +91,9 @@ Gamestate::Gamestate(const Gamestate & o, const Move m)
 
     alloc(this);
     update_phase(this, m);
+
+    // this may not be true: it gets set by cands()
+    in_check = false;
 
     if (o.board.get(m.from) == W_KING) {
         w_king = m.to;
@@ -118,7 +123,8 @@ Gamestate::Gamestate(const std::string & fen)
     : board(fen_to_board(fen)),
       phase(OPENING),
       w_cas(false),
-      b_cas(false) {
+      b_cas(false),
+      in_check(false) {
     alloc(this);
     find_kings(this);
 }
@@ -127,7 +133,8 @@ Gamestate::Gamestate(const std::string & fen, GamePhase phase)
     : board(fen_to_board(fen)),
       phase(phase),
       w_cas(false),
-      b_cas(false) {
+      b_cas(false),
+      in_check(false) {
     alloc(this);
     find_kings(this);
 }
@@ -146,6 +153,7 @@ Gamestate::Gamestate(Gamestate && o) {
     this->b_cas = o.b_cas;
     this->w_king = o.w_king;
     this->b_king = o.b_king;
+    this->in_check = o.in_check;
     this->phase = o.phase;
     o.feature_frames = nullptr;
     o.control_cache = nullptr;
@@ -186,6 +194,7 @@ Gamestate::Gamestate(const Gamestate & o) {
     }
     w_cas = o.w_cas;
     b_cas = o.b_cas;
+    in_check = o.in_check;
     w_king = o.w_king;
     b_king = o.b_king;
     last_move = o.last_move;

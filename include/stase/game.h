@@ -119,6 +119,7 @@ struct Gamestate {
     bool has_been_mated = false;
     bool w_cas = false;
     bool b_cas = false;
+    bool in_check = false;
     Move last_move;
     Piece last_capture;
     mutable Square w_king;

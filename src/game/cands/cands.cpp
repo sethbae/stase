@@ -63,6 +63,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
         cands_in_check(gs, cand_set);
+        gs.in_check = true;
         if (cand_set->empty()) {
             gs.has_been_mated = true;
         }
