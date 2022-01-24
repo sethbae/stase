@@ -19,7 +19,7 @@ const Eval WHITE_MATE_MASK = 0x40000000;
 // 14 bits are used to represent actual evaluations; these are the positive numbers 0-16384
 // We then use an offset when needed to map these to -8192 <= x <= 8191
 //      N.B. for correct behaviour, the offset must be half the total range
-const Eval OFFSET = 0x20000000; // 2^13
+const Eval OFFSET = 0x20000000;
 
 const Eval SWING_THRESHOLD = 2000;
 
@@ -32,11 +32,7 @@ constexpr Eval white_mates_in(unsigned num) {
 }
 
 constexpr Eval black_mates_in(unsigned num) {
-    return BLACK_GIVES_MATE + ((Eval)num);
-}
-
-constexpr Eval mate_in(Colour colour, unsigned num) {
-    return (colour == WHITE) ? white_mates_in(num) : black_mates_in(num);
+    return BLACK_GIVES_MATE + num;
 }
 
 /**
@@ -76,16 +72,11 @@ constexpr bool black_is_mated(const Eval eval) {
 
 // convert the Eval to a float representing a more traditional human evaluation
 inline float human_eval(const int eval) {
-
     if (is_mate(eval)) {
         // cannot be represented as a float
         return nanf("");
     }
     return ((float) eval - OFFSET) / 1000.0f;
-}
-
-constexpr int int_eval(const Eval eval) {
-    return eval - OFFSET;
 }
 
 constexpr bool is_swing(const Eval a, const Eval b) {
