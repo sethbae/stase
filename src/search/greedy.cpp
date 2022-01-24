@@ -6,7 +6,7 @@
 const int CRITICAL_THRESHOLD = 0;
 const int MEDIAL_THRESHOLD = 2;
 const int FINAL_THRESHOLD = 8;
-const int LEGAL_THRESHOLD = 128;
+const int LEGAL_THRESHOLD = 256;
 
 // the point at which a position will be considered not quiescent
 const float QUIESS_THRESHOLD = 2.0f;
@@ -74,6 +74,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
 
     // exit conditions
     check_abort();
+    if (node->gs->has_been_mated) { return false; }
+
     if (depth == 0) {
 
         if (burst) { return false; }
@@ -86,16 +88,6 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
     }
 
     if (burst && quiess(*node->gs) < QUIESS_THRESHOLD) {
-        return false;
-    }
-
-    if (node->gs->has_been_mated) {
-        node->score =
-            node->gs->board.get_white()
-              ? white_has_been_mated()
-              : black_has_been_mated();
-        node->best_child = nullptr;
-        node->best_trust_child = nullptr;
         return false;
     }
 
@@ -137,13 +129,14 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
     int c = node->num_children;
     for (int i = 0; i < list.size(); ++i) {
         node->children[c + i] = new_node(*node->gs, list[i]);
-        Eval score = heur(*node->children[c + i]->gs);
-        node->children[c + i]->score = score;
         node->children[c + i]->cand_set = cands(*node->children[c + i]->gs);
-        if (score > (Eval) OFFSET + 100000 || score < (Eval) OFFSET - 100000) {
-            std::cout << board_to_fen(node->children[c + i]->gs->board) << "\n";
-            heur_with_description(*node->children[c + i]->gs);
-            exit(1);
+        if (node->children[c + i]->gs->has_been_mated) {
+            node->children[c + i]->score =
+                node->children[c + i]->gs->board.get_white()
+                    ? white_has_been_mated()
+                    : black_has_been_mated();
+        } else {
+            node->children[c + i]->score = heur(*node->children[c + i]->gs);
         }
     }
     node->num_children += list.size();

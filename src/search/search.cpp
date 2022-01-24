@@ -213,13 +213,8 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
  */
 void update_score(SearchNode * node) {
 
-    if (node->num_children == 0) {
-        node->best_child = nullptr;
-        node->best_trust_child = nullptr;
-        return;
-    }
-
     check_abort();
+    if (node->num_children == 0) { return; }
 
     // find the best score among children
     node->score = node->children[0]->score;
