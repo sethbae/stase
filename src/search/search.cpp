@@ -110,7 +110,7 @@ void write_to_file(SearchNode *node, ostream & output) {
 
     wr_board_conf(node->gs->board, output);
 
-    output << "\nScore: " << etos(best_line[best_line.size() - 1]->score) << "\n";
+    output << "\nScore: " << etos(node->score) << "\n";
     output << "Trust score: " << etos(trust_line[trust_line.size() - 1]->score) << "\n";
     output << "Has been mated? " << (node->gs->has_been_mated ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
@@ -144,7 +144,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "Candidates:\n";
     print_cand_set(*node->gs, *node->cand_set, output);
 
-    output << "Best line from here: (" << etos(best_line[best_line.size() - 1]->score) << ")";
+    output << "Best line from here: (" << etos(node->score) << ")";
     for (int i = 1; i < best_line.size(); ++i) {
         output << " " << mtos(best_line[i-1]->gs->board, best_line[i]->move);
     }
