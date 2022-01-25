@@ -11,7 +11,7 @@ const int LEGAL_THRESHOLD = 256;
 // the point at which a position will be considered not quiescent
 const float QUIESS_THRESHOLD = 2.0f;
 
-const int BURST_DEPTH = 10;
+const int BURST_DEPTH = 6;
 const int CRITICAL_DEPTH = 4;
 const int MEDIAL_DEPTH = 1;
 const int FINAL_DEPTH = 1;
