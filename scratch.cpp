@@ -100,7 +100,7 @@ void number_of_cands_hist(CandList cand_list) {
 
 inline int count_frames(const Gamestate & gs, int hook_id) {
     int sum = 0;
-    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
+    for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[hook_id][i].centre); ++i) {
         ++sum;
     }
     return sum;

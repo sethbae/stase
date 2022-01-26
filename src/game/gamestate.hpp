@@ -25,7 +25,6 @@ public:
     Square * b_kpinned_pieces;
     Delta * b_kpin_dirs;
 
-    FeatureFrame ** feature_frames;
     ControlCache * control_cache;
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
@@ -106,7 +105,13 @@ public:
 
     Gamestate(Gamestate && o) {
         board = o.board;
-        feature_frames = o.feature_frames;
+        // copy contents of feature frames across
+        for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+            for (int j = 0; j < MAX_FRAMES; ++j) {
+                frames[i][j] = o.frames[i][j];
+                if (is_sentinel(o.frames[i][j].centre)) { break; }
+            }
+        }
         control_cache = o.control_cache;
         wpieces = o.wpieces;
         bpieces = o.bpieces;
@@ -120,7 +125,6 @@ public:
         b_king = o.b_king;
         in_check = o.in_check;
         phase = o.phase;
-        o.feature_frames = nullptr;
         o.control_cache = nullptr;
         o.wpieces = nullptr;
         o.bpieces = nullptr;
@@ -138,23 +142,11 @@ public:
     Gamestate(const Gamestate & o) {
         alloc();
         board = o.board;
-        // copy contents of feature frame across
+        // copy contents of feature frames across
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-            if (o.feature_frames[i]) {
-
-                FeatureFrame new_frames[64];
-
-                int j = 0;
-                while (!is_sentinel(o.feature_frames[i][j].centre)) {
-                    new_frames[j] = o.feature_frames[i][j];
-                    ++j;
-                }
-
-                feature_frames[i] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (j + 1)));
-                for (int k = 0; k < j; ++k) {
-                    feature_frames[i][k] = o.feature_frames[i][k];
-                }
-                *feature_frames[j] = FeatureFrame{SQUARE_SENTINEL, 0, 0, 0};
+            for (int j = 0; j < MAX_FRAMES; ++j) {
+                frames[i][j] = o.frames[i][j];
+                if (is_sentinel(o.frames[i][j].centre)) { break; }
             }
         }
         w_cas = o.w_cas;
@@ -168,10 +160,6 @@ public:
     }
 
     ~Gamestate() {
-        for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-            delete feature_frames[i];
-        }
-        delete[] feature_frames;
         delete control_cache;
         delete wpieces;
         delete bpieces;
@@ -339,7 +327,6 @@ private:
      * Allocates memory for all the fields in a gamestate which need it.
      */
     void alloc() {
-        feature_frames = new FeatureFrame*[ALL_HOOKS.size()];
         control_cache = new ControlCache;
         wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
@@ -350,7 +337,7 @@ private:
 
         // set all pointers to null
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-            feature_frames[i] = nullptr;
+            frames[i][0] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
         }
 
         // add sentinels to the pieces lists

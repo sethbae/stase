@@ -113,7 +113,7 @@ bool evaluate_test_case_knight_fork_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at knight forks for these tests!
         if (type(gs.board.get(ff->centre)) == KNIGHT) {
             // the tests were written looking at the square the fork happens on, which is the secondary

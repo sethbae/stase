@@ -24,7 +24,7 @@ bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h
         discover_feature_frames(gs, h);
 
         FeatureFrame ff;
-        for (int j = 0; !is_sentinel((ff = gs.feature_frames[h->id][j]).centre); ++j) {
+        for (int j = 0; !is_sentinel((ff = gs.frames[h->id][j]).centre); ++j) {
 
             if (!val(ff.centre)) {
                 cout << "\n[" << j << "] FAILED: Received " << sqtos(ff.centre) << "\n";

@@ -103,7 +103,7 @@ bool evaluate_test_case_unsafe_piece_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[unsafe_piece_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[unsafe_piece_hook.id]; !is_sentinel(ff->centre); ++ff) {
         strings.push_back(sqtos(ff->centre));
     }
 

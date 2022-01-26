@@ -65,8 +65,8 @@ bool evaluate_test_case_development_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame *ff = gs.feature_frames[develop_hook.id]; !is_sentinel(ff->centre); ++ff) {
-        strings.push_back(sqtos(ff->centre));
+    for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[develop_hook.id][i].centre); ++i) {
+        strings.push_back(sqtos(gs.frames[develop_hook.id][i].centre));
     }
 
     // print_feature_frames(gs.feature_frames[0]);

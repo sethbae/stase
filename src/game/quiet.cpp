@@ -7,7 +7,7 @@ const float PROMOTION_WEIGHT = 1.0f;
 
 inline int count_frames(const Gamestate & gs, int hook_id) {
     int sum = 0;
-    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
+    for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[hook_id][i].centre); ++i) {
         ++sum;
     }
     return sum;
@@ -15,8 +15,8 @@ inline int count_frames(const Gamestate & gs, int hook_id) {
 
 inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
     int sum = 0;
-    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
-        if (colour(gs.board.get(ff->centre)) == c) {
+    for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[hook_id][i].centre); ++i) {
+        if (colour(gs.board.get(gs.frames[hook_id][i].centre)) == c) {
             ++sum;
         }
     }
@@ -29,7 +29,6 @@ inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
  */
 float quiess(const Gamestate & gs) {
 
-    if (!gs.feature_frames) { return 0.0f; }
     if (gs.in_check) { return 2.0f; }
 
     Colour colour_to_move = gs.board.get_white() ? WHITE : BLACK;

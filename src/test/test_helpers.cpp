@@ -31,7 +31,7 @@ bool evaluate_hook_test_case(const Hook * h, const HookTestCase * tc) {
 
     int num_features = 0;
 
-    for (FeatureFrame * ff = gs.feature_frames[h->id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame * ff = gs.frames[h->id]; !is_sentinel(ff->centre); ++ff) {
 
         bool found = false;
         for (const ExpectedFeatureFrame & expected : tc->expected_frames) {

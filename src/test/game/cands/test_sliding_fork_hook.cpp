@@ -135,7 +135,7 @@ bool evaluate_test_case_sliding_fork_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at sliding forks for these tests!
         if (type(gs.board.get(ff->centre)) == ROOK || type(gs.board.get(ff->centre)) == BISHOP) {
             strings.push_back(sqtos(ff->secondary));
