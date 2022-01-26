@@ -377,9 +377,10 @@ void show_hook_frames(Gamestate & gs, const Hook * h) {
 
     pr_board(gs.board);
     cout << "\nFeatureFrames found for " << h->name << ":\n";
-    for (FeatureFrame * ff = gs.feature_frames[h->id]; !is_sentinel(ff->centre); ++ff) {
-        cout << "FeatureFrame: " << sqtos(ff->centre) << " " << sqtos(ff->secondary);
-        cout << " c1: " << ff->conf_1 << " c2: " << ff->conf_2 << "\n";
+    for (int i = 0; !is_sentinel(gs.frames[h->id][i].centre); ++i) {
+        FeatureFrame ff = gs.frames[h->id][i];
+        cout << "FeatureFrame: " << sqtos(ff.centre) << " " << sqtos(ff.secondary);
+        cout << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
     }
 
 }
