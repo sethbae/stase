@@ -84,7 +84,6 @@ struct Responder {
 };
 
 void discover_feature_frames(Gamestate &, const Hook *);
-void record_hook_features(Gamestate &, const Hook *, FeatureFrame *, int);
 
 struct FeatureHandler {
     const Hook * hook;
