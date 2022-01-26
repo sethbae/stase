@@ -26,7 +26,7 @@ bool run_hook(const BenchHookParam & b_h_p) {
 
     // count the feature frames and return that
     int frame_count = 0;
-    for (FeatureFrame * ff = b_h_p.gs.feature_frames[b_h_p.h->id]; !is_sentinel(ff->centre); ++ff, ++frame_count);
+    for (int i = 0; !is_sentinel(b_h_p.gs.frames[b_h_p.h->id][i].centre); ++i, ++frame_count);
 
     return frame_count;
 }
@@ -96,12 +96,12 @@ void bench_responder(std::vector<Gamestate> & gamestates, const Responder * resp
         for (Gamestate & gs: gamestates) {
             discover_feature_frames(gs, fh.hook);
 
-            for (int i = 0; !is_sentinel(gs.feature_frames[fh.hook->id][i].centre); ++i) {
+            for (int i = 0; !is_sentinel(gs.frames[fh.hook->id][i].centre); ++i) {
                 resp_params.push_back(
                         BenchResponderParam{
                             resp,
                             &gs,
-                            &gs.feature_frames[fh.hook->id][i],
+                            &gs.frames[fh.hook->id][i],
                             ignored_moves
                         }
                 );
