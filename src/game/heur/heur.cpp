@@ -5,8 +5,10 @@ using std::setw;
 #include <string>
 using std::string;
 
-#include "game.h"
 #include "board.h"
+#include "game.h"
+#include "../gamestate.hpp"
+#include "../eval.hpp"
 #include "heur.h"
 
 // the central 16 squares

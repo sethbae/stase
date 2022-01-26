@@ -14,6 +14,7 @@ using std::ofstream;
 #include "include/stase/search.h"
 #include "include/stase/puzzle.h"
 #include "src/game/cands/cands.h"
+#include "src/game/gamestate.hpp"
 #include "src/bench/bench.h"
 #include "src/test/test.h"
 
@@ -21,7 +22,7 @@ using std::ofstream;
 
 /**
  * Runs cands on the first hundred thousand puzzles. Prints out a histogram showing for each decile,
- * how many pyzzles fell into that bin (for number of candidates generated).
+ * how many puzzles fell into that bin (for number of candidates generated).
  */
 void number_of_cands_hist(CandList cand_list) {
 
@@ -77,6 +78,76 @@ void number_of_cands_hist(CandList cand_list) {
         double upper_bound = (i + 1) / ((double)n);
         for (int j = 0; j < N;  ++j) {
             if (lower_bound <= num_cands[j] && num_cands[j] <= upper_bound) {
+                hist_bins[i]++;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        cout << "    " << i;
+    }
+    cout << "\n";
+
+    for (int i = 0; i < n; ++i) {
+        cout << hist_bins[i] << "  ";
+    }
+    cout << "\n";
+
+    cout << "MAX: " << max_size << "\n";
+    cout << "MEAN: " << sum / ((double)N) << "\n";
+
+}
+
+inline int count_frames(const Gamestate & gs, int hook_id) {
+    int sum = 0;
+    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
+        ++sum;
+    }
+    return sum;
+}
+
+void number_of_frames_hist(const Hook * h) {
+
+    std::vector<Gamestate> states;
+    puzzle_gamestates(states);
+
+    cout << "loaded states\n";
+
+    int N = 100000;
+
+    double num_frames[N];
+
+    int max_size = 0;
+    for (int i = 0; i < N; ++i) {
+        cands(states[i]);
+        int size = count_frames(states[i], h->id);
+        max_size = std::max(size, max_size);
+        num_frames[i] = (double)size;
+    }
+
+    cout << "For " << h->name << ":\n";
+
+    double sum = 0.0;
+    for (int i = 0; i < N; ++i) {
+        sum += num_frames[i];
+    }
+
+    int n = 10;
+
+    int hist_bins[n];
+    for (int i = 0; i < n; ++i) {
+        hist_bins[i] = 0;
+    }
+
+    for (int i = 0; i < N; ++i) {
+        num_frames[i] /= ((double)max_size);
+    }
+
+    for (int i = 0; i < n; ++i) {
+        double lower_bound = i / ((double)n);
+        double upper_bound = (i + 1) / ((double)n);
+        for (int j = 0; j < N;  ++j) {
+            if (lower_bound <= num_frames[j] && num_frames[j] <= upper_bound) {
                 hist_bins[i]++;
             }
         }
@@ -461,16 +532,6 @@ void repl(const std::string & fen) {
     }
 }
 
-inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
-    int sum = 0;
-    for (FeatureFrame * ff = gs.feature_frames[hook_id]; (ff != nullptr) && !is_sentinel(ff->centre); ++ff) {
-        if (colour(gs.board.get(ff->centre)) == c) {
-            ++sum;
-        }
-    }
-    return sum;
-}
-
 int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
@@ -478,15 +539,19 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "rnb2rk1/ppppbppp/1n2p3/4P3/2PP4/1PqB1N2/P2N1PPP/R1BQ1RK1 w - - 1 10"
+                "rn2kb1r/pp2q1p1/2p4p/6N1/3P2Q1/8/PPP4P/2KR4 w kq - 0 15"
             );
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
 
+    for (const Hook * h : ALL_HOOKS) {
+        number_of_frames_hist(h);
+    }
+
 //    q_scores();
 
-    repl(fen);
+//    repl(fen);
 
 //    run_engine(fen, 3);
 
@@ -494,17 +559,11 @@ int main(int argc, char** argv) {
 
 //    cands_report(gs);
 
-    Eval score = heur_with_description(gs);
+//    Eval score = heur_with_description(gs);
 
 //    std::vector<Move> best_line = greedy_search(fen, 50000);
 
 //    number_of_cands(CRITICAL);
-
-    if (score > (Eval) OFFSET + 100000 || score < (Eval) OFFSET - 100000) {
-        cout << "True\n";
-    } else {
-        cout << "False\n";
-    }
 
     return 0;
 

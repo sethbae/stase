@@ -4,6 +4,7 @@ using std::cout;
 #include "board.h"
 #include "game.h"
 #include "heur.h"
+#include "../gamestate.hpp"
 
 /**
  * Returns zero if both sides have either castled or not castled, otherwise

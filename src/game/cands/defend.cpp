@@ -1,7 +1,6 @@
-#include <iostream>
 #include "board.h"
 #include "cands.h"
-#include "game.h"
+#include "../gamestate.hpp"
 
 /**
  * Walks out from the piece looking for other pieces which can move to the squares encountered

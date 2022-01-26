@@ -3,6 +3,7 @@
 #include <board.h>
 
 #include "../../../game/cands/cands.h"
+#include "../../../game/gamestate.hpp"
 #include "../../test.h"
 
 TestSet<StringTestCase> knight_fork_hook_test_cases = {

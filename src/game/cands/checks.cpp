@@ -1,4 +1,5 @@
 #include "cands.h"
+#include "../../game/gamestate.hpp"
 
 /**
  * Finds checks in the given gamestate. Adds feature frames to the given vector to record the ones it does find.

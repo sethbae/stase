@@ -4,6 +4,7 @@
 using std::cout;
 
 #include "../../../game/cands/cands.h"
+#include "../../../game/gamestate.hpp"
 #include "../../test.h"
 
 bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h) {

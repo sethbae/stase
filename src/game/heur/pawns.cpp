@@ -1,6 +1,6 @@
 #include "board.h"
 #include "heur.h"
-
+#include "../gamestate.hpp"
 
 // returns the number of pawns which directly defend the given pawn (square),
 // relying on the colour of the piece on the square given

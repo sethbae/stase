@@ -1,4 +1,5 @@
 #include "cands.h"
+#include "../gamestate.hpp"
 
 const int BISHOPS[64] = {
         0, 0, 0, 0, 0, 0, 0, 0,

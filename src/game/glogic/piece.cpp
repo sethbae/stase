@@ -1,5 +1,6 @@
-#include "game.h"
+#include "glogic.h"
 #include "board.h"
+#include "../gamestate.hpp"
 
 #include <iostream>
 using std::cout;

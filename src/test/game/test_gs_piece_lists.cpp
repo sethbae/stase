@@ -1,4 +1,5 @@
 #include "../test.h"
+#include "../../game/gamestate.hpp"
 
 const TestSet<StringTestCase> kpinned_piece_test_set{
     "game-gs-kpinned-piece-list",

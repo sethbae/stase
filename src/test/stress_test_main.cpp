@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "../game/gamestate.hpp"
 
 #include "test.h"
 #include "game.h"

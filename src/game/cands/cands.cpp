@@ -1,6 +1,7 @@
 #include "board.h"
 #include "game.h"
 #include "cands.h"
+#include "../gamestate.hpp"
 
 #include <vector>
 using std::vector;

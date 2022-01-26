@@ -16,6 +16,7 @@ using std::string;
 #include "board.h"
 #include "search.h"
 #include "utils/utils.h"
+#include "game/gamestate.hpp"
 
 const std::string GAME_FILE_DIR = "/home/seth/Documents/stase_lichess";
 

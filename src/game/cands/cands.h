@@ -4,6 +4,7 @@
 #include "game.h"
 #include "board.h"
 #include "score.h"
+#include <iostream>
 
 const int MAX_TOTAL_CANDS = 30;
 const int MAX_MOVES_PER_HOOK = 20;
@@ -83,6 +84,14 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
+inline void print_feature_frames(const FeatureFrame * ff) {
+    std::cout << "Printing feature-frame list @" << ff << ":\n";
+    for (const FeatureFrame* ptr = ff; !equal(ptr->centre, SQUARE_SENTINEL); ptr++) {
+        std::cout << "Frame: " << sqtos(ptr->centre) << " " << sqtos(ptr->secondary) << "\n";
+    }
+    std::cout << "(sentinel)\n";
+}
+
 void is_unsafe_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 void is_undeveloped_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
 void find_forks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
@@ -135,6 +144,12 @@ const std::vector<const Hook *> ALL_HOOKS {
         &pin_skewer_hook,
         &promotion_hook
 };
+
+// in order to allocate the feature frames array statically, we cannot take the value
+// from the vector dynamically. Instead we have to do this :(
+const int NUM_HOOKS = 7;
+inline bool assert_failed() { abort(); return true; }
+const bool assertion_failed = (NUM_HOOKS == ALL_HOOKS.size() ? false : assert_failed());
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
         &defend_centre_resp,

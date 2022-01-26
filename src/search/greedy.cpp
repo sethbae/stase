@@ -2,6 +2,7 @@
 #include "search.h"
 #include "game.h"
 #include "search_tools.h"
+#include "../game/gamestate.hpp"
 
 const int CRITICAL_THRESHOLD = 0;
 const int MEDIAL_THRESHOLD = 2;

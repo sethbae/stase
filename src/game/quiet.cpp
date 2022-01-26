@@ -1,4 +1,5 @@
 #include "cands/cands.h"
+#include "gamestate.hpp"
 
 const float UNSAFE_WEIGHT = 1.0f;
 const float FORK_WEIGHT = 1.0f;

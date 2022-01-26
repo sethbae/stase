@@ -7,6 +7,7 @@ using std::cout;
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
 #include "../../../game/heur/heur.h"
+#include "../../../game/gamestate.hpp"
 
 const TestSet<StringTestCase> hook_test_cases = {
     "game-cands-unsafe-piece-hook",

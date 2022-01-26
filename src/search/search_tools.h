@@ -2,6 +2,7 @@
 #define STASE_SEARCH_TOOLS_H
 
 SearchNode *new_node(const Gamestate & gs, Move m);
+SearchNode *new_node(const std::string &);
 
 void update_score(SearchNode *);
 Eval trust_score(SearchNode *, bool is_white);

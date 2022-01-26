@@ -4,6 +4,7 @@
 
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
+#include "../../../game/gamestate.hpp"
 
 TestSet<StringTestCase> sliding_fork_hook_test_cases = {
         "game-cands-sliding-fork-hook",

@@ -1,4 +1,5 @@
 #include "cands.h"
+#include "../gamestate.hpp"
 
 /**
  * Checks for a pawn on the given square which can promote. Also checks for 3rd / 6th rank

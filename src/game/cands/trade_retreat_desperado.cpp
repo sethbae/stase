@@ -1,5 +1,6 @@
 #include "cands.h"
 #include "../heur/heur.h"
+#include "../gamestate.hpp"
 
 /**
  * Tries to trade off the unsafe piece with any piece of greater or equal value. Suggests all

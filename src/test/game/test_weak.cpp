@@ -1,4 +1,5 @@
 #include "../test.h"
+#include "../../game/gamestate.hpp"
 #include "game.h"
 #include <string.h>
 

@@ -19,13 +19,7 @@ set(SOURCE_FILES
 
         src/game/eval.hpp
         src/game/control_cache.hpp
-        src/game/gamestate.cpp
-        src/game/geometry.cpp
-        src/game/piece.cpp
-        src/game/helper.h
-        src/game/helper.cpp
-        src/game/weak.cpp
-        src/game/king.cpp
+        src/game/create_states.cpp
         src/game/quiet.cpp
 
         src/game/heur/heur.cpp
@@ -59,6 +53,14 @@ set(SOURCE_FILES
         src/game/cands/checks.cpp
         src/game/cands/pin_skewer.cpp
         src/game/cands/promote.cpp
+
+        src/game/glogic/geometry.cpp
+        src/game/glogic/piece.cpp
+        src/game/glogic/helper.cpp
+        src/game/glogic/weak.cpp
+        src/game/glogic/king.cpp
+        src/game/glogic/glogic.h
+        src/game/glogic/piece_moves.hpp
 
         src/utils/utils.h
         src/utils/print.cpp

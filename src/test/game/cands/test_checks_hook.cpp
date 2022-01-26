@@ -1,4 +1,5 @@
 #include "../../../game/cands/cands.h"
+#include "../../../game/gamestate.hpp"
 #include "../../test.h"
 
 TestSet<StringTestCase> check_hook_test_cases = {

@@ -1,5 +1,7 @@
 #include "game.h"
 #include "cands.h"
+#include "../gamestate.hpp"
+#include "../glogic/glogic.h"
 
 /**
  * Wraps the weak square logic in a hook which, if the square is weak, records a feature frame

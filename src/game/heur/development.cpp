@@ -1,5 +1,6 @@
 #include "board.h"
 #include "heur.h"
+#include "../gamestate.hpp"
 
 float development_metric(const Gamestate & gs) {
 

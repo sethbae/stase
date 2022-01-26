@@ -1,6 +1,7 @@
 #include "board.h"
 #include "game.h"
 #include "heur.h"
+#include "../gamestate.hpp"
 
 
 float piece_activity_alpha_metric(const Gamestate & gs) {

@@ -1,5 +1,7 @@
 #include "game.h"
 #include "cands.h"
+#include "../gamestate.hpp"
+#include "../glogic/glogic.h"
 
 void find_knight_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
 

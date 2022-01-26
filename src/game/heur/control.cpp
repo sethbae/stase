@@ -1,6 +1,7 @@
 #include "board.h"
-#include "game.h"
 #include "heur.h"
+#include "../glogic/glogic.h"
+#include "../gamestate.hpp"
 
 /**
  * Open files: return the number of squares controlled on the given file (which is presumed

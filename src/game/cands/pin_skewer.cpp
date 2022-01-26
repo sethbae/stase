@@ -1,4 +1,5 @@
 #include "cands.h"
+#include "../gamestate.hpp"
 
 /**
  * Returns the final empty square on the trajectory and board given.

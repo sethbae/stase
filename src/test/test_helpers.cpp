@@ -1,5 +1,6 @@
 #include <cstring>
 #include "test.h"
+#include "../game/gamestate.hpp"
 
 bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCase * tc) {
 

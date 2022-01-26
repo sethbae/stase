@@ -9,6 +9,7 @@ using std::setw;
 
 #include "game.h"
 #include "../../../game/heur/heur.h"
+#include "../../../game/gamestate.hpp"
 #include "../../bench.h"
 #include "puzzle.h"
 

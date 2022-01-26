@@ -1,6 +1,7 @@
 #include "../heur/heur.h"
 #include "cands.h"
 #include "game.h"
+#include "../gamestate.hpp"
 
 /**
  * Generates moves which capture a weak piece. Searches outwards from the target square looking for
