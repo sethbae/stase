@@ -199,6 +199,23 @@ public:
     }
 
     /**
+     * Attempts to add a frame for the given hook. If there is space, then true is returned.
+     * Otherwise, false is returned and no changes are made.
+     */
+    inline bool add_frame(const int hook_id, const FeatureFrame frame) {
+        for (int i = 0; i < MAX_FRAMES; ++i) {
+            if (is_sentinel(frames[hook_id][i].centre)) {
+                frames[hook_id][i] = frame;
+                if (i < MAX_FRAMES - 1) {
+                    frames[hook_id][i + 1] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Updates the current gamestate such that it now represents the position resulting
      * from the given move being played.
      */

@@ -67,8 +67,16 @@ struct IndexCounter {
 struct Hook {
     const std::string name;
     const int id;
-    void (*hook)(Gamestate &, const Square centre, std::vector<FeatureFrame> & frames);
+    bool (*hook)(Gamestate &, const Square centre);
 };
+
+extern const Hook unsafe_piece_hook;
+extern const Hook develop_hook;
+extern const Hook fork_hook;
+extern const Hook check_hook;
+extern const Hook pin_skewer_hook;
+extern const Hook king_pinned_pieces_hook;
+extern const Hook promotion_hook;
 
 struct Responder {
     const std::string name;
@@ -92,14 +100,6 @@ inline void print_feature_frames(const FeatureFrame * ff) {
     std::cout << "(sentinel)\n";
 }
 
-void is_unsafe_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void is_undeveloped_piece_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_forks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_checks_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void find_pin_skewer_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void identify_king_pinned_pieces_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-void can_promote_hook(Gamestate &, const Square, std::vector<FeatureFrame> &);
-
 // functions used by responders
 void defend_centre(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void defend_secondary(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
@@ -112,15 +112,6 @@ void desperado_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCount
 void play_check(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void pin_or_skewer_piece(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
 void promote_pawn(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
-
-// the actual hooks
-const Hook unsafe_piece_hook = Hook{"unsafe-piece", 0, &is_unsafe_piece_hook};
-const Hook develop_hook = Hook{"development", 1, &is_undeveloped_piece_hook};
-const Hook fork_hook = Hook{"fork", 2, &find_forks_hook};
-const Hook check_hook = Hook{"check", 3, &find_checks_hook};
-const Hook pin_skewer_hook = Hook{"pin-skewer", 4, &find_pin_skewer_hook};
-const Hook king_pinned_pieces_hook = Hook{"king-pinned-piece", 5, &identify_king_pinned_pieces_hook};
-const Hook promotion_hook = Hook{"promotion", 6, &can_promote_hook};
 
 // the actual responders
 const Responder defend_centre_resp = Responder{"defend-centre", &defend_centre};

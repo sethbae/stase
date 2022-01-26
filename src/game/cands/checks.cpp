@@ -10,7 +10,7 @@
  * -conf1: unused
  * -conf2: unused
  */
-void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_checks_hook(Gamestate & gs, const Square s) {
 
     // find the enemy king
     Piece p = gs.board.get(s);
@@ -35,13 +35,21 @@ void find_checks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> 
         }
 
         if (!would_be_safe_for_king_after(gs, k_sq, m, colour(gs.board.get(k_sq)))) {
-            frames.push_back(
-              FeatureFrame{s, m.to, 0, 0 }
+            bool result = gs.add_frame(
+            check_hook.id,
+            FeatureFrame{s, m.to, 0, 0 }
             );
+            if (!result) { return false; }
         }
     }
-
+    return true;
 }
+
+const Hook check_hook{
+    "check",
+    3,
+    &find_checks_hook
+};
 
 void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
     if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
