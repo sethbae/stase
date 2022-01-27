@@ -1,5 +1,6 @@
 #include "game.h"
 #include "cands/cands.h"
+#include "cands/hook.hpp"
 #include "control_cache.hpp"
 
 const int MAX_FRAMES = 20;

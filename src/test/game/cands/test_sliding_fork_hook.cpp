@@ -142,8 +142,6 @@ bool evaluate_test_case_sliding_fork_hook(const StringTestCase *tc) {
         }
     }
 
-    // print_feature_frames(gs.feature_frames[0]);
-
     return assert_string_lists_equal(strings, tc->expected_results);
 }
 

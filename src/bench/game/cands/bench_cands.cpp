@@ -9,6 +9,8 @@ using std::setw;
 
 #include "game.h"
 #include "../../../game/cands/cands.h"
+#include "../../../game/cands/responder.hpp"
+#include "../../../game/cands/features.hpp"
 #include "../../../game/gamestate.hpp"
 #include "../../bench.h"
 #include "puzzle.h"

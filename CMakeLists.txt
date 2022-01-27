@@ -43,6 +43,9 @@ set(SOURCE_FILES
 
         src/game/cands/cands.h
         src/game/cands/score.h
+        src/game/cands/hook.hpp
+        src/game/cands/responder.hpp
+        src/game/cands/features.hpp
         src/game/cands/cands.cpp
         src/game/cands/unsafe_piece.cpp
         src/game/cands/defend.cpp

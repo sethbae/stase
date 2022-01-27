@@ -1,6 +1,9 @@
 #include "board.h"
 #include "game.h"
 #include "cands.h"
+#include "hook.hpp"
+#include "responder.hpp"
+#include "features.hpp"
 #include "../gamestate.hpp"
 
 #include <vector>
