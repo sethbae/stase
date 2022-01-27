@@ -4,7 +4,7 @@
 #include "../gamestate.hpp"
 
 
-float piece_activity_alpha_metric(const Gamestate & gs) {
+float __metrics::__piece_activity_alpha_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;
@@ -33,7 +33,7 @@ float piece_activity_alpha_metric(const Gamestate & gs) {
 
 }
 
-float piece_activity_beta_metric(const Gamestate & gs) {
+float __metrics::__piece_activity_beta_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;
@@ -62,7 +62,7 @@ float piece_activity_beta_metric(const Gamestate & gs) {
 
 }
 
-float piece_activity_gamma_metric(const Gamestate & gs) {
+float __metrics::__piece_activity_gamma_metric(const Gamestate & gs) {
 
     int w_control = 0;
     int b_control = 0;

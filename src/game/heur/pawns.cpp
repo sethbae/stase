@@ -35,7 +35,7 @@ int supporting_pawns(const Board & b, Square s) {
     Assesses how well defended pawns are. You score a point for every time a pawn defends
     another, and lose a point every time a pawn is undefended (unless it hasn't yet moved)
 */
-float defended_pawns_metric(const Gamestate & gs) {
+float __metrics::__defended_pawns_metric(const Gamestate & gs) {
 
     Square sq;
     int score = 0;
@@ -77,7 +77,7 @@ float defended_pawns_metric(const Gamestate & gs) {
 
 }
 
-float isolated_pawns_metric(const Gamestate & gs) {
+float __metrics::__isolated_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 
@@ -126,7 +126,7 @@ float isolated_pawns_metric(const Gamestate & gs) {
 
 }
 
-float central_pawns_metric(const Gamestate & gs) {
+float __metrics::__central_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 
@@ -167,7 +167,7 @@ float central_pawns_metric(const Gamestate & gs) {
 
 }
 
-float far_advanced_pawns_metric(const Gamestate & gs) {
+float __metrics::__far_advanced_pawns_metric(const Gamestate & gs) {
 
     int score = 0;
 

@@ -117,7 +117,7 @@ int count_pawns(const Board & b, Square s, Delta d) {
  * Returns a measure of who controls the open lines and diagonals. This checks ranks,
  * files and major diagonals.
  */
-float open_line_control_metric(const Gamestate & gs) {
+float __metrics::__open_line_control_metric(const Gamestate & gs) {
 
     /*
 
@@ -241,7 +241,7 @@ float open_line_control_metric(const Gamestate & gs) {
 /*
  * Returns a measure of who controls the central squares.
  */
-float centre_control_metric(const Gamestate & gs) {
+float __metrics::__centre_control_metric(const Gamestate & gs) {
 
     int count = 0;
 
