@@ -24,16 +24,6 @@ struct Metric {
     float (*metric)(const Gamestate &);
 };
 
-/*
- * Useful collections of squares
- */
-extern const Square CENTRAL_SQUARES[];
-extern const unsigned NUM_CENTRAL_SQUARES;
-extern const Square INNER_CENTRAL_SQUARES[];
-extern const unsigned NUM_INNER_CENTRAL_SQUARES;
-extern const Square OUTER_CENTRAL_SQUARES[];
-extern const unsigned NUM_OUTER_CENTRAL_SQUARES;
-
 namespace __piece_constants{
     const int PAWN_VAL = 1000;
     const int BISHOP_VAL = 3000;
@@ -75,10 +65,6 @@ constexpr int piece_value(const Piece p) {
         default: return __piece_constants::KING_VAL;
     }
 }
-
-int open_line_walk(const Board &, Square s, Delta, MoveType);
-int half_line_walk(const Board &, Square, Delta, MoveType);
-int count_pawns(const Board &, Square, Delta);
 
 namespace __metrics {
 

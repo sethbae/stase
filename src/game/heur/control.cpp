@@ -1,5 +1,6 @@
 #include "board.h"
 #include "heur.h"
+#include "heur_util.h"
 #include "../glogic/glogic.h"
 #include "../gamestate.hpp"
 

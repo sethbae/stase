@@ -10,6 +10,7 @@ using std::string;
 #include "../gamestate.hpp"
 #include "../eval.hpp"
 #include "heur.h"
+#include "heur_util.h"
 
 // the central 16 squares
 const Square CENTRAL_SQUARES[] = {

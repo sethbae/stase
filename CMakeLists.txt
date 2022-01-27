@@ -68,7 +68,7 @@ set(SOURCE_FILES
         src/utils/utils.h
         src/utils/print.cpp
         src/utils/uci.cpp
-        src/utils/signal.cpp)
+        src/utils/signal.cpp src/game/heur/heur_util.h)
 
 set(STASE_SOURCE_FILES)
 
