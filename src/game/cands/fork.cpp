@@ -306,12 +306,6 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
 
 }
 
-const Hook fork_hook{
-    "fork",
-    2,
-    &find_forks_hook
-};
-
 /**
  * Responder which takes fork FeatureFrames and plays the fork described.
  */
@@ -322,6 +316,12 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
         m[counter.inc()] = move;
     }
 }
+
+const Hook fork_hook{
+    "fork",
+    2,
+    &find_forks_hook
+};
 
 const Responder play_fork_resp{
     "fork",

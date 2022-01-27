@@ -1,5 +1,4 @@
 #include "cands.h"
-#include "../heur/heur.h"
 #include "../gamestate.hpp"
 #include "responder.hpp"
 

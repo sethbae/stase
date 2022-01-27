@@ -46,12 +46,6 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
     return true;
 }
 
-const Hook check_hook{
-    "check",
-    3,
-    &find_checks_hook
-};
-
 void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
     if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
 
@@ -67,6 +61,12 @@ void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, Ind
         moves[counter.inc()] = m;
     }
 }
+
+const Hook check_hook{
+    "check",
+    3,
+    &find_checks_hook
+};
 
 const Responder play_check_resp{
     "check",

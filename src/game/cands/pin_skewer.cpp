@@ -213,11 +213,6 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
     }
 }
 
-const Responder pin_skewer_resp{
-    "pin-skewer",
-    &pin_or_skewer_piece
-};
-
 /**
  * Detects pieces which in the current position are already pinned. Writes a feature frame for each such
  * piece it finds. This will only operate on a square containing a king.
@@ -266,4 +261,9 @@ const Hook king_pinned_pieces_hook {
     "king-pinned-pieces",
     5,
     &identify_king_pinned_pieces_hook
+};
+
+const Responder pin_skewer_resp{
+    "pin-skewer",
+    &pin_or_skewer_piece
 };
