@@ -2,6 +2,7 @@
 #include "cands.h"
 #include "../gamestate.hpp"
 #include "../glogic/glogic.h"
+#include "responder.hpp"
 
 bool find_knight_forks(Gamestate & gs, const Square s) {
 
@@ -321,3 +322,8 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
         m[counter.inc()] = move;
     }
 }
+
+const Responder play_fork_resp{
+    "fork",
+    &play_fork
+};

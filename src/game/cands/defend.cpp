@@ -1,6 +1,7 @@
 #include "board.h"
 #include "cands.h"
 #include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Walks out from the piece looking for other pieces which can move to the squares encountered
@@ -196,9 +197,19 @@ void defend_centre(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     defend_square(gs, ff->centre, moves, counter);
 }
 
+const Responder defend_centre_resp{
+    "defend-centre",
+    &defend_centre
+};
+
 /**
  * Responder which tries to defend the secondary square of the given feature frame.
  */
 void defend_secondary(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
     defend_square(gs, ff->secondary, moves, counter);
 }
+
+const Responder defend_secondary_resp{
+    "defend-secondary",
+    &defend_secondary
+};

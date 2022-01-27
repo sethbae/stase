@@ -1,5 +1,6 @@
 #include "cands.h"
 #include "../gamestate.hpp"
+#include "responder.hpp"
 
 const int BISHOPS[64] = {
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -366,4 +367,9 @@ const Hook develop_hook {
     "undeveloped-piece",
     1,
     &is_undeveloped_piece_hook
+};
+
+const Responder develop_resp{
+    "develop",
+    &develop_piece
 };

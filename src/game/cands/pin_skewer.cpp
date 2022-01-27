@@ -1,5 +1,6 @@
 #include "cands.h"
 #include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Returns the final empty square on the trajectory and board given.
@@ -211,6 +212,11 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
         moves[counter.inc()] = m;
     }
 }
+
+const Responder pin_skewer_resp{
+    "pin-skewer",
+    &pin_or_skewer_piece
+};
 
 /**
  * Detects pieces which in the current position are already pinned. Writes a feature frame for each such

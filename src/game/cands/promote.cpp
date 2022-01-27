@@ -1,5 +1,6 @@
 #include "cands.h"
 #include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Checks for a pawn on the given square which can promote. Also checks for 3rd / 6th rank
@@ -51,3 +52,8 @@ void promote_pawn(const Gamestate & gs, const FeatureFrame * ff, Move * m, Index
         m[counter.inc()] = move;
     }
 }
+
+const Responder promotion_resp{
+    "promotion",
+    &promote_pawn
+};

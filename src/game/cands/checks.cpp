@@ -1,5 +1,6 @@
 #include "cands.h"
 #include "../../game/gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Finds checks in the given gamestate. Adds feature frames to the given vector to record the ones it does find.
@@ -66,3 +67,8 @@ void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, Ind
         moves[counter.inc()] = m;
     }
 }
+
+const Responder play_check_resp{
+    "check",
+    &play_check
+};
