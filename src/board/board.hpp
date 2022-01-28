@@ -121,7 +121,7 @@ struct Board {
      * updating any conf info.
      * You can only SNEAK if you promise to immediately UNSNEAK!
      */
-    Piece sneak(const Move m) const {
+    inline Piece sneak(const Move m) const {
         Piece p = this->get(m.from);
         Piece captured = this->get(m.to);
 
@@ -144,7 +144,7 @@ struct Board {
      * The captured piece was returned to you from the SNEAK. Pass it back in to avoid
      * vanishing pieces!
      */
-    void unsneak(const Move m, const Piece captured) const {
+    inline void unsneak(const Move m, const Piece captured) const {
 
         Piece p = this->get(m.to);
 
@@ -155,50 +155,50 @@ struct Board {
         squares[m.from.x][m.from.y] = p;
     }
 
-    void set_conf_word(Int c) { conf = c; }
-    Int get_conf_word() const { return conf; }
+    inline void set_conf_word(Int c) { conf = c; }
+    inline Int get_conf_word() const { return conf; }
 
     /**
      * Returns true iff it is white's turn to play
      */
-    bool get_white() const { return conf & __bit_masks::WHITE_MASK; }
-    void set_white(bool b) {
+    inline bool get_white() const { return conf & __bit_masks::WHITE_MASK; }
+    inline void set_white(bool b) {
         if (b)
             conf |= __bit_masks::WHITE_MASK;
         else
             conf &= ~__bit_masks::WHITE_MASK;
     }
-    void flip_white() { conf ^= __bit_masks::WHITE_MASK; }
-    Colour colour_to_move() const {
+    inline void flip_white() { conf ^= __bit_masks::WHITE_MASK; }
+    inline Colour colour_to_move() const {
         return (conf & __bit_masks::WHITE_MASK) ? WHITE : BLACK;
     }
 
     /**
      * Get/set castling rights individually
      * */
-    bool get_cas_ws() const { return conf & __bit_masks::CAS_WS_MASK; }
-    void set_cas_ws(bool b) {
+    inline bool get_cas_ws() const { return conf & __bit_masks::CAS_WS_MASK; }
+    inline void set_cas_ws(bool b) {
         if (b)
             conf |= __bit_masks::CAS_WS_MASK;
         else
             conf &= ~__bit_masks::CAS_WS_MASK;
     }
-    bool get_cas_wl() const { return conf & __bit_masks::CAS_WL_MASK; }
-    void set_cas_wl(bool b) {
+    inline bool get_cas_wl() const { return conf & __bit_masks::CAS_WL_MASK; }
+    inline void set_cas_wl(bool b) {
         if (b)
             conf |= __bit_masks::CAS_WL_MASK;
         else
             conf &= ~__bit_masks::CAS_WL_MASK;
     }
-    bool get_cas_bs() const { return conf & __bit_masks::CAS_BS_MASK; }
-    void set_cas_bs(bool b) {
+    inline bool get_cas_bs() const { return conf & __bit_masks::CAS_BS_MASK; }
+    inline void set_cas_bs(bool b) {
         if (b)
             conf |= __bit_masks::CAS_BS_MASK;
         else
             conf &= ~__bit_masks::CAS_BS_MASK;
     }
-    bool get_cas_bl() const { return conf & __bit_masks::CAS_BL_MASK; }
-    void set_cas_bl(bool b) {
+    inline bool get_cas_bl() const { return conf & __bit_masks::CAS_BL_MASK; }
+    inline void set_cas_bl(bool b) {
         if (b)
             conf |= __bit_masks::CAS_BL_MASK;
         else
@@ -208,8 +208,8 @@ struct Board {
     /**
      * Get/set en-passant boolean
      */
-    bool get_ep_exists() const { return conf & __bit_masks::EP_EX_MASK; }
-    void set_ep_exists(bool b) {
+    inline bool get_ep_exists() const { return conf & __bit_masks::EP_EX_MASK; }
+    inline void set_ep_exists(bool b) {
         if (b)
             conf |= __bit_masks::EP_EX_MASK;
         else
@@ -219,13 +219,13 @@ struct Board {
     /**
      * Read/write 3 bits representing ep file
      */
-    Byte get_ep_file() const {
+    inline Byte get_ep_file() const {
         return (conf & __bit_masks::EP_FILE_MASK) >> 6;
     }
-    void set_ep_file(Byte u) {
+    inline void set_ep_file(Byte u) {
         conf = (conf & ~__bit_masks::EP_FILE_MASK) | (u << 6);
     }
-    Square get_ep_sq() const {
+    inline Square get_ep_sq() const {
         return get_white()
                ? Square{ get_ep_file(), 5}
                : Square{get_ep_file(), 2};
@@ -234,24 +234,24 @@ struct Board {
     /**
      * Read/write 7 bits for the half move count
      */
-    unsigned get_halfmoves() const {
+    inline unsigned get_halfmoves() const {
         return (conf & __bit_masks::HALF_M_MASK) >> 9;
     }
-    void set_halfmoves(unsigned u) {
+    inline void set_halfmoves(unsigned u) {
         conf = (conf & ~__bit_masks::HALF_M_MASK) | (u << 9);
     }
-    void inc_halfmoves() { conf += 1 << 9; }
+    inline void inc_halfmoves() { conf += 1 << 9; }
 
     /**
      * Read/write 16 bits for the whole move count
      */
-    unsigned get_wholemoves() const {
+    inline unsigned get_wholemoves() const {
         return (conf & __bit_masks::WHOLE_M_MASK) >> 16;
     }
-    void set_wholemoves(unsigned u) {
+    inline void set_wholemoves(unsigned u) {
         conf = (conf & ~__bit_masks::WHOLE_M_MASK) | (u << 16);
     }
-    void inc_wholemoves() { conf += (1 << 16); }
+    inline void inc_wholemoves() { conf += (1 << 16); }
 
     /* change the position of the pieces, without affecting config */
     void mutate(const Move m) {
