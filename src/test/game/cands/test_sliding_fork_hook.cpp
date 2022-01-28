@@ -4,6 +4,7 @@
 
 #include "../../../game/cands/cands.h"
 #include "../../test.h"
+#include "../../../game/gamestate.hpp"
 
 TestSet<StringTestCase> sliding_fork_hook_test_cases = {
         "game-cands-sliding-fork-hook",
@@ -134,14 +135,12 @@ bool evaluate_test_case_sliding_fork_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at sliding forks for these tests!
         if (type(gs.board.get(ff->centre)) == ROOK || type(gs.board.get(ff->centre)) == BISHOP) {
             strings.push_back(sqtos(ff->secondary));
         }
     }
-
-    // print_feature_frames(gs.feature_frames[0]);
 
     return assert_string_lists_equal(strings, tc->expected_results);
 }

@@ -1,7 +1,8 @@
 #include "board.h"
 #include "heur.h"
+#include "../gamestate.hpp"
 
-float development_metric(const Gamestate & gs) {
+float __metrics::__development_metric(const Gamestate & gs) {
 
     int count = 0;
 

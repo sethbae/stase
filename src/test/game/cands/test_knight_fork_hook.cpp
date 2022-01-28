@@ -3,6 +3,7 @@
 #include <board.h>
 
 #include "../../../game/cands/cands.h"
+#include "../../../game/gamestate.hpp"
 #include "../../test.h"
 
 TestSet<StringTestCase> knight_fork_hook_test_cases = {
@@ -112,15 +113,13 @@ bool evaluate_test_case_knight_fork_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
         // only look at knight forks for these tests!
         if (type(gs.board.get(ff->centre)) == KNIGHT) {
             // the tests were written looking at the square the fork happens on, which is the secondary
             strings.push_back(sqtos(ff->secondary));
         }
     }
-
-    // print_feature_frames(gs.feature_frames[0]);
 
     return assert_string_lists_equal(strings, tc->expected_results);
 }

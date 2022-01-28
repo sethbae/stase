@@ -2,10 +2,11 @@
 #include "puzzle.h"
 #include "game.h"
 #include "../utils/utils.h"
+#include "../game/gamestate.hpp"
 
 bool score_puzzle_against_cands(const Puzzle & puzzle) {
 
-    Gamestate gs(puzzle.fen);
+    Gamestate gs = *fresh_gamestate(puzzle.fen);
 
     for (int i = 0; i < puzzle.solution_moves.size(); ++i) {
 

@@ -1,6 +1,8 @@
 #include "../heur/heur.h"
 #include "cands.h"
 #include "game.h"
+#include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Generates moves which capture a weak piece. Searches outwards from the target square looking for
@@ -227,3 +229,8 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     }
 
 }
+
+const Responder capture_resp{
+    "capture",
+    &capture_piece
+};

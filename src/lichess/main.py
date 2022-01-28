@@ -70,7 +70,7 @@ def main():
     print("Building engine...", end="")
     rebuild_stase()
     print("done!")
-    play_single_games(think_time=5, timeout=10)
+    play_single_games(think_time=5, timeout=6)
 
 
 if __name__ == "__main__":

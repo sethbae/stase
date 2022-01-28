@@ -2,8 +2,8 @@
 using std::cout;
 
 #include "board.h"
-#include "heur/heur.h"
-#include "cands/cands.h"
+#include "game.h"
+#include "glogic.h"
 
 /*
  * print out a little grid of the control counts for each square
@@ -28,12 +28,4 @@ void display_control_counts(const Board & b) {
         cout << "\n";
     }
 
-}
-
-void print_feature_frames(const FeatureFrame * ff) {
-    cout << "Printing feature-frame list @" << ff << ":\n";
-    for (const FeatureFrame* ptr = ff; !equal(ptr->centre, SQUARE_SENTINEL); ptr++) {
-        cout << "Frame: " << sqtos(ptr->centre) << " " << sqtos(ptr->secondary) << "\n";
-    }
-    cout << "(sentinel)\n";
 }

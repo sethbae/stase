@@ -8,6 +8,8 @@
 #include "board.h"
 #include "game.h"
 #include "../../src/game/cands/cands.h"
+#include "../../src/game/cands/hook.hpp"
+#include "../../src/game/cands/responder.hpp"
 #include "../../src/game/heur/heur.h"
 
 // save some typing! Used for responders.

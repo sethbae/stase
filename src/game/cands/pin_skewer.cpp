@@ -1,4 +1,6 @@
 #include "cands.h"
+#include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Returns the final empty square on the trajectory and board given.
@@ -24,18 +26,18 @@ inline Square find_line_end(const Gamestate & gs, int x, int y, Delta d) {
  * - conf1: the value of the piece which is being pinned or skewered
  * - conf2: the value of the piece which it is being pinned or skewered to
  */
-inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta d, std::vector<FeatureFrame> & frames) {
+inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
 
     Square other_p_sq = first_piece_encountered(gs.board, s, d);
 
     // check we actually hit a piece
     if (is_sentinel(other_p_sq)) {
-        return;
+        return true;
     }
 
     if (!val(s.x - d.dx, s.y - d.dy) || gs.board.get(s.x - d.dx, s.y - d.dy) != EMPTY) {
         // no pin in this direction is possible
-        return;
+        return true;
     }
 
     Piece other_p = gs.board.get(other_p_sq);
@@ -43,12 +45,12 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
     // only consider pawns which aren't 'structurally' defended
     if (type(other_p) == PAWN
         && control_count(gs.board, other_p_sq) != 0) {
-        return;
+        return true;
     }
 
     // pin pieces of the same colour
     if (colour(other_p) != colour(gs.board.get(s))) {
-        return;
+        return true;
     }
 
     /*
@@ -81,7 +83,8 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
                     if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
                             && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
 
-                        frames.push_back(
+                        bool result = gs.add_frame(
+                                pin_skewer_hook.id,
                                 FeatureFrame{
                                     mksq(x,y),
                                     squares_on_line[i],
@@ -89,6 +92,7 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
                                     piece_value(other_p)
                                 }
                         );
+                        if (!result) { return false; }
 
                     }
                 }
@@ -108,7 +112,8 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
                 if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
                         && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
 
-                    frames.push_back(
+                    bool result = gs.add_frame(
+                            pin_skewer_hook.id,
                             FeatureFrame{
                                 mksq(x, y),
                                 pin_from_square,
@@ -116,13 +121,14 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
                                 piece_value(other_p)
                             }
                     );
+                    if (!result) { return false; }
 
                 }
             }
 
         }
     }
-
+    return true;
 }
 
 /**
@@ -134,14 +140,14 @@ inline void detect_pin_skewer(const Gamestate & gs, const Square s, const Delta 
  * - conf1: the value of the piece which is being pinned or skewered
  * - conf2: the value of the piece which it is being pinned or skewered to
  */
-void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_pin_skewer_hook(Gamestate & gs, const Square s) {
 
     bool check_ortho;
     bool check_diag;
     Piece p = gs.board.get(s);
 
     if (p == EMPTY) {
-        return;
+        return true;
     }
 
     if (type(p) == PAWN) {
@@ -150,7 +156,7 @@ void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFra
             check_ortho = true;
             check_diag = true;
         } else {
-            return;
+            return true;
         }
     } else {
         // any king or queen, and pieces which can't move in the pin direction
@@ -165,7 +171,8 @@ void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFra
                 // no pin in this direction is possible
                 continue;
             }
-            detect_pin_skewer(gs, s, Delta{XD[dir], YD[dir]}, frames);
+            bool result = detect_pin_skewer(gs, s, Delta{XD[dir], YD[dir]});
+            if (!result) { return false; }
         }
     }
 
@@ -176,11 +183,18 @@ void find_pin_skewer_hook(Gamestate & gs, const Square s, std::vector<FeatureFra
                 // no pin in this direction is possible
                 continue;
             }
-            detect_pin_skewer(gs, s, Delta{XD[dir], YD[dir]}, frames);
+            bool result = detect_pin_skewer(gs, s, Delta{XD[dir], YD[dir]});
+            if (!result) { return false; }
         }
     }
-
+    return true;
 }
+
+const Hook pin_skewer_hook{
+    "pin-skewer",
+    4,
+    &find_pin_skewer_hook
+};
 
 /**
  * This responder plays the move as described in the given FeatureFrame.
@@ -208,12 +222,12 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
  * conf_1: dx of the pin direction
  * conf_2: dy of the pin direction
  */
-void identify_king_pinned_pieces_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool identify_king_pinned_pieces_hook(Gamestate & gs, const Square s) {
 
     Piece king = gs.board.get(s);
 
     if (type(king) != KING) {
-        return;
+        return true;
     }
 
     for (int i = ALL_DIRS_START; i < ALL_DIRS_STOP; ++i) {
@@ -236,7 +250,20 @@ void identify_king_pinned_pieces_hook(Gamestate & gs, const Square s, std::vecto
             continue;
         }
 
-        frames.push_back(FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
         gs.add_kpinned_piece(pinned_sq, d);
+        bool result = gs.add_frame(king_pinned_pieces_hook.id, FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
+        if (!result) { return false; }
     }
+    return true;
 }
+
+const Hook king_pinned_pieces_hook {
+    "king-pinned-pieces",
+    5,
+    &identify_king_pinned_pieces_hook
+};
+
+const Responder pin_skewer_resp{
+    "pin-skewer",
+    &pin_or_skewer_piece
+};

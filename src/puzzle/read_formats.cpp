@@ -6,6 +6,7 @@
 #include "game.h"
 #include "puzzle.h"
 #include "../utils/utils.h"
+#include "../game/gamestate.hpp"
 
 /**
  * Reads and returns every FEN from the lichess puzzle database. This uses caching - it's cheap!
@@ -36,7 +37,7 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
         std::vector<std::string> fens;
         read_all_fens(fens);
         for (std::string & fen : fens) {
-            cache.emplace_back(fen);
+            cache.push_back(*fresh_gamestate(fen));
         }
     }
 

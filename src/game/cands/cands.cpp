@@ -1,6 +1,10 @@
 #include "board.h"
 #include "game.h"
 #include "cands.h"
+#include "hook.hpp"
+#include "responder.hpp"
+#include "features.hpp"
+#include "../gamestate.hpp"
 
 #include <vector>
 using std::vector;
@@ -9,34 +13,17 @@ using std::cout;
 #include <iomanip>
 
 /**
- * Records the feature frames in the right place on the gamestate (allocating memory for them).
- * Also adds a sentinel to the end of the list.
- */
-void record_hook_features(Gamestate & gs, const Hook * h, FeatureFrame * ff, int n) {
-
-    gs.feature_frames[h->id] = static_cast<FeatureFrame*> (operator new((sizeof(FeatureFrame)) * (n + 1)));
-    for (int i = 0; i < n; ++i) {
-        gs.feature_frames[h->id][i] = ff[i];
-    }
-    gs.feature_frames[h->id][n] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
-
-}
-
-/**
  * Runs the given hook over every square on the board and records any successes in feature frames.
  */
 void discover_feature_frames(Gamestate & gs, const Hook * hook) {
 
-    std::vector<FeatureFrame> frames;
-    frames.reserve(64);
-
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            hook->hook(gs, mksq(x, y), frames);
+            bool result = hook->hook(gs, mksq(x, y));
+            if (!result) { return; }
         }
     }
 
-    record_hook_features(gs, hook, frames.data(), frames.size());
 }
 
 /**
@@ -83,9 +70,9 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
+        for (int j = 0; !is_sentinel(gs.frames[fh.hook->id][j].centre) && j < MAX_FRAMES; ++j) {
 
-            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
+            FeatureFrame ff = gs.frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
             std::vector<const Responder *> responders =
@@ -206,16 +193,16 @@ CandSet * cands_report(Gamestate & gs) {
         discover_feature_frames(gs, fh.hook);
 
         cout << "\nFound frames:\n";
-        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
-            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
+        for (int j = 0; !is_sentinel(gs.frames[fh.hook->id][j].centre); ++j) {
+            FeatureFrame ff = gs.frames[fh.hook->id][j];
             cout << "Centre: " << sqtos(ff.centre) << " Second: " << sqtos(ff.secondary) << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
         }
         cout << "\n\n";
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; !is_sentinel(gs.feature_frames[fh.hook->id][j].centre); ++j) {
+        for (int j = 0; !is_sentinel(gs.frames[fh.hook->id][j].centre); ++j) {
 
-            FeatureFrame ff = gs.feature_frames[fh.hook->id][j];
+            FeatureFrame ff = gs.frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
             cout << "Looking at frame " << j << " (" << sqtos(ff.centre) << ", " << sqtos(ff.secondary) << "):\n";

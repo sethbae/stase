@@ -1,5 +1,6 @@
 #include "cands.h"
-#include "../heur/heur.h"
+#include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Tries to trade off the unsafe piece with any piece of greater or equal value. Suggests all
@@ -110,3 +111,18 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
     }
 
 }
+
+const Responder trade_resp{
+    "trade",
+    &trade_piece
+};
+
+const Responder retreat_resp{
+    "retreat",
+    &retreat_piece
+};
+
+const Responder desperado_resp{
+    "desperado",
+    &desperado_piece
+};

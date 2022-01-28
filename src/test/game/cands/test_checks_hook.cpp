@@ -1,4 +1,5 @@
 #include "../../../game/cands/cands.h"
+#include "../../../game/gamestate.hpp"
 #include "../../test.h"
 
 TestSet<StringTestCase> check_hook_test_cases = {
@@ -79,7 +80,7 @@ bool evaluate_test_case_check_hook(const StringTestCase *tc) {
 
     std::vector<std::string> strings;
 
-    for (FeatureFrame* ff = gs.feature_frames[check_hook.id]; !is_sentinel(ff->centre); ++ff) {
+    for (FeatureFrame* ff = gs.frames[check_hook.id]; !is_sentinel(ff->centre); ++ff) {
         strings.push_back(sqtos(ff->centre) + sqtos(ff->secondary));
     }
 

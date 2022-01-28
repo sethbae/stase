@@ -2,7 +2,10 @@
 using std::cout;
 
 #include "game.h"
-#include "heur/heur.h"
+#include "board.h"
+#include "../heur/heur.h"
+#include "glogic.h"
+#include "../gamestate.hpp"
 
 /**
  * Walks outward from the given piece, maintaining a running total of the +- control

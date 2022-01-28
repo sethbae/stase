@@ -2,14 +2,14 @@
 using std::cout;
 
 #include "board.h"
-#include "game.h"
 #include "heur.h"
+#include "../gamestate.hpp"
 
 /**
  * Returns zero if both sides have either castled or not castled, otherwise
  * +1 or -1 to indicate that only one side has castled.
  */
-float castling_metric(const Gamestate & gs) {
+float __metrics::__castling_metric(const Gamestate & gs) {
     if (gs.b_cas == gs.w_cas) { return 0.0f; }
     return (gs.w_cas) ? 1.0f : -1.0f;
 }
@@ -17,7 +17,7 @@ float castling_metric(const Gamestate & gs) {
 /**
  * Returns a score comparing the castling rights available to each side.
  */
-float castling_rights_metric(const Gamestate & gs) {
+float __metrics::__castling_rights_metric(const Gamestate & gs) {
 
     float w_score = 0.0f, b_score = 0.0f;
 
@@ -107,7 +107,7 @@ int pk_count(const Gamestate & gs, const bool use_white) {
 
 }
 
-float pawns_defend_king_metric(const Gamestate & gs) {
+float __metrics::__pawns_defend_king_metric(const Gamestate & gs) {
     // delegate to the pawn-king-counter (pk-count)
     return ((float)(pk_count(gs, true) - pk_count(gs, false))) / 8.0f;
 }
@@ -116,7 +116,7 @@ float pawns_defend_king_metric(const Gamestate & gs) {
  * Returns a score representing the balance of control near the king.
  * Sums gamma control count on all adjacent squares to each king.
  */
-float control_near_king_metric(const Gamestate & gs) {
+float __metrics::__control_near_king_metric(const Gamestate & gs) {
 
     int score = 0;
     int wx = gs.w_king.x, wy = gs.w_king.y, bx = gs.b_king.x, by = gs.b_king.y;
@@ -243,6 +243,6 @@ int one_king_exposure(const Gamestate & gs, const Square s) {
 /**
  * Combines two calls to one_king_exposure into a metric.
  */
-float king_exposure_metric(const Gamestate & gs) {
+float __metrics::__king_exposure_metric(const Gamestate & gs) {
     return (((float)one_king_exposure(gs, gs.w_king)) + ((float)one_king_exposure(gs, gs.b_king))) / 6.0f;
 }

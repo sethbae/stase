@@ -2,16 +2,7 @@
 #define STASE_CONTROL_CACHE_HPP
 
 #include "game.h"
-
-
-/**
- * Used to pass information about the pieces attacking and controlling a certain square.
- */
-struct SquareControlStatus {
-    int16_t balance = 0;
-    uint16_t min_w = 0;
-    uint16_t min_b = 0;
-};
+#include "glogic/glogic.h"
 
 /**
  * Caches a set of SquareControlStates by the square to which they refer.

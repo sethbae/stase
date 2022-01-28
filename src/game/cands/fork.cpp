@@ -1,7 +1,10 @@
 #include "game.h"
 #include "cands.h"
+#include "../gamestate.hpp"
+#include "../glogic/glogic.h"
+#include "responder.hpp"
 
-void find_knight_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_knight_forks(Gamestate & gs, const Square s) {
 
     for (int j = 0; j < 8; ++j) {
 
@@ -43,10 +46,11 @@ void find_knight_forks(const Gamestate & gs, const Square s, std::vector<Feature
         }
 
         if (forked_count >= 2) {
-            frames.push_back(FeatureFrame{s, fork_square, val_a, val_b});
+            bool result = gs.add_frame(fork_hook.id, FeatureFrame{s, fork_square, val_a, val_b});
+            if (!result) { return false; }
         }
     }
-
+    return true;
 }
 
 /**
@@ -133,12 +137,11 @@ inline int count_forkable_pieces_after(const Gamestate & gs, const Move move, Mo
 
 }
 
-void find_forks(
-        const Gamestate & gs,
+bool find_forks(
+        Gamestate & gs,
         const Square forker_sq,
         const bool ortho,
-        const bool diag,
-        std::vector<FeatureFrame> & frames) {
+        const bool diag) {
 
     Square temp;
 
@@ -147,7 +150,7 @@ void find_forks(
     if (ortho && diag) { start_idx = DIAG_START, end_idx = ORTHO_STOP; }
     else if (ortho) { start_idx = ORTHO_START, end_idx = ORTHO_STOP; }
     else if (diag) { start_idx = DIAG_START, end_idx = DIAG_STOP; }
-    else { return; }
+    else { return true; }
 
     // for each sliding direction
     for (int j = start_idx; j < end_idx; ++j) {
@@ -176,7 +179,8 @@ void find_forks(
                 }
 
                 if (forked_pieces >= 2) {
-                    frames.push_back(FeatureFrame{forker_sq, temp, val_a, val_b});
+                    bool result = gs.add_frame(fork_hook.id, FeatureFrame{forker_sq, temp, val_a, val_b});
+                    if (!result) { return false; }
                 }
 
             }
@@ -190,10 +194,10 @@ void find_forks(
             }
         }
     }
-
+    return true;
 }
 
-void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_pawn_forks(Gamestate & gs, const Square s) {
 
     std::vector<Move> moves;
     moves.reserve(32);
@@ -212,7 +216,7 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);
 
             if (val(l_sq) && val(r_sq) && forkable(gs, m, l_sq) && forkable(gs, m, r_sq)) {
-                frames.push_back(
+                bool result = gs.add_frame(fork_hook.id,
                     FeatureFrame{
                     s,
                     m.to,
@@ -220,12 +224,14 @@ void find_pawn_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
                     piece_value(gs.board.get(r_sq))
                     }
                 );
+                if (!result) { return false; }
             }
         }
     }
+    return true;
 }
 
-void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_king_forks(Gamestate & gs, const Square s) {
 
     Colour king_col = colour(gs.board.get(s));
 
@@ -263,11 +269,12 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
             }
 
             if (count >= 2) {
-                frames.push_back(FeatureFrame{s, forker_sq, val_a, val_b});
+                bool result = gs.add_frame(fork_hook.id, FeatureFrame{s, forker_sq, val_a, val_b});
+                if (!result) { return false; }
             }
         }
     }
-
+    return true;
 }
 
 /**
@@ -278,23 +285,23 @@ void find_king_forks(const Gamestate & gs, const Square s, std::vector<FeatureFr
  * -conf1: unused
  * -conf2: unused
  */
-void find_forks_hook(Gamestate & gs, const Square s, std::vector<FeatureFrame> & frames) {
+bool find_forks_hook(Gamestate & gs, const Square s) {
 
     switch (type(gs.board.get(s))) {
         case KNIGHT:
-            find_knight_forks(gs, s, frames); return;
+            return find_knight_forks(gs, s);
         case BISHOP:
-            find_forks(gs, s, false, true, frames); return;
+            return find_forks(gs, s, false, true);
         case ROOK:
-            find_forks(gs, s, true, false, frames); return;
+            return find_forks(gs, s, true, false);
         case QUEEN:
-            find_forks(gs, s, true, true, frames); return;
+            return find_forks(gs, s, true, true);
         case PAWN:
-            find_pawn_forks(gs, s, frames); return;
+            return find_pawn_forks(gs, s);
         case KING:
-            find_king_forks(gs, s, frames); return;
+            return find_king_forks(gs, s);
         default:
-            return;
+            return true;
     }
 
 }
@@ -309,3 +316,14 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
         m[counter.inc()] = move;
     }
 }
+
+const Hook fork_hook{
+    "fork",
+    2,
+    &find_forks_hook
+};
+
+const Responder play_fork_resp{
+    "fork",
+    &play_fork
+};

@@ -1,4 +1,7 @@
 #include "game.h"
+#include "board.h"
+#include "glogic.h"
+#include "../gamestate.hpp"
 
 /**
  * Looks for attackers of the opposite colour to the given king_colour by working outwards from
