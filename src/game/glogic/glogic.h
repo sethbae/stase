@@ -15,10 +15,16 @@ struct SquareControlStatus {
 };
 
 /**
+ * Checks whether the three points given all lie on a straight line.
+ */
+inline bool collinear_points(Square a, Square b, Square c) {
+    return (get_y(a) - get_y(b)) * (get_x(b) - get_x(c)) == (get_y(b) - get_y(c)) * (get_x(a) - get_x(b));
+}
+
+/**
  * Geometry functions: what squares can a piece move to, can it reach this line etc.
  */
 bool can_move_to_square(const Board &, Square from, Square to);
-bool collinear_points(Square, Square, Square);
 Delta open_path_between(const Board & b, const Square, const Square);
 Square square_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
 std::vector<Square> squares_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
