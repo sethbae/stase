@@ -1,4 +1,5 @@
 #include "board.h"
+#include "board.hpp"
 
 #include <iostream>
 using std::cout;

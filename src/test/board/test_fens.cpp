@@ -1,6 +1,7 @@
 #include "../test.h"
 #include "board.h"
 #include "puzzle.h"
+#include "../../board/board.hpp"
 
 struct FenTestCase {
     const std::string & fen;

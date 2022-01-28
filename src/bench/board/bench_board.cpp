@@ -11,6 +11,7 @@ using std::string;
 #include "board.h"
 #include "puzzle.h"
 #include "../bench.h"
+#include "../../board/board.hpp"
 
 
 struct BoardPairParam {

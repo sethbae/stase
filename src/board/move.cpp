@@ -6,6 +6,7 @@ using std::string;
 using std::cout;
 
 #include "board.h"
+#include "board.hpp"
 
 /*
  * Defines a move data type and defines functions to make moves

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../board/board.hpp"
 #include "cands/cands.h"
 #include "cands/hook.hpp"
 #include "control_cache.hpp"

@@ -121,7 +121,7 @@ const unsigned ALL_DIRS_STOP = 8;
 /**
  * String conversions.
  */
-class Board;
+struct Board;
 Move stom(const Board &, const std::string &);
 std::string mtos(const Board &, const Move);
 

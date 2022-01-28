@@ -1,6 +1,7 @@
 #include "game.h"
 #include "board.h"
 #include "glogic.h"
+#include "../../board/board.hpp"
 
 /**
  * Checks whether the three points given all lie on a straight line.

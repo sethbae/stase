@@ -1,6 +1,7 @@
 #include "board.h"
 #include "../test.h"
 #include "../../game/glogic/glogic.h"
+#include "../../board/board.hpp"
 
 #include <vector>
 #include <iostream>

@@ -15,64 +15,7 @@
  * There is no validity requirement for the represented position. For example, you
  * can have no kings, be in check on your opponents turn etc.
  */
-struct Board {
-
-    mutable Piece squares[8][8];
-    Int conf;
-
-    inline Piece get(const int x, const int y) const {
-        return squares[x][y];
-    };
-    inline void set(const int x, const int y, const Piece p) {
-        squares[x][y] = p;
-    }
-    inline Piece get(const Square & s) const {
-        return squares[s.x][s.y];
-    };
-    inline void set(const Square & s, const Piece p) {
-        squares[s.x][s.y] = p;
-    }
-
-    Piece sneak(const Move) const;
-    void unsneak(const Move, const Piece) const;
-
-    void mutate(const Move);
-    void mutate_hard(const Move); // does not assume move flags are correctly set
-
-    Board successor(const Move) const;
-    Board successor_hard(const Move) const;
-
-    void set_conf_word(Int);
-    Int get_conf_word() const;
-
-    bool get_white() const;
-    void set_white(bool);
-    void flip_white();
-    Colour colour_to_move() const;
-
-    bool get_cas_ws() const;
-    void set_cas_ws(bool);
-    bool get_cas_wl() const;
-    void set_cas_wl(bool);
-    bool get_cas_bs() const;
-    void set_cas_bs(bool);
-    bool get_cas_bl() const;
-    void set_cas_bl(bool);
-
-    bool get_ep_exists() const;
-    void set_ep_exists(bool);
-    Byte get_ep_file() const;
-    void set_ep_file(Byte);
-    Square get_ep_sq() const;
-
-    unsigned get_halfmoves() const;
-    void set_halfmoves(unsigned);
-    void inc_halfmoves();
-    unsigned get_wholemoves() const;
-    void set_wholemoves(unsigned);
-    void inc_wholemoves();
-
-};
+struct Board;
 
 /** special values: empty, starting */
 Board empty_board();
