@@ -70,7 +70,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
-        for (int j = 0; !is_sentinel(gs.frames[fh.hook->id][j].centre); ++j) {
+        for (int j = 0; !is_sentinel(gs.frames[fh.hook->id][j].centre) && j < MAX_FRAMES; ++j) {
 
             FeatureFrame ff = gs.frames[fh.hook->id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);

@@ -52,6 +52,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         }
 
         Gamestate & gs = states[i];
+        gs.clear_all_frames();
 
         std::vector<Move> moves = cands(gs)->critical;
         std::vector<Move> legals = legal_moves(gs.board);

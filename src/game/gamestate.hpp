@@ -216,6 +216,15 @@ public:
         return false;
     }
 
+    inline void clear_frames(const int hook_id) {
+        frames[hook_id][0] = FeatureFrame{ SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0 };
+    }
+    inline void clear_all_frames() {
+        for (int i = 0; i < NUM_HOOKS; ++i) {
+            frames[i][0] = FeatureFrame{ SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0 };
+        }
+    }
+
     /**
      * Updates the current gamestate such that it now represents the position resulting
      * from the given move being played.
