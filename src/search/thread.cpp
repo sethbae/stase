@@ -68,6 +68,12 @@ void run_in_background(const std::string & fen) {
     current_running_config.t_id = t_id;
 }
 
+void run_with_node_limit(const std::string & fen, int node_limit) {
+    set_node_limit(node_limit);
+    run_in_background(fen);
+    pthread_join(current_running_config.t_id, nullptr);
+}
+
 /**
  * Cancels the given thread and fetches the best move it found. Responsible for cleaning up
  * the memory the engine was using etc.

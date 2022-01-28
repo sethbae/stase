@@ -36,6 +36,8 @@ void write_to_file(SearchNode*, std::ostream &);
 void write_to_file_recursively(SearchNode*, std::ostream &);
 
 void run_in_background(const std::string & fen);
+void run_with_node_limit(const std::string & fen, int);
+
 void stop_engine(bool cleanup=true);
 Move fetch_best_move();
 int fetch_node_count();
