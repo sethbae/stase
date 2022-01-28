@@ -4,6 +4,7 @@
 #include "search_tools.h"
 
 int node_count();
+void register_new_node();
 void reset_node_count();
 
 inline Move current_best_move(SearchNode * root) {

@@ -1,6 +1,8 @@
 #ifndef STASE_SEARCH_TOOLS_H
 #define STASE_SEARCH_TOOLS_H
 
+#include "search.h"
+
 SearchNode *new_node(const Gamestate & gs, Move m);
 SearchNode *new_node(const std::string &);
 

@@ -4,8 +4,12 @@
 #include "search.h"
 
 void abort_analysis();
+bool abort_flag();
 void reset_abort_flag();
-void check_abort();
+
+void set_node_limit(int nodes);
+int get_node_limit();
+void clear_node_limit();
 
 void interrupt_execution(int);
 

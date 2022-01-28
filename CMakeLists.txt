@@ -38,8 +38,10 @@ set(SOURCE_FILES
         src/search/thread.cpp
         src/search/greedy.cpp
         src/search/metrics.h
+        src/search/metrics.cpp
         src/search/thread.h
         src/search/search_tools.h
+        src/search/search_tools.cpp
 
         src/game/cands/cands.h
         src/game/cands/score.h

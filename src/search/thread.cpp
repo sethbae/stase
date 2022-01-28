@@ -110,3 +110,13 @@ int fetch_node_count() {
 SearchNode * fetch_root() {
     return current_running_config.root;
 }
+
+bool engine_abort = false;
+bool abort_flag() { return engine_abort; }
+void abort_analysis() { engine_abort = true; }
+void reset_abort_flag() { engine_abort = false; }
+
+int max_nodes = -1;
+int get_node_limit() { return max_nodes; }
+void set_node_limit(int limit) { max_nodes = limit; }
+void clear_node_limit() { max_nodes = -1; }

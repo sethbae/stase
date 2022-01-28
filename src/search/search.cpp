@@ -4,6 +4,7 @@
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
 #include "../game/eval.hpp"
+#include "metrics.h"
 
 #include <vector>
 using std::vector;
@@ -13,24 +14,6 @@ using std::cout;
 using std::ofstream;
 #include <ostream>
 using std::ostream;
-
-// global kill switch to gracefully exit
-bool engine_abort = false;
-void abort_analysis() {
-    engine_abort = true;
-}
-void reset_abort_flag() {
-    engine_abort = false;
-}
-
-// hacky way to count the number of nodes we create
-int COUNT = 0;
-int node_count() {
-    return COUNT;
-}
-void reset_node_count() {
-    COUNT = 0;
-}
 
 // recursively count the number of nodes in the subtree rooted at the given node
 int subtree_size(SearchNode *node) {
@@ -195,7 +178,7 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
  * gamestate will represent the position after the given move has been played.
  */
 SearchNode *new_node(const Gamestate & gs, Move m) {
-    COUNT++;
+    register_new_node();
     return new SearchNode{
         new Gamestate(gs, m),
         new CandSet,
@@ -404,7 +387,7 @@ std::vector<Move> iterative_deepening_search(const std::string & fen, int max_de
         long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
         double seconds = ((double)duration) / 1000000.0;
 
-        cout << d << ": (" << ((double) COUNT) / seconds << ") ";
+        cout << d << ": (" << ((double) node_count()) / seconds << ") ";
         std::vector<SearchNode *> best_line = retrieve_best_line(&root);
         print_line(best_line);
     }
@@ -445,13 +428,4 @@ void delete_tree(SearchNode * node) {
     delete node->gs;
     delete node->cand_set;
     delete node;
-}
-
-/**
- * Checks whether the engine abort flag has been set and gracefully exits if so.
- */
-void check_abort() {
-    if (engine_abort) {
-        interrupt_execution(0);
-    }
 }
