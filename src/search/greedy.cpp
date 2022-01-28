@@ -12,7 +12,7 @@ const int LEGAL_THRESHOLD = 256;
 // the point at which a position will be considered not quiescent
 const float QUIESS_THRESHOLD = 2.0f;
 
-const int BURST_DEPTH = 6;
+const int BURST_DEPTH = 5;
 const int CRITICAL_DEPTH = 4;
 const int MEDIAL_DEPTH = 1;
 const int FINAL_DEPTH = 1;
@@ -101,8 +101,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
         // we still need to recurse up to the given depth
         bool changes = false;
         for (int i = 0; i < node->num_children; ++i) {
-            changes = changes ||
-                        deepen(node->children[i], cand_list, depth - 1, burst);
+            changes = deepen(node->children[i], cand_list, depth - 1, burst)
+                        || changes;
         }
         update_score(node);
         return changes;
@@ -146,8 +146,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
     // recurse as appropriate
     bool changes = (node->num_children != c);
     for (int i = 0; i < node->num_children; ++i) {
-        changes = changes ||
-                    deepen(node->children[i], cand_list, depth - 1, burst);
+        changes = deepen(node->children[i], cand_list, depth - 1, burst)
+                    || changes;
     }
 
     update_score(node);
