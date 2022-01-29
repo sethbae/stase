@@ -1,11 +1,139 @@
 #include <iostream>
 using std::cout;
 
-#include "game.h"
 #include "board.h"
 #include "../heur/heur.h"
 #include "glogic.h"
 #include "../gamestate.hpp"
+
+/**
+ * Returns true if the piece on the square s is the piece which separates colour control
+ * along a poly x-ray line. For example:
+ *              --r-QR-x-
+ * Here, the rook controls x by a poly x-ray, and the queen is the white piece which
+ * 'separates' the white and black pieces. The white rook, however, does not separate
+ * them, because the white queen comes between it and the first black piece found.
+ */
+bool is_separator_on_poly_x_ray(const Gamestate & gs, const Square s, const Delta d) {
+
+    int x = s.x + d.dx, y = s.y + d.dy;
+    bool cont = true;
+
+    while (val(x, y) && cont) {
+
+        Piece p = gs.board.get(x, y);
+
+        if (p == EMPTY) {
+            x += d.dx;
+            y += d.dy;
+            continue;
+        }
+        if (!can_move_in_direction(p, d)) {
+            cont = false;
+            continue;
+        }
+
+        // we've found the first piece behind this one; check its colour
+        return colour(p) != colour(gs.board.get(s));
+    }
+
+    return false;
+}
+
+/**
+ * Finds the pieces of minimum value which control the given square. Records the value of
+ * the minimum white piece in min_w and vice versa for min_b.
+ */
+void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16_t * min_b) {
+
+    /*
+     * Throughout, early exits are possible because pieces are tackled in non-decreasing order.
+     */
+
+    //TODO: try separating this into two functions for b/w to see the speedup
+
+    //TODO: write some tests!
+
+    Square temp;
+    *min_w = piece_value(W_KING) + 1;
+    *min_b = piece_value(W_KING) + 1;
+
+    // pawns
+    if (val(temp = mksq(s.x - 1, s.y - 1)) && gs.board.get(temp) == W_PAWN && !gs.is_kpinned_piece(temp, delta(-1, -1))) {
+        *min_w = piece_value(W_PAWN);
+    } else if (val(temp = mksq(s.x + 1, s.y - 1)) && gs.board.get(temp) == W_PAWN && !gs.is_kpinned_piece(temp, delta(+1, -1))) {
+        *min_w = piece_value(W_PAWN);
+    }
+    if (val(temp = mksq(s.x - 1, s.y + 1)) && gs.board.get(temp) == B_PAWN && !gs.is_kpinned_piece(temp, delta(-1, +1))) {
+        *min_b = piece_value(B_PAWN);
+    } else if (val(temp = mksq(s.x + 1, s.y + 1)) && gs.board.get(temp) == B_PAWN && !gs.is_kpinned_piece(temp, delta(+1, +1))) {
+        *min_b = piece_value(B_PAWN);
+    }
+
+    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
+
+    // knights
+    for (int i = 0; i < 8; ++i) {
+
+        temp = mksq(s.x + XKN[i], s.y + YKN[i]);
+        Piece p = gs.board.get(temp);
+
+        if (p == W_KNIGHT) {
+            if (!gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+                *min_w = piece_value(W_KNIGHT);
+            }
+        } else if (p == B_KNIGHT) {
+            if (!gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+                *min_b = piece_value(W_KNIGHT);
+            }
+        }
+    }
+
+    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
+
+    // sliding pieces
+    MoveType dir = DIAG;
+    for (int i = 0; i < 8; ++i) {
+
+        if (i == 4) { dir = ORTHO; }
+
+        Delta d{XD[i], YD[i]};
+        temp = first_piece_encountered(gs.board, s, d);
+
+//        std::cout << ptoc(gs.board.get(temp)) << "\n";
+
+        if (val(temp)) {
+            Piece p = gs.board.get(first_piece_encountered(gs.board, s, d));
+            if (can_move_in_direction(p, dir) && !gs.is_kpinned_piece(temp, d)) {
+                if (colour(p) == WHITE) {
+                    if (piece_value(p) < *min_w) {
+                        *min_w = piece_value(p);
+                    }
+                } else {
+                    if (piece_value(p) < *min_b) {
+                        *min_b = piece_value(p);
+                    }
+                }
+            }
+        }
+    }
+
+    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
+
+    // kings
+    for (int i = 0; i < 8; ++i) {
+
+        if (!val(s.x + XD[i], s.y + YD[i])) { continue; }
+
+        Piece p = gs.board.get(s.x + XD[i], s.y + YD[i]);
+        if (p == W_KING) {
+            *min_w = piece_value(W_KING);
+        } else if (p == B_KING) {
+            *min_b = piece_value(B_KING);
+        }
+    }
+
+}
 
 /**
  * Walks outward from the given piece, maintaining a running total of the +- control
@@ -243,9 +371,9 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
             uint16_t min_defender = (min_poly_x_ray_defender < min_value_w) ? min_poly_x_ray_defender : min_value_w;
 
             return {
-              poly_x_ray_balance,
-              min_defender,
-              min_value_b
+                poly_x_ray_balance,
+                min_defender,
+                min_value_b
             };
 
         } else {
@@ -278,22 +406,86 @@ SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s)
 }
 
 /**
- * Analyses a SquareControlStatus as returned by capture_walk to detect whether the square is in fact
- * a weak square. If a square is empty, a weak square is defined as one whose control count is strictly
- * unfavourable (ie not zero) for the given colour [c].
- * If a square is not empty, then weakness is more complex:
+ * Interpolates a new SquareControlStatus on the basis of the given one. This function assumes that
+ * the move made is onto the square in question; it doesn't work otherwise. The from_sq should be
+ * the square which the piece originates from.
+ */
+SquareControlStatus update_status(const Gamestate & gs, SquareControlStatus status, Square s, Square from_sq) {
+
+    int16_t new_balance = status.balance;
+    uint16_t new_min_w = status.min_w;
+    uint16_t new_min_b = status.min_b;
+    bool is_white_piece = colour(gs.board.get(from_sq)) == WHITE;
+
+    if (is_white_piece) {
+        --new_balance;
+        if (is_separator_on_poly_x_ray(gs, from_sq, get_delta_between(s, from_sq))) {
+            // if the piece was "separating" a poly x-ray, there is now no poly x-ray.
+            // so on top of the fact this piece does not cover the original square,
+            // there is also the fact that whichever pieces were blocked by the poly
+            // x-ray are no longer blocked.
+            --new_balance;
+        }
+    } else {
+        ++new_balance;
+        if (is_separator_on_poly_x_ray(gs, from_sq, get_delta_between(s, from_sq))) {
+            ++new_balance;
+        }
+    }
+
+    bool refresh_min_attackers = false;
+
+    // quite a lot of caution is needed with refreshing the attackers: if either side did not attack
+    // at all, you need to refresh; this is because of eg a poly x-ray.
+    // otherwise, you only need to refresh if you actually could have been the min attacker.
+    if (is_white_piece) {
+        if (piece_value(gs.board.get(from_sq)) == status.min_w
+                || status.min_w > piece_value(W_KING)
+                || status.min_b > piece_value(W_KING)) {
+            refresh_min_attackers = true;
+        }
+    } else {
+        if (piece_value(gs.board.get(from_sq)) == status.min_b
+                || status.min_b > piece_value(W_KING)
+                || status.min_w > piece_value(W_KING)) {
+            refresh_min_attackers = true;
+        }
+    }
+
+    if (refresh_min_attackers) {
+        Piece sneaked = gs.board.get(from_sq);
+        gs.board.sneak_set(from_sq, EMPTY);
+        find_min_attackers(gs, s, &new_min_w, &new_min_b);
+        gs.board.sneak_set(from_sq, sneaked);
+    }
+
+    return SquareControlStatus{
+        new_balance,
+        new_min_w,
+        new_min_b
+    };
+
+}
+
+/**
+ * Analyses a SquareControlStatus to determine whether it would be safe to move a piece
+ * of the given colour onto a square with the given control status.
+ */
+bool is_weak_status_for_colour(const Gamestate & gs, const SquareControlStatus ss, const Colour c) {
+    return c == WHITE
+        ? ss.balance < 0
+        : ss.balance > 0;
+}
+
+/**
+ * Analyses a SquareControlStatus to detect whether the square is in fact a weak
+ * square for the given piece type. This takes several factors into account, such as:
  * - attacked by a piece of lower value
  * - attacked by a piece of equal value and not sufficiently defended
  * - attacked by any piece and not defended at all
  * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
  */
-bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, SquareControlStatus ss) {
-
-    if (gs.board.get(s) == EMPTY) {
-        return c == WHITE
-               ? ss.balance < 0
-               : ss.balance > 0;
-    }
+bool is_weak_status_for_piece(const Gamestate & gs, SquareControlStatus ss, const Piece p) {
 
     bool
             totally_undefended,
@@ -305,12 +497,12 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
             weakest_attacker,
             weakest_defender;
 
-    if (colour(gs.board.get(s)) == WHITE) {
+    if (colour(p) == WHITE) {
 
         totally_undefended = (ss.min_w > piece_value(W_KING));
         attacked_at_all = (ss.min_b <= piece_value(B_KING));
-        attacked_by_weaker = (ss.min_b < piece_value(gs.board.get(s)));
-        attacked_by_equal = (ss.min_b == piece_value(gs.board.get(s)));
+        attacked_by_weaker = (ss.min_b < piece_value(p));
+        attacked_by_equal = (ss.min_b == piece_value(p));
         under_defended = (ss.balance < 0);
 
         weakest_attacker = ss.min_b;
@@ -320,14 +512,15 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
 
         totally_undefended = (ss.min_b > piece_value(B_KING));
         attacked_at_all = (ss.min_w <= piece_value(W_KING));
-        attacked_by_weaker = (ss.min_w < piece_value(gs.board.get(s)));
-        attacked_by_equal = (ss.min_w == piece_value(gs.board.get(s)));
+        attacked_by_weaker = (ss.min_w < piece_value(p));
+        attacked_by_equal = (ss.min_w == piece_value(p));
         under_defended = (ss.balance > 0);
 
         weakest_attacker = ss.min_w;
         weakest_defender = ss.min_b;
     }
 
+//    cout << "Colour: " << (colour(p) == WHITE ? "white\n" : "black\n");
 //    cout << "totally undefended: " << totally_undefended << "\n";
 //    cout << "attacked at all: " << attacked_at_all << "\n";
 //    cout << "attacked by weaker: " << attacked_by_weaker << "\n";
@@ -347,59 +540,117 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
 }
 
 /**
- * Checks if the given square is weak for either white or black (according to the given colour [c]).
- * If a square is empty, then only the control count is looked at, which must be strictly less or more
- * than zero respectively.
- * If a square is not empty, there is a more complex set of rules. In this case, the colour is not
- * relevant and the return value represents solely the weakness/safety of the piece on the square.
- * The definition of weakness is then:
- * - attacked by a piece of lower value
- * - attacked by a piece of equal value and not sufficiently defended
- * - attacked by any piece and not defended at all
- * - not sufficiently defended and attacked by a piece of lower value than the weakest defender
- * However, there is more complicated logic regarding the interaction of x-rays when pieces are
- * on the same diagonal/orthogonal line.
+ * Returns true iff the square is controlled by the opposing colour to that given.
+ * So if WHITE was given, this returns true if BLACK control the square, and false
+ * if WHITE control it or if the control is balanced.
+ * No notice is taken of whether the square is empty or not: use weak_piece if you
+ * want to know whether a piece on a given square is safe there or not.
  */
-bool is_weak_square(const Gamestate & gs, const Square s, const Colour c, const bool use_caches) {
-    if (!use_caches) {
-        return is_weak_status(gs, s, c, capture_walk(gs, s));
-    }
+bool weak_square(const Gamestate & gs, const Square s, Colour c) {
+
     if (gs.control_cache->contains(s)) {
-        return is_weak_status(gs, s, c, gs.control_cache->get(s));
+        return is_weak_status_for_colour(gs, gs.control_cache->get(s), c);
     }
+
     SquareControlStatus status = capture_walk(gs, s);
     gs.control_cache->put(s, status);
-    return is_weak_status(gs, s, c, status);
-}
 
-/**
- * Calculates exactly the same thing as is_weak_square, but after the given move has
- * taken place.
- * Not suitable for kings (use eg is_safe_for_king).
- */
-bool would_be_weak_after(const Gamestate & gs, const Square s, const Colour c, const Move m) {
-
-    Piece sneaked = gs.sneak(m);
-    bool weak = is_weak_square(gs, s, c, false);
-    gs.unsneak(m, sneaked);
-
-    return weak;
+    return is_weak_status_for_colour(gs, status, c);
 
 }
 
 /**
- * Returns true iff the given square has a weak piece on it. For the definition of weak,
- * see is_weak_square.
- * Not suitable for kings (use eg is_safe_for_king).
+ * Returns true iff the given square is not empty, and if the piece on it is not
+ * safe to remain there.
  */
-bool is_unsafe_piece(const Gamestate & gs, const Square s) {
-    return (gs.board.get(s) != EMPTY) && is_weak_square(gs, s, colour(gs.board.get(s)));
+bool weak_piece(const Gamestate & gs, const Square s) {
+
+    // empty squares by definition don't contain an unsafe piece
+    if (gs.board.get(s) == EMPTY) { return false; }
+
+    if (gs.control_cache->contains(s)) {
+        return is_weak_status_for_piece(gs, gs.control_cache->get(s), gs.board.get(s));
+    }
+
+    SquareControlStatus status = capture_walk(gs, s);
+    gs.control_cache->put(s, status);
+
+    return is_weak_status_for_piece(gs, status, gs.board.get(s));
 }
 
 /**
- * Returns the same as is_unsafe_piece, but after the given move has been played.
- * Not suitable for kings (use eg is_safe_for_king).
+ * This behaves as if the given move had been played.
+ * Returns true iff the square is controlled by the opposing colour to that given.
+ * So if WHITE was given, this returns true if BLACK control the square, and false
+ * if WHITE control it or if the control is balanced.
+ * No notice is taken of whether the square is empty or not: use weak_piece if you
+ * want to know whether a piece on a given square is safe there or not.
  */
-bool would_be_unsafe_after(const Gamestate & gs, const Square s, const Move m) {
-    return (gs.board.get(s) != EMPTY || equal(s, m.to)) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
+bool weak_square(const Gamestate & gs, const Square s, const Colour c, const Move m) {
+
+    // we can only interpolate if (i) the move is onto the square in question (ii) it's neither king nor pawn
+    if (equal(m.to, s) && type(gs.board.get(m.from)) != PAWN && type(gs.board.get(m.from)) != KING) {
+
+        SquareControlStatus status;
+        if (gs.control_cache->contains(s)) {
+            status = gs.control_cache->get(s);
+        } else {
+            status = capture_walk(gs, s);
+            gs.control_cache->put(s, status);
+        }
+
+        status = update_status(gs, status, s, m.from);
+
+        return is_weak_status_for_colour(gs, status, c);
+
+    } else {
+
+        Piece sneaked = gs.board.sneak(m);
+        SquareControlStatus status = capture_walk(gs, s);
+        gs.board.unsneak(m, sneaked);
+
+        return is_weak_status_for_colour(gs, status, c);
+    }
+
+}
+
+/**
+ * This behaves as if the given move had been played.
+ * Returns true iff the given square is not empty, and if the piece on it is not
+ * safe to remain there.
+ */
+bool weak_piece(const Gamestate & gs, const Square s, const Move m) {
+
+    // empty squares by definition don't contain an unsafe piece
+    if (!equal(m.to, s) && gs.board.get(s) == EMPTY) { return false; }
+
+    // we can only interpolate if (i) the move is onto the square in question (ii) it's neither king nor pawn
+    if (equal(m.to, s) && type(gs.board.get(m.from)) != PAWN && type(gs.board.get(m.from)) != KING) {
+
+        SquareControlStatus status;
+        if (gs.control_cache->contains(s)) {
+            status = gs.control_cache->get(s);
+        } else {
+            status = capture_walk(gs, s);
+            gs.control_cache->put(s, status);
+        }
+
+        status = update_status(gs, status, s, m.from);
+
+        return is_weak_status_for_piece(gs, status, gs.board.get(m.from));
+
+    } else {
+
+        Piece sneaked = gs.board.sneak(m);
+        SquareControlStatus status = capture_walk(gs, s);
+        gs.board.unsneak(m, sneaked);
+
+        if (equal(s, m.to)) {
+            // king/pawn moves come out in this branch
+            return is_weak_status_for_piece(gs, status, gs.board.get(m.from));
+        } else {
+            return is_weak_status_for_piece(gs, status, gs.board.get(s));
+        }
+    }
+
 }
