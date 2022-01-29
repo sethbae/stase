@@ -51,7 +51,7 @@ void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, Ind
 
         Move m{ff->centre, ff->secondary, 0};
         int score;
-        if (would_be_weak_after(gs, m.to, colour(gs.board.get(m.from)), m)) {
+        if (weak_piece(gs, m.to, m)) {
             score = unsafe_check_score(gs.board.get(m.from));
         } else {
             score = safe_check_score(gs.board.get(m.from));

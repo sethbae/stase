@@ -70,7 +70,7 @@ const TestSet<WeakTestCase> weak_test_cases = {
             {"d4"},
             {"none"},
             {"white"},
-            {true}
+            {false}
         },
         // pawns in x-rays don't count #1
         WeakTestCase{
@@ -258,9 +258,9 @@ bool evaluate_weak_test_case(const WeakTestCase * tc) {
             m = MOVE_SENTINEL;
         } else {
             m = Move{
-                    stosq(tc->moves[i].substr(0,2)),
-                    stosq(tc->moves[i].substr(2,4)),
-                    0
+                stosq(tc->moves[i].substr(0,2)),
+                stosq(tc->moves[i].substr(2,4)),
+                0
             };
         }
 
@@ -270,11 +270,11 @@ bool evaluate_weak_test_case(const WeakTestCase * tc) {
                 : BLACK;
 
         if (is_sentinel(m)) {
-            if (is_weak_square(gs, s, colour) != tc->expected_results[i]) {
+            if (weak_square(gs, s, colour) != tc->expected_results[i]) {
                 return false;
             }
         } else {
-            if (would_be_weak_after(gs, s, colour, m) != tc->expected_results[i]) {
+            if (weak_square(gs, s, colour, m) != tc->expected_results[i]) {
                 return false;
             }
         }
@@ -303,11 +303,11 @@ bool evaluate_unsafe_test_case(const UnsafeTestCase * tc) {
         }
 
         if (is_sentinel(m)) {
-            if (is_unsafe_piece(gs, s) != tc->expected_results[i]) {
+            if (weak_piece(gs, s) != tc->expected_results[i]) {
                 return false;
             }
         } else {
-            if (would_be_unsafe_after(gs, s, m) != tc->expected_results[i]) {
+            if (weak_piece(gs, s, m) != tc->expected_results[i]) {
                 return false;
             }
         }

@@ -27,7 +27,7 @@ bool can_promote_hook(Gamestate & gs, const Square s) {
     Square temp = mksq(s.x, s.y + FORWARD);
 
     if (gs.board.get(temp) != EMPTY
-        || would_be_unsafe_after(gs, temp, Move{s, temp, 0})
+        || weak_square(gs, temp, colour(gs.board.get(temp)), Move{s, temp, 0})
         || gs.is_kpinned_piece(s, get_delta_between(s, temp))) {
         return true;
     }

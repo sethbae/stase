@@ -65,7 +65,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             const Colour c = colour(gs.board.get(ff->centre));
             would_be_unsafe = !would_be_safe_for_king_after(gs, piece_moves[i].to, piece_moves[i], c);
         } else {
-            would_be_unsafe = would_be_unsafe_after(gs, piece_moves[i].to, piece_moves[i]);
+            would_be_unsafe = weak_piece(gs, piece_moves[i].to, piece_moves[i]);
         }
 
         if (!would_be_unsafe && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {

@@ -12,7 +12,7 @@ bool find_knight_forks(Gamestate & gs, const Square s) {
 
         if (!val(fork_square)
             || colour(gs.board.get(fork_square)) == colour(gs.board.get(s))
-            || would_be_unsafe_after(gs, fork_square, Move{s, fork_square, 0})) {
+            || weak_piece(gs, fork_square, Move{s, fork_square, 0})) {
             continue;
         }
 
@@ -34,7 +34,7 @@ bool find_knight_forks(Gamestate & gs, const Square s) {
             if (p != EMPTY
                 && colour(p) != colour(gs.board.get(s))
                 && type(p) != KNIGHT
-                && (would_be_unsafe_after(gs, forked_square, Move{s, fork_square, 0})
+                && (weak_piece(gs, forked_square, Move{s, fork_square, 0})
                     || piece_value(p) > piece_value(KNIGHT))) {
                 if (forked_count % 2 == 0) {
                     val_a = piece_value(p);
@@ -84,7 +84,7 @@ bool forkable(const Gamestate &gs, const Move m, const Square forked_piece_sq) {
 
     // the piece should either be more valuable, or should be made unsafe after the move
     if (piece_value(forked_p) > piece_value(gs.board.get(m.from))
-        || would_be_unsafe_after(gs, forked_piece_sq, m)) {
+        || weak_piece(gs, forked_piece_sq, m)) {
 
         // avoid forking pieces which we already attacked
         if (!beta_covers(gs.board, m.from, forked_piece_sq)) {
@@ -165,7 +165,7 @@ bool find_forks(
             // - there isn't a piece on the square of the queen's colour (illegal move)
             // - the square is safe
             if (colour(gs.board.get(temp)) != colour(gs.board.get(forker_sq))
-                    && !would_be_unsafe_after(gs, temp, Move{forker_sq, temp, 0})) {
+                    && !weak_piece(gs, temp, Move{forker_sq, temp, 0})) {
 
                 int forked_pieces = 0;
                 int val_a;
@@ -210,7 +210,7 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
 
         Move m = moves[i];
 
-        if (!would_be_unsafe_after(gs, m.to, m)) {
+        if (!weak_piece(gs, m.to, m)) {
 
             Square l_sq = mksq(get_x(m.to) - 1, get_y(m.to) + yd);
             Square r_sq = mksq(get_x(m.to) + 1, get_y(m.to) + yd);

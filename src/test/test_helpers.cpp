@@ -10,6 +10,7 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
+        gs.control_cache->clear();
         resp->resp(gs, &ff, &moves[0], move_counter);
     }
 
