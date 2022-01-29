@@ -122,8 +122,8 @@ struct Board {
      * You can only SNEAK if you promise to immediately UNSNEAK!
      */
     inline Piece sneak(const Move m) const {
-        Piece p = this->get(m.from);
-        Piece captured = this->get(m.to);
+        Piece p = get(m.from);
+        Piece captured = get(m.to);
 
         // set the from square to empty
         squares[m.from.x][m.from.y] = EMPTY;
@@ -137,6 +137,15 @@ struct Board {
     }
 
     /**
+     * Sneak-set is used to very temporarily modify the board contents, for example to check if a
+     * piece obstructs a certain path or not by removing it before performing the check. Always
+     * unsneak and be very careful!
+     */
+    inline void sneak_set(const Square s, const Piece p) const {
+        squares[s.x][s.y] = p;
+    }
+
+    /**
      * Unsneak is used to undo a sneak operation. It undoes the given move, which should be
      * the same move passed to SNEAK. You should only UNSNEAK after a SNEAK, and you should
      * always UNSNEAK as soon as possible!
@@ -146,7 +155,7 @@ struct Board {
      */
     inline void unsneak(const Move m, const Piece captured) const {
 
-        Piece p = this->get(m.to);
+        Piece p = get(m.to);
 
         // set the to square to the captured piece
         squares[m.to.x][m.to.y] = captured;
@@ -299,8 +308,7 @@ struct Board {
 
         // promotion
         if (m.is_prom()) {
-            Piece p = m.get_prom_piece(col);
-            set(m.to, p);
+            set(m.to, m.get_prom_piece(col));
         }
 
         return;
