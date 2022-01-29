@@ -26,6 +26,10 @@ struct ControlCache {
         squares |= (1l << index(s));
     }
 
+    inline void clear() {
+        squares = 0;
+    }
+
 private:
     constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);
