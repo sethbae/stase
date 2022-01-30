@@ -68,6 +68,8 @@ set(SOURCE_FILES
         src/game/glogic/glogic.h
         src/game/glogic/piece_moves.hpp
         src/game/glogic/edge_of_board_lookup.h
+        src/game/glogic/piece_encounter_cache.hpp
+        src/game/glogic/piece_encounter_lookups.cpp
 
         src/utils/utils.h
         src/utils/print.cpp

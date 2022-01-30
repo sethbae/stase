@@ -128,25 +128,6 @@ std::vector<Square> squares_piece_can_reach_on_line(
 }
 
 /**
- * Walks out from the given square in the given direction until it reaches a piece.
- * It returns the square on which that piece lies, or SQUARE_SENTINEL if no piece was
- * encountered before the edge of the board.
- */
-Square first_piece_encountered(const Board & b, const Square start, const Delta delta) {
-
-    int x = get_x(start) + delta.dx, y = get_y(start) + delta.dy;
-    Square temp;
-
-    while (val(temp = mksq(x, y)) && b.get(temp) == EMPTY) {
-        x += delta.dx;
-        y += delta.dy;
-    }
-
-    return val(temp) ? temp : SQUARE_SENTINEL;
-
-}
-
-/**
  * Finds squares moving in one direction according to gamma-logic. Writes to squares starting from the given
  * index.
  */
