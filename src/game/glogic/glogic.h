@@ -4,6 +4,7 @@
 #include "game.h"
 #include "board.h"
 #include "piece_moves.hpp"
+#include "piece_encounter_cache.hpp"
 
 /**
  * Used to pass information about the pieces attacking and controlling a certain square.
@@ -28,7 +29,6 @@ bool can_move_to_square(const Board &, Square from, Square to);
 Delta open_path_between(const Board & b, const Square, const Square);
 Square square_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
 std::vector<Square> squares_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
-Square first_piece_encountered(const Board &, const Square, const Delta);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);
