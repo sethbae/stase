@@ -12,6 +12,7 @@ using std::ofstream;
 #include "include/stase/board.h"
 #include "include/stase/game.h"
 #include "include/stase/search.h"
+#include "src/search/thread.h"
 #include "include/stase/puzzle.h"
 #include "src/game/cands/cands.h"
 #include "src/game/gamestate.hpp"
@@ -540,21 +541,21 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "rn2kb1r/pp2q1p1/2p4p/6N1/3P2Q1/8/PPP4P/2KR4 w kq - 0 15"
+                "r1r3k1/p2b1ppp/3bp3/3p3Q/3p1P2/1P5N/P2q2PP/R2NR1K1 w - - 0 20"
             );
 
-    Gamestate gs(fen, MIDGAME);
-    pr_board(gs.board);
+//    Gamestate gs(fen, MIDGAME);
+//    pr_board(gs.board);
 
-    for (const Hook * h : ALL_HOOKS) {
-        number_of_frames_hist(h);
-    }
+//    for (const Hook * h : ALL_HOOKS) {
+//        number_of_frames_hist(h);
+//    }
 
 //    q_scores();
 
 //    repl(fen);
 
-//    run_engine(fen, 3);
+    run_with_node_limit(fen, 25000);
 
 //    show_hook_frames(gs, &unsafe_piece_hook);
 
