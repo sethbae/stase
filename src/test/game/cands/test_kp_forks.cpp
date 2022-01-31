@@ -120,6 +120,7 @@ TestSet<StringTestCase> kp_fork_hook_test_cases = {
 bool evaluate_test_case_kp_fork_hook(const StringTestCase *tc) {
 
     Gamestate gs(tc->fen);
+    create_piece_encountered_caches(gs.board);
 
     discover_feature_frames(gs, &fork_hook);
 

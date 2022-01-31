@@ -28,9 +28,10 @@ namespace __data {
     extern DirCache caches[3][3];
 
     /**
-     * This array tracks whether the caches are valid or not.
+     * A flag used internally to confirm that the caches are up to date. If set to false, they get recalculated
+     * on next access.
      */
-    extern bool valid[3][3];
+    extern bool caches_valid;
 
 }
 
@@ -87,15 +88,25 @@ namespace __internal {
     }
 }
 
-/**
- * Sets all caches to be invalid, so that on access they will be refreshed.
- */
-inline void invalidate_piece_encountered_caches() {
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            __data::valid[i][j] = false;
-        }
+inline void create_piece_encountered_caches(const Board & b) {
+    for (int i = 0; i < 8; ++i) {
+        Delta d = delta(XD[i], YD[i]);
+        __internal::create_cache(b, __data::caches[d.dx + 1][d.dy + 1], d);
     }
+    __data::caches_valid = true;
+}
+
+inline Square __manual_first_piece_encountered(const Board & b, const Square start, const Delta delta) {
+
+    int x = get_x(start) + delta.dx, y = get_y(start) + delta.dy;
+    Square temp;
+
+    while (val(temp = mksq(x, y)) && b.get(temp) == EMPTY) {
+        x += delta.dx;
+        y += delta.dy;
+    }
+
+    return val(temp) ? temp : SQUARE_SENTINEL;
 }
 
 /**
@@ -104,16 +115,10 @@ inline void invalidate_piece_encountered_caches() {
  * encountered before the edge of the board.
  */
 inline Square first_piece_encountered(const Board & b, const Square s, const Delta d) {
-
-    int i = d.dx + 1;
-    int j = d.dy + 1;
-
-    if (!__data::valid[i][j]) {
-        __internal::create_cache(b, __data::caches[i][j], d);
-        __data::valid[i][j] = true;
+    if (!__data::caches_valid) {
+        create_piece_encountered_caches(b);
     }
-
-    return __data::caches[i][j].p[s.x][s.y];
+    return __data::caches[(d.dx + 1)][(d.dy + 1)].p[s.x][s.y];
 }
 
 #endif //STASE_PIECE_ENCOUNTER_CACHE_HPP

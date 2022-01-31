@@ -18,7 +18,7 @@ using std::ofstream;
 #include "src/game/gamestate.hpp"
 #include "src/bench/bench.h"
 #include "src/test/test.h"
-
+#include "src/game/glogic/piece_encounter_cache.hpp"
 
 
 /**

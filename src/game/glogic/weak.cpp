@@ -44,7 +44,7 @@ bool is_separator_on_poly_x_ray(const Gamestate & gs, const Square s, const Delt
  * Finds the pieces of minimum value which control the given square. Records the value of
  * the minimum white piece in min_w and vice versa for min_b.
  */
-void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16_t * min_b) {
+uint16_t find_min_w(const Gamestate & gs, Square s) {
 
     /*
      * Throughout, early exits are possible because pieces are tackled in non-decreasing order.
@@ -55,22 +55,18 @@ void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16
     //TODO: write some tests!
 
     Square temp;
-    *min_w = piece_value(W_KING) + 1;
-    *min_b = piece_value(W_KING) + 1;
+    uint16_t min_w = piece_value(W_KING) + 1;
 
     // pawns
-    if (val(temp = mksq(s.x - 1, s.y - 1)) && gs.board.get(temp) == W_PAWN && !gs.is_kpinned_piece(temp, delta(-1, -1))) {
-        *min_w = piece_value(W_PAWN);
-    } else if (val(temp = mksq(s.x + 1, s.y - 1)) && gs.board.get(temp) == W_PAWN && !gs.is_kpinned_piece(temp, delta(+1, -1))) {
-        *min_w = piece_value(W_PAWN);
+    if (val(temp = mksq(s.x - 1, s.y - 1))
+            && gs.board.get(temp) == W_PAWN
+            && !gs.is_kpinned_piece(temp, delta(-1, -1))) {
+        return piece_value(W_PAWN);
+    } else if (val(temp = mksq(s.x + 1, s.y - 1))
+            && gs.board.get(temp) == W_PAWN
+            && !gs.is_kpinned_piece(temp, delta(+1, -1))) {
+        return piece_value(W_PAWN);
     }
-    if (val(temp = mksq(s.x - 1, s.y + 1)) && gs.board.get(temp) == B_PAWN && !gs.is_kpinned_piece(temp, delta(-1, +1))) {
-        *min_b = piece_value(B_PAWN);
-    } else if (val(temp = mksq(s.x + 1, s.y + 1)) && gs.board.get(temp) == B_PAWN && !gs.is_kpinned_piece(temp, delta(+1, +1))) {
-        *min_b = piece_value(B_PAWN);
-    }
-
-    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
 
     // knights
     for (int i = 0; i < 8; ++i) {
@@ -80,16 +76,10 @@ void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16
 
         if (p == W_KNIGHT) {
             if (!gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
-                *min_w = piece_value(W_KNIGHT);
-            }
-        } else if (p == B_KNIGHT) {
-            if (!gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
-                *min_b = piece_value(W_KNIGHT);
+                return piece_value(W_KNIGHT);
             }
         }
     }
-
-    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
 
     // sliding pieces
     MoveType dir = DIAG;
@@ -100,25 +90,21 @@ void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16
         Delta d{XD[i], YD[i]};
         temp = first_piece_encountered(gs.board, s, d);
 
-//        std::cout << ptoc(gs.board.get(temp)) << "\n";
-
         if (val(temp)) {
             Piece p = gs.board.get(first_piece_encountered(gs.board, s, d));
             if (can_move_in_direction(p, dir) && !gs.is_kpinned_piece(temp, d)) {
                 if (colour(p) == WHITE) {
-                    if (piece_value(p) < *min_w) {
-                        *min_w = piece_value(p);
-                    }
-                } else {
-                    if (piece_value(p) < *min_b) {
-                        *min_b = piece_value(p);
+                    if (piece_value(p) < min_w) {
+                        min_w = piece_value(p);
                     }
                 }
             }
         }
     }
 
-    if (*min_w <= piece_value(W_KING) && *min_b <= piece_value(W_KING)) { return; }
+    if (min_w <= piece_value(W_KING)) {
+        return min_w;
+    }
 
     // kings
     for (int i = 0; i < 8; ++i) {
@@ -127,11 +113,94 @@ void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16
 
         Piece p = gs.board.get(s.x + XD[i], s.y + YD[i]);
         if (p == W_KING) {
-            *min_w = piece_value(W_KING);
-        } else if (p == B_KING) {
-            *min_b = piece_value(B_KING);
+            return piece_value(W_KING);
         }
     }
+
+    return min_w;
+
+}
+/**
+ * Finds the pieces of minimum value which control the given square. Records the value of
+ * the minimum white piece in min_w and vice versa for min_b.
+ */
+uint16_t find_min_b(const Gamestate & gs, Square s) {
+
+    /*
+     * Throughout, early exits are possible because pieces are tackled in non-decreasing order.
+     */
+
+    //TODO: try separating this into two functions for b/w to see the speedup
+
+    //TODO: write some tests!
+
+    Square temp;
+    uint16_t min_b = piece_value(W_KING) + 1;
+
+    // pawns
+    if (val(temp = mksq(s.x - 1, s.y + 1))
+            && gs.board.get(temp) == B_PAWN
+            && !gs.is_kpinned_piece(temp, delta(-1, +1))) {
+        return piece_value(B_PAWN);
+    } else if (val(temp = mksq(s.x + 1, s.y + 1))
+            && gs.board.get(temp) == B_PAWN
+            && !gs.is_kpinned_piece(temp, delta(+1, +1))) {
+        return piece_value(B_PAWN);
+    }
+
+    // knights
+    for (int i = 0; i < 8; ++i) {
+
+        temp = mksq(s.x + XKN[i], s.y + YKN[i]);
+        Piece p = gs.board.get(temp);
+
+        if (p == B_KNIGHT) {
+            if (!gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+                return piece_value(B_KNIGHT);
+            }
+        }
+    }
+
+    // sliding pieces
+    MoveType dir = DIAG;
+    for (int i = 0; i < 8; ++i) {
+
+        if (i == 4) { dir = ORTHO; }
+
+        Delta d{XD[i], YD[i]};
+        temp = first_piece_encountered(gs.board, s, d);
+
+        if (val(temp)) {
+            Piece p = gs.board.get(first_piece_encountered(gs.board, s, d));
+            if (can_move_in_direction(p, dir) && !gs.is_kpinned_piece(temp, d)) {
+                if (colour(p) == BLACK) {
+                    if (piece_value(p) < min_b) {
+                        min_b = piece_value(p);
+                        if (min_b == piece_value(W_KNIGHT)) {
+                            return min_b;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (min_b <= piece_value(W_KING)) {
+        return min_b;
+    }
+
+    // kings
+    for (int i = 0; i < 8; ++i) {
+
+        if (!val(s.x + XD[i], s.y + YD[i])) { continue; }
+
+        Piece p = gs.board.get(s.x + XD[i], s.y + YD[i]);
+        if (p == B_KING) {
+            return piece_value(W_KING);
+        }
+    }
+
+    return min_b;
 
 }
 
@@ -455,7 +524,8 @@ SquareControlStatus update_status(const Gamestate & gs, SquareControlStatus stat
     if (refresh_min_attackers) {
         Piece sneaked = gs.board.get(from_sq);
         gs.board.sneak_set(from_sq, EMPTY);
-        find_min_attackers(gs, s, &new_min_w, &new_min_b);
+        new_min_b = find_min_b(gs, s);
+        new_min_w = find_min_w(gs, s);
         gs.board.sneak_set(from_sq, sneaked);
     }
 
