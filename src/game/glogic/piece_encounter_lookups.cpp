@@ -80,16 +80,7 @@ DirCache __data::caches[3][3] = {
 };
 
 /**
- * This array tracks whether the caches are valid or not.
+ * A flag used internally to confirm that the caches are up to date. If set to false, they get recalculated
+ * on next access.
  */
-bool __data::valid[3][3] = {
-        {
-                false, false, false
-        },
-        {
-                false, false, false
-        },
-        {
-                false, false, false
-        }
-};
+bool __data::caches_valid = false;

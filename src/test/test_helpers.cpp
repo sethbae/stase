@@ -7,6 +7,7 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
     Gamestate gs(tc->fen);
     Move moves[MAX_MOVES_PER_HOOK];
     IndexCounter move_counter(MAX_MOVES_PER_HOOK);
+    create_piece_encountered_caches(gs.board);
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
@@ -26,6 +27,7 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
 bool evaluate_hook_test_case(const Hook * h, const HookTestCase * tc) {
 
     Gamestate gs(tc->fen);
+    create_piece_encountered_caches(gs.board);
 
     discover_feature_frames(gs, h);
 
