@@ -539,14 +539,36 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
 
+//    const std::string fen =
+//            std::string(
+//                "r1r3k1/p2b1ppp/3bp3/3p3Q/3p1P2/1P5N/P2q2PP/R2NR1K1 w - - 0 20"
+//            );
+
     const std::string fen =
             std::string(
-                "r1r3k1/p2b1ppp/3bp3/3p3Q/3p1P2/1P5N/P2q2PP/R2NR1K1 w - - 0 20"
+                "8/8/8/8/8/b1N5/1qPB4/1R1Q4 b - - 0 1"
             );
 
-//    Gamestate gs(fen, MIDGAME);
-//    pr_board(gs.board);
+    Gamestate gs(fen, MIDGAME);
+    pr_board(gs.board);
 
+    const Delta d = delta(1, -1);
+    PieceEncounteredCache * cache = new PieceEncounteredCache;
+
+    compute_cache(gs.board, cache);
+
+    __debug::print_cache(cache->d[d.dx + 1][d.dy + 1]);
+
+    const Move m{stosq("h5"), stosq("h4")};
+
+    update_cache(gs.board, cache, m);
+
+    cout << "\n";
+
+    __debug::print_cache(cache->d[d.dx + 1][d.dy + 1]);
+
+
+//    update_cache(gs.board, )
 //    for (const Hook * h : ALL_HOOKS) {
 //        number_of_frames_hist(h);
 //    }
@@ -555,9 +577,16 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_with_node_limit(fen, 25000);
+//    run_with_node_limit(fen, 25000);
 
-//    show_hook_frames(gs, &unsafe_piece_hook);
+    show_responder_moves(fen, retreat_resp, FeatureFrame{stosq("b2")});
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            __debug::print_cache(gs.pdir_cache->d[i][j]);
+            cout << "\n";
+        }
+    }
 
 //    cands_report(gs);
 

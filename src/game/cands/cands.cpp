@@ -47,8 +47,6 @@ CandSet * cands(Gamestate & gs) {
  */
 CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
-    create_piece_encountered_caches(gs.board);
-
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
         cands_in_check(gs, cand_set);
@@ -153,8 +151,6 @@ CandSet * cands_report(Gamestate & gs) {
 
     pr_board_conf(gs.board);
     CandSet * cand_set = new CandSet;
-
-    create_piece_encountered_caches(gs.board);
 
     // if we're in check, handle the candidates differently
     if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {

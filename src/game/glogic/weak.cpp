@@ -98,12 +98,12 @@ void find_min_attackers(const Gamestate & gs, Square s, uint16_t * min_w, uint16
         if (i == 4) { dir = ORTHO; }
 
         Delta d{XD[i], YD[i]};
-        temp = first_piece_encountered(gs.board, s, d);
+        temp = gs.first_piece_encountered(s, d);
 
 //        std::cout << ptoc(gs.board.get(temp)) << "\n";
 
         if (val(temp)) {
-            Piece p = gs.board.get(first_piece_encountered(gs.board, s, d));
+            Piece p = gs.board.get(gs.first_piece_encountered(s, d));
             if (can_move_in_direction(p, dir) && !gs.is_kpinned_piece(temp, d)) {
                 if (colour(p) == WHITE) {
                     if (piece_value(p) < *min_w) {

@@ -28,7 +28,7 @@ inline Square find_line_end(const Gamestate & gs, int x, int y, Delta d) {
  */
 inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
 
-    Square other_p_sq = first_piece_encountered(gs.board, s, d);
+    Square other_p_sq = gs.first_piece_encountered(s, d);
 
     // check we actually hit a piece
     if (is_sentinel(other_p_sq)) {
@@ -234,13 +234,13 @@ bool identify_king_pinned_pieces_hook(Gamestate & gs, const Square s) {
     for (int i = ALL_DIRS_START; i < ALL_DIRS_STOP; ++i) {
 
         Delta d{XD[i], YD[i]};
-        Square pinned_sq = first_piece_encountered(gs.board, s, d);
+        Square pinned_sq = gs.first_piece_encountered(s, d);
 
         if (is_sentinel(pinned_sq) || colour(gs.board.get(pinned_sq)) != colour(king)) {
             continue;
         }
 
-        Square pinner_sq = first_piece_encountered(gs.board, pinned_sq, d);
+        Square pinner_sq = gs.first_piece_encountered(pinned_sq, d);
 
         if (is_sentinel(pinner_sq)) {
             continue;

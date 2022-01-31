@@ -75,7 +75,6 @@ TestSet<StringTestCase> check_hook_test_cases = {
 bool evaluate_test_case_check_hook(const StringTestCase *tc) {
 
     Gamestate gs(tc->fen);
-    create_piece_encountered_caches(gs.board);
 
     discover_feature_frames(gs, &check_hook);
 
