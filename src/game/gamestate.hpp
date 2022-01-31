@@ -28,6 +28,7 @@ public:
     Delta * b_kpin_dirs;
 
     ControlCache * control_cache;
+    PieceEncounteredCache * pdir_cache;
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
     Gamestate()
@@ -48,12 +49,17 @@ public:
               in_check(false) {
         alloc();
         find_kings();
+        compute_cache(board, pdir_cache);
     }
 
     Gamestate(const Gamestate & o, const Move m)
             : board(o.board.successor_hard(m)), last_move(m) {
 
         alloc();
+
+        // copy pdir_cache contents across and then update it
+        copy_cache(o.pdir_cache, pdir_cache);
+        update_cache(board, pdir_cache, m);
 
         phase = o.phase;
         update_phase(m);
@@ -95,6 +101,7 @@ public:
               in_check(false) {
         alloc();
         find_kings();
+        compute_cache(board, pdir_cache);
     }
 
     Gamestate(const std::string & fen, GamePhase phase)
@@ -105,6 +112,7 @@ public:
               in_check(false) {
         alloc();
         find_kings();
+        compute_cache(board, pdir_cache);
     }
 
     Gamestate(Gamestate && o) {
@@ -117,6 +125,7 @@ public:
             }
         }
         control_cache = o.control_cache;
+        pdir_cache = o.pdir_cache;
         wpieces = o.wpieces;
         bpieces = o.bpieces;
         w_kpinned_pieces = o.w_kpinned_pieces;
@@ -130,6 +139,7 @@ public:
         in_check = o.in_check;
         phase = o.phase;
         o.control_cache = nullptr;
+        o.pdir_cache = nullptr;
         o.wpieces = nullptr;
         o.bpieces = nullptr;
         o.w_kpinned_pieces = nullptr;
@@ -153,6 +163,8 @@ public:
                 if (is_sentinel(o.frames[i][j].centre)) { break; }
             }
         }
+        // copy the piece encountered cache across
+        copy_cache(o.pdir_cache, pdir_cache);
         w_cas = o.w_cas;
         b_cas = o.b_cas;
         in_check = o.in_check;
@@ -165,6 +177,7 @@ public:
 
     ~Gamestate() {
         delete control_cache;
+        delete pdir_cache;
         delete wpieces;
         delete bpieces;
         delete w_kpinned_pieces;
@@ -226,6 +239,15 @@ public:
         for (int i = 0; i < NUM_HOOKS; ++i) {
             frames[i][0] = FeatureFrame{ SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0 };
         }
+    }
+
+    /**
+     * Walks out from the given square in the given direction until it reaches a piece.
+     * It returns the square on which that piece lies, or SQUARE_SENTINEL if no piece was
+     * encountered before the edge of the board.
+     */
+    inline Square first_piece_encountered(const Square s, const Delta d) const {
+        return pdir_cache->d[(d.dx + 1)][(d.dy + 1)].p[s.x][s.y];
     }
 
     /**
@@ -383,6 +405,7 @@ private:
      */
     void alloc() {
         control_cache = new ControlCache;
+        pdir_cache = new PieceEncounteredCache;
         wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         w_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));

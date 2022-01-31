@@ -20,7 +20,6 @@ bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook * h
         }
 
         Gamestate & gs = states[i];
-        create_piece_encountered_caches(gs.board);
 
         discover_feature_frames(gs, h);
 
@@ -53,7 +52,6 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         }
 
         Gamestate & gs = states[i];
-        create_piece_encountered_caches(gs.board);
         gs.clear_all_frames();
 
         std::vector<Move> moves = cands(gs)->critical;

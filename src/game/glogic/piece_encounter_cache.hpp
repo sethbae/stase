@@ -9,6 +9,10 @@ struct DirCache {
     Square p[8][8];
 };
 
+struct PieceEncounteredCache {
+    DirCache d[3][3];
+};
+
 namespace __data {
 
     /**
@@ -88,14 +92,6 @@ namespace __internal {
     }
 }
 
-inline void create_piece_encountered_caches(const Board & b) {
-    for (int i = 0; i < 8; ++i) {
-        Delta d = delta(XD[i], YD[i]);
-        __internal::create_cache(b, __data::caches[d.dx + 1][d.dy + 1], d);
-    }
-    __data::caches_valid = true;
-}
-
 inline Square __manual_first_piece_encountered(const Board & b, const Square start, const Delta delta) {
 
     int x = get_x(start) + delta.dx, y = get_y(start) + delta.dy;
@@ -110,15 +106,100 @@ inline Square __manual_first_piece_encountered(const Board & b, const Square sta
 }
 
 /**
- * Walks out from the given square in the given direction until it reaches a piece.
- * It returns the square on which that piece lies, or SQUARE_SENTINEL if no piece was
- * encountered before the edge of the board.
+ * Writes to the given PieceEncounteredCache so that it can be used to answer queries about the
+ * board given.
  */
-inline Square first_piece_encountered(const Board & b, const Square s, const Delta d) {
-    if (!__data::caches_valid) {
-        create_piece_encountered_caches(b);
+inline void  compute_cache(const Board & b, PieceEncounteredCache * cache) {
+    for (int i = 0; i < 8; ++i) {
+        Delta d = delta(XD[i], YD[i]);
+        __internal::create_cache(b, cache->d[d.dx + 1][d.dy + 1], d);
     }
-    return __data::caches[(d.dx + 1)][(d.dy + 1)].p[s.x][s.y];
+}
+
+/**
+ * Copies the contents of the first cache into the second.
+ */
+inline void copy_cache(const PieceEncounteredCache * from, PieceEncounteredCache * to) {
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            for (int x = 0; x < 8; ++x) {
+                for (int y = 0; y < 8; ++y) {
+                    to->d[i][j].p[x][y] = from->d[i][j].p[x][y];
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Assuming that the cache reflects the current state of the board prior to this call, the update_cache
+ * function modifies the new_cache so that it reflects the state of the board after the given move has been made.
+ * The board should represent the position prior to the move being made.
+ */
+inline void update_cache(const Board & b, PieceEncounteredCache * cache, const Move m) {
+
+
+    // from the from square of the move
+
+    // for each direction
+
+    // take the value on this square as the new value
+
+    //                                  going in the opposite way
+    // copy that value into the squares along that direction up to and including the first non-empty square
+
+    Square target_sq = m.from;
+    Square copy_val;
+
+    for (int i = 0; i < 8; ++i) {
+
+        Delta d = delta(XD[i], YD[i]);
+        int x = target_sq.x - d.dx;
+        int y = target_sq.y - d.dy;
+        DirCache & dir_cache = cache->d[d.dx + 1][d.dy + 1];
+        copy_val = dir_cache.p[target_sq.x][target_sq.y];
+
+        while (val(x, y)) {
+            dir_cache.p[x][y] = copy_val;
+            if (b.get(x, y) != EMPTY) {
+                break;
+            } else {
+                x -= d.dx;
+                y -= d.dy;
+            }
+        }
+    }
+
+    target_sq = m.to;
+    copy_val = m.to;
+
+    for (int i = 0; i < 8; ++i) {
+
+        Delta d = delta(XD[i], YD[i]);
+        int x = target_sq.x - d.dx;
+        int y = target_sq.y - d.dy;
+        DirCache & dir_cache = cache->d[d.dx + 1][d.dy + 1];
+
+        while (val(x, y)) {
+            dir_cache.p[x][y] = copy_val;
+            if (b.get(x, y) != EMPTY) {
+                break;
+            } else {
+                x -= d.dx;
+                y -= d.dy;
+            }
+        }
+    }
+
+    // from the to-square of the move
+
+    // for each direction
+
+    // take this piece as the new value
+
+    // put that value in the squares (not the start square) leading away from that square (opposite to the delta)
+    // up to and including the first non-empty square on the board.
+
 }
 
 #endif //STASE_PIECE_ENCOUNTER_CACHE_HPP
