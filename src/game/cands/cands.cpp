@@ -165,7 +165,7 @@ CandSet * cands_report(Gamestate & gs) {
         } else{
             cout << "In check. Returning legal moves:\n";
             for (const Move & m : cand_set->critical) {
-                cout << mtos(gs.board, m);
+                cout << mtos(gs.board, m) << "\n";
             }
             cout << "\n";
         }
