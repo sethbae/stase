@@ -83,7 +83,7 @@ Gamestate * next_gamestate(const Gamestate *, const Move);
 CandSet * cands(Gamestate &);
 CandSet * cands(Gamestate &, CandSet *);
 Eval heur(const Gamestate &);
-float quiess(const Gamestate &);
+float quiess(Gamestate &);
 
 void print_cand_set(const Gamestate &, const CandSet &, std::ostream &);
 Eval heur_with_description(const Gamestate &);

@@ -27,7 +27,11 @@ inline int count_frames(const Gamestate & gs, int hook_id, Colour c) {
  * Returns a score representing how quiescent a position is. The score will be non-negative,
  * and the higher it is, the crazier the position is.
  */
-float quiess(const Gamestate & gs) {
+float quiess(Gamestate & gs) {
+
+    if (gs.in_check) {
+        discover_feature_frames(gs, &unsafe_piece_hook);
+    }
 
     Colour colour_to_move = gs.board.get_white() ? WHITE : BLACK;
 
