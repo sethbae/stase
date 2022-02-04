@@ -113,16 +113,18 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
     }
 
-    int best_score = 0;
+    int best_score = 0, second_best_score = 0;
     for (int i = 0; i < m; ++i) {
         if (all_moves[i].get_score() > best_score) {
             best_score = all_moves[i].get_score();
+        } else if (all_moves[i].get_score() > second_best_score) {
+            second_best_score = all_moves[i].get_score();
         }
     }
 
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
-        if (score > 1 && score >= best_score - 1) {
+        if (score > 1 && score >= second_best_score) {
             cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
             cand_set->medial.push_back(all_moves[j]);
@@ -257,16 +259,18 @@ CandSet * cands_report(Gamestate & gs) {
 
     }
 
-    int best_score = 0;
+    int best_score = 0, second_best_score = 0;
     for (int i = 0; i < m; ++i) {
         if (all_moves[i].get_score() > best_score) {
             best_score = all_moves[i].get_score();
+        } else if (all_moves[i].get_score() > second_best_score) {
+            second_best_score = all_moves[i].get_score();
         }
     }
 
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
-        if (score > 1 && score >= best_score - 1) {
+        if (score > 1 && score >= second_best_score) {
             cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
             cand_set->medial.push_back(all_moves[j]);
