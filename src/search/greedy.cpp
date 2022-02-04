@@ -13,7 +13,7 @@ const int LEGAL_THRESHOLD = 256;
 const float QUIESS_THRESHOLD = 2.0f;
 
 const int BURST_DEPTH = 5;
-const int CRITICAL_DEPTH = 4;
+const int CRITICAL_DEPTH = 2;
 const int MEDIAL_DEPTH = 1;
 const int FINAL_DEPTH = 1;
 const int LEGAL_DEPTH = 1;

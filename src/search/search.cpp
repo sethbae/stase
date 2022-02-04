@@ -111,6 +111,7 @@ void write_to_file(SearchNode *node, ostream & output) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->gs->board, node->children[i]->move)
                    << ") (" << etos(node->children[i]->score)
+                   << ") (" << etos(trust_score(node->children[i], node->gs->board.get_white()))
                    << ") (" << subtree_depth(node->children[i]) << ")\n";
         }
     }

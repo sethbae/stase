@@ -6,7 +6,7 @@
 #include "../../utils/utils.h"
 
 constexpr int safe_check_score(const Piece p) {
-    return 4;
+    return 2;
 }
 constexpr int unsafe_check_score(const Piece p) {
     if (is_major_piece(p)) {
@@ -34,7 +34,7 @@ constexpr int promotion_score() {
 
 constexpr int pin_skewer_score(const int value_of_pinner, const int value_of_pinned, const int value_of_pinned_to) {
     int value_putatively_lost = min(value_of_pinned, value_of_pinned_to) - value_of_pinner;
-    return max(value_putatively_lost / 1000, 2);
+    return max(value_putatively_lost / 1000, 1);
 }
 
 constexpr int defend_score(const Piece defended_piece) {

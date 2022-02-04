@@ -122,7 +122,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
-        if (score > 1 && score >= best_score / 2) {
+        if (score > 1 && score >= best_score - 1) {
             cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
             cand_set->medial.push_back(all_moves[j]);
@@ -266,7 +266,7 @@ CandSet * cands_report(Gamestate & gs) {
 
     for (int j = 0; j < m; ++j) {
         int score = all_moves[j].get_score();
-        if (score > 1 && score >= best_score / 2) {
+        if (score > 1 && score >= best_score - 1) {
             cand_set->critical.push_back(all_moves[j]);
         } else if (score > 0) {
             cand_set->medial.push_back(all_moves[j]);
