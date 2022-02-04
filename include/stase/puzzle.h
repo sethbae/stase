@@ -15,13 +15,15 @@ class Puzzle {
 public:
     std::string fen;
     std::vector<Move> solution_moves;
+    double rating;
 
-    Puzzle(const std::string & fen_in, std::vector<Move> soln_in) : fen(fen_in), solution_moves(soln_in) {}
+    Puzzle(const std::string & fen_in, std::vector<Move> soln_in, double rating_in)
+        : fen(fen_in), solution_moves(soln_in), rating(rating_in) {}
 
 };
 
 bool read_lines(std::vector<std::string> &);
-bool read_fens(unsigned, std::vector<std::string> &);
+bool read_fens(unsigned, std::vector<std::string> &, bool random=true);
 
 bool read_all_fens(std::vector<std::string> &);
 
@@ -36,5 +38,6 @@ void retrieve_all_puzzles(std::vector<Puzzle> &);
 
 bool score_puzzle_against_cands(const Puzzle &);
 void test_cands_against_puzzles();
+void test_engine_against_puzzles(int num_puzzles, int positions_per_puzzle, float rating_cap);
 
 #endif //STASE_PUZZLE_H

@@ -83,9 +83,11 @@ void retrieve_all_puzzles(std::vector<Puzzle> & vec) {
 
             int first_comma = csv_line.find(',', 0);
             int second_comma = csv_line.find(',', first_comma + 1);
+            int third_comma = csv_line.find(',', second_comma + 1);
 
             const std::string fen = csv_line.substr(0, first_comma);
             const std::string move_str = csv_line.substr(first_comma + 1, second_comma - first_comma - 1);
+            const std::string rating_str = csv_line.substr(second_comma + 1, third_comma - second_comma - 1);
 
             std::vector<Move> moves;
 
@@ -110,7 +112,7 @@ void retrieve_all_puzzles(std::vector<Puzzle> & vec) {
                 n = i + 1;
             }
 
-            cache.emplace_back(fen, moves);
+            cache.emplace_back(fen, moves, std::stod(rating_str));
         }
 
     }

@@ -72,6 +72,7 @@ void run_with_node_limit(const std::string & fen, int node_limit) {
     set_node_limit(node_limit);
     run_in_background(fen);
     pthread_join(current_running_config.t_id, nullptr);
+    clear_node_limit();
 }
 
 /**

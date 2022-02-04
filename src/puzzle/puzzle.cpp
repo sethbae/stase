@@ -49,38 +49,35 @@ bool read_lines(std::vector<std::string> & vec) {
 
 /* fill the given vector with [num] randomly selected puzzles 
     these puzzles will always differ since they are selected using a random seed */
-bool read_fens(unsigned num, vector<string> & vec) {
-       
+bool read_fens(unsigned num, vector<string> & vec, bool random) {
+
+    string s;
     ifstream file;
-    
+
     file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
     if (!file) {
         cout << "WARNING: could not read puzzle csv\n";
         return false;
     }
-    
-    string s;
-    
-    // initialise the seed with current time
-    srand(time(nullptr));
-    
-    // and skip a random number of puzzles (different every time)
-    unsigned x = rand() % 10000;
-    while (x--)
-        getline(file, s);
-    
-    // before reading the required number of puzzles
+
+    if (random) {
+        // skip a random number of positions
+        srand(time(nullptr));
+        unsigned x = rand() % 10000;
+        while (x--) {
+            getline(file, s);
+        }
+    }
+
+    // read the required number of puzzles
     for (; getline(file, s) && num > 0; --num) {
-        
         // FEN is second field of CSV
         s = s.substr(s.find_first_of(',') + 1);
         s = s.substr(0, s.find_first_of(','));
         vec.push_back(s);
-        
     } 
 
     return true;
-
 }
 
 bool read_all_fens(vector<string> & vec) {
