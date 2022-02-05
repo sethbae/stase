@@ -18,14 +18,14 @@ constexpr int unsafe_check_score(const Piece p) {
 
 constexpr int capture_piece_score(const bool totally_undefended, const Piece capturing, const Piece captured) {
     if (totally_undefended) {
-        return piece_value(captured) / 1000;
+        return piece_value(captured);
     }
     int diff = piece_value(captured) - piece_value(capturing);
-    return max(2 + (diff / 1000), 0);
+    return max(2 + diff, 0);
 }
 
 constexpr int fork_score(const int value_a, const int value_b) {
-    return max(value_a / 1000, value_b / 1000);
+    return max(value_a, value_b);
 }
 
 constexpr int promotion_score() {
@@ -34,7 +34,7 @@ constexpr int promotion_score() {
 
 constexpr int pin_skewer_score(const int value_of_pinner, const int value_of_pinned, const int value_of_pinned_to) {
     int value_putatively_lost = min(value_of_pinned, value_of_pinned_to) - value_of_pinner;
-    return max(value_putatively_lost / 1000, 1);
+    return max(value_putatively_lost, 1);
 }
 
 constexpr int defend_score(const Piece defended_piece) {
@@ -48,8 +48,7 @@ constexpr int defend_score(const Piece defended_piece) {
 }
 
 constexpr int trade_score(const Piece trade_this, const Piece for_this) {
-    int diff = piece_value(for_this) - piece_value(trade_this);
-    return 1 + (diff / 1000);
+    return 1 + (piece_value(for_this) - piece_value(trade_this));
 }
 
 constexpr int retreat_score(Piece p) {
@@ -57,7 +56,7 @@ constexpr int retreat_score(Piece p) {
 }
 
 constexpr int desperado_score(int piece_val) {
-    return piece_val / 1000;
+    return piece_val;
 }
 
 #endif //STASE_SCORE_H
