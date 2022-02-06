@@ -26,6 +26,16 @@ struct ControlCache {
         squares |= (1l << index(s));
     }
 
+    /**
+     * If the square is already in the cache, this returns its status. Otherwise, it
+     * computes and adds its status before returning it.
+     */
+    inline SquareControlStatus safe_get(const Gamestate & gs, const Square s) {
+        if (contains(s)) { return get(s); }
+        put(s, evaluate_square_status(gs, s));
+        return get(s);
+    }
+
 private:
     constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);
