@@ -105,15 +105,11 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
  */
 bool find_knight_forks(Gamestate & gs, const Square s) {
 
-    std::cout << "Looking for knight forks on " << sqtos(s) << "\n";
-
     if (type(gs.board.get(s)) != KNIGHT) { return true; }
 
     for (int j = 0; j < 8; ++j) {
 
         Square fork_square = mksq(s.x + XKN[j], s.y + YKN[j]);
-
-        std::cout << "Checking " << sqtos(fork_square) << "\n";
 
         if (!val(fork_square)
             || colour(gs.board.get(fork_square)) == colour(gs.board.get(s))
@@ -150,7 +146,6 @@ bool find_knight_forks(Gamestate & gs, const Square s) {
         }
 
         if (forked_count >= 2) {
-            std::cout << "Adding frame!\n";
             if (!gs.add_frame(
                     fork_hook.id,
                     FeatureFrame{
@@ -172,7 +167,7 @@ bool find_knight_forks(Gamestate & gs, const Square s) {
 inline bool non_pawn_enemy(const Piece pawn, const Piece enemy) {
     // TODO: it is relevant here whether the piece is pinned or not, if it were pinned,
     //  it would be allowed to be a pawn.
-    return colour(enemy) != colour(pawn) && type(enemy) != PAWN;
+    return enemy != EMPTY && colour(enemy) != colour(pawn) && type(enemy) != PAWN;
 }
 
 /**
@@ -200,16 +195,27 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
     Square fw1 = mksq(s.x, s.y + FORWARD);
     Square fw2 = mksq(s.x, s.y + FORWARD + FORWARD);
 
+    // regular captures
     if (val(lcap) && gs.board.get(lcap) != EMPTY && colour(gs.board.get(lcap)) != colour(pawn)) {
         squares.push_back(lcap);
     }
     if (val(rcap) && gs.board.get(rcap) != EMPTY && colour(gs.board.get(rcap)) != colour(pawn)) {
         squares.push_back(rcap);
     }
+    // forward moves
     if (val(fw1) && gs.board.get(fw1) == EMPTY) {
         squares.push_back(fw1);
         if (FIRST_MOVE && gs.board.get(fw2) == EMPTY) {
             squares.push_back(fw2);
+        }
+    }
+    // en-passant
+    if (gs.board.get_ep_exists()) {
+        // note that we do not risk duplicating, because ep squares are always empty
+        if (equal(lcap, gs.board.get_ep_sq())) {
+            squares.push_back(lcap);
+        } else if (equal(rcap, gs.board.get_ep_sq())) {
+            squares.push_back(rcap);
         }
     }
 

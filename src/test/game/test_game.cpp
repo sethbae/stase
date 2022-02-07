@@ -21,7 +21,8 @@ bool test_game() {
     passed = test_knight_fork_hook() && passed;
     passed = test_sliding_fork_hook() && passed;
     passed = test_queen_fork_hook() && passed;
-    passed = test_kp_fork_hook() && passed;
+    passed = test_pawn_fork_hook() && passed;
+    passed = test_king_fork_hook() && passed;
     passed = test_trade_piece() && passed;
     passed = test_retreat_piece() && passed;
     passed = test_desperado_piece() && passed;
