@@ -89,6 +89,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_board.cpp
         src/test/game/test_game.cpp
         src/test/test_helpers.cpp
+        src/test/game/cands/fork_helpers.h
         src/test/game/test_piece.cpp
         src/test/game/test_gs_piece_lists.cpp
         src/test/game/cands/test_capture_piece.cpp
