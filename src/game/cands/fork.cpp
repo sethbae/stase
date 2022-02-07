@@ -282,7 +282,10 @@ bool find_king_forks(Gamestate & gs, const Square s) {
                 int xd = forked_sq.x - s.x, yd = forked_sq.y - s.y;
                 if ((-1 <= xd && xd <= 1) && (-1 <= yd && yd <= 1)) { continue; }
 
-                if (val(forked_sq) && zero_or_worse_control(gs, forked_sq)) {
+                if (val(forked_sq)
+                    && gs.board.get(forked_sq) != EMPTY
+                    && zero_or_worse_control(gs, forked_sq)) {
+
                     if (count % 2 == 0) {
                         sq1 = forked_sq;
                     } else {

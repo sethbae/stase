@@ -138,7 +138,7 @@ const TestSet<ForkTestCase> king_fork_hook_test_cases{
         ForkTestCase{
             "8/8/8/6k1/6P1/5NB1/8/8 b - - 0 1",
             {
-                ForkFrame{"g3", "f3", "f5", "g5"}
+                ForkFrame{"g3", "f3", "g4", "g5"}
             }
         },
         // KING: doesn't fork pieces already attacked
