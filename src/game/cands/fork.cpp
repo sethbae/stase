@@ -44,6 +44,7 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
 
         if (is_sentinel(s2)) { continue; }
         if (p2 == EMPTY || colour(p) != colour(p2)) { continue; }
+        if (abs(s.x - s2.x) <= 1 && abs(s.y - s2.y) <= 1) { continue; }
 
         // you only want to fork queens along a direction they can move:
         //  - bishops along diagonal: don't fork with another bishop or with a queen
@@ -75,15 +76,18 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
             } else {
                 val = min(piece_value(p), piece_value(p2));
             }
-            if (!gs.add_frame(
-                    fork_hook.id,
-                    FeatureFrame{
-                       s,
-                       s2,
-                       val,
-                       sq_sentinel_as_int()
-                    })) {
-                return false;
+            // don't fork two defended pawns...
+            if (val > piece_value(PAWN)) {
+                if (!gs.add_frame(
+                        fork_hook.id,
+                        FeatureFrame{
+                                s,
+                                s2,
+                                val,
+                                sq_sentinel_as_int()
+                        })) {
+                    return false;
+                }
             }
         }
     }
