@@ -13,6 +13,14 @@ inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
         : gs.control_cache->safe_get(gs, s).balance >= 0;
 }
 
+// TODO: interrupting poly x-rays
+
+// TODO: defence along the line of the fork: 8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1
+
+// TODO: fork with capture?? 8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1
+
+// TODO: reject pawns defended by pawns! 4r2k/3q2p1/6Qp/p3p3/8/2P2R1P/6PK/8 w - - 2 37
+
 /**
  * Checks whether from this square, there are two pieces which can be forked.
  * This is done regardless of whether there is actually a piece threatening to
@@ -20,6 +28,8 @@ inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
  * of the two pieces should be exactly on the given square. Does not duplicate
  * forks, in the sense the each fork will only be found from exactly one of
  * its two "endpoints".
+ * Does not report pieces on adjacent squares, or forks with constraints which
+ * can never be met (no sliding piece can fork a defended knight, for example).
  *
  * The format of the FeatureFrames is:
  * centre - the square of the first piece
@@ -46,7 +56,7 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
         if (p2 == EMPTY || colour(p) != colour(p2)) { continue; }
         if (abs(s.x - s2.x) <= 1 && abs(s.y - s2.y) <= 1) { continue; }
 
-        // you only want to fork queens along a direction they can move:
+        // queens are the only piece you want to fork along a direction they can move:
         //  - bishops along diagonal: don't fork with another bishop or with a queen
         //  - rooks along straight: don't fork with rooks or queens, obviously.
         // TODO: check here for pins.
@@ -55,6 +65,11 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
 
         bool unconditional1 = zero_or_worse_control(gs, s);
         bool unconditional2 = zero_or_worse_control(gs, s2);
+
+        if ((!unconditional1 && piece_value(p) < piece_value(ROOK))
+            || (!unconditional2 && piece_value(p2) < piece_value(ROOK))) {
+            continue;
+        }
 
         if (unconditional1 && unconditional2) {
             if (!gs.add_frame(
@@ -347,13 +362,6 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
     bool forker_is_white = colour(gs.board.get(ff->centre)) == BLACK;
     Delta d = get_delta_between(ff->centre, ff->secondary);
 
-    if (ff->secondary.x == ff->centre.x + d.dx
-        && ff->secondary.y == ff->centre.y + d.dy) {
-        // pieces are adjacent: no fork possible
-        // TODO: move this check into the hook
-        return;
-    }
-
     // go over all pieces of the appropriate colour
     Square * sq_ptr = forker_is_white ? gs.wpieces : gs.bpieces;
     for (Square temp = *sq_ptr; !is_sentinel(temp); ++sq_ptr) {
@@ -446,3 +454,41 @@ const Responder play_fork_resp{
     "fork",
     &respond_to_fork_frame
 };
+
+/**
+ * Assesses whether the given move, assumed to be a capture, is also a fork.
+ */
+bool capture_is_fork(Gamestate & gs, const Move m) {
+
+    Piece p = gs.board.get(m.from);
+    int forkable = 0;
+    MoveType dir_array[2] = {ORTHO, DIAG};
+
+    for (int i = 0; i < 2; ++i) {
+        MoveType dir = dir_array[i];
+        if (can_move_in_direction(p, dir)) {
+            for (int j = 0; j < 4; ++j) {
+
+                Delta d = D_ORTH[j];
+                Square s = first_piece_encountered(gs.board, m.to, d);
+
+                if (is_sentinel(s) || equal(s, m.from)) { continue; }
+                Piece forked_p = gs.board.get(s);
+
+                // avoid pieces of the same colour
+                if (colour(p) == colour(forked_p)) { continue; }
+
+                // avoid pieces which can move in this direction (and aren't pinned)
+                if (can_move_in_direction(forked_p, d) && !gs.is_kpinned_piece(s, d)) { continue; }
+
+                // finally, accept pieces more valuable than the attacker, or which are on unsafe squares
+                if (piece_value(forked_p) <= piece_value(p) && !zero_or_worse_control(gs, s)) { continue; }
+
+                if (++forkable == 2) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}

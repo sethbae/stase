@@ -111,6 +111,8 @@ extern const SignedByte XKN[];
 extern const SignedByte YKN[];
 
 extern const Delta D[8];
+extern const Delta D_ORTH[8];
+extern const Delta D_DIAG[8];
 
 // constants for iterating over the directions
 const unsigned DIAG_START  = 0;
