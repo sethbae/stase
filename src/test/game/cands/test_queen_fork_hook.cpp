@@ -1,140 +1,138 @@
-#include <string>
-#include <vector>
 #include <board.h>
 
-#include "../../../game/cands/cands.h"
 #include "../../test.h"
 #include "../../../game/gamestate.hpp"
+#include "fork_helpers.h"
 
-TestSet<StringTestCase> queen_fork_hook_test_cases = {
-        "game-cands-queen-fork-hook",
-        {
-                StringTestCase{
-                        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        {}
-                },
-                // (STRAIGHT) basic undefended pieces #1
-                StringTestCase{
-                        "8/6b1/3Q4/8/8/8/6n1/8 w - - 0 1",
-                        {"g6", "g3"}
-                },
-                // (STRAIGHT) does not fork from unsafe square
-                StringTestCase{
-                        "8/4B3/3q4/8/8/8/8/4R3 b - - 0 1",
-                        {}
-                },
-                // (STRAIGHT) does not fork defended piece of lower/equal value
-                StringTestCase{
-                        "8/4p3/3b4/8/8/8/1Q6/3n4 w - - 0 1",
-                        {}
-                },
-                // (STRAIGHT) does not fork pieces which can move in that direction
-                StringTestCase{
-                        "8/8/8/8/8/3q4/1R4B1/8 b - - 0 1",
-                        {}
-                },
-                // (STRAIGHT) gives multiple choices #1
-                StringTestCase{
-                        "8/1p3p2/3Q4/8/8/8/8/8 w - - 0 1",
-                        {"c7", "d7", "e7", "d5"}
-                },
-                // (STRAIGHT) gives multiple choices #2
-                StringTestCase{
-                        "8/8/3q4/8/8/8/1P3P2/8 b - - 0 1",
-                        {"b6", "f6", "d4", "d2"}
-                },
-                // (MIXED) basic undefended pieces #1
-                StringTestCase{
-                        "8/3r4/7Q/8/8/8/6r1/8 w - - 0 1",
-                        {"c6", "h3"}
-                },
-                // (MIXED) does not fork from unsafe square
-                StringTestCase{
-                        "8/8/3q4/8/4Q3/8/8/R5K1 b - - 0 1",
-                        {}
-                },
-                // (MIXED) does not fork defended piece of lower/equal value
-                StringTestCase{
-                        "8/6p1/5b2/8/2Q5/4n3/8/8 w - - 0 1",
-                        {}
-                },
-                // (MIXED) does not fork pieces which can move in that direction
-                StringTestCase{
-                        "8/3R4/8/2q5/8/3R4/8/8 b - - 0 1",
-                        {}
-                },
-                // forks with capture
-                StringTestCase{
-                        "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1",
-                        {"e5"}
-                },
-                // does not fork pieces already attacked
-                StringTestCase{
-                        "8/1q6/8/8/8/8/N5B1/8 b - - 0 1",
-                        {}
-                },
-                // forks are blocked by own piece!
-                StringTestCase{
-                        "1r3k2/8/3N4/8/8/3Q4/8/8 w - - 0 1",
-                        {}
-                },
-                // forks with a capture #1
-                StringTestCase{
-                        "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1",
-                        {"c6"}
-                },
-                // forks with a capture #2
-                StringTestCase{
-                        "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1",
-                        {"a5"}
-                },
-                // does not fork a piece which can just trade immediately
-                StringTestCase{
-                        "1q3r2/8/8/2B5/3Q4/8/8/8 w - - 0 1",
-                        {}
-                },
-                // puzzle #1
-                StringTestCase{
-                        "r2q4/5ppk/p2p3p/1p1P4/2p1rNQ1/8/PPP3PP/5RK1 w - - 0 23",
-                        {"f5"}
-                },
-                // puzzle #2 (it finds an extra fork, on b3)
-                StringTestCase{
-                        "r1b1k2r/ppq2ppp/5n2/3p4/1b1P4/2NBB3/PP3PPP/R2QK2R w KQkq - 3 11",
-                        {"a4", "b3"}
-                },
-                // puzzle #3
-                StringTestCase{
-                        "1k5n/pbp2q2/1p2p3/3p1pQ1/3P2p1/2P1P1P1/PPBN2P1/2K5 w - - 0 29",
-                        {"d8"}
-                },
-                // puzzle #4 (the correct solution is not actually a fork, but this tests the logic regardless.
-                // there are two minor pawn forks it finds!)
-                StringTestCase{
-                        "r5qr/p1p1p2p/2Qp2p1/5k2/5n2/5P2/PP3K1P/2R3NR w - - 0 21",
-                        {"e4", "d7"}
+TestSet<ForkTestCase> queen_fork_hook_test_cases = {
+    "game-cands-queen-fork-hook",
+    {
+        ForkTestCase{
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            {}
+        },
+        // basic undefended pieces #1
+        ForkTestCase{
+            "8/6b1/3Q4/8/8/8/6n1/8 w - - 0 1",
+            {
+                ForkFrame{"g2", "g7", "b7", "d6"}
+            }
+        },
+            // basic undefended pieces #2
+        ForkTestCase{
+                "8/3r4/7Q/8/8/8/6r1/8 w - - 0 1",
+                {
+                        ForkFrame{"d7", "g2", "c6", "h6"},
+                        ForkFrame{"d7", "g2", "h3", "h6"}
                 }
-        }
-};
-
-bool evaluate_test_case_queen_fork_hook(const StringTestCase *tc) {
-
-    Gamestate gs(tc->fen);
-
-    discover_feature_frames(gs, &fork_hook);
-
-    std::vector<std::string> strings;
-
-    for (FeatureFrame* ff = gs.frames[fork_hook.id]; !is_sentinel(ff->centre); ++ff) {
-        // only look at queen forks for these tests!
-        if (type(gs.board.get(ff->centre)) == QUEEN) {
-            strings.push_back(sqtos(ff->secondary));
+        },
+            // undefended pieces #3
+        ForkTestCase{
+                "8/8/3q4/8/4Q3/8/8/R5K1 b - - 0 1",
+                {
+                        ForkFrame{"a1", "g1", "g7", "d6"}
+                }
+        },
+            // basic undefended pieces #4
+        ForkTestCase{
+                "8/1q6/8/8/8/8/N5B1/8 b - - 0 1",
+                {
+                        ForkFrame{"a2", "g2", "g8", "b7"}
+                }
+        },
+        // none available
+        ForkTestCase{
+            "8/4B3/3q4/8/8/8/8/4R3 b - - 0 1",
+            {}
+        },
+        // does not fork defended piece of lower/equal value
+        ForkTestCase{
+            "8/4p3/3b4/8/8/8/1Q6/3n4 w - - 0 1",
+            {}
+        },
+        // does not fork pieces which can move in that direction
+        ForkTestCase{
+            "8/8/8/8/8/3q4/1R4B1/8 b - - 0 1",
+            {}
+        },
+        //  gives multiple choices #1
+        ForkTestCase{
+            "8/1p3p2/3Q4/8/8/8/8/8 w - - 0 1",
+            {
+                ForkFrame{"b7", "f7", "b3", "d6"},
+                ForkFrame{"b7", "f7", "d5", "d6"},
+                ForkFrame{"b7", "f7", "f3", "d6"}
+            }
+        },
+        //  gives multiple choices #2
+        ForkTestCase{
+            "8/8/3q4/8/8/8/1P3P2/8 b - - 0 1",
+            {
+                ForkFrame{"b2", "f2", "b6", "d6"},
+                ForkFrame{"b2", "f2", "f6", "d6"},
+                ForkFrame{"b2", "f2", "d4", "d6"}
+            }
+        },
+        // does not fork defended piece of lower/equal value
+        ForkTestCase{
+            "8/6p1/5b2/8/2Q5/4n3/8/8 w - - 0 1",
+            {}
+        },
+        // does not fork pieces which can move in that direction
+        ForkTestCase{
+            "8/3R4/8/2q5/8/3R4/8/8 b - - 0 1",
+            {}
+        },
+        // forks are blocked by own piece!
+        ForkTestCase{
+            "1r3k2/8/3N4/8/8/3Q4/8/8 w - - 0 1",
+            {}
+        },
+        // does not fork a piece which can just trade immediately
+        ForkTestCase{
+            "1q3r2/8/8/2B5/3Q4/8/8/8 w - - 0 1",
+            {}
+        },
+        // puzzle #1
+        ForkTestCase{
+            "r2q4/5ppk/p2p3p/1p1P4/2p1rNQ1/8/PPP3PP/5RK1 w - - 0 23",
+            {
+                ForkFrame{"a2", "c2", "a4", "d8"},
+                ForkFrame{"g1", "b2", "d4", "d8"},
+                ForkFrame{"f7", "e4", "f5", "g4"},
+                ForkFrame{"e4", "g7", "h7", "g4"}
+            }
+        },
+        // puzzle #2 (it finds an extra fork, on b3)
+        ForkTestCase{
+            "r1b1k2r/ppq2ppp/5n2/3p4/1b1P4/2NBB3/PP3PPP/R2QK2R w KQkq - 3 11",
+            {
+                ForkFrame{"g2", "e1", "h1", "c7"},
+                ForkFrame{"h2", "h1", "g2", "c7"},
+                ForkFrame{"d5", "b4", "b5", "d1"},
+                ForkFrame{"d5", "b4", "b3", "d1"},
+                ForkFrame{"e8", "b4", "a4", "d1"},
+                ForkFrame{"g7", "d5", "g5", "d1"},
+                ForkFrame{"g7", "e8", "h8", "d1"}
+            }
+        },
+        // puzzle #3 (the correct solution is not actually a fork, but this tests the logic regardless)
+        ForkTestCase{
+            "r5qr/p1p1p2p/2Qp2p1/5k2/5n2/5P2/PP3K1P/2R3NR w - - 0 21",
+            {
+                ForkFrame{"f5", "c7", "a5", "c6"},
+                ForkFrame{"f5", "e7", "e4", "c6"},
+                ForkFrame{"f2", "b2", "d4", "g8"},
+                ForkFrame{"h1", "f2", "g2", "g8"},
+            }
         }
     }
+};
 
-    return assert_string_lists_equal(strings, tc->expected_results);
+bool evaluate_test_case_queen_fork_hook(const ForkTestCase *tc) {
+    return evaluate_fork_test_case(tc, QUEEN);
 }
 
 bool test_queen_fork_hook() {
-    return evaluate_test_set(&queen_fork_hook_test_cases, &evaluate_test_case_queen_fork_hook);
+     return evaluate_test_set(&queen_fork_hook_test_cases, &evaluate_test_case_queen_fork_hook);
 }
