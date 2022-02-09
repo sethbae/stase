@@ -93,14 +93,23 @@ inline MoveType direction_of_delta(const Delta d) {
 inline Delta get_delta_between(const Square a, const Square b){
     SignedByte dx = b.x - a.x;
     SignedByte dy = b.y - a.y;
-    if (dx != 0) {
+    if (abs(dx) == abs(dy)) {
         dx = (dx > 0) ? 1 : -1;
-    }
-    if (dy != 0) {
+        dy = (dy > 0) ? 1 : -1;
+    } else if (dx != 0 && dy == 0) {
+        dx = (dx > 0) ? 1 : -1;
+    } else if (dx == 0 && dy != 0) {
         dy = (dy > 0) ? 1 : -1;
     }
     return Delta{dx, dy};
 };
+inline bool orth_diag(const Delta d) {
+    return (d.dx <= 1 && d.dx >= -1) && (d.dy <= 1 && d.dy >= -1);
+}
+inline bool parallel(const Delta d, const Delta d2) {
+    return equal(d, d2) || equal(d, delta(-d2.dx, -d2.dy));
+}
+
 
 /**
  * Arrays for diffs which can be added to a square; e.g. (1,1) to move diagonally up right.
@@ -111,8 +120,8 @@ extern const SignedByte XKN[];
 extern const SignedByte YKN[];
 
 extern const Delta D[8];
-extern const Delta D_ORTH[8];
-extern const Delta D_DIAG[8];
+extern const Delta D_ORTH[4];
+extern const Delta D_DIAG[4];
 
 // constants for iterating over the directions
 const unsigned DIAG_START  = 0;
