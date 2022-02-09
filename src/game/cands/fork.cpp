@@ -8,9 +8,15 @@
  * for its colour (ie non-negative for black, non-positive for white).
  */
 inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
-    return colour(gs.board.get(s)) == WHITE
-        ? gs.control_cache->safe_get(gs, s).balance <= 0
-        : gs.control_cache->safe_get(gs, s).balance >= 0;
+    SquareControlStatus status =
+        colour(gs.board.get(s)) == WHITE
+            ? gs.control_cache->safe_get(gs, s)
+            : gs.control_cache->safe_get(gs, s);
+    if (colour(gs.board.get(s)) == WHITE) {
+        return status.balance <= 0 && status.min_w > piece_value(PAWN);
+    } else {
+        return status.balance >= 0 && status.min_b > piece_value(PAWN);
+    }
 }
 
 // TODO: interrupting poly x-rays
@@ -18,8 +24,13 @@ inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
 // TODO: defence along the line of the fork: 8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1
 
 // TODO: fork with capture?? 8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1
+//  "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1"
+//  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
+//  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
 
 // TODO: reject pawns defended by pawns! 4r2k/3q2p1/6Qp/p3p3/8/2P2R1P/6PK/8 w - - 2 37
+
+//TODO: (other forks) well defended king can always be forked
 
 /**
  * Checks whether from this square, there are two pieces which can be forked.
@@ -107,6 +118,248 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
         }
     }
 
+    return true;
+}
+
+/**
+ * Works out from the given square along either ORTHO or DIAG deltas (according to parameter),
+ * and records each square from which a forking piece could attack it in the fork_bools array.
+ * If a square reaches 2, then it is added to the fork_squares vector.
+ * If the parameter avoid is filled, then this delta will not be considered: use this for when
+ * a piece is pinned. Neither direction of the avoid delta will be considered!
+ */
+inline void update_fork_net(
+        Gamestate & gs,
+        const Square s,
+        uint8_t * fork_bools,
+        Square * other_forked_piece,
+        std::vector<FeatureFrame> & frames,
+        MoveType dir,
+        const Delta avoid = INVALID_DELTA) {
+
+    // retrieve the correct deltas to use
+    const Delta * deltas;
+    if (dir == ORTHO) {
+        deltas = D_ORTH;
+    } else {
+        deltas = D_DIAG;
+    }
+
+    // work out from the piece along each delta, and mark up in the bools as appropriate
+    for (int i = 0; i < 4; ++i) {
+
+        Delta d = deltas[i];
+        if (equal(d, avoid) || equal(delta(-d.dx, -d.dy), avoid)) { continue; }
+        if (can_move_in_direction(gs.board.get(s), d)) { continue; }
+
+        bool cont = true;
+        int x = s.x + d.dx,
+            y = s.y + d.dy;
+
+        while (val(x, y) && cont) {
+
+            Piece p = gs.board.get(x, y);
+
+            if (p == EMPTY) {
+                // empty: can be hit here, can continue looking
+                if (fork_bools[8*x + y]++ == 1) {
+                    frames.push_back(
+                            FeatureFrame{
+                                s,
+                                other_forked_piece[8*x + y],
+                                sqtoi(mksq(x, y)),
+                                0  // these get filled in by the caller
+                            });
+                } else {
+                    other_forked_piece[8*x + y] = s;
+                }
+            } else if (colour(p) == colour(gs.board.get(s))) {
+                // own team: a capture could occur here and hit it, but stop looking
+                if (fork_bools[8*x + y]++ == 1) {
+                    frames.push_back(
+                            FeatureFrame{
+                                s,
+                                other_forked_piece[8*x + y],
+                                sqtoi(mksq(x, y)),
+                                0  // these get filled in by the caller
+                            });
+                } else {
+                    other_forked_piece[8*x + y] = s;
+                }
+                cont = false;
+            } else {
+                // other colour: no fork could occur here, and can't continue looking.
+                cont = false;
+            }
+            x += d.dx;
+            y += d.dy;
+        }
+    }
+}
+
+/**
+ * This performs the same job as update_fork_net, but with some extra logic required to handle
+ * pawns and their pins correctly.
+ */
+void update_pawn_fork_net(
+        const Gamestate & gs, const Square s, uint8_t * fork_bools, Square * other_forked_piece, std::vector<FeatureFrame> & frames) {
+
+    Delta avoid = gs.delta_of_kpinned_piece(s);
+    int capturing_y_delta = (colour(gs.board.get(s)) == WHITE ? 1 : -1);
+
+    for (int i = 0; i < 4; ++i) {
+
+        Delta d = D_DIAG[i];
+        bool cont = true;
+        int x = s.x + d.dx,
+            y = s.y + d.dy;
+
+        if (d.dy == capturing_y_delta && !equal(d, delta(-avoid.dx, avoid.dy))) {
+            // if we are working away from the pawn's "dangerous" side (ie, it could capture),
+            // then in most cases we want to skip an extra square. If the pawn is pinned along
+            // the opposite direction however, we also don't want to skip a square:
+            //              . . k . .
+            //              . . . p .
+            //              . . Q . B
+            // we can find that delta by flipping the x on the pawn's pin delta. If it wasn't pinned,
+            // this won't matter anyway.
+            x += d.dx;
+            y += d.dy;
+        }
+
+        while (val(x, y) && cont) {
+
+            Piece p = gs.board.get(x, y);
+
+            if (p == EMPTY) {
+                // empty: can be hit here, can continue looking
+                if (fork_bools[8*x + y]++ == 1) {
+                    frames.push_back(
+                            FeatureFrame{
+                                s,
+                                other_forked_piece[8*x + y],
+                                sqtoi(mksq(x, y)),
+                                0  // these get filled in by the caller
+                            });
+                } else {
+                    other_forked_piece[8*x + y] = s;
+                }
+            } else if (colour(p) == colour(gs.board.get(s))) {
+                // own team: a capture could occur here and hit it, but stop looking
+                if (fork_bools[8*x + y]++ == 1) {
+                    frames.push_back(
+                            FeatureFrame{
+                                s,
+                                other_forked_piece[8*x + y],
+                                sqtoi(mksq(x, y)),
+                                0  // these get filled in by the caller
+                            });
+                } else {
+                    other_forked_piece[8*x + y] = s;
+                }
+                cont = false;
+            } else {
+                // other colour: no fork could occur here, and can't continue looking.
+                cont = false;
+            }
+            x += d.dx;
+            y += d.dy;
+        }
+    }
+}
+
+/**
+ * Finds pieces which could be forked by a queen, regardless of whether there is actually a
+ * legal (or safe) queen move to play the fork. These frames can be distinguished by conf_2,
+ * which gives the current location of the putatively forking queen.
+ *
+ * The format of the FeatureFrames is this:
+ * centre - the square of the first attacked piece
+ * secondary - the square of the second attacked piece
+ * conf_1 - the int-ised square on which the fork would be played
+ * conf_2 - the int-ised current location of the queen
+ */
+bool find_queen_forks(Gamestate & gs, const Square s) {
+
+    Piece p = gs.board.get(s);
+    if (type(p) != QUEEN) { return true; }
+
+    uint8_t fork_bools[64];
+    for (int i = 0; i < 64; ++i) {
+        fork_bools[i] = 0;
+    }
+    Square other_forked_piece[64];
+    for (int i = 0; i < 64; ++i) {
+        other_forked_piece[i] = SQUARE_SENTINEL;
+    }
+
+    std::vector<FeatureFrame> fork_frames;
+
+    // first take all enemies not on a safe square
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            Square forked_sq = mksq(x, y);
+            Piece forked_p = gs.board.get(forked_sq);
+
+            if (forked_p == EMPTY || colour(forked_p) == colour(p)) { continue; }
+
+            if (type(forked_p) == QUEEN) { continue; }
+            if (type(forked_p) == KING || zero_or_worse_control(gs, forked_sq)) {
+                switch (type(forked_p)) {
+                    case KING:
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, ORTHO);
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, DIAG);
+                        break;
+                    case ROOK:
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, ORTHO,
+                                        gs.delta_of_kpinned_piece(forked_sq));
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, DIAG);
+                        break;
+                    case KNIGHT:
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, ORTHO);
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, DIAG);
+                        break;
+                    case BISHOP:
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, ORTHO);
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, DIAG,
+                                        gs.delta_of_kpinned_piece(forked_sq));
+                        break;
+                    case PAWN:
+                        update_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames, ORTHO);
+                        update_pawn_fork_net(gs, forked_sq, fork_bools, other_forked_piece, fork_frames);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    for (const FeatureFrame & ff : fork_frames) {
+
+        // don't record traditional forks: only those which go in different directions
+        Delta d1 = get_delta_between(ff.centre, itosq(ff.conf_1));
+        Delta d2 = get_delta_between(ff.secondary, itosq(ff.conf_1));
+        if (parallel(d1, d2)) { continue; }
+
+        // don't record forks from unsafe squares
+        SquareControlStatus status = gs.control_cache->safe_get(gs, itosq(ff.conf_1));
+        if (colour(p) == WHITE
+            && (status.balance < 0 || status.min_b < piece_value(KING))) { continue; }
+        else if (colour(p) == BLACK
+            && (status.balance > 0 || status.min_w < piece_value(KING))) { continue; }
+
+        if (!gs.add_frame(
+                fork_hook.id,
+                FeatureFrame{
+                    ff.centre,
+                    ff.secondary,
+                    ff.conf_1,
+                    sqtoi(s)        // we put the queen here, regardless of whether the fork is safe or not.
+                })) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -348,6 +601,7 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
         case KNIGHT: return find_knight_forks(gs, s);
         case KING: return find_king_forks(gs, s);
         case PAWN: return find_pawn_forks(gs, s);
+        case QUEEN: return find_queen_forks(gs, s);
         default: return true;
     }
 }
@@ -436,9 +690,58 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
     }
 }
 
+void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
+
+    // find the queen which can fork
+    Piece queen = colour(gs.board.get(ff->centre)) == WHITE ? B_QUEEN : W_QUEEN;
+    Square q_sq = SQUARE_SENTINEL;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
+            if (gs.board.get(x, y) == queen) {
+                q_sq = mksq(x, y);
+            }
+        }
+    }
+
+    // check we have a queen
+    if (is_sentinel(q_sq)) { return; }
+
+    Square fork_sq = itosq(ff->conf_1);
+    Delta d = get_delta_between(fork_sq, q_sq);
+
+    // check we can move in the required direction
+    if (!orth_diag(d) || gs.is_kpinned_piece(q_sq, d)) { return; }
+
+    // establish that the run of squares to it is empty by using the first piece encountered
+    Square fpe = first_piece_encountered(gs.board, q_sq, d);
+    if (!is_sentinel(fpe)) {
+        if (d.dx == 0) {
+            // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
+            if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
+            if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
+        } else {
+            // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
+            if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
+            if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
+        }
+    }
+
+    // safety checks are done on the hook side, so it's safe to play the fork!
+    if (counter.has_space()) {
+        Move move{q_sq, fork_sq, 0};
+        m->set_score(
+            fork_score(
+                piece_value(gs.board.get(ff->centre)),
+                piece_value(gs.board.get(ff->secondary))));
+        m[counter.inc()] = move;
+    }
+}
+
 void respond_to_fork_frame(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
     if (ff->conf_1 == sq_sentinel_as_int()) {
         find_piece_to_fork(gs, ff, m, counter);
+    } else if (type(gs.board.get(itosq(ff->conf_2))) == QUEEN) {
+        seek_queen_to_play_fork(gs, ff, m, counter);
     } else {
         play_fork(gs, ff, m, counter);
     }
