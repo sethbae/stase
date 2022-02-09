@@ -317,6 +317,31 @@ public:
     }
 
     /**
+     * If the piece on the given square is pinned to its king, this returns the delta along which it is pinned.
+     * Otherwise, it returns INVALID_DELTA.
+     */
+    Delta delta_of_kpinned_piece(const Square s) const {
+
+        Square * pieces;
+        Delta * dirs;
+        if (colour(board.get(s)) == WHITE) {
+            pieces = w_kpinned_pieces;
+            dirs = w_kpin_dirs;
+        } else {
+            pieces = b_kpinned_pieces;
+            dirs = b_kpin_dirs;
+        }
+
+        for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
+            // check that the square matches
+            if (equal(s, *pieces)) {
+                return *dirs;
+            }
+        }
+        return INVALID_DELTA;
+    }
+
+    /**
      * Mark a piece as no longer pinned to its king, so that it is able to move once more.
      */
     void remove_kpinned_piece(const Square s) {
