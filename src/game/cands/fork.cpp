@@ -350,7 +350,7 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
             && (status.balance > 0 || status.min_w < piece_value(KING))) { continue; }
 
         if (!gs.add_frame(
-                fork_hook.id,
+                queen_fork_hook.id,
                 FeatureFrame{
                     ff.centre,
                     ff.secondary,
@@ -601,7 +601,6 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
         case KNIGHT: return find_knight_forks(gs, s);
         case KING: return find_king_forks(gs, s);
         case PAWN: return find_pawn_forks(gs, s);
-        case QUEEN: return find_queen_forks(gs, s);
         default: return true;
     }
 }
@@ -751,6 +750,12 @@ const Hook fork_hook{
     "fork",
     2,
     &find_forks_hook
+};
+
+const Hook queen_fork_hook{
+    "queen-fork",
+    7,
+    &find_queen_forks
 };
 
 const Responder play_fork_resp{

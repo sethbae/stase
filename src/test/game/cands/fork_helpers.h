@@ -51,14 +51,15 @@ inline bool list_contains_match(const std::vector<ForkFrame> expecteds, const Fe
 inline bool evaluate_fork_test_case(const ForkTestCase * tc, const Ptype expected) {
 
     Gamestate gs(tc->fen);
+    const Hook & h = (expected == QUEEN) ? queen_fork_hook : fork_hook;
 
-    discover_feature_frames(gs, &fork_hook);
+    discover_feature_frames(gs, &h);
 
     int actual_frames_encountered = 0;
 
-    for (int i = 0; !is_sentinel(gs.frames[fork_hook.id][i].centre) && i < MAX_FRAMES; ++i) {
+    for (int i = 0; !is_sentinel(gs.frames[h.id][i].centre) && i < MAX_FRAMES; ++i) {
 
-        FeatureFrame ff = gs.frames[fork_hook.id][i];
+        FeatureFrame ff = gs.frames[h.id][i];
         if (ff.conf_2 == sq_sentinel_as_int()) {
             continue;
         }
