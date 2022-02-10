@@ -76,7 +76,7 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
                 SlidingForkFrame{"a8", "e8", k + 1}
             }
         },
-//        // BISHOP: puzzle #1
+//        // BISHOP: puzzle #1 TODO
 //        SlidingForkTestCase{
 //            "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
 //            {
