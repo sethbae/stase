@@ -51,9 +51,9 @@ int material_balance(const Gamestate & gs) {
             Piece p = gs.board.get(mksq(x, y));
             
             if (colour(p) == WHITE)
-                count += piece_value(p);
+                count += piece_value_millis(p);
             else if (colour(p) == BLACK)
-                count -= piece_value(p);
+                count -= piece_value_millis(p);
             // colour can be INVALID
         
         }
