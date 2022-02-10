@@ -123,6 +123,7 @@ bool test_sliding_fork_hook();
 bool test_queen_fork_hook();
 bool test_pawn_fork_hook();
 bool test_king_fork_hook();
+bool test_fork_responder();
 bool test_weak_square();
 bool test_unsafe_piece();
 bool test_trade_piece();

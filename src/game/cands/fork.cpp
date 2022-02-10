@@ -568,10 +568,10 @@ bool find_king_forks(Gamestate & gs, const Square s) {
                 if (!gs.add_frame(
                         fork_hook.id,
                         FeatureFrame{
-                                sq1,
-                                sq2,
-                                sqtoi(fork_sq),
-                                sqtoi(s)})) {
+                            sq1,
+                            sq2,
+                            sqtoi(fork_sq),
+                            sqtoi(s)})) {
                     return false;
                 }
             }
@@ -612,59 +612,69 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
  */
 void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
 
-    bool forker_is_white = colour(gs.board.get(ff->centre)) == BLACK;
+    std::cout << "Finding piece to fork\n";
+
+    Colour forked_piece_colour = colour(gs.board.get(ff->centre));
     Delta d = get_delta_between(ff->centre, ff->secondary);
 
+    // TODO raise ticket for checking wpieces / bpieces
+
     // go over all pieces of the appropriate colour
-    Square * sq_ptr = forker_is_white ? gs.wpieces : gs.bpieces;
-    for (Square temp = *sq_ptr; !is_sentinel(temp); ++sq_ptr) {
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 8; ++y) {
 
-        Piece p = gs.board.get(temp);
-        if (!can_move_in_direction(p, d)) {
-            continue;
-        }
-
-        // find any squares that the piece can move to on the required line
-        Square endpoint = mksq(ff->secondary.x - d.dx, ff->secondary.y - d.dy);
-        std::vector<Square> squares_reachable;
-        if (type(p) == QUEEN) {
-            // queens might be able to reach more than one square
-            squares_reachable =
-                squares_piece_can_reach_on_line(
-                    gs.board,
-                    temp,
-                    ff->centre,
-                    endpoint
-                );
-        } else {
-            // other pieces can only reach a single square on a line
-            Square reachable =
-                square_piece_can_reach_on_line(
-                    gs.board,
-                    temp,
-                    ff->centre,
-                    endpoint
-                );
-            if (is_sentinel(reachable)) {
-                squares_reachable = {};
-            } else {
-                squares_reachable = { reachable };
-            }
-        }
-
-        // and check for each one that the piece is not pinned, and that it would end up safe.
-        for (const Square fork_sq : squares_reachable) {
-            if (gs.is_kpinned_piece(temp, get_delta_between(temp, fork_sq))
-                || would_be_unsafe_after(gs, fork_sq, Move{temp, fork_sq})) {
+            Square temp = mksq(x, y);
+            Piece p = gs.board.get(temp);
+            if (p == EMPTY || colour(p) == forked_piece_colour) { continue; }
+            if (!can_move_in_direction(p, d)) {
                 continue;
             }
-            if (counter.has_space()) {
-                Move move{temp, fork_sq, 0};
-                move.set_score(fork_score(piece_value(gs.board.get(ff->centre)), piece_value(gs.board.get(ff->secondary))));
-                m[counter.inc()] = move;
+
+            std::cout << "Found potential forker on " << sqtos(temp) << "\n";
+
+            // find any squares that the piece can move to on the required line
+            Square endpoint = mksq(ff->secondary.x - d.dx, ff->secondary.y - d.dy);
+            std::vector<Square> squares_reachable;
+            if (type(p) == QUEEN) {
+                // queens might be able to reach more than one square
+                squares_reachable =
+                    squares_piece_can_reach_on_line(
+                        gs.board,
+                        temp,
+                        ff->centre,
+                        endpoint
+                    );
             } else {
-                return;
+                // other pieces can only reach a single square on a line
+                Square reachable =
+                    square_piece_can_reach_on_line(
+                        gs.board,
+                        temp,
+                        ff->centre,
+                        endpoint
+                    );
+                if (is_sentinel(reachable)) {
+                    squares_reachable = {};
+                } else {
+                    squares_reachable = { reachable };
+                }
             }
+
+            // and check for each one that the piece is not pinned, and that it would end up safe.
+            for (const Square fork_sq : squares_reachable) {
+                if (gs.is_kpinned_piece(temp, get_delta_between(temp, fork_sq))
+                    || would_be_unsafe_after(gs, fork_sq, Move{temp, fork_sq})) {
+                    continue;
+                }
+                if (counter.has_space()) {
+                    Move move{temp, fork_sq, 0};
+                    move.set_score(fork_score(piece_value(gs.board.get(ff->centre)), piece_value(gs.board.get(ff->secondary))));
+                    m[counter.inc()] = move;
+                } else {
+                    return;
+                }
+            }
+
         }
     }
 }
