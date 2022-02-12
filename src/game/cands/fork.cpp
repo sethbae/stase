@@ -612,8 +612,6 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
  */
 void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
 
-    std::cout << "Finding piece to fork\n";
-
     Colour forked_piece_colour = colour(gs.board.get(ff->centre));
     Delta d = get_delta_between(ff->centre, ff->secondary);
 
@@ -626,11 +624,9 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
             Square temp = mksq(x, y);
             Piece p = gs.board.get(temp);
             if (p == EMPTY || colour(p) == forked_piece_colour) { continue; }
-            if (!can_move_in_direction(p, d)) {
+            if (!can_move_in_direction(p, d) || piece_value(p) >= ff->conf_2) {
                 continue;
             }
-
-            std::cout << "Found potential forker on " << sqtos(temp) << "\n";
 
             // find any squares that the piece can move to on the required line
             Square endpoint = mksq(ff->secondary.x - d.dx, ff->secondary.y - d.dy);
