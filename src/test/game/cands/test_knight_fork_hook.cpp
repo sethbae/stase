@@ -92,6 +92,13 @@ TestSet<ForkTestCase> knight_fork_hook_test_cases = {
                 ForkFrame{"g8", "c8", "e7", "d5"}
             }
         },
+        // forks king even if defended
+        ForkTestCase{
+                "8/8/8/8/3n4/8/8/R3K3 w - - 0 1",
+                {
+                        ForkFrame{"a1", "e1", "c2", "d4"}
+                }
+        },
         // puzzle #1
         ForkTestCase{
             "5bk1/2p2p2/6pp/3N4/1r2q3/4PN1P/1P3PP1/5QK1 w - - 0 22",
