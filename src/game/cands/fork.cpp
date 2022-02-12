@@ -28,9 +28,6 @@ inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
 //  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
 //  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
 
-// TODO: reject pawns defended by pawns! 4r2k/3q2p1/6Qp/p3p3/8/2P2R1P/6PK/8 w - - 2 37
-
-//TODO: (other forks) well defended king can always be forked
 
 /**
  * Checks whether from this square, there are two pieces which can be forked.
@@ -448,8 +445,6 @@ inline bool non_pawn_enemy(const Piece pawn, const Piece enemy) {
  */
 bool find_pawn_forks(Gamestate & gs, const Square s) {
 
-    // TODO: check the pins here - direction matters for captures.
-
     Piece pawn = gs.board.get(s);
     const int FORWARD = colour(pawn) == WHITE ? 1 : -1;
     const bool FIRST_MOVE = colour(pawn) == WHITE ? s.y == 1 : s.y == 6;
@@ -614,8 +609,6 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
 
     Colour forked_piece_colour = colour(gs.board.get(ff->centre));
     Delta d = get_delta_between(ff->centre, ff->secondary);
-
-    // TODO raise ticket for checking wpieces / bpieces
 
     // go over all pieces of the appropriate colour
     for (int x = 0; x < 8; ++x) {
