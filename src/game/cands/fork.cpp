@@ -736,7 +736,7 @@ void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move
 }
 
 void respond_to_fork_frame(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
-    if (ff->conf_1 == sq_sentinel_as_int()) {
+    if (ff->conf_2 == sq_sentinel_as_int()) {
         find_piece_to_fork(gs, ff, m, counter);
     } else if (type(gs.board.get(itosq(ff->conf_2))) == QUEEN) {
         seek_queen_to_play_fork(gs, ff, m, counter);
