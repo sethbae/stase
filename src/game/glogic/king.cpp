@@ -109,19 +109,11 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
  */
 bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colour colour) {
 
-    Square k_sq;
-    if (colour == WHITE) {
-        k_sq = gs.w_king;
-    } else {
-        k_sq = gs.b_king;
-    }
+    SquareControlStatus status = gs.control_cache->safe_get(gs, s);
 
-    Piece sneaked = gs.sneak(Move{k_sq, s, 0});
-    bool result = is_safe_for_king(gs, s);
-    gs.unsneak(Move{k_sq, s, 0}, sneaked);
-
-    return result;
-
+    return colour == WHITE
+        ? status.min_b <= piece_value(W_KING)
+        : status.min_w <= piece_value(B_KING);
 }
 
 /**
