@@ -57,7 +57,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
 
                     if (beta_covers(b, piece_squares[j], temp)
                             && can_move_in_direction(b.get(piece_squares[j]), dir)
-                            && !would_be_unsafe_after(gs, temp, Move{piece_squares[j], temp, 0})
+                            && move_is_safe(gs, Move{piece_squares[j], temp, 0})
                             && !gs.is_kpinned_piece(piece_squares[j], mov_dir)) {
                         if (move_counter.has_space()) {
                             Move m{piece_squares[j], temp, 0};
@@ -98,7 +98,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                         && (colour(b.get(temp)) == defending_colour)
                         && !equal(temp, s)
                         && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)
-                        && !would_be_unsafe_after(gs, defend_from_square, Move{temp, defend_from_square, 0})) {
+                        && move_is_safe(gs, Move{temp, defend_from_square, 0})) {
                     if (move_counter.has_space()) {
                         Move m{temp, defend_from_square, 0};
                         m.set_score(defend_score(b.get(s)));
@@ -155,8 +155,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
         if (type(b.get(piece_squares[i])) == PAWN) {
             if (val(left_pawn_defence_square)
                     && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)
-                    && !would_be_unsafe_after(gs, left_pawn_defence_square,
-                                            Move{piece_squares[i], left_pawn_defence_square, 0})) {
+                    && move_is_safe(gs, Move{piece_squares[i], left_pawn_defence_square, 0})) {
                 Delta mov_dir = get_delta_between(left_pawn_defence_square, piece_squares[i]);
                 if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
                     if (move_counter.has_space()) {
@@ -170,8 +169,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
                 }
             } else if (val(right_pawn_defence_square)
                         && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)
-                        && !would_be_unsafe_after(gs, right_pawn_defence_square,
-                                                Move{piece_squares[i], right_pawn_defence_square, 0})) {
+                        && move_is_safe(gs, Move{piece_squares[i], right_pawn_defence_square, 0})) {
                 Delta mov_dir = get_delta_between(right_pawn_defence_square, piece_squares[i]);
                 if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
                     if (move_counter.has_space()) {
