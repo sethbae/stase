@@ -6,25 +6,25 @@ const TestSet<ResponderTestCase> fork_responder_test_set{
         // basics: bishop
         ResponderTestCase{
             "6r1/8/8/5B2/2r5/8/8/8 w - - 0 1",
-            { FeatureFrame{stosq("c4"), stosq("g8"), sq_sentinel_as_int(), k + 1} },
+            { FeatureFrame{stosq("c4"), stosq("g8"), k + 1, sq_sentinel_as_int()} },
             {"f5e6"}
         },
         // basics: rook
         ResponderTestCase{
             "1B4N1/8/8/5r2/8/8/8/8 w - - 0 1",
-            { FeatureFrame{stosq("b8"), stosq("g8"), sq_sentinel_as_int(), k + 1} },
+            { FeatureFrame{stosq("b8"), stosq("g8"), k + 1, sq_sentinel_as_int()} },
             {"f5f8"}
         },
         // bishop does not fork on unsafe square
         ResponderTestCase{
             "8/8/8/2b3R1/8/8/3R1P2/8 w - - 0 1",
-            { FeatureFrame{stosq("d2"), stosq("g5"), sq_sentinel_as_int(), k + 1} },
+            { FeatureFrame{stosq("d2"), stosq("g5"), k + 1, sq_sentinel_as_int()} },
             {}
         },
         // rook does not fork on unsafe square
         ResponderTestCase{
             "8/8/8/2bb4/6R1/8/2n5/8 w - - 0 1",
-            { FeatureFrame{stosq("c4"), stosq("c2"), sq_sentinel_as_int(), k + 1} },
+            { FeatureFrame{stosq("c4"), stosq("c2"), k + 1, sq_sentinel_as_int()} },
             {}
         },
         // white pawn
@@ -54,13 +54,13 @@ const TestSet<ResponderTestCase> fork_responder_test_set{
         // queen plays normal fork
         ResponderTestCase{
             "5r2/8/8/8/4Q3/r7/8/8 w - - 0 1",
-            { FeatureFrame{stosq("a3"), stosq("f8"), sq_sentinel_as_int(), k + 1}},
+            { FeatureFrame{stosq("a3"), stosq("f8"), k + 1, sq_sentinel_as_int()}},
             {"e4e7", "e4b4"}
         },
         // pieces don't respond to forks with value restrictions
         ResponderTestCase{
             "8/1b6/4R3/8/8/1R6/P5q1/8 w - - 0 1",
-            { FeatureFrame{stosq("b3"), stosq("e6"), sq_sentinel_as_int(), r} },
+            { FeatureFrame{stosq("b3"), stosq("e6"), r, sq_sentinel_as_int()} },
             {"b7d5"}
         },
         // queen plays queen fork

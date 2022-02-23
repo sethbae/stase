@@ -618,7 +618,7 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
             Square temp = mksq(x, y);
             Piece p = gs.board.get(temp);
             if (p == EMPTY || colour(p) == forked_piece_colour) { continue; }
-            if (!can_move_in_direction(p, d) || piece_value(p) >= ff->conf_2) {
+            if (!can_move_in_direction(p, d) || piece_value(p) >= ff->conf_1) {
                 continue;
             }
 
@@ -714,15 +714,16 @@ void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move
     // establish that the run of squares to it is empty by using the first piece encountered
     Square fpe = first_piece_encountered(gs.board, q_sq, d);
 
-    if (is_sentinel(fpe)) { return; }
-    if (d.dx == 0) {
-        // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
-        if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
-        if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
-    } else {
-        // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
-        if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
-        if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
+    if (!is_sentinel(fpe)) {
+        if (d.dx == 0) {
+            // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
+            if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
+            if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
+        } else {
+            // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
+            if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
+            if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
+        }
     }
 
     // safety checks are done on the hook side, so it's safe to play the fork!
