@@ -80,7 +80,7 @@ inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
 
                 for (int i = 0; i < squares_on_line.size(); ++i) {
                     Move pin_move = Move{mksq(x, y), squares_on_line[i], 0};
-                    if (!would_be_unsafe_after(gs, squares_on_line[i], pin_move)
+                    if (move_is_safe(gs, pin_move)
                             && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
 
                         bool result = gs.add_frame(
@@ -109,7 +109,7 @@ inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
                 }
 
                 Move pin_move = Move{mksq(x, y), pin_from_square, 0};
-                if (!would_be_unsafe_after(gs, pin_from_square, pin_move)
+                if (move_is_safe(gs, pin_move)
                         && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
 
                     bool result = gs.add_frame(
