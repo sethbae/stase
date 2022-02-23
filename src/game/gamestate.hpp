@@ -58,6 +58,8 @@ public:
         phase = o.phase;
         update_phase(m);
 
+        this->control_cache->update(o.board, *o.control_cache, m);
+
         // this may not be true: it gets set by cands()
         in_check = false;
 

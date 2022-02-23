@@ -2,6 +2,7 @@
 #include "board.h"
 #include "glogic.h"
 #include "../../board/board.hpp"
+#include "../gamestate.hpp"
 
 /**
  * Checks whether the given board contains a path of empty squares which lie in a straight line from
@@ -143,4 +144,69 @@ Square first_piece_encountered(const Board & b, const Square start, const Delta 
 
     return val(temp) ? temp : SQUARE_SENTINEL;
 
+}
+
+/**
+ * Finds squares moving in one direction according to gamma-logic. Writes to squares starting from the given
+ * index.
+ */
+inline void gamma_explore(const Board & b, const Square s, Square * squares, int & i, Delta d, MoveType dir) {
+
+    Colour c = colour(b.get(s));
+    Square temp = s;
+    bool cont = true;
+
+    temp.x += d.dx;
+    temp.y += d.dy;
+
+    while (val(temp) && cont) {
+
+        squares[i++] = temp;
+
+        Piece otherp = b.get(temp);
+        if (otherp != EMPTY) {
+            // gamma: x-ray
+            cont = (colour(otherp) == c) && can_move_in_direction(otherp, dir);
+        }
+        temp.x += d.dx;
+        temp.y += d.dy;
+    }
+}
+
+/**
+ * Finds squares which the given move might invalidate information about (eg, for the control_cache).
+ * This is defined as all of the following:
+ *   - squares gamma-reachable from the start or end square of the move
+ *   - if the start move contains a knight, squares a knight move from either start or end square.
+ *   - if the end move contains a knight, squares a knight move from the end square.
+ * Board state should be prior to the playing of the move.
+ * The squares pointer should have space for 80 (=64 + 8 + 8) squares.
+ */
+void find_invalidated_squares(const Board & b, Square * squares, const Move m) {
+    int i = 0;
+    for (int j = 0; j < 8; ++j) {
+        Delta d = D[j];
+        gamma_explore(b, m.from, squares, i, d, direction_of_delta(d));
+        gamma_explore(b, m.to, squares, i, d, direction_of_delta(d));
+    }
+    if (type(b.get(m.from)) == KNIGHT) {
+        for (int j = 0; j < 8; ++j) {
+            Square temp = mksq(m.from.x + XKN[j], m.from.y + YKN[j]);
+            if (val(temp)) {
+                squares[i++] = temp;
+            }
+            temp = mksq(m.to.x + XKN[j], m.to.y + YKN[j]);
+            if (val(temp)) {
+                squares[i++] = temp;
+            }
+        }
+    }
+    else if (type(b.get(m.to)) == KNIGHT) {
+        for (int j = 0; j < 8; ++j) {
+            Square temp = mksq(m.to.x + XKN[j], m.to.y + YKN[j]);
+            if (val(temp)) {
+                squares[i++] = temp;
+            }
+        }
+    }
 }
