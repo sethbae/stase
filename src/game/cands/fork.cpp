@@ -23,12 +23,6 @@ inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
 
 // TODO: defence along the line of the fork: 8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1
 
-// TODO: fork with capture?? 8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1
-//  "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1"
-//  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
-//  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
-
-
 /**
  * Checks whether from this square, there are two pieces which can be forked.
  * This is done regardless of whether there is actually a piece threatening to
@@ -335,16 +329,38 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
     for (const FeatureFrame & ff : fork_frames) {
 
         // don't record traditional forks: only those which go in different directions
-        Delta d1 = get_delta_between(ff.centre, itosq(ff.conf_1));
-        Delta d2 = get_delta_between(ff.secondary, itosq(ff.conf_1));
+        Square fork_sq = itosq(ff.conf_1);
+        Delta d1 = get_delta_between(ff.centre, fork_sq);
+        Delta d2 = get_delta_between(ff.secondary, fork_sq);
         if (parallel(d1, d2)) { continue; }
 
         // don't record forks from unsafe squares
-        SquareControlStatus status = gs.control_cache->safe_get(gs, itosq(ff.conf_1));
+        SquareControlStatus status = gs.control_cache->safe_get(gs, fork_sq);
         if (colour(p) == WHITE
             && (status.balance < 0 || status.min_b < piece_value(KING))) { continue; }
         else if (colour(p) == BLACK
             && (status.balance > 0 || status.min_w < piece_value(KING))) { continue; }
+
+        // now check that the queen can actually play the fork
+        Delta d = get_delta_between(s, fork_sq);
+
+        // check we can move in the required direction
+        if (!orth_diag(d) || gs.is_kpinned_piece(s, d)) { continue; }
+
+        // establish that the run of squares to it is empty by using the first piece encountered
+        Square fpe = first_piece_encountered(gs.board, s, d);
+
+        if (!is_sentinel(fpe)) {
+            if (d.dx == 0) {
+                // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
+                if (d.dy > 0 && fpe.y < fork_sq.y) { continue; }
+                if (d.dy < 0 && fpe.y > fork_sq.y) { continue; }
+            } else {
+                // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
+                if (d.dx > 0 && fpe.x < fork_sq.x) { continue; }
+                if (d.dx < 0 && fpe.x > fork_sq.x) { continue; }
+            }
+        }
 
         if (!gs.add_frame(
                 queen_fork_hook.id,
@@ -689,46 +705,9 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
     }
 }
 
-void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
-
-    Square q_sq = itosq(ff->conf_2);
-    Square fork_sq = itosq(ff->conf_1);
-    Delta d = get_delta_between(q_sq, fork_sq);
-
-    // check we can move in the required direction
-    if (!orth_diag(d) || gs.is_kpinned_piece(q_sq, d)) { return; }
-
-    // establish that the run of squares to it is empty by using the first piece encountered
-    Square fpe = first_piece_encountered(gs.board, q_sq, d);
-
-    if (!is_sentinel(fpe)) {
-        if (d.dx == 0) {
-            // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
-            if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
-            if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
-        } else {
-            // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
-            if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
-            if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
-        }
-    }
-
-    // safety checks are done on the hook side, so it's safe to play the fork!
-    if (counter.has_space()) {
-        Move move{q_sq, fork_sq, 0};
-        m->set_score(
-            fork_score(
-                piece_value(gs.board.get(ff->centre)),
-                piece_value(gs.board.get(ff->secondary))));
-        m[counter.inc()] = move;
-    }
-}
-
 void respond_to_fork_frame(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
     if (ff->conf_2 == sq_sentinel_as_int()) {
         find_piece_to_fork(gs, ff, m, counter);
-    } else if (type(gs.board.get(itosq(ff->conf_2))) == QUEEN) {
-        seek_queen_to_play_fork(gs, ff, m, counter);
     } else {
         play_fork(gs, ff, m, counter);
     }
@@ -755,6 +734,11 @@ const Responder play_fork_resp{
  * Assesses whether the given move, assumed to be a capture, is also a fork.
  */
 bool capture_is_fork(Gamestate & gs, const Move m) {
+
+    // TODO: fork with capture?? 8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1
+    //  "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1"
+    //  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
+    //  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
 
     Piece p = gs.board.get(m.from);
     int forkable = 0;
