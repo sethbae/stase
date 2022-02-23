@@ -691,20 +691,7 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
 
 void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
 
-    // find the queen which can fork
-    Piece queen = colour(gs.board.get(ff->centre)) == WHITE ? B_QUEEN : W_QUEEN;
-    Square q_sq = SQUARE_SENTINEL;
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            if (gs.board.get(x, y) == queen) {
-                q_sq = mksq(x, y);
-            }
-        }
-    }
-
-    // check we have a queen
-    if (is_sentinel(q_sq)) { return; }
-
+    Square q_sq = itosq(ff->conf_2);
     Square fork_sq = itosq(ff->conf_1);
     Delta d = get_delta_between(q_sq, fork_sq);
 
