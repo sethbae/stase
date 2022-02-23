@@ -11,8 +11,6 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-// TODO add one for queen_fork_hook!
-
 const std::vector<FeatureHandler> feature_handlers = {
     FeatureHandler{
         &king_pinned_pieces_hook,

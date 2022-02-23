@@ -547,6 +547,7 @@ bool find_king_forks(Gamestate & gs, const Square s) {
 
                 if (val(forked_sq)
                     && gs.board.get(forked_sq) != EMPTY
+                    && colour(gs.board.get(forked_sq)) != king_col
                     && zero_or_worse_control(gs, forked_sq)) {
 
                     if (count % 2 == 0) {
@@ -705,23 +706,23 @@ void seek_queen_to_play_fork(const Gamestate & gs, const FeatureFrame * ff, Move
     if (is_sentinel(q_sq)) { return; }
 
     Square fork_sq = itosq(ff->conf_1);
-    Delta d = get_delta_between(fork_sq, q_sq);
+    Delta d = get_delta_between(q_sq, fork_sq);
 
     // check we can move in the required direction
     if (!orth_diag(d) || gs.is_kpinned_piece(q_sq, d)) { return; }
 
     // establish that the run of squares to it is empty by using the first piece encountered
     Square fpe = first_piece_encountered(gs.board, q_sq, d);
-    if (!is_sentinel(fpe)) {
-        if (d.dx == 0) {
-            // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
-            if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
-            if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
-        } else {
-            // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
-            if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
-            if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
-        }
+
+    if (is_sentinel(fpe)) { return; }
+    if (d.dx == 0) {
+        // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
+        if (d.dy > 0 && fpe.y < fork_sq.y) { return; }
+        if (d.dy < 0 && fpe.y > fork_sq.y) { return; }
+    } else {
+        // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
+        if (d.dx > 0 && fpe.x < fork_sq.x) { return; }
+        if (d.dx < 0 && fpe.x > fork_sq.x) { return; }
     }
 
     // safety checks are done on the hook side, so it's safe to play the fork!
