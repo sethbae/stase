@@ -52,6 +52,33 @@ const SignedByte YD[] = {-1, 1, -1, 1, 0, 0, 1, -1};
 const SignedByte XKN[] = {1, 1, 2, 2, -1, -1, -2, -2};
 const SignedByte YKN[] = {2, -2, 1, -1, 2, -2, 1, -1};
 
+const Delta D[8] = {
+        // the first four deltas originate on the left hand side, and go right
+        delta(1, 0),
+        delta(0, 1),
+        delta(1, 1),
+        delta(1, -1),
+        // the final four deltas run counter to the originals
+        delta(-1, 0),
+        delta(0, -1),
+        delta(-1, -1),
+        delta(-1, 1)
+};
+
+const Delta D_ORTH[4] = {
+        delta(1, 0),
+        delta(-1, 0),
+        delta(0, 1),
+        delta(0, -1)
+};
+
+const Delta D_DIAG[4] = {
+        delta(1, 1),
+        delta(-1, 1),
+        delta(1, -1),
+        delta(-1, -1)
+};
+
 /* get/set promotion, castle flags etc */
 bool Move::is_prom() const { return flags & PROM_FLAG; }
 void Move::set_prom() { flags |= PROM_FLAG; }

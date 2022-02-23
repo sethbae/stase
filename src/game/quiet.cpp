@@ -45,7 +45,7 @@ float quiess(Gamestate & gs) {
             break;
         }
         if (is_major_piece(gs.board.get(ff.centre))) {
-            return piece_value(gs.board.get(ff.centre)) / 1000;
+            return piece_value(gs.board.get(ff.centre));
         }
         ++unsafe;
     }

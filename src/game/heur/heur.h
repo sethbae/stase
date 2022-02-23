@@ -31,12 +31,18 @@ namespace __piece_constants{
     const int ROOK_VAL = 5000;
     const int QUEEN_VAL = 9000;
     const int KING_VAL = 9001;
+    const uint8_t PAWN_VAL_SIMPLE = 1;
+    const uint8_t BISHOP_VAL_SIMPLE = 3;
+    const uint8_t KNIGHT_VAL_SIMPLE = 3;
+    const uint8_t ROOK_VAL_SIMPLE = 5;
+    const uint8_t QUEEN_VAL_SIMPLE = 9;
+    const uint8_t KING_VAL_SIMPLE = 10;
 }
 
 /**
  * Returns a positive integer representing the value of the given piece type in millipawns.
  */
-constexpr int piece_value(const Ptype p) {
+constexpr int piece_value_millis(const Ptype p) {
     switch (p) {
         case PAWN: return __piece_constants::PAWN_VAL;
         case KNIGHT: return __piece_constants::KNIGHT_VAL;
@@ -50,7 +56,7 @@ constexpr int piece_value(const Ptype p) {
 /**
  * Returns a positive integer representing the value of the given piece in millipawns.
  */
-constexpr int piece_value(const Piece p) {
+constexpr int piece_value_millis(const Piece p) {
     switch (p) {
         case W_PAWN: return __piece_constants::PAWN_VAL;
         case W_KNIGHT: return __piece_constants::KNIGHT_VAL;
@@ -63,6 +69,41 @@ constexpr int piece_value(const Piece p) {
         case B_ROOK: return __piece_constants::ROOK_VAL;
         case B_QUEEN: return __piece_constants::QUEEN_VAL;
         default: return __piece_constants::KING_VAL;
+    }
+}
+
+/**
+ * Returns an integer between 0 and 10 representing the traditional value of the piece
+ * (10 for kings).
+ */
+constexpr uint8_t piece_value(const Ptype p) {
+    switch (p) {
+        case PAWN: return __piece_constants::PAWN_VAL_SIMPLE;
+        case KNIGHT: return __piece_constants::KNIGHT_VAL_SIMPLE;
+        case BISHOP: return __piece_constants::BISHOP_VAL_SIMPLE;
+        case ROOK: return __piece_constants::ROOK_VAL_SIMPLE;
+        case QUEEN: return __piece_constants::QUEEN_VAL_SIMPLE;
+        default: return __piece_constants::KING_VAL_SIMPLE;
+    }
+}
+
+/**
+ * Returns an integer between 0 and 10 representing the traditional value of the piece
+ * (10 for kings).
+ */
+constexpr uint8_t piece_value(const Piece p) {
+    switch (p) {
+        case W_PAWN: return __piece_constants::PAWN_VAL_SIMPLE;
+        case W_KNIGHT: return __piece_constants::KNIGHT_VAL_SIMPLE;
+        case W_BISHOP: return __piece_constants::BISHOP_VAL_SIMPLE;
+        case W_ROOK: return __piece_constants::ROOK_VAL_SIMPLE;
+        case W_QUEEN: return __piece_constants::QUEEN_VAL_SIMPLE;
+        case B_PAWN: return __piece_constants::PAWN_VAL_SIMPLE;
+        case B_KNIGHT: return __piece_constants::KNIGHT_VAL_SIMPLE;
+        case B_BISHOP: return __piece_constants::BISHOP_VAL_SIMPLE;
+        case B_ROOK: return __piece_constants::ROOK_VAL_SIMPLE;
+        case B_QUEEN: return __piece_constants::QUEEN_VAL_SIMPLE;
+        default: return __piece_constants::KING_VAL_SIMPLE;
     }
 }
 

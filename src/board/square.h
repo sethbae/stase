@@ -31,6 +31,14 @@ inline bool val(const Byte x, const Byte y) {
     return x < 8 && y < 8;
 }
 
+constexpr int sq_sentinel_as_int() { return 0xFFFF; }
+constexpr int sqtoi(const Square s) {
+    return (((int) s.x) << 4) | ((int) s.y);
+}
+constexpr Square itosq(const int i) {
+    return Square{(Byte) (i >> 4), (Byte) (i & 0xF)};
+}
+
 /**
  * String conversion functions.
  */
