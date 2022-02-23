@@ -65,6 +65,20 @@ const Delta D[8] = {
         delta(-1, 1)
 };
 
+const Delta D_ORTH[4] = {
+        delta(1, 0),
+        delta(-1, 0),
+        delta(0, 1),
+        delta(0, -1)
+};
+
+const Delta D_DIAG[4] = {
+        delta(1, 1),
+        delta(-1, 1),
+        delta(1, -1),
+        delta(-1, -1)
+};
+
 /* get/set promotion, castle flags etc */
 bool Move::is_prom() const { return flags & PROM_FLAG; }
 void Move::set_prom() { flags |= PROM_FLAG; }

@@ -14,6 +14,7 @@ void discover_feature_frames(Gamestate &, const Hook *);
 extern const Hook unsafe_piece_hook;
 extern const Hook develop_hook;
 extern const Hook fork_hook;
+extern const Hook queen_fork_hook;
 extern const Hook check_hook;
 extern const Hook pin_skewer_hook;
 extern const Hook king_pinned_pieces_hook;
@@ -24,6 +25,7 @@ const std::vector<const Hook *> ALL_HOOKS {
         &unsafe_piece_hook,
         &develop_hook,
         &fork_hook,
+        &queen_fork_hook,
         &check_hook,
         &pin_skewer_hook,
         &promotion_hook
@@ -31,7 +33,7 @@ const std::vector<const Hook *> ALL_HOOKS {
 
 // in order to allocate the feature frames array statically, we cannot take the value
 // from the vector dynamically. Instead we have to do this :(
-const int NUM_HOOKS = 7;
+const int NUM_HOOKS = 8;
 inline bool assert_failed() {
     std::cout << "Assertion failed: update NUM_HOOKS to correctly match the number of hooks\n";
     abort();

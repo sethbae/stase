@@ -16,8 +16,9 @@ using std::ofstream;
 #include "src/game/cands/cands.h"
 #include "src/game/gamestate.hpp"
 #include "src/bench/bench.h"
-#include "src/test/test.h"
-
+#include "src/game/cands/responder.hpp"
+//#include "src/test/test.h"
+//#include "src/test/game/cands/fork_helpers.h"
 
 
 /**
@@ -377,10 +378,10 @@ void show_hook_frames(Gamestate & gs, const Hook * h) {
 
     pr_board(gs.board);
     cout << "\nFeatureFrames found for " << h->name << ":\n";
-    for (int i = 0; !is_sentinel(gs.frames[h->id][i].centre); ++i) {
+    for (int i = 0; !is_sentinel(gs.frames[h->id][i].centre) && i < MAX_FRAMES; ++i) {
         FeatureFrame ff = gs.frames[h->id][i];
         cout << "FeatureFrame: " << sqtos(ff.centre) << " " << sqtos(ff.secondary);
-        cout << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
+        cout << " c1: " << sqtos(itosq(ff.conf_1)) << " c2: " << sqtos(itosq(ff.conf_2)) << "\n";
     }
 
 }
@@ -540,23 +541,36 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "rn2kb1r/pp2q1p1/2p4p/6N1/3P2Q1/8/PPP4P/2KR4 w kq - 0 15"
+                "rnbqkbnr/ppp3pp/4p3/8/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
             );
 
-    Gamestate gs(fen, MIDGAME);
+    const std::string fen2 =
+            std::string(
+                "rnbqkbnr/ppp2ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+            );
+
+    Gamestate gs(fen2, OPENING);
     pr_board(gs.board);
 
-    for (const Hook * h : ALL_HOOKS) {
-        number_of_frames_hist(h);
-    }
+//    for (const Move m : legal_moves(gs.board)) {
+//        cout << mtos(gs.board, m) << " ";
+//    }
+//    cout << "\n";
+
+//    CandSet * c = cands(gs);
+//    print_cand_set(gs, *c, cout);
 
 //    q_scores();
 
 //    repl(fen);
 
-//    run_engine(fen, 3);
+//    std::string fen2(starting_fen());
+//    run_engine(fen2, 10);
+//    std::cout << fetch_node_count() << "\n";
 
-//    show_hook_frames(gs, &unsafe_piece_hook);
+//    show_hook_frames(gs, &queen_fork_hook);
+
+//    show_responder_moves(fen, play_fork_resp, FeatureFrame{stosq("g7"), stosq("b6"), sqtoi(stosq("f6")), sqtoi(stosq("d4"))});
 
 //    cands_report(gs);
 

@@ -58,6 +58,8 @@ public:
         phase = o.phase;
         update_phase(m);
 
+        this->control_cache->update(o.board, *o.control_cache, m);
+
         // this may not be true: it gets set by cands()
         in_check = false;
 
@@ -314,6 +316,31 @@ public:
         }
         return false;
 
+    }
+
+    /**
+     * If the piece on the given square is pinned to its king, this returns the delta along which it is pinned.
+     * Otherwise, it returns INVALID_DELTA.
+     */
+    Delta delta_of_kpinned_piece(const Square s) const {
+
+        Square * pieces;
+        Delta * dirs;
+        if (colour(board.get(s)) == WHITE) {
+            pieces = w_kpinned_pieces;
+            dirs = w_kpin_dirs;
+        } else {
+            pieces = b_kpinned_pieces;
+            dirs = b_kpin_dirs;
+        }
+
+        for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
+            // check that the square matches
+            if (equal(s, *pieces)) {
+                return *dirs;
+            }
+        }
+        return INVALID_DELTA;
     }
 
     /**

@@ -36,6 +36,25 @@ struct ControlCache {
         return get(s);
     }
 
+    /**
+     * Copies the data from the given control cache, and marks invalid squares gamma-reachable
+     * from the start or end square of the given move.
+     */
+    inline void update(const Board & b, const ControlCache & o, const Move m) {
+
+        Square invalidated[64];
+        find_invalidated_squares(b, &invalidated[0], m);
+
+        squares = o.squares;
+        for (int i = 0; i < 64; ++i) {
+            cache[i] = o.cache[i];
+        }
+
+        for (int i = 0; i < 64 && !is_sentinel(invalidated[i]); ++i) {
+            squares &= ~(1l << index(invalidated[i]));
+        }
+    }
+
 private:
     constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);

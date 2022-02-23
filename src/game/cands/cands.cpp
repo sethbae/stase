@@ -76,7 +76,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
             std::vector<const Responder *> responders =
-                    (gs.board.get_white() == centre_piece_is_white)
+                (gs.board.get_white() == centre_piece_is_white)
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
