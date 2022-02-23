@@ -486,7 +486,7 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
 
         Square fork_square = squares[i];
 
-        if (!would_be_unsafe_after(gs, fork_square, Move{s, fork_square})) {
+        if (!would_be_unsafe_after(gs, fork_square, Move{s, fork_square, 0})) {
 
             Square l_sq = mksq(fork_square.x - 1, fork_square.y + FORWARD);
             Square r_sq = mksq(fork_square.x + 1, fork_square.y + FORWARD);
@@ -653,7 +653,7 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
             // and check for each one that the piece is not pinned, and that it would end up safe.
             for (const Square fork_sq : squares_reachable) {
                 if (gs.is_kpinned_piece(temp, get_delta_between(temp, fork_sq))
-                    || would_be_unsafe_after(gs, fork_sq, Move{temp, fork_sq})) {
+                    || would_be_unsafe_after(gs, fork_sq, Move{temp, fork_sq, 0})) {
                     continue;
                 }
                 if (counter.has_space()) {
@@ -679,7 +679,7 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
     Square fork_square = itosq(ff->conf_1);
 
     if (!gs.is_kpinned_piece(forker_square, get_delta_between(forker_square, fork_square))
-        && !would_be_unsafe_after(gs, fork_square, Move{forker_square, fork_square})) {
+        && !would_be_unsafe_after(gs, fork_square, Move{forker_square, fork_square, 0})) {
 
         if (counter.has_space()) {
             Move move{forker_square, fork_square, 0};
