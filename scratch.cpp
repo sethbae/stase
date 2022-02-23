@@ -541,21 +541,36 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "6r1/8/8/5B2/2r5/8/8/8 w - - 0 1"
+                "rnbqkbnr/ppp3pp/4p3/8/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
             );
 
-    Gamestate gs(fen, MIDGAME);
+    const std::string fen2 =
+            std::string(
+                "rnbqkbnr/ppp2ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+            );
+
+    Gamestate gs(fen2, OPENING);
     pr_board(gs.board);
+
+//    for (const Move m : legal_moves(gs.board)) {
+//        cout << mtos(gs.board, m) << " ";
+//    }
+//    cout << "\n";
+
+//    CandSet * c = cands(gs);
+//    print_cand_set(gs, *c, cout);
 
 //    q_scores();
 
 //    repl(fen);
 
-//    run_engine(fen, 3);
+//    std::string fen2(starting_fen());
+//    run_engine(fen2, 10);
+//    std::cout << fetch_node_count() << "\n";
 
-//    show_hook_frames(gs, &fork_hook);
+//    show_hook_frames(gs, &queen_fork_hook);
 
-    show_responder_moves(fen, play_fork_resp, FeatureFrame{stosq("c4"), stosq("g8"), sq_sentinel_as_int(), piece_value(KING) + 1});
+//    show_responder_moves(fen, play_fork_resp, FeatureFrame{stosq("g7"), stosq("b6"), sqtoi(stosq("f6")), sqtoi(stosq("d4"))});
 
 //    cands_report(gs);
 
