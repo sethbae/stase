@@ -403,3 +403,78 @@ bool is_unsafe_piece(const Gamestate & gs, const Square s) {
 bool would_be_unsafe_after(const Gamestate & gs, const Square s, const Move m) {
     return (gs.board.get(s) != EMPTY || equal(s, m.to)) && would_be_weak_after(gs, s, colour(gs.board.get(s)), m);
 }
+
+/**
+ * Returns false if the move moves a piece onto a square which it isn't safe on. If the square
+ * would be safe, returns true.
+ */
+bool move_is_safe(const Gamestate & gs, const Move m) {
+
+    Piece p = gs.board.get(m.from);
+    if (p == EMPTY) { return true; }
+
+    SquareControlStatus status = gs.control_cache->safe_get(gs, m.to);
+
+    if (colour(p) == WHITE) {
+
+        if (type(p) != PAWN) {
+            // pawns don't control the squares they move onto
+            status.balance -= 1;
+        }
+
+        // if the square is not controlled, the move is safe.
+        if (status.min_b > piece_value(B_KING)) { return true; }
+
+        // if it's attacked only by more valuable pieces, then:
+        if (status.min_b > piece_value(p)) {
+            // uncontrolled square: unsafe
+            if (status.balance < 0) { return false; }
+            // neutral square: safe if defended at all
+            if (status.balance == 0) { return status.min_w <= piece_value(W_KING); }
+            // controlled square: safe
+            return true;
+        }
+
+        // if attacked by same piece, then:
+        else if (status.min_b == piece_value(p)) {
+            // safe unless the square is definitely not controlled
+            return status.balance >= 0;
+        }
+
+        // if attacked by weaker piece, then unsafe
+        else {
+            return false;
+        }
+
+    } else {
+
+        if (type(p) != PAWN) {
+            // pawns don't control the squares they move onto
+            status.balance += 1;
+        }
+
+        // if the square is not controlled, the move is safe.
+        if (status.min_w > piece_value(W_KING)) { return true; }
+
+        // if it's attacked only by more valuable pieces, then:
+        if (status.min_w > piece_value(p)) {
+            // uncontrolled square: unsafe
+            if (status.balance > 0) { return false; }
+            // neutral square: safe if defended at all
+            if (status.balance == 0) { return status.min_b <= piece_value(B_KING); }
+            // controlled square: safe
+            return true;
+        }
+
+        // if attacked by same piece, then:
+        else if (status.min_w == piece_value(p)) {
+            // safe unless the square is definitely not controlled
+            return status.balance <= 0;
+        }
+
+        // if attacked by weaker piece, then unsafe
+        else {
+            return false;
+        }
+    }
+}

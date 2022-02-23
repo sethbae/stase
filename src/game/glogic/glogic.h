@@ -64,6 +64,7 @@ bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, c
 bool is_unsafe_piece(const Gamestate &, const Square);
 bool would_be_unsafe_after(const Gamestate &, const Square s, const Move m);
 
+bool move_is_safe(const Gamestate &, const Move);
 void find_invalidated_squares(const Board &, Square *, const Move);
 
 /**
