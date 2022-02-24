@@ -71,16 +71,7 @@ const TestSet<ResponderTestCase> fork_responder_test_set{
                 FeatureFrame{stosq("e1"), stosq("g5"), sqtoi(stosq("g3")), sqtoi(stosq("c7"))}
             },
             {"c7a5", "c7g3"}
-        },
-        // queen can't play queen fork
-        ResponderTestCase{
-            "2q5/8/8/6B1/8/8/8/4K3 w - - 0 1",
-            {
-                FeatureFrame{stosq("e1"), stosq("g5"), sqtoi(stosq("a5")), sqtoi(stosq("c8"))},
-                FeatureFrame{stosq("e1"), stosq("g5"), sqtoi(stosq("g3")), sqtoi(stosq("c8"))}
-            },
-            {}
-        },
+        }
     }
 };
 
