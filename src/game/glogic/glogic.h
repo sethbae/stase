@@ -4,6 +4,7 @@
 #include "game.h"
 #include "board.h"
 #include "piece_moves.hpp"
+#include <iostream>
 
 /**
  * Used to pass information about the pieces attacking and controlling a certain square.
@@ -12,6 +13,12 @@ struct SquareControlStatus {
     int16_t balance = 0;
     uint16_t min_w = 0;
     uint16_t min_b = 0;
+
+    inline void print() {
+        std::cout << "Status: b " << balance
+                    << ", min_w " << (int)min_w
+                    << ", min_b " << (int)min_b << "\n";
+    }
 };
 
 /**

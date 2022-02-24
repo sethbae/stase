@@ -112,8 +112,8 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colou
     SquareControlStatus status = gs.control_cache->safe_get(gs, s);
 
     return colour == WHITE
-        ? status.min_b <= piece_value(W_KING)
-        : status.min_w <= piece_value(B_KING);
+        ? status.min_b > piece_value(W_KING)
+        : status.min_w > piece_value(B_KING);
 }
 
 /**
