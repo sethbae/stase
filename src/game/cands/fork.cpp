@@ -52,6 +52,8 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
 
         Delta d = D[i];
         Square s2 = first_piece_encountered(gs.board, s, d);
+        if (is_sentinel(s2)) { continue; }
+
         Piece p2 = gs.board.get(s2);
 
         if (is_sentinel(s2)) { continue; }
@@ -79,7 +81,7 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
                     FeatureFrame{
                        s,
                        s2,
-                       piece_value(KING) + 1,
+                       NOT_ATTACKED_AT_ALL,
                        sq_sentinel_as_int()
                     })) {
                 return false;
