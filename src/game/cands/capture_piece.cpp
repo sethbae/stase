@@ -23,7 +23,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     const Piece captured_piece = gs.board.get(s);
     const int cap_val = piece_value(captured_piece);
 
-    int min_value_seen = piece_value(W_KING) + 1;
+    int min_value_seen = NOT_ATTACKED_AT_ALL;
     int x, y;
     Square temp;
 

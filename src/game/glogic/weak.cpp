@@ -47,9 +47,11 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
     int16_t basic_balance = 0;
     int16_t poly_x_ray_balance = 0;
     int directions_attacked_from = 0;
-    uint16_t min_value_w = piece_value(W_KING) + 1;
-    uint16_t min_value_b = piece_value(W_KING) + 1;
-    uint16_t min_poly_x_ray_defender = piece_value(W_KING) + 1;
+    bool attacked_by_pinned_w_piece = false;
+    bool attacked_by_pinned_b_piece = false;
+    uint16_t min_value_w = NOT_ATTACKED_AT_ALL;
+    uint16_t min_value_b = NOT_ATTACKED_AT_ALL;
+    uint16_t min_poly_x_ray_defender = NOT_ATTACKED_AT_ALL;
     int x, y;
     Square temp;
 
@@ -81,10 +83,6 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
                 y += y_inc;
                 continue;
             }
-            if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
-                cont = false;
-                continue;
-            }
 
             bool moves_in_right_dir = (p != EMPTY) && can_move_in_direction(p, dir);
 
@@ -111,6 +109,16 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
             }
 
             if (moves_in_right_dir) {
+
+                if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                    cont = false;
+                    if (colour(p) == WHITE) {
+                        attacked_by_pinned_w_piece = true;
+                    } else {
+                        attacked_by_pinned_b_piece = true;
+                    }
+                    continue;
+                }
 
                 // attacking piece found: update (poly) x-ray info and balances
 
@@ -215,6 +223,21 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
         }
     }
 
+    // update the min_values correctly
+    if (min_value_w > piece_value(W_KING)) {
+        if (attacked_by_pinned_w_piece) {
+            min_value_w = ATTACKED_BY_PINNED_PIECE;
+        } else {
+            min_value_w = NOT_ATTACKED_AT_ALL;
+        }
+    } else if (min_value_b > piece_value(B_KING)) {
+        if (attacked_by_pinned_b_piece) {
+            min_value_b = ATTACKED_BY_PINNED_PIECE;
+        } else {
+            min_value_b = NOT_ATTACKED_AT_ALL;
+        }
+    }
+
 //    cout << "attacked from " << directions_attacked_from << " directions\n";
 //    cout << "basic balance: " << basic_balance << "\n";
 //    cout << "poly_x_ray_balance: " << poly_x_ray_balance << "\n";
@@ -269,9 +292,9 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
  * applying any logic or interpretation to the result.
  */
 SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s) {
-    if (gs.control_cache->contains(s)) {
-        return gs.control_cache->get(s);
-    }
+//    if (gs.control_cache->contains(s)) {
+//        return gs.control_cache->get(s);
+//    }
     SquareControlStatus status = capture_walk(gs, s);
     gs.control_cache->put(s, status);
     return status;

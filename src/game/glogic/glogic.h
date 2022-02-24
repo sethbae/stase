@@ -19,7 +19,15 @@ struct SquareControlStatus {
                     << ", min_w " << (int)min_w
                     << ", min_b " << (int)min_b << "\n";
     }
+    inline void print(const Square s) {
+        std::cout << "[" << sqtos(s) << "] ";
+        print();
+    }
 };
+
+// Special values used in min_w and min_b fields to distinguish cases relevant for kings.
+const uint16_t ATTACKED_BY_PINNED_PIECE = 11;
+const uint16_t NOT_ATTACKED_AT_ALL = 12;
 
 /**
  * Checks whether the three points given all lie on a straight line.
