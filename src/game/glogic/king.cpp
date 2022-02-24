@@ -123,8 +123,21 @@ bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colou
  */
 bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Colour colour) {
 
+    // sneak the first move: a move taking place before this calculation
     Piece sneaked = gs.sneak(m);
-    bool result = would_be_safe_king_square(gs, s, colour);
+    Square k_sq;
+    if (colour == WHITE) {
+        k_sq = gs.w_king;
+    } else {
+        k_sq = gs.b_king;
+    }
+
+    // perform an inner sneak: moving the king onto the square we want to know about
+    Piece sneaked2 = gs.sneak(Move{k_sq, s, 0});
+    bool result = is_safe_for_king(gs, s); // fetch the result on the double-sneaked board
+
+    // unsneak
+    gs.unsneak(Move{k_sq, s, 0}, sneaked2);
     gs.unsneak(m, sneaked);
 
     return result;
