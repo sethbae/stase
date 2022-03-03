@@ -102,7 +102,7 @@ inline Delta get_delta_between(const Square a, const Square b){
         dy = (dy > 0) ? 1 : -1;
     }
     return Delta{dx, dy};
-};
+}
 inline bool orth_diag(const Delta d) {
     return (d.dx <= 1 && d.dx >= -1) && (d.dy <= 1 && d.dy >= -1);
 }
