@@ -17,6 +17,7 @@ using std::ofstream;
 #include "src/game/gamestate.hpp"
 #include "src/bench/bench.h"
 #include "src/game/cands/responder.hpp"
+#include "src/test/test.h"
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"
 
@@ -381,7 +382,7 @@ void show_hook_frames(Gamestate & gs, const Hook * h) {
     for (int i = 0; !is_sentinel(gs.frames[h->id][i].centre) && i < MAX_FRAMES; ++i) {
         FeatureFrame ff = gs.frames[h->id][i];
         cout << "FeatureFrame: " << sqtos(ff.centre) << " " << sqtos(ff.secondary);
-        cout << " c1: " << sqtos(itosq(ff.conf_1)) << " c2: " << sqtos(itosq(ff.conf_2)) << "\n";
+        cout << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
     }
 
 }
@@ -541,15 +542,10 @@ int main(int argc, char** argv) {
 
     const std::string fen =
             std::string(
-                "rnbqkbnr/ppp3pp/4p3/8/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"
+                "r1bqk2r/1p2bppp/p1nppn2/2p5/2B1P3/2NP1Q2/PPP1NPPP/R1B2RK1 w kq - 0 8"
             );
 
-    const std::string fen2 =
-            std::string(
-                "rnbqkbnr/ppp2ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
-            );
-
-    Gamestate gs(fen2, OPENING);
+    Gamestate gs(fen, OPENING);
     pr_board(gs.board);
 
 //    for (const Move m : legal_moves(gs.board)) {
@@ -564,13 +560,12 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-//    std::string fen2(starting_fen());
-//    run_engine(fen2, 10);
-//    std::cout << fetch_node_count() << "\n";
+    run_with_node_limit(fen, 50000);
+    std::cout << fetch_node_count() << "\n";
 
-//    show_hook_frames(gs, &queen_fork_hook);
+//    show_hook_frames(gs, &fork_hook);
 
-//    show_responder_moves(fen, play_fork_resp, FeatureFrame{stosq("g7"), stosq("b6"), sqtoi(stosq("f6")), sqtoi(stosq("d4"))});
+//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("g6"), {0, 0}, q, none});
 
 //    cands_report(gs);
 
