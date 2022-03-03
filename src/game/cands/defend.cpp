@@ -3,6 +3,12 @@
 #include "../gamestate.hpp"
 #include "responder.hpp"
 
+/**
+ * Checks whether a piece of the given type, standing on the from square, could move
+ * onto the to square. This allows for captures, and does not consider whether the piece
+ * is pinned or not. This assumes that the piece is able to move in the direction leading
+ * from from to to.
+ */
 bool can_see_immediately(const Gamestate & gs, const Piece p, const Square from, const Square to) {
 
     Delta d = get_delta_between(from, to);
@@ -23,16 +29,30 @@ bool can_see_immediately(const Gamestate & gs, const Piece p, const Square from,
     return false;
 }
 
+/**
+ * Checks whether a piece of the given type, if it were standing on the from square,
+ * would be able to control the to square, permitting x-rays. This does not take
+ * account of pins, and assumes the piece given can indeed move in the direction required.
+ */
 bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const Square to) {
+
     Delta d = get_delta_between(from, to);
     bool x_changing = (d.dx != 0);
+    bool already_x_raying = false;
     Square fpe = first_piece_encountered(gs.board, from, d);
 
     while (!is_sentinel(fpe) && ((x_changing && fpe.x < to.x) || (!x_changing && fpe.y < to.y))) {
         Piece other_p =  gs.board.get(fpe);
         if (colour(other_p) != colour(p)) {
-            // hit enemy piece: check if there's a clear segment remaining
-            return can_see_immediately(gs, p, fpe, to);
+            if (already_x_raying) {
+                // if we hit an enemy piece and we were already in an x-ray, we can't see the square
+                return false;
+            } else {
+                // otherwise, however, we can continue (now in an x-ray)
+                already_x_raying = true;
+                fpe = first_piece_encountered(gs.board, fpe, d);
+                continue;
+            }
         }
         if (can_move_in_direction(other_p, d)) {
             // x-rayable piece: loop
@@ -47,7 +67,11 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
     return true;
 }
 
-void find_ortho_cover(
+/**
+ * Finds squares on which a rook on p_sq would be able to defend c_sq. Does not account for whether
+ * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ */
+void find_rook_cover(
         const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
 
     if (p_sq.x == c_sq.x || p_sq.y == c_sq.y) {
@@ -58,24 +82,22 @@ void find_ortho_cover(
     Square top_left = mksq(p_sq.x, c_sq.y);
     Square top_right = mksq(c_sq.x, p_sq.y);
 
-    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_left) && can_see_x_ray(gs, gs.board.get(p_sq), top_left, c_sq)) {
+    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_left)
+            && can_see_x_ray(gs, gs.board.get(p_sq), top_left, c_sq)) {
         squares.push_back(top_left);
     }
-    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_right) && can_see_x_ray(gs, gs.board.get(p_sq), top_right, c_sq)) {
+    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_right)
+            && can_see_x_ray(gs, gs.board.get(p_sq), top_right, c_sq)) {
         squares.push_back(top_right);
     }
     return;
 }
 
-int diag_ordinal(const Square s) {
-    if (light_square(s)) {
-        return (s.x + (7 - s.y)) / 2;
-    } else {
-        return ((7 - s.x) + s.y) / 2;
-    }
-}
-
-void find_diag_cover(const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
+/**
+ * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
+ * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ */
+void find_bishop_cover(const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
 
     if (abs(c_sq.x - p_sq.x) == abs(c_sq.y - p_sq.y)) {
         // piece already defends
@@ -99,36 +121,21 @@ void find_diag_cover(const Gamestate & gs, std::vector<Square> & squares, const 
     }
 
     if (val(corner1)
-        && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner1)
-        && can_see_x_ray(gs, gs.board.get(p_sq), corner1, c_sq)) {
+            && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner1)
+            && can_see_x_ray(gs, gs.board.get(p_sq), corner1, c_sq)) {
         squares.push_back(corner1);
     }
     if (val(corner2)
-        && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner2)
-        && can_see_x_ray(gs, gs.board.get(p_sq), corner2, c_sq)) {
+            && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner2)
+            && can_see_x_ray(gs, gs.board.get(p_sq), corner2, c_sq)) {
         squares.push_back(corner2);
     }
-
 }
 
-Square find_edge_of_board(const Gamestate & gs, const Square s, const Delta d) {
-    if (d.dx == 0) {
-        if (d.dy > 0) { return mksq(s.x, 7); }
-        else { return mksq(s.x, 0); }
-    }
-    if (d.dy == 0) {
-        if (d.dx > 0) { return mksq(7, s.y); }
-        else { return mksq(0, s.y); }
-    }
-    Square temp = s;
-    // TODO be clever here
-    while (val(temp.x + d.dx, temp.y + d.dy)) {
-        temp.x += d.dx;
-        temp.y += d.dy;
-    }
-    return temp;
-}
-
+/**
+ * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
+ * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ */
 void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const Square q_sq, const Square c_sq) {
 
     if (beta_covers(gs.board, q_sq, c_sq)) {
@@ -144,7 +151,7 @@ void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const
         // TODO make this account for x-rays (use a while loop)
         Square segment_end = first_piece_encountered(gs.board, c_sq, d);
         if (is_sentinel(segment_end)) {
-            segment_end = find_edge_of_board(gs.board, c_sq, d);
+            segment_end = edge_of_board(c_sq, i);
         }
         if (equal(c_sq, segment_end)) { continue; }
 
@@ -157,11 +164,17 @@ void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const
     }
 }
 
+/**
+ * Given a list in which to accumulate possibilities, this finds squares that a sliding piece could
+ * move to in order to defend the given cover square (c_sq). This does not check for pins or for
+ * square safety: it just finds the moves.
+ * This does nothing if given a non sliding piece (king, pawn or knight).
+ */
 void find_cover_squares(
         const Gamestate & gs, std::vector<Square> & squares, const Square piece_square, const Square cover_square) {
     switch (type(gs.board.get(piece_square))) {
-        case BISHOP: find_diag_cover(gs, squares, piece_square, cover_square); return;
-        case ROOK: find_ortho_cover(gs, squares, piece_square, cover_square); return;
+        case BISHOP: find_bishop_cover(gs, squares, piece_square, cover_square); return;
+        case ROOK: find_rook_cover(gs, squares, piece_square, cover_square); return;
         case QUEEN: find_queen_cover(gs, squares, piece_square, cover_square); return;
         default: return;
     }
@@ -315,191 +328,6 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
         }
     }
 
-}
-
-/**
- * Walks out from the piece looking for other pieces which can move to the squares encountered
- * and therefore can defend the piece. Does not consider discovered defences or promotions.
- */
-void defend_square2(const Gamestate & gs, const Square s, Move * moves, IndexCounter & move_counter) {
-
-    const Board & b = gs.board;
-    const Colour defending_colour = b.get_white() ? WHITE : BLACK;
-
-    Square piece_squares[16];
-    int pieces_point = 0;
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            Square temp = mksq(x, y);
-            if (colour(b.get(temp)) == defending_colour
-                    && !equal(temp, s)) {
-                piece_squares[pieces_point++] = temp;
-            }
-        }
-    }
-
-    int x, y;
-    Square temp;
-
-    // go through the delta pairs entailing each sliding direction
-    MoveType dir = DIAG;
-    for (int i = 0; i < 8; ++i) {
-
-        if (i == 4) {
-            dir = ORTHO;
-        }
-
-        const int x_inc = XD[i], y_inc = YD[i];
-        x = get_x(s) + x_inc, y = get_y(s) + y_inc;
-
-        // and go in that direction
-        while (val(temp = mksq(x, y))) {
-
-            Piece p = b.get(temp);
-
-            if (p == EMPTY) {
-                // check for any piece which can move here
-                for (int j = 0; j < pieces_point; ++j) {
-
-                    // check that the piece does not already control the square
-                    if (collinear_points(s, temp, piece_squares[j])
-                        || ((type(b.get(piece_squares[j])) == QUEEN) && gamma_covers(b, piece_squares[j], s))) {
-                        continue;
-                    }
-
-                    Delta mov_dir = get_delta_between(temp, piece_squares[j]);
-
-                    if (beta_covers(b, piece_squares[j], temp)
-                            && can_move_in_direction(b.get(piece_squares[j]), dir)
-                            && move_is_safe(gs, Move{piece_squares[j], temp, 0})
-                            && !gs.is_kpinned_piece(piece_squares[j], mov_dir)) {
-                        if (move_counter.has_space()) {
-                            Move m{piece_squares[j], temp, 0};
-                            m.set_score(defend_score(b.get(s)));
-                            moves[move_counter.inc()] = m;
-                        } else {
-                            // no space remaining
-                            return;
-                        }
-                    }
-                }
-            } else if (!can_move_in_direction(p, dir)) {
-                // blocking piece (which cannot move in same direction)
-                break;
-            }
-
-            // square was empty, continue
-            x += x_inc;
-            y += y_inc;
-
-        }
-
-    }
-
-    x = get_x(s), y = get_y(s);
-
-    // knights
-    for (int i = 0; i < 8; ++i) {
-
-        // first get the square it would be defending from
-        const Square defend_from_square = mksq(x + XKN[i], y + YKN[i]);
-        if (val(defend_from_square) && b.get(defend_from_square) == EMPTY) {
-
-            // then check for knights which can move to that square
-            for (int j = 0; j < 8; ++j) {
-                if (val(temp = mksq(x + XKN[i] + XKN[j], y + YKN[i] + YKN[j]))
-                        && (type(b.get(temp)) == KNIGHT)
-                        && (colour(b.get(temp)) == defending_colour)
-                        && !equal(temp, s)
-                        && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)
-                        && move_is_safe(gs, Move{temp, defend_from_square, 0})) {
-                    if (move_counter.has_space()) {
-                        Move m{temp, defend_from_square, 0};
-                        m.set_score(defend_score(b.get(s)));
-                        moves[move_counter.inc()] = m;
-                    } else {
-                        // no space remaining
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    // kings
-    for (int i = 0; i < 8; ++i) {
-
-        // check the possible square that a king could defend from
-        const Square defend_from_square = mksq(x + XD[i], y + YD[i]);
-        if (val(defend_from_square) && b.get(defend_from_square) == EMPTY) {
-
-            // and check the surrounding squares for kings
-            for (int j = 0; j < 8; ++j) {
-                if (val(temp = mksq(x + XD[i] + XD[j], y + YD[i] + YD[j]))
-                        && (type(b.get(temp)) == KING)
-                        && (colour(b.get(temp)) == defending_colour)
-                        && !equal(temp, s)
-                        && would_be_safe_for_king_after(gs, defend_from_square, Move{temp, defend_from_square, 0}, defending_colour)) {
-                    if (move_counter.has_space()) {
-                        Move m{temp, defend_from_square, 0};
-                        m.set_score(defend_score(b.get(s)));
-                        moves[move_counter.inc()] = m;
-                    } else {
-                        // no space remaining
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    // pawns
-    Square left_pawn_defence_square;
-    Square right_pawn_defence_square;
-    if (defending_colour == WHITE) {
-        left_pawn_defence_square = mksq(x - 1, y - 1);
-        right_pawn_defence_square = mksq(x + 1, y - 1);
-    } else {
-        left_pawn_defence_square = mksq(x - 1, y + 1);
-        right_pawn_defence_square = mksq(x + 1, y + 1);
-    }
-
-    for (int i = 0; i < pieces_point; ++i) {
-        // check that squares are empty?
-        if (type(b.get(piece_squares[i])) == PAWN) {
-            if (val(left_pawn_defence_square)
-                    && can_move_to_square(b, piece_squares[i], left_pawn_defence_square)
-                    && move_is_safe(gs, Move{piece_squares[i], left_pawn_defence_square, 0})) {
-                Delta mov_dir = get_delta_between(left_pawn_defence_square, piece_squares[i]);
-                if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
-                    if (move_counter.has_space()) {
-                        Move m{piece_squares[i], left_pawn_defence_square, 0};
-                        m.set_score(defend_score(b.get(s)));
-                        moves[move_counter.inc()] = m;
-                    } else {
-                        // no space remaining
-                        return;
-                    }
-                }
-            } else if (val(right_pawn_defence_square)
-                        && can_move_to_square(b, piece_squares[i], right_pawn_defence_square)
-                        && move_is_safe(gs, Move{piece_squares[i], right_pawn_defence_square, 0})) {
-                Delta mov_dir = get_delta_between(right_pawn_defence_square, piece_squares[i]);
-                if (!gs.is_kpinned_piece(piece_squares[i], mov_dir)) {
-                    if (move_counter.has_space()) {
-                        Move m{piece_squares[i], right_pawn_defence_square, 0};
-                        m.set_score(defend_score(b.get(s)));
-                        moves[move_counter.inc()] = m;
-                    } else {
-                        // no space remaining
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    return;
 }
 
 /**
