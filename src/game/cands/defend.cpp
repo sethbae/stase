@@ -30,7 +30,6 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
 
     while (!is_sentinel(fpe) && ((x_changing && fpe.x < to.x) || (!x_changing && fpe.y < to.y))) {
         Piece other_p =  gs.board.get(fpe);
-        std::cout << ptoc(p) << "\n";
         if (colour(other_p) != colour(p)) {
             // hit enemy piece: check if there's a clear segment remaining
             return can_see_immediately(gs, p, fpe, to);
