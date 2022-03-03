@@ -31,6 +31,20 @@ inline bool val(const Byte x, const Byte y) {
     return x < 8 && y < 8;
 }
 
+inline bool light_square(const Square s) {
+    const static bool lookup[8][8] = {
+        {true, false, true, false, true, false, true, false},
+        {false, true, false, true, false, true, false, true},
+        {true, false, true, false, true, false, true, false},
+        {false, true, false, true, false, true, false, true},
+        {true, false, true, false, true, false, true, false},
+        {false, true, false, true, false, true, false, true},
+        {true, false, true, false, true, false, true, false},
+        {false, true, false, true, false, true, false, true},
+    };
+    return lookup[7 - s.y][s.x];
+}
+
 constexpr int sq_sentinel_as_int() { return 0xFFFF; }
 constexpr int sqtoi(const Square s) {
     return (((int) s.x) << 4) | ((int) s.y);
