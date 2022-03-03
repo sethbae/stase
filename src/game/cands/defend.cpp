@@ -3,24 +3,49 @@
 #include "../gamestate.hpp"
 #include "responder.hpp"
 
-bool can_see(const Gamestate & gs, const Square from, const Square to) {
+bool can_see_immediately(const Gamestate & gs, const Piece p, const Square from, const Square to) {
 
     Delta d = get_delta_between(from, to);
     Square fpe = first_piece_encountered(gs.board, from, d);
 
-//    std::cout << "fpe: " << sqtos(fpe) << "\n";
-
     if (is_sentinel(fpe)) { return true; }
     if (d.dx == 0) {
         // y is increasing, so we can reach any square on the line with y less than the fpe's, and vice versa
-        if (d.dy > 0 && to.y <= fpe.y) { return true; }
-        if (d.dy < 0 && to.y >= fpe.y) { return true; }
+        if (d.dy > 0 && to.y < fpe.y) { return true; }
+        if (d.dy < 0 && to.y > fpe.y) { return true; }
+        if (to.y == fpe.y) { return colour(gs.board.get(fpe)) != colour(p); }
     } else {
         // x is increasing, so we can reach any square on the line with x less than the fpe's, and vice versa
-        if (d.dx > 0 && to.x <= fpe.x) { return true; }
-        if (d.dx < 0 && to.x >= fpe.x) { return true; }
+        if (d.dx > 0 && to.x < fpe.x) { return true; }
+        if (d.dx < 0 && to.x > fpe.x) { return true; }
+        if (to.x == fpe.x) { return colour(gs.board.get(fpe)) != colour(p); }
     }
     return false;
+}
+
+bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const Square to) {
+    Delta d = get_delta_between(from, to);
+    bool x_changing = (d.dx != 0);
+    Square fpe = first_piece_encountered(gs.board, from, d);
+
+    while (!is_sentinel(fpe) && ((x_changing && fpe.x < to.x) || (!x_changing && fpe.y < to.y))) {
+        Piece other_p =  gs.board.get(fpe);
+        std::cout << ptoc(p) << "\n";
+        if (colour(other_p) != colour(p)) {
+            // hit enemy piece: check if there's a clear segment remaining
+            return can_see_immediately(gs, p, fpe, to);
+        }
+        if (can_move_in_direction(other_p, d)) {
+            // x-rayable piece: loop
+            fpe = first_piece_encountered(gs.board, fpe, d);
+        } else {
+            // not x-rayable, cannot see square
+            return false;
+        }
+    }
+
+    // sentinel encountered or square beyond(at) the target square
+    return true;
 }
 
 void find_ortho_cover(
@@ -34,20 +59,17 @@ void find_ortho_cover(
     Square top_left = mksq(p_sq.x, c_sq.y);
     Square top_right = mksq(c_sq.x, p_sq.y);
 
-//    std::cout << "tl: " << sqtos(top_left) << "\n";
-//    std::cout << "tr: " << sqtos(top_right) << "\n";
-
-    if (can_see(gs, p_sq, top_left)) {
+    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_left) && can_see_x_ray(gs, gs.board.get(p_sq), top_left, c_sq)) {
         squares.push_back(top_left);
     }
-    if (can_see(gs, p_sq, top_right)) {
+    if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_right) && can_see_x_ray(gs, gs.board.get(p_sq), top_right, c_sq)) {
         squares.push_back(top_right);
     }
     return;
 }
 
 int diag_ordinal(const Square s) {
-    if ((s.x + (7 - s.y)) % 2 == 0) {
+    if (light_square(s)) {
         return (s.x + (7 - s.y)) / 2;
     } else {
         return ((7 - s.x) + s.y) / 2;
@@ -56,25 +78,38 @@ int diag_ordinal(const Square s) {
 
 void find_diag_cover(const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
 
-    if (collinear_points(p_sq, p_sq, c_sq)) {
+    if (abs(c_sq.x - p_sq.x) == abs(c_sq.y - p_sq.y)) {
         // piece already defends
         return;
     }
 
+    Square corner1, corner2;
+    bool is_light_square = light_square(p_sq);
+    if (light_square(c_sq) != is_light_square) { return; }
     int diag_diff = diag_ordinal(p_sq) - diag_ordinal(c_sq);
-    if (diag_diff > 0) {
-        // p is on the further diagonal; up-left from it and down-right from the other
-        Square corner1 = mksq(p_sq.x - diag_diff, p_sq.y + diag_diff);
-        Square corner2 = mksq(p_sq.x + diag_diff, p_sq.y - diag_diff);
-        if (val(corner1)) { squares.push_back(corner1); }
-        if (val(corner2)) { squares.push_back(corner2); }
+
+    if ((is_light_square && diag_diff > 0)
+        || (!is_light_square && diag_diff < 0)) {
+        // go up left, then down right
+        corner1 = mksq(p_sq.x - abs(diag_diff), p_sq.y + abs(diag_diff));
+        corner2 = mksq(c_sq.x + abs(diag_diff), c_sq.y - abs(diag_diff));
     } else {
-        // p is on the lesser diagonal; add to it and sub from the other
-        Square corner1 = mksq(p_sq.x + diag_diff, p_sq.y - diag_diff);
-        Square corner2 = mksq(p_sq.x - diag_diff, p_sq.y + diag_diff);
-        if (val(corner1)) { squares.push_back(corner1); }
-        if (val(corner2)) { squares.push_back(corner2); }
+        // go down right, then up left
+        corner1 = mksq(p_sq.x + abs(diag_diff), p_sq.y - abs(diag_diff));
+        corner2 = mksq(c_sq.x - abs(diag_diff), c_sq.y + abs(diag_diff));
     }
+
+    if (val(corner1)
+        && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner1)
+        && can_see_x_ray(gs, gs.board.get(p_sq), corner1, c_sq)) {
+        squares.push_back(corner1);
+    }
+    if (val(corner2)
+        && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner2)
+        && can_see_x_ray(gs, gs.board.get(p_sq), corner2, c_sq)) {
+        squares.push_back(corner2);
+    }
+
 }
 
 Square find_edge_of_board(const Gamestate & gs, const Square s, const Delta d) {
@@ -96,6 +131,12 @@ Square find_edge_of_board(const Gamestate & gs, const Square s, const Delta d) {
 }
 
 void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const Square q_sq, const Square c_sq) {
+
+    if (beta_covers(gs.board, q_sq, c_sq)) {
+        // queen already defends
+        return;
+    }
+
     // strategy is to find the segment of emtpy squares leading from c_sq to either a piece or the edge of the board
     for (int i = 0; i < 8; ++i) {
 
