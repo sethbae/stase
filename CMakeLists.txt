@@ -24,6 +24,7 @@ set(SOURCE_FILES
 
         src/game/heur/heur.cpp
         src/game/heur/heur.h
+        src/game/heur/heur_util.h
         src/game/heur/piece_activity.cpp
         src/game/heur/control.cpp
         src/game/heur/pawns.cpp
@@ -66,11 +67,12 @@ set(SOURCE_FILES
         src/game/glogic/king.cpp
         src/game/glogic/glogic.h
         src/game/glogic/piece_moves.hpp
+        src/game/glogic/edge_of_board_lookup.h
 
         src/utils/utils.h
         src/utils/print.cpp
         src/utils/uci.cpp
-        src/utils/signal.cpp src/game/heur/heur_util.h)
+        src/utils/signal.cpp)
 
 set(STASE_SOURCE_FILES)
 

@@ -5,6 +5,7 @@
 #include "board.h"
 #include "piece_moves.hpp"
 #include <iostream>
+#include "edge_of_board_lookup.h"
 
 /**
  * Used to pass information about the pieces attacking and controlling a certain square.
