@@ -32,7 +32,7 @@ inline bool val(const Byte x, const Byte y) {
 }
 
 inline bool light_square(const Square s) {
-    const static bool lookup[8][8] = {
+    const static bool lookup[8][8]{
         {true, false, true, false, true, false, true, false},
         {false, true, false, true, false, true, false, true},
         {true, false, true, false, true, false, true, false},
@@ -43,6 +43,20 @@ inline bool light_square(const Square s) {
         {false, true, false, true, false, true, false, true},
     };
     return lookup[7 - s.y][s.x];
+}
+
+inline uint8_t diag_ordinal(const Square s) {
+    const static uint8_t lookup[8][8]{
+        {3, 4, 2, 5, 1, 6, 0, 7},
+        {3, 3, 4, 2, 5, 1, 6, 0},
+        {4, 3, 3, 4, 2, 5, 1, 6},
+        {2, 4, 3, 3, 4, 2, 5, 1},
+        {5, 2, 4, 3, 3, 4, 2, 5},
+        {1, 5, 2, 4, 3, 3, 4, 2},
+        {6, 1, 5, 2, 4, 3, 3, 4},
+        {0, 6, 1, 5, 2, 4, 3, 3},
+    };
+    return lookup[s.y][s.x];
 }
 
 constexpr int sq_sentinel_as_int() { return 0xFFFF; }
