@@ -11,7 +11,7 @@ bool is_unsafe_piece_hook(Gamestate & gs, const Square s) {
 
     if (gs.board.get(s) == EMPTY) { return true; }
 
-    SquareControlStatus ss = evaluate_square_status(gs, s);
+    SquareControlStatus ss = evaluate_square_control(gs, s);
 
     if (is_weak_status(gs, s, colour(gs.board.get(s)), ss)) {
         return gs.add_frame(unsafe_piece_hook.id, FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});

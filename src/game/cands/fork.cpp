@@ -10,8 +10,8 @@
 inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
     SquareControlStatus status =
         colour(gs.board.get(s)) == WHITE
-            ? gs.control_cache->get_control_status(gs, s)
-            : gs.control_cache->get_control_status(gs, s);
+            ? gs.control_cache->get_control_status(s)
+            : gs.control_cache->get_control_status(s);
     if (colour(gs.board.get(s)) == WHITE) {
         return status.balance <= 0 && status.min_w > piece_value(PAWN);
     } else {
@@ -337,7 +337,7 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
         if (parallel(d1, d2)) { continue; }
 
         // don't record forks from unsafe squares
-        SquareControlStatus status = gs.control_cache->get_control_status(gs, fork_sq);
+        SquareControlStatus status = gs.control_cache->get_control_status(fork_sq);
         if (colour(p) == WHITE
             && (status.balance < 0 || status.min_b < piece_value(KING))) { continue; }
         else if (colour(p) == BLACK

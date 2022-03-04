@@ -124,7 +124,7 @@ public:
                 if (is_sentinel(o.frames[i][j].centre)) { break; }
             }
         }
-        control_cache = o.control_cache;
+        control_cache = o.control_cache; control_cache->gs = this;
         pdir_cache = o.pdir_cache;
         wpieces = o.wpieces;
         bpieces = o.bpieces;
@@ -404,7 +404,7 @@ private:
      * Allocates memory for all the fields in a gamestate which need it.
      */
     void alloc() {
-        control_cache = new ControlCache;
+        control_cache = new ControlCache; control_cache->gs = this;
         pdir_cache = new PieceEncounteredCache;
         wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));

@@ -14,7 +14,7 @@ using std::cout;
  * Includes more complicated logic regarding x-rays including those of mixed colour.
  * @return a summary of the information found, a SquareControlStatus.
  */
-SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
+SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
 
     /*
      *                  X-RAYS and POLY X-RAYS
@@ -288,20 +288,7 @@ SquareControlStatus capture_walk(const Gamestate & gs, Square s) {
 }
 
 /**
- * This method retrieves the actual control status of a given square, without
- * applying any logic or interpretation to the result.
- */
-SquareControlStatus evaluate_square_status(const Gamestate & gs, const Square s) {
-//    if (gs.control_cache->contains(s)) {
-//        return gs.control_cache->get(s);
-//    }
-    SquareControlStatus status = capture_walk(gs, s);
-    gs.control_cache->put(s, status);
-    return status;
-}
-
-/**
- * Analyses a SquareControlStatus as returned by capture_walk to detect whether the square is in fact
+ * Analyses a SquareControlStatus as returned by evaluate_square_control to detect whether the square is in fact
  * a weak square. If a square is empty, a weak square is defined as one whose control count is strictly
  * unfavourable (ie not zero) for the given colour [c].
  * If a square is not empty, then weakness is more complex:
@@ -385,9 +372,9 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
  */
 bool is_weak_square(const Gamestate & gs, const Square s, const Colour c, const bool use_caches) {
     if (!use_caches) {
-        return is_weak_status(gs, s, c, capture_walk(gs, s));
+        return is_weak_status(gs, s, c, evaluate_square_control(gs, s));
     }
-    return is_weak_status(gs, s, c, gs.control_cache->get_control_status(gs, s));
+    return is_weak_status(gs, s, c, gs.control_cache->get_control_status(s));
 }
 
 /**
@@ -431,7 +418,7 @@ bool move_is_safe(const Gamestate & gs, const Move m) {
     Piece p = gs.board.get(m.from);
     if (p == EMPTY) { return true; }
 
-    SquareControlStatus status = gs.control_cache->get_control_status(gs, m.to);
+    SquareControlStatus status = gs.control_cache->get_control_status(m.to);
 
     if (colour(p) == WHITE) {
 

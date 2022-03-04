@@ -67,7 +67,7 @@ bool gamma_covers(const Board &, Square piece_sq, Square target_sq);
 /**
  * Safety functions: is this square weak, and would it be, after a move?
  */
-SquareControlStatus evaluate_square_status(const Gamestate &, const Square);
+SquareControlStatus evaluate_square_control(const Gamestate &, const Square);
 bool is_weak_status(const Gamestate &, const Square, const Colour colour, SquareControlStatus);
 
 bool is_weak_square(const Gamestate &, const Square, const Colour colour, const bool use_caches = true);

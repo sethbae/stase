@@ -12,14 +12,15 @@ struct ControlCache {
     uint64_t squares = 0;
     SquareControlStatus status_cache[64];
     uint8_t control_count_cache[64];
+    const Gamestate * gs;
 
     /**
      * If the square is already in the cache, this returns its status. Otherwise, it
      * computes and adds its status before returning it.
      */
-    inline SquareControlStatus get_control_status(const Gamestate & gs, const Square s) {
+    inline SquareControlStatus get_control_status(const Square s) {
         if (contains(s)) { return get_control(s); }
-        SquareControlStatus status = evaluate_square_status(gs, s);
+        SquareControlStatus status = evaluate_square_control(*gs, s);
         put_control(s, status);
         return status;
     }
@@ -27,6 +28,8 @@ struct ControlCache {
     /**
      * Copies the data from the given control cache, and marks invalid squares gamma-reachable
      * from the start or end square of the given move.
+     * The given board may or may not belong to the gamestate which owns this control cache. It
+     * should reflect the state of the board prior to the given move being made.
      */
     inline void update(const Board & b, const ControlCache & o, const Move m) {
 
