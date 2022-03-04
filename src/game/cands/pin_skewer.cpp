@@ -44,7 +44,7 @@ inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
 
     // only consider pawns which aren't 'structurally' defended
     if (type(other_p) == PAWN
-        && control_count(gs, other_p_sq) != 0) {
+        && gs.control_cache->get_control_count(other_p_sq) != 0) {
         return true;
     }
 
@@ -152,7 +152,7 @@ bool find_pin_skewer_hook(Gamestate & gs, const Square s) {
 
     if (type(p) == PAWN) {
         // check only those pawns which currently hang in the balance
-        if (control_count(gs, s) == 0) {
+        if (gs.control_cache->get_control_count(s) == 0) {
             check_ortho = true;
             check_diag = true;
         } else {

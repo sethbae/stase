@@ -8,10 +8,7 @@
  * for its colour (ie non-negative for black, non-positive for white).
  */
 inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
-    SquareControlStatus status =
-        colour(gs.board.get(s)) == WHITE
-            ? gs.control_cache->get_control_status(s)
-            : gs.control_cache->get_control_status(s);
+    SquareControlStatus status = gs.control_cache->get_control_status(s);
     if (colour(gs.board.get(s)) == WHITE) {
         return status.balance <= 0 && status.min_w > piece_value(PAWN);
     } else {
