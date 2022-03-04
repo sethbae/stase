@@ -51,7 +51,7 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
     for (int i = 0; i < 4; ++i) {
 
         Delta d = D[i];
-        Square s2 = first_piece_encountered(gs.board, s, d);
+        Square s2 = gs.first_piece_encountered(s, d);
         if (is_sentinel(s2)) { continue; }
 
         Piece p2 = gs.board.get(s2);
@@ -350,7 +350,7 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
         if (!orth_diag(d) || gs.is_kpinned_piece(s, d)) { continue; }
 
         // establish that the run of squares to it is empty by using the first piece encountered
-        Square fpe = first_piece_encountered(gs.board, s, d);
+        Square fpe = gs.first_piece_encountered(s, d);
 
         if (!is_sentinel(fpe)) {
             if (d.dx == 0) {
@@ -752,7 +752,7 @@ bool capture_is_fork(Gamestate & gs, const Move m) {
             for (int j = 0; j < 4; ++j) {
 
                 Delta d = D_ORTH[j];
-                Square s = first_piece_encountered(gs.board, m.to, d);
+                Square s = gs.first_piece_encountered(m.to, d);
 
                 if (is_sentinel(s) || equal(s, m.from)) { continue; }
                 Piece forked_p = gs.board.get(s);

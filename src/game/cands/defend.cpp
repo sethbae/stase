@@ -12,7 +12,7 @@
 bool can_see_immediately(const Gamestate & gs, const Piece p, const Square from, const Square to) {
 
     Delta d = get_delta_between(from, to);
-    Square fpe = first_piece_encountered(gs.board, from, d);
+    Square fpe = gs.first_piece_encountered(from, d);
 
     if (is_sentinel(fpe)) { return true; }
     if (d.dx == 0) {
@@ -39,7 +39,7 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
     Delta d = get_delta_between(from, to);
     bool x_changing = (d.dx != 0);
     bool already_x_raying = false;
-    Square fpe = first_piece_encountered(gs.board, from, d);
+    Square fpe = gs.first_piece_encountered(from, d);
 
     while (!is_sentinel(fpe) && ((x_changing && fpe.x < to.x) || (!x_changing && fpe.y < to.y))) {
         Piece other_p =  gs.board.get(fpe);
@@ -50,13 +50,13 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
             } else {
                 // otherwise, however, we can continue (now in an x-ray)
                 already_x_raying = true;
-                fpe = first_piece_encountered(gs.board, fpe, d);
+                fpe = gs.first_piece_encountered(fpe, d);
                 continue;
             }
         }
         if (can_move_in_direction(other_p, d)) {
             // x-rayable piece: loop
-            fpe = first_piece_encountered(gs.board, fpe, d);
+            fpe = gs.first_piece_encountered(fpe, d);
         } else {
             // not x-rayable, cannot see square
             return false;
@@ -149,7 +149,7 @@ void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const
         Delta d = D[i];
 
         // TODO make this account for x-rays (use a while loop)
-        Square segment_end = first_piece_encountered(gs.board, c_sq, d);
+        Square segment_end = gs.first_piece_encountered(c_sq, d);
         if (is_sentinel(segment_end)) {
             segment_end = edge_of_board(c_sq, i);
         }
