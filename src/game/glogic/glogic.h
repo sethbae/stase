@@ -56,7 +56,7 @@ int pawn_defence_count(const Gamestate &, const Square);
 /**
  * Control functions: how many pieces control this square, and does a piece cover a given square.
  */
-int control_count(const Board &, Square);
+int control_count(const Gamestate &, Square);
 int alpha_control(const Board &, Square);
 int beta_control(const Board &, Square);
 int gamma_control(const Board &, Square);
@@ -85,6 +85,6 @@ void find_invalidated_squares(const Board &, Square *, const Move);
 /**
  * Helper functions: printing mostly.
  */
-void display_control_counts(const Board &);
+void display_control_counts(const Gamestate &);
 
 #endif //STASE_GLOGIC_H

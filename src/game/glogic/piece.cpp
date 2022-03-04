@@ -294,18 +294,18 @@ int control_walk(const Board & b, const Square s, Delta d, MoveType dir) {
     This accounts for kings, knights and pawns, and delegates sliding pieces to the method
     above.
 */
-int control_count(const Board & b, const Square s) {
+int control_count(const Gamestate & gs, const Square s) {
 
     int count = 0;
 
     // orthogonal movement
     for (int i = ORTHO_START; i < ORTHO_STOP; ++i) {
-        count += control_walk(b, s, Delta{XD[i], YD[i]}, ORTHO);
+        count += control_walk(gs.board, s, Delta{XD[i], YD[i]}, ORTHO);
     }
 
     // diagonal movement
     for (int i = DIAG_START; i < DIAG_STOP; ++i) {
-        count += control_walk(b, s, Delta{XD[i], YD[i]}, DIAG);
+        count += control_walk(gs.board, s, Delta{XD[i], YD[i]}, DIAG);
     }
     
     
@@ -314,49 +314,49 @@ int control_count(const Board & b, const Square s) {
     Square sq;
     
     // knights
-    if (val(sq = mksq(x + 1, y + 2)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 1, y - 2)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 2, y + 1)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 2, y - 1)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 1, y + 2)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 1, y - 2)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 2, y + 1)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 2, y - 1)) && (type(b.get(sq)) == KNIGHT))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 1, y + 2)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 1, y - 2)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 2, y + 1)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 2, y - 1)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 1, y + 2)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 1, y - 2)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 2, y + 1)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 2, y - 1)) && (type(gs.board.get(sq)) == KNIGHT))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
         
     // kings
-    if (val(sq = mksq(x + 1, y + 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 1, y + 0)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 1, y - 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 0, y + 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x + 0, y - 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 1, y + 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 1, y + 0)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
-    if (val(sq = mksq(x - 1, y - 1)) && (type(b.get(sq)) == KING))
-        count += (colour(b.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 1, y + 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 1, y + 0)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 1, y - 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 0, y + 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x + 0, y - 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 1, y + 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 1, y + 0)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
+    if (val(sq = mksq(x - 1, y - 1)) && (type(gs.board.get(sq)) == KING))
+        count += (colour(gs.board.get(sq)) == WHITE) ? 1 : -1;
     
     // pawns
-    if (val(sq = mksq(x + 1, y + 1)) && (b.get(sq) == B_PAWN))
+    if (val(sq = mksq(x + 1, y + 1)) && (gs.board.get(sq) == B_PAWN))
         count -= 1;
-    if (val(sq = mksq(x - 1, y + 1)) && (b.get(sq) == B_PAWN))
+    if (val(sq = mksq(x - 1, y + 1)) && (gs.board.get(sq) == B_PAWN))
         count -= 1;
-    if (val(sq = mksq(x + 1, y - 1)) && (b.get(sq) == W_PAWN))
+    if (val(sq = mksq(x + 1, y - 1)) && (gs.board.get(sq) == W_PAWN))
         count += 1;
-    if (val(sq = mksq(x - 1, y - 1)) && (b.get(sq) == W_PAWN))
+    if (val(sq = mksq(x - 1, y - 1)) && (gs.board.get(sq) == W_PAWN))
         count += 1;
         
     return count;

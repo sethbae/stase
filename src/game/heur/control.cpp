@@ -248,7 +248,7 @@ float __metrics::__centre_control_metric(const Gamestate & gs) {
 
     for (int i = 0; i < NUM_INNER_CENTRAL_SQUARES; ++i) {
 
-        int control = control_count(gs.board, INNER_CENTRAL_SQUARES[i]);
+        int control = control_count(gs, INNER_CENTRAL_SQUARES[i]);
         if (control > 0) {
             count += 2;
         } else if (control < 0) {
@@ -259,7 +259,7 @@ float __metrics::__centre_control_metric(const Gamestate & gs) {
 
     for (int i = 0; i < NUM_OUTER_CENTRAL_SQUARES; ++i) {
 
-        int control = control_count(gs.board, OUTER_CENTRAL_SQUARES[i]);
+        int control = control_count(gs, OUTER_CENTRAL_SQUARES[i]);
         if (control > 0) {
             count += 1;
         } else if (control < 0) {
