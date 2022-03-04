@@ -387,12 +387,7 @@ bool is_weak_square(const Gamestate & gs, const Square s, const Colour c, const 
     if (!use_caches) {
         return is_weak_status(gs, s, c, capture_walk(gs, s));
     }
-    if (gs.control_cache->contains(s)) {
-        return is_weak_status(gs, s, c, gs.control_cache->get(s));
-    }
-    SquareControlStatus status = capture_walk(gs, s);
-    gs.control_cache->put(s, status);
-    return is_weak_status(gs, s, c, status);
+    return is_weak_status(gs, s, c, gs.control_cache->get_control_status(gs, s));
 }
 
 /**
@@ -436,7 +431,7 @@ bool move_is_safe(const Gamestate & gs, const Move m) {
     Piece p = gs.board.get(m.from);
     if (p == EMPTY) { return true; }
 
-    SquareControlStatus status = gs.control_cache->safe_get(gs, m.to);
+    SquareControlStatus status = gs.control_cache->get_control_status(gs, m.to);
 
     if (colour(p) == WHITE) {
 

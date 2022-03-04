@@ -10,30 +10,18 @@
 struct ControlCache {
 
     uint64_t squares = 0;
-    SquareControlStatus cache[64];
-
-    inline bool contains(const Square s) {
-        return squares & (1l << index(s));
-    }
-
-    inline SquareControlStatus get(const Square s) {
-        int ind = s.x + (8*s.y);
-        return cache[ind];
-    }
-
-    inline void put(const Square s, SquareControlStatus status) {
-        cache[index(s)] = status;
-        squares |= (1l << index(s));
-    }
+    SquareControlStatus status_cache[64];
+    uint8_t control_count_cache[64];
 
     /**
      * If the square is already in the cache, this returns its status. Otherwise, it
      * computes and adds its status before returning it.
      */
-    inline SquareControlStatus safe_get(const Gamestate & gs, const Square s) {
-        if (contains(s)) { return get(s); }
-        put(s, evaluate_square_status(gs, s));
-        return get(s);
+    inline SquareControlStatus get_control_status(const Gamestate & gs, const Square s) {
+        if (contains(s)) { return get_control(s); }
+        SquareControlStatus status = evaluate_square_status(gs, s);
+        put_control(s, status);
+        return status;
     }
 
     /**
@@ -47,7 +35,8 @@ struct ControlCache {
 
         squares = o.squares;
         for (int i = 0; i < 64; ++i) {
-            cache[i] = o.cache[i];
+            status_cache[i] = o.status_cache[i];
+            control_count_cache[i] = o.control_count_cache[i];
         }
 
         for (int i = 0; i < 64 && !is_sentinel(invalidated[i]); ++i) {
@@ -58,6 +47,20 @@ struct ControlCache {
 private:
     constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);
+    }
+
+    inline bool contains(const Square s) {
+        return squares & (1l << index(s));
+    }
+
+    inline SquareControlStatus get_control(const Square s) {
+        int ind = s.x + (8*s.y);
+        return status_cache[ind];
+    }
+
+    inline void put_control(const Square s, SquareControlStatus status) {
+        status_cache[index(s)] = status;
+        squares |= (1l << index(s));
     }
 };
 

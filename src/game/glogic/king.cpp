@@ -109,7 +109,7 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
  */
 bool would_be_safe_king_square(const Gamestate & gs, const Square s, const Colour colour) {
 
-    SquareControlStatus status = gs.control_cache->safe_get(gs, s);
+    SquareControlStatus status = gs.control_cache->get_control_status(gs, s);
 
     return colour == WHITE
         ? status.min_b > ATTACKED_BY_PINNED_PIECE
