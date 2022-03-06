@@ -183,8 +183,19 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
     int kn_val = piece_value(W_KNIGHT);
     for (int i = 0; i < 8; ++i) {
         if (val(temp = mksq(x + XKN[i], y + YKN[i]))
-                && (type(gs.board.get(temp)) == KNIGHT)
-                && !gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+                && (type(gs.board.get(temp)) == KNIGHT)) {
+
+            // if the piece is pinned, note this
+            if (gs.is_kpinned_piece(temp, KNIGHT_DELTA)) {
+                if (colour(gs.board.get(temp)) == WHITE) {
+                    attacked_by_pinned_w_piece = true;
+                } else {
+                    attacked_by_pinned_b_piece = true;
+                }
+                continue;
+            }
+
+            // unpinned, account as usual
             if (colour(gs.board.get(temp)) == WHITE) {
                 ++basic_balance;
                 ++poly_x_ray_balance;

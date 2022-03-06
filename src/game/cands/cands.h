@@ -62,4 +62,7 @@ struct IndexCounter {
     }
 };
 
+/** finds squares which the first square's piece can move to and cover the second square */
+void find_sliding_cover_squares(const Gamestate &gs, std::vector<Square> &squares, const Square piece_square, const Square cover_square);
+
 #endif //STASE_CANDS_H

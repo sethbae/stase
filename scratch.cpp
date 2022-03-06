@@ -558,14 +558,14 @@ int main(int argc, char** argv) {
 
 //    q_scores();
 
-//    repl(fen);
+    repl(fen);
 
-    run_with_node_limit(fen, 50000);
-    std::cout << fetch_node_count() << "\n";
+//    run_with_node_limit(fen, 50000);
+//    std::cout << fetch_node_count() << "\n";
 
 //    show_hook_frames(gs, &fork_hook);
 
-//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("g6"), {0, 0}, q, none});
+//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("c4"), {0, 0}, 0, 0});
 
 //    cands_report(gs);
 

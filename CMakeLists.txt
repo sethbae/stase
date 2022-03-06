@@ -70,6 +70,8 @@ set(SOURCE_FILES
         src/game/glogic/edge_of_board_lookup.h
         src/game/glogic/piece_encounter_cache.hpp
         src/game/glogic/piece_encounter_lookups.cpp
+        src/game/glogic/pawn.cpp
+        src/game/glogic/control.cpp
 
         src/utils/utils.h
         src/utils/print.cpp
