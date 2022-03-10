@@ -131,7 +131,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
     int c = node->num_children;
     for (int i = 0; i < list.size(); ++i) {
         node->children[c + i] = new_node(*node->gs, list[i]);
-        node->children[c + i]->cand_set = cands(*node->children[c + i]->gs);
+        node->children[c + i]->cand_set = cands(*node->children[c + i]->gs, new CandSet);
         if (node->children[c + i]->gs->has_been_mated) {
             node->children[c + i]->score =
                 node->children[c + i]->gs->board.get_white()
@@ -264,7 +264,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles) {
     Gamestate root_gs(fen);
     SearchNode root{
             &root_gs,
-            cands(root_gs),
+            cands(root_gs, new CandSet),
             heur(root_gs),
             MOVE_SENTINEL,
             0,

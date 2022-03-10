@@ -80,7 +80,6 @@ struct CandSet {
 Gamestate * fresh_gamestate(const std::string &);
 Gamestate * next_gamestate(const Gamestate *, const Move);
 
-CandSet * cands(Gamestate &);
 CandSet * cands(Gamestate &, CandSet *);
 Eval heur(const Gamestate &);
 float quiess(Gamestate &);

@@ -41,10 +41,10 @@ void number_of_cands_hist(CandList cand_list) {
     for (int i = 0; i < N; ++i) {
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i])->critical.size(); break;
-            case MEDIAL: size = cands(states[i])->medial.size(); break;
-            case FINAL: size = cands(states[i])->final.size(); break;
-            case LEGAL: size = cands(states[i])->legal.size(); break;
+            case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
+            case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
+            case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
+            case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
         }
         max_size = std::max(size, max_size);
         num_cands[i] = (double)size;
@@ -121,7 +121,7 @@ void number_of_frames_hist(const Hook * h) {
 
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
-        cands(states[i]);
+        cands(states[i], new CandSet);
         int size = count_frames(states[i], h->id);
         max_size = std::max(size, max_size);
         num_frames[i] = (double)size;
@@ -185,10 +185,10 @@ void number_of_cands(CandList cand_list) {
     for (int i = 0; i < N; ++i) {
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i])->critical.size(); break;
-            case MEDIAL: size = cands(states[i])->medial.size(); break;
-            case FINAL: size = cands(states[i])->final.size(); break;
-            case LEGAL: size = cands(states[i])->legal.size(); break;
+            case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
+            case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
+            case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
+            case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
         }
         max_size = max(size, max_size);
         num_cands[i] = (double)size;
@@ -245,7 +245,7 @@ void q_scores() {
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
 
-        CandSet cs = *cands(states[i]);
+        CandSet cs = *cands(states[i], new CandSet);
         if (cs.size() == 1000) {
             exit(1);
         }
@@ -318,10 +318,10 @@ void find_cands_outliers(CandList cand_list) {
 
         int size;
         switch (cand_list) {
-            case CRITICAL: size = cands(states[i])->critical.size(); break;
-            case MEDIAL: size = cands(states[i])->medial.size(); break;
-            case FINAL: size = cands(states[i])->final.size(); break;
-            case LEGAL: size = cands(states[i])->legal.size(); break;
+            case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
+            case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
+            case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
+            case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
         }
 
         max_size = max(size, max_size);
@@ -414,7 +414,7 @@ SearchNode * repl_cycles(const std::string & fen) {
     Gamestate * root_gs = new Gamestate(fen);
     SearchNode * root = new SearchNode{
             root_gs,
-            cands(*root_gs),
+            cands(*root_gs, new CandSet),
             heur(*root_gs),
             MOVE_SENTINEL,
             0,

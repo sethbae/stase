@@ -36,10 +36,6 @@ CandSet * cands_in_check(const Gamestate & gs, CandSet * cand_set) {
     return cand_set;
 }
 
-CandSet * cands(Gamestate & gs) {
-    return cands(gs, new CandSet);
-}
-
 /**
  * Computes and returns a set of candidate moves for the given position. Returns at most
  * MAX_TOTAL_CANDS moves which are guaranteed to be unique. No guarantee is made as to

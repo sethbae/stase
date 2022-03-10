@@ -259,7 +259,7 @@ void deepen_tree(SearchNode * node, int alpha, int beta) {
         vector<Move> moves;
         moves.reserve(64);
 
-        CandSet * cand_set = cands(*node->gs);
+        CandSet * cand_set = cands(*node->gs, new CandSet);
 
         if (cand_set->legal.size() > 0) {
             moves = cand_set->legal;
