@@ -44,7 +44,7 @@ CandSet * cands_in_check(const Gamestate & gs, CandSet * cand_set) {
 CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
     // if we're in check, handle the candidates differently
-    if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
+    if (!has_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
         cands_in_check(gs, cand_set);
         gs.in_check = true;
         if (cand_set->empty()) {
@@ -151,7 +151,7 @@ CandSet * cands_report(Gamestate & gs) {
     CandSet * cand_set = new CandSet;
 
     // if we're in check, handle the candidates differently
-    if (!is_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
+    if (!has_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
 
         cands_in_check(gs, cand_set);
 

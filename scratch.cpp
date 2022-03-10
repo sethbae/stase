@@ -311,7 +311,7 @@ void find_cands_outliers(CandList cand_list) {
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
 
-        if (!is_safe_king(states[i], states[i].board.get_white() ? WHITE : BLACK)) {
+        if (!has_safe_king(states[i], states[i].board.get_white() ? WHITE : BLACK)) {
             // skip positions which are in check, they get handled differently
             continue;
         }
@@ -540,10 +540,17 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
 
-    const std::string fen =
-            std::string(
-                "r1bqk2r/1p2bppp/p1nppn2/2p5/2B1P3/2NP1Q2/PPP1NPPP/R1B2RK1 w kq - 0 8"
-            );
+//   // original benchmark position
+//    const std::string fen =
+//            std::string(
+//                "r1bqk2r/1p2bppp/p1nppn2/2p5/2B1P3/2NP1Q2/PPP1NPPP/R1B2RK1 w kq - 0 8"
+//            );
+
+    const std::string fen1 = "r4k1r/3n1p1p/p1p2npb/8/3P4/2P5/PP1NqPPP/R1BQ1RK1 b - - 0 1";
+
+    const std::string fen2 = "r4k1r/3n1p1p/p1p2npb/3q4/2NP4/2P5/PP3PPP/R2QR1K1 b - - 0 1";
+
+    const std::string fen = fen2;
 
     Gamestate gs(fen, OPENING);
     pr_board(gs.board);
@@ -558,10 +565,12 @@ int main(int argc, char** argv) {
 
 //    q_scores();
 
-    repl(fen);
+//    repl(fen);
 
-//    run_with_node_limit(fen, 50000);
-//    std::cout << fetch_node_count() << "\n";
+    run_with_node_limit(fen, 50000);
+    std::cout << fetch_node_count() << "\n";
+
+//    greedy_search(fen, 15);
 
 //    show_hook_frames(gs, &fork_hook);
 

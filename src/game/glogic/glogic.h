@@ -73,7 +73,7 @@ bool is_weak_status(const Gamestate &, const Square, const Colour colour, Square
 bool is_weak_square(const Gamestate &, const Square, const Colour colour, const bool use_caches = true);
 bool would_be_weak_after(const Gamestate &, const Square s, const Colour colour, const Move m);
 
-bool is_safe_king(const Gamestate &, const Colour colour);
+bool has_safe_king(const Gamestate &gs, const Colour king_colour);
 bool would_be_safe_king_square(const Gamestate &, const Square, const Colour colour);
 bool would_be_safe_for_king_after(const Gamestate &, const Square, const Move, const Colour colour);
 bool is_unsafe_piece(const Gamestate &, const Square);
