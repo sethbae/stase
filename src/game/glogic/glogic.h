@@ -89,6 +89,10 @@ void find_pawn_moves_to(const Gamestate &, std::vector<Move> &, const Colour, co
 bool can_see_immediately(const Gamestate &, const Piece, const Square, const Square);
 bool can_see_x_ray(const Gamestate &, const Piece, const Square, const Square);
 
+bool is_knight_move(const Square, const Square);
+bool is_king_move(const Square, const Square);
+bool is_pawn_capture(const Colour, const Square, const Square);
+
 /**
  * Helper functions: printing mostly.
  */

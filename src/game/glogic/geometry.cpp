@@ -191,3 +191,20 @@ void find_invalidated_squares(const Board & b, Square * squares, const Move m) {
         }
     }
 }
+
+bool is_knight_move(const Square a, const Square b) {
+    return abs(b.x - a.x) == 1 && abs(b.y - a.y) == 2
+        || abs(b.x - a.x) == 2 && abs(b.y - a.y) == 1;
+}
+
+bool is_king_move(const Square a, const Square b) {
+    return abs(b.x - a.x) <= 1 && abs(b.y - a.y) <= 1;
+}
+
+bool is_pawn_capture(const Colour c, const Square a, const Square b) {
+    if (c == WHITE) {
+        return (b.y == a.y + 1) && (abs(b.x - a.x) == 1);
+    } else {
+        return (b.y == a.y - 1) && (abs(b.x - a.x) == 1);
+    }
+}
