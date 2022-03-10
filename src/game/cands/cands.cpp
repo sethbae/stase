@@ -221,7 +221,7 @@ CandSet * cands_report(Gamestate & gs) {
 
                 if (counter.idx() > prev_num) {
                     for (int l = prev_num; l < counter.idx(); ++l) {
-                        cout << "      " << mtos(gs.board, moves[l]) << "\n";
+                        cout << "      " << mtos(gs.board, moves[l]) << " [" << (int) moves[l].get_score() << "]\n";
                     }
                 } else {
                     cout << "      No moves\n";
@@ -246,7 +246,7 @@ CandSet * cands_report(Gamestate & gs) {
                 }
             }
             if (!present && m < MAX_TOTAL_CANDS) {
-                cout << "   Confirming " << mtos(gs.board, moves[j]) << "\n";
+                cout << "   Confirming " << mtos(gs.board, moves[j]) << " [" << (int) moves[j].get_score() << "]\n";
                 all_moves[m++] = moves[j];
             } else if (m >= MAX_TOTAL_CANDS) {
                 break;
