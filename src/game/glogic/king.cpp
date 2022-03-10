@@ -150,19 +150,3 @@ bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Mo
 
     return result;
 }
-
-bool would_be_safe_for_king_after2(const Gamestate & gs, const Square s, const Move m, Colour colour) {
-
-    Piece p = gs.board.get(s);
-
-    Delta d = get_delta_between(m.to, s);
-    if (orth_diag(d) && can_move_in_direction(p, d) && can_see_immediately(gs, p, m.to, s)) {
-        // piece controls the square from where it's moving to (sliding piece)
-        return true;
-    }
-
-    // if it controls it from the start, give up and run the slow one
-
-    // return the normal one, regardless of the move
-
-}

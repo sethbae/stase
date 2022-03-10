@@ -92,6 +92,7 @@ bool can_see_x_ray(const Gamestate &, const Piece, const Square, const Square);
 bool is_knight_move(const Square, const Square);
 bool is_king_move(const Square, const Square);
 bool is_pawn_capture(const Colour, const Square, const Square);
+bool piece_covers_from_square(const Gamestate &, const Piece, const Square, const Square);
 
 /**
  * Helper functions: printing mostly.
