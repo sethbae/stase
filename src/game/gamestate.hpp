@@ -72,7 +72,7 @@ public:
         if (o.board.get(m.from) == W_KING) {
             w_king = m.to;
             b_king = o.b_king;
-        } else if (board.get(m.from) == B_KING) {
+        } else if (o.board.get(m.from) == B_KING) {
             w_king = o.w_king;
             b_king = m.to;
         } else {
