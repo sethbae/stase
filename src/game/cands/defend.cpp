@@ -237,7 +237,7 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
         Delta d = get_delta_between(m.from, m.to);
         if (!gs.is_kpinned_piece(m.from, d) && move_is_safe(gs, m)) {
             if (counter.has_space()) {
-                m.set_score(gs.board.get(s));
+                m.set_score(defend_score(gs.board.get(s)));
                 moves[counter.inc()] = m;
             }
         }
@@ -259,8 +259,8 @@ void defend_secondary(const Gamestate & gs, const FeatureFrame * ff, Move * move
 }
 
 const Responder defend_centre_resp{
-        "defend-centre",
-        &defend_centre
+    "defend-centre",
+    &defend_centre
 };
 
 const Responder defend_secondary_resp{
