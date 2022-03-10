@@ -98,6 +98,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "\nScore: " << etos(node->score) << "\n";
     output << "Trust score: " << etos(trust_line[trust_line.size() - 1]->score) << "\n";
     output << "Has been mated? " << (node->gs->has_been_mated ? "true\n" : "false\n");
+    output << "Is in check? " << (node->gs->in_check ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
 
     if (node->num_children == 0) {
