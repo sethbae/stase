@@ -31,14 +31,14 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
     // add a frame for each one which engenders an unsafe enemy king
     for (const Move & m : piece_moves) {
 
-        if (moving_king && !would_be_safe_for_king_after(gs, m.to, m, colour(gs.board.get(m.from)))) {
+        if (moving_king && !would_be_safe_king_square(gs, m.to, colour(gs.board.get(m.from)))) {
             continue;
         }
 
         if (!would_be_safe_for_king_after(gs, k_sq, m, colour(gs.board.get(k_sq)))) {
             bool result = gs.add_frame(
-            check_hook.id,
-            FeatureFrame{s, m.to, 0, 0 }
+                check_hook.id,
+                FeatureFrame{s, m.to, 0, 0 }
             );
             if (!result) { return false; }
         }

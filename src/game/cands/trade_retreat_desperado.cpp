@@ -63,7 +63,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
 
         if (is_king) {
             const Colour c = colour(gs.board.get(ff->centre));
-            would_be_unsafe = !would_be_safe_for_king_after(gs, piece_moves[i].to, piece_moves[i], c);
+            would_be_unsafe = !would_be_safe_king_square(gs, piece_moves[i].to, c);
         } else {
             would_be_unsafe = would_be_unsafe_after(gs, piece_moves[i].to, piece_moves[i]);
         }
