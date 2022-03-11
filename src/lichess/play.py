@@ -44,6 +44,10 @@ def play_game(token: str, game_id: str):
                     resign_game(token, game_id)
                     return
 
+        elif event["status"] != "started":
+            print(f"Game {game_id} has ended")
+            return
+
         elif event["type"] == "gameState":
 
             moves_played: str = event["moves"].strip()
@@ -56,11 +60,6 @@ def play_game(token: str, game_id: str):
                     print("Error encountered: resigning the game")
                     resign_game(token, game_id)
                     return
-
-        elif event["type"] == "gameFinish":
-
-            print(f"Game {event['game']['id']} has ended")
-            return
 
         else:
             print(f"Received event of type {event['type']}")
