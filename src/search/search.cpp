@@ -15,37 +15,34 @@ using std::ofstream;
 #include <ostream>
 using std::ostream;
 
-// recursively count the number of nodes in the subtree rooted at the given node
-int subtree_size(SearchNode *node) {
+/**
+ * Recursively counts the number of nodes in the subtree rooted at the given node.
+ */
+int subtree_size(SearchNode * node) {
 
-    if (node == nullptr) {
-        return 0;
-    }
+    if (node == nullptr) { return 0; }
 
     int size = 1;
-
-    for (int i = 0; i < node->num_children; ++i)
+    for (int i = 0; i < node->children.size(); ++i) {
         size += subtree_size(node->children[i]);
-
+    }
     return size;
-
 }
 
+/**
+ * Returns the depth of the subtree rooted at the given node.
+ */
 int subtree_depth(SearchNode *node) {
 
-    if (node == nullptr || node->num_children == 0) {
-        return 0;
-    }
+    if (node == nullptr || node->children.size() == 0) { return 0; }
 
     int max = 0;
-
-    for (int i = 0; i < node->num_children; ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         int depth = subtree_depth(node->children[i]);
         if (depth > max) {
             max = depth;
         }
     }
-
     return max + 1;
 }
 
@@ -101,14 +98,14 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "Is in check? " << (node->gs->in_check ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
 
-    if (node->num_children == 0) {
+    if (node->children.size() == 0) {
         output << "Has no children.\n";
     } else {
         output << "Children:\n";
-        output << node->num_children << " children\n";
+        output << node->children.size() << " children\n";
 
         // list of children and names
-        for (int i = 0; i < node->num_children; ++i) {
+        for (int i = 0; i < node->children.size(); ++i) {
             output << "Child " << i << ": " << node->children[i]
                    << " (" << mtos(node->gs->board, node->children[i]->move)
                    << ") (" << etos(node->children[i]->score)
@@ -154,13 +151,12 @@ void write_to_file(SearchNode *node, ostream & output) {
  */
 void write_to_file_recursively(SearchNode *node, ostream & output) {
     write_to_file(node, output);
-    for (int i = 0; i < node->num_children; ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         write_to_file_recursively(node->children[i], output);
     }
 }
 
 void record_tree_in_file(const std::string & filename, SearchNode * root) {
-
     ofstream file;
     file.open(filename, std::ios::out);
 
@@ -172,7 +168,6 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
 
     write_to_file_recursively(root, file);
     file.close();
-
 }
 
 /**
@@ -186,8 +181,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
         new CandSet,
         zero(),
         m,
-        0,
-        nullptr,
+        {},
         nullptr,
         nullptr,
         0
@@ -201,13 +195,13 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
 void update_score(SearchNode * node) {
 
     check_abort();
-    if (node->num_children == 0) { return; }
+    if (node->children.size() == 0) { return; }
 
     // find the best score among children
     node->score = node->children[0]->score;
     node->best_child = node->children[0];
 
-    for (int i = 1; i < node->num_children; ++i) {
+    for (int i = 1; i < node->children.size(); ++i) {
         Eval score = node->children[i]->score;
         if (node->gs->board.get_white() && score > node->score) {
             node->score = score;
@@ -231,7 +225,7 @@ void update_score(SearchNode * node) {
     Eval best_trust_score = trust_score(node->children[0], node->gs->board.get_white());
     node->best_trust_child = node->children[0];
 
-    for (int i = 1; i < node->num_children; ++i) {
+    for (int i = 1; i < node->children.size(); ++i) {
         Eval score = trust_score(node->children[i], node->gs->board.get_white());
         if (node->gs->board.get_white() && score > best_trust_score) {
             best_trust_score = score;
@@ -241,88 +235,6 @@ void update_score(SearchNode * node) {
             node->best_trust_child = node->children[i];
         }
     }
-}
-
-/**
- * Deepens the tree or sub-tree pointed to. For each terminal node, this retrieves candidates
- * and extends accordingly. The heuristic evaluation is called on each node and the scores of
- * all nodes are updated accordingly.
- */
-void deepen_tree(SearchNode * node, int alpha, int beta) {
-
-    check_abort();
-
-    bool white = node->gs->board.get_white();
-
-    if (node->num_children == 0) {
-
-        // get candidate moves and initialise the score counter
-        vector<Move> moves;
-        moves.reserve(64);
-
-        CandSet * cand_set = cands(*node->gs, new CandSet);
-
-        if (cand_set->legal.size() > 0) {
-            moves = cand_set->legal;
-        } else {
-            for (const Move & m : cand_set->critical) {
-                moves.push_back(m);
-            }
-            for (const Move & m : cand_set->medial) {
-                moves.push_back(m);
-            }
-            for (const Move & m : cand_set->final) {
-                moves.push_back(m);
-            }
-        }
-
-        if (node->gs->has_been_mated) {
-            node->score = node->gs->board.get_white()
-                    ? white_has_been_mated()
-                    : black_has_been_mated();
-            node->best_child = nullptr;
-            return;
-        }
-
-        if (moves.empty()) {
-            return;
-        }
-
-        // set up the node's children pointers
-        node->children = new SearchNode *[moves.size()];
-
-        for (int i = 0; i < moves.size(); ++i) {
-            // create a new child and perform the heuristic eval
-            node->children[i] = new_node(*(node->gs), moves[i]);
-            node->children[i]->score = heur(*node->children[i]->gs);
-        }
-
-        node->num_children = moves.size();
-
-    } else {
-
-        // deepen tree on each child recursively, updating a/b
-        for (int i = 0; i < node->num_children && alpha < beta; ++i) {
-
-            deepen_tree(node->children[i], alpha, beta);
-
-            Eval score = node->children[i]->score;
-            if (white && score > alpha) {
-                alpha = score;
-            } else if (!white && score < beta) {
-                beta = score;
-            }
-        }
-    }
-
-    update_score(node);
-
-    check_abort();
-
-}
-
-void deepen_tree(SearchNode * root) {
-    deepen_tree(root, white_has_been_mated(), black_has_been_mated());
 }
 
 /**
@@ -360,56 +272,6 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
 }
 
 /**
- * Begins a search from the given FEN, performing repeated DFS to increasing depths.
- * Returns a vector of moves which is the best line of play.
- */
-std::vector<Move> iterative_deepening_search(const std::string & fen, int max_depth) {
-
-    // initialise with root only
-    Gamestate root_gs(fen);
-    SearchNode root{
-            &root_gs,
-            {},
-            zero(),
-            MOVE_SENTINEL,
-            0,
-            nullptr,
-            nullptr,
-            nullptr,
-            0
-    };
-
-    auto start = std::chrono::high_resolution_clock::now();
-
-    int d = 0;
-    while (++d <= max_depth) {
-        deepen_tree(&root);
-
-        auto stop = std::chrono::high_resolution_clock::now();
-        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
-        double seconds = ((double)duration) / 1000000.0;
-
-        cout << d << ": (" << ((double) node_count()) / seconds << ") ";
-        std::vector<SearchNode *> best_line = retrieve_best_line(&root);
-        print_line(best_line);
-    }
-
-    std::vector<SearchNode *> best_line = retrieve_best_line(&root);
-    print_line(best_line);
-
-    std::vector<Move> moves;
-    for (SearchNode * s : best_line) {
-        if (s != &root) {
-            moves.push_back(s->move);
-        }
-    }
-
-//     record_tree_in_file("stase_tree", &root);
-
-    return moves;
-}
-
-/**
  * Extends the search tree indefinitely from the root. This method will never return and
  * is intended to be used in a multi-threaded context only.
  */
@@ -424,11 +286,10 @@ void delete_tree(SearchNode * node) {
 
     if (!node) { return; }
 
-    for (int i = 0; i < node->num_children; ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         delete_tree(node->children[i]);
     }
     delete node->gs;
     delete node->cand_set;
-    delete[] node->children;
     delete node;
 }
