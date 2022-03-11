@@ -12,11 +12,13 @@ from info import (
     ENGINE_USERNAME
 )
 
+THINK_TIME_PROPORTION: float = 0.025
 
-def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15):
 
-    def play_a_move(game_so_far: str) -> bool:
-        move: str = _get_move(game_id, game_so_far, think_time=think_time, timeout=timeout)
+def play_game(token: str, game_id: str):
+
+    def play_a_move(game_so_far: str, think_time) -> bool:
+        move: str = _get_move(game_id, game_so_far, think_time)
         if move == "ERROR":
             print("Encountered engine error")
             return False
@@ -38,7 +40,7 @@ def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15)
             as_white = (event["white"]["id"] == ENGINE_USERNAME)
 
             if as_white:
-                if not play_a_move(""):
+                if not play_a_move("", think_time=5):
                     resign_game(token, game_id)
                     return
 
@@ -46,10 +48,11 @@ def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15)
 
             moves_played: str = event["moves"].strip()
             half_move_count = moves_played.count(' ') + 1
+            millis_remaining = event["wtime"] if as_white else event["btime"]
 
             if (as_white and half_move_count % 2 == 0)\
                     or (not as_white and half_move_count % 2 == 1):
-                if not play_a_move(moves_played):
+                if not play_a_move(moves_played, int((millis_remaining * THINK_TIME_PROPORTION) / 1000)):
                     print("Error encountered: resigning the game")
                     resign_game(token, game_id)
                     return
@@ -63,7 +66,7 @@ def play_game(token: str, game_id: str, think_time: int = 10, timeout: int = 15)
             print(f"Received event of type {event['type']}")
 
 
-def _get_move(game_id: str, moves_played: str, think_time: int = 10, timeout: int = 15) -> str:
+def _get_move(game_id: str, moves_played: str, think_time: int) -> str:
 
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "w") as file:
         file.write(moves_played)
@@ -79,7 +82,7 @@ def _get_move(game_id: str, moves_played: str, think_time: int = 10, timeout: in
     )
 
     engine_failed = True
-    stop_time = time.time() + timeout
+    stop_time = time.time() + max(int(think_time * 1.1), think_time + 2)
 
     while time.time() < stop_time:
         time.sleep(0.2)

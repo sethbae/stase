@@ -39,7 +39,7 @@ def repl_game():
                     print("Move failed!")
 
 
-def play_single_games(think_time: int = 10, timeout: int = 15):
+def play_single_games():
     """
     Accepts all challenges but only plays one game at a time.
     """
@@ -58,7 +58,7 @@ def play_single_games(think_time: int = 10, timeout: int = 15):
         elif event["type"] == "gameStart":
             print(f"Starting game {event['game']['id']}")
             game_id = event["game"]["id"]
-            play_game(tk, game_id, think_time=think_time, timeout=timeout)
+            play_game(tk, game_id)
         elif event["type"] == "gameFinish":
             # no action required
             pass
@@ -70,7 +70,7 @@ def main():
     print("Building engine...", end="")
     rebuild_stase()
     print("done!")
-    play_single_games(think_time=5, timeout=6)
+    play_single_games()
 
 
 if __name__ == "__main__":
