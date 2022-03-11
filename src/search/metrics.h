@@ -10,7 +10,7 @@ void reset_node_count();
 inline Move current_best_move(SearchNode * root) {
 
     if (!root) { return MOVE_SENTINEL; }
-    if (root->num_children == 0) { return MOVE_SENTINEL; }
+    if (root->children.size() == 0) { return MOVE_SENTINEL; }
 
     update_score(root);
 

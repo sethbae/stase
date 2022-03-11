@@ -50,7 +50,7 @@ void add_legal_moves(SearchNode * node) {
 
         // check in children
         bool already_created = false;
-        for (int j = 0; j < node->num_children; ++j) {
+        for (int j = 0; j < node->children.size(); ++j) {
             if (equal(node->children[j]->move, legals[i])) {
                 already_created = true;
                 break;
@@ -101,7 +101,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
     if (list.empty()) {
         // we still need to recurse up to the given depth
         bool changes = false;
-        for (int i = 0; i < node->num_children; ++i) {
+        for (int i = 0; i < node->children.size(); ++i) {
             changes = deepen(node->children[i], cand_list, depth - 1, burst)
                         || changes;
         }
@@ -109,44 +109,26 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
         return changes;
     }
 
-    // if the node hasn't yet been extended at all, allocate *all* its children pointers
-    if (node->num_children == 0) {
-        node->children = new SearchNode *[node->cand_set->size()];
-    }
-
-    // if we're extending legal moves, we need to re-allocate and copy the child pointers
-    if (cand_list == LEGAL) {
-        int all_kids = node->num_children + list.size();
-        SearchNode ** new_ptr = new SearchNode *[all_kids];
-
-        for (int i = 0; i < node->num_children; ++i) {
-            new_ptr[i] = node->children[i];
-        }
-
-        delete[] node->children;
-        node->children = new_ptr;
-    }
-
     // create child for each move in the list (appending)
-    int c = node->num_children;
+    int c = node->children.size();
     for (int i = 0; i < list.size(); ++i) {
-        node->children[c + i] = new_node(*node->gs, list[i]);
-        node->children[c + i]->cand_set = cands(*node->children[c + i]->gs, new CandSet);
-        if (node->children[c + i]->gs->has_been_mated) {
-            node->children[c + i]->score =
-                node->children[c + i]->gs->board.get_white()
+        SearchNode * child = new_node(*node->gs, list[i]);
+        child->cand_set = cands(*child->gs, new CandSet);
+        if (child->gs->has_been_mated) {
+            child->score =
+                child->gs->board.get_white()
                     ? white_has_been_mated()
                     : black_has_been_mated();
         } else {
-            node->children[c + i]->score = heur(*node->children[c + i]->gs);
+            child->score = heur(*child->gs);
         }
+        node->children.push_back(child);
     }
-    node->num_children += list.size();
     node->cand_set->clear_list(cand_list);
 
     // recurse as appropriate
-    bool changes = (node->num_children != c);
-    for (int i = 0; i < node->num_children; ++i) {
+    bool changes = (node->children.size() != c);
+    for (int i = 0; i < node->children.size(); ++i) {
         changes = deepen(node->children[i], cand_list, depth - 1, burst)
                     || changes;
     }
@@ -267,8 +249,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles) {
             cands(root_gs, new CandSet),
             heur(root_gs),
             MOVE_SENTINEL,
-            0,
-            nullptr,
+            {},
             nullptr,
             nullptr,
             0

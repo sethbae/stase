@@ -50,10 +50,10 @@ void run_in_background(const std::string & fen) {
                     new CandSet,
                     zero(),
                     MOVE_SENTINEL,
-                    0,
+                    {},
                     nullptr,
                     nullptr,
-                    nullptr
+                    0
             };
 
     pthread_t t_id;

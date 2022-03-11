@@ -417,8 +417,7 @@ SearchNode * repl_cycles(const std::string & fen) {
             cands(*root_gs, new CandSet),
             heur(*root_gs),
             MOVE_SENTINEL,
-            0,
-            nullptr,
+            {},
             nullptr,
             nullptr,
             0
@@ -515,7 +514,7 @@ void repl(const std::string & fen) {
             } else {
 
                 bool found = false;
-                for (int i = 0; i < current->num_children; ++i) {
+                for (int i = 0; i < current->children.size(); ++i) {
                     Move m = current->children[i]->move;
                     if (mtos(current->gs->board, m) == input) {
                         found = true;
@@ -546,13 +545,9 @@ int main(int argc, char** argv) {
 //                "r1bqk2r/1p2bppp/p1nppn2/2p5/2B1P3/2NP1Q2/PPP1NPPP/R1B2RK1 w kq - 0 8"
 //            );
 
-    const std::string fen1 = "r4k1r/3n1p1p/p1p2npb/8/3P4/2P5/PP1NqPPP/R1BQ1RK1 b - - 0 1";
+    const std::string fen = "1rr3k1/R4R2/3q2pQ/2pP4/2Pb4/1P3B2/5PPP/6K1 b - - 0 27";
 
-    const std::string fen2 = "r4k1r/3n1p1p/p1p2npb/3q4/2NP4/2P5/PP3PPP/R2QR1K1 b - - 0 1";
-
-    const std::string fen = fen2;
-
-    Gamestate gs(fen, OPENING);
+    Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
 
 //    for (const Move m : legal_moves(gs.board)) {
@@ -567,7 +562,7 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_with_node_limit(fen, 50000);
+    run_with_node_limit(fen, 25000);
     std::cout << fetch_node_count() << "\n";
 
 //    greedy_search(fen, 15);

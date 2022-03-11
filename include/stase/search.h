@@ -15,8 +15,7 @@ struct SearchNode {
     CandSet * cand_set;
     Eval score;
     Move move;
-    unsigned short num_children;
-    SearchNode ** children;
+    std::vector<SearchNode*> children;
     SearchNode * best_child;
     SearchNode * best_trust_child;
     unsigned short visit_count;
