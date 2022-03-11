@@ -123,7 +123,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
             new_ptr[i] = node->children[i];
         }
 
-        delete node->children;
+        delete[] node->children;
         node->children = new_ptr;
     }
 
