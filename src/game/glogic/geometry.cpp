@@ -190,6 +190,7 @@ void find_invalidated_squares(const Board & b, Square * squares, const Move m) {
             }
         }
     }
+    squares[i] = SQUARE_SENTINEL;
 }
 
 bool is_knight_move(const Square a, const Square b) {
