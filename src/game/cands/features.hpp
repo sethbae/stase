@@ -48,6 +48,11 @@ const std::vector<FeatureHandler> feature_handlers = {
         { &defend_secondary_resp },
     },
     FeatureHandler{
+        &discovered_hook,
+        { &play_discovered_resp },
+        { }
+    },
+    FeatureHandler{
         &develop_hook,
         { &develop_resp },
         { }
