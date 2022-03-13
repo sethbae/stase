@@ -64,3 +64,16 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
     // sentinel encountered or square beyond(at) the target square
     return true;
 }
+
+/**
+ * Returns true if the square contains a piece which is not favourably controlled
+ * for its colour (ie non-negative for black, non-positive for white).
+ */
+bool zero_or_worse_control(Gamestate & gs, const Square s) {
+    SquareControlStatus status = gs.control_cache->get_control_status(s);
+    if (colour(gs.board.get(s)) == WHITE) {
+        return status.balance <= 0 && status.min_w > piece_value(PAWN);
+    } else {
+        return status.balance >= 0 && status.min_b > piece_value(PAWN);
+    }
+}

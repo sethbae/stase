@@ -3,19 +3,6 @@
 #include "cands.h"
 #include "responder.hpp"
 
-/**
- * Returns true if the square contains a piece which is not favourably controlled
- * for its colour (ie non-negative for black, non-positive for white).
- */
-inline bool zero_or_worse_control(Gamestate & gs, const Square s) {
-    SquareControlStatus status = gs.control_cache->get_control_status(s);
-    if (colour(gs.board.get(s)) == WHITE) {
-        return status.balance <= 0 && status.min_w > piece_value(PAWN);
-    } else {
-        return status.balance >= 0 && status.min_b > piece_value(PAWN);
-    }
-}
-
 // TODO: interrupting poly x-rays
 
 // TODO: defence along the line of the fork: 8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1
