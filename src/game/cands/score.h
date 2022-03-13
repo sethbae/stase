@@ -59,4 +59,12 @@ constexpr int desperado_score(int piece_val) {
     return piece_val;
 }
 
+constexpr int discovered_score(Piece attacked) {
+    if (type(attacked) == QUEEN) {
+        return 5;
+    } else {
+        return 3;
+    }
+}
+
 #endif //STASE_SCORE_H
