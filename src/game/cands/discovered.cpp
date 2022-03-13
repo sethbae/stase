@@ -89,10 +89,8 @@ void play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves
     // always do checks
     for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[check_hook.id][i].centre); ++i) {
 
-        Square to_sq = gs.frames[check_hook.id][i].centre;
-
-        if (equal(ff->centre, to_sq)
-            && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, to_sq))) {
+        if (equal(ff->centre, gs.frames[check_hook.id][i].centre)
+            && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, gs.frames[check_hook.id][i].secondary))) {
 
             if (counter.has_space()) {
                 Move m{ff->centre, gs.frames[check_hook.id][i].secondary, 0};
