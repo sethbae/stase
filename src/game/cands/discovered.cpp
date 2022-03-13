@@ -1,6 +1,7 @@
 #include "cands.h"
 #include "hook.hpp"
 #include "../gamestate.hpp"
+#include "responder.hpp"
 
 /**
  * Looks for situations where a piece is blocking a potential discovery. Does not
@@ -75,8 +76,40 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
     return true;
 }
 
+/**
+ * Responds to a discovered FeatureFrame by attempting to maximise the damage done. If check
+ * is required, this will recommend every appropriate check. Otherwise, it will currently
+ * desperado the piece.
+ * Todo (GM-88): extend this to threaten a valuable piece where possible.
+ */
+void play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+    if (ff->conf_2 == 1) {
+        // check is required
+        for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[check_hook.id][i].centre); ++i) {
+            if (equal(ff->centre, gs.frames[check_hook.id][i].centre)) {
+                if (counter.has_space()) {
+                    Move m{ff->centre, gs.frames[check_hook.id][i].secondary, 0};
+                    m.set_score(
+                        discovered_score(gs.board.get(itosq(ff->conf_1))));
+                    moves[counter.inc()] = m;
+                } else {
+                    return;
+                }
+            }
+        }
+    } else {
+        // check is not required
+        desperado_resp.resp(gs, ff, moves, counter);
+    }
+}
+
 const Hook discovered_hook{
     "discovered",
     8,
     &discovered_attack_hook
+};
+
+const Responder play_discovered_resp{
+    "play-discovered",
+    &play_discovered
 };
