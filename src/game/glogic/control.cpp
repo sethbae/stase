@@ -69,7 +69,7 @@ bool can_see_x_ray(const Gamestate & gs, const Piece p, const Square from, const
  * Returns true if the square contains a piece which is not favourably controlled
  * for its colour (ie non-negative for black, non-positive for white).
  */
-bool zero_or_worse_control(Gamestate & gs, const Square s) {
+bool zero_or_worse_control(const Gamestate & gs, const Square s) {
     SquareControlStatus status = gs.control_cache->get_control_status(s);
     if (colour(gs.board.get(s)) == WHITE) {
         return status.balance <= 0 && status.min_w > piece_value(PAWN);
@@ -82,7 +82,7 @@ bool zero_or_worse_control(Gamestate & gs, const Square s) {
  * Returns true iff the given colour does not defend the given square whatsoever.
  * A defender is counted even if it is pinned.
  */
-bool totally_undefended(Gamestate & gs, const Colour c, const Square s) {
+bool totally_undefended(const Gamestate & gs, const Colour c, const Square s) {
     SquareControlStatus status = gs.control_cache->get_control_status(s);
     return c == WHITE
         ? status.min_w == NOT_ATTACKED_AT_ALL
