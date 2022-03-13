@@ -88,3 +88,30 @@ bool totally_undefended(const Gamestate & gs, const Colour c, const Square s) {
         ? status.min_w == NOT_ATTACKED_AT_ALL
         : status.min_b == NOT_ATTACKED_AT_ALL;
 }
+
+/**
+ * Returns true if the given square contains a pawn which can in fact be captured
+ * en-passant in the next move.
+ */
+bool pawn_is_en_passantable(const Gamestate & gs, const Square s) {
+
+    Piece p = gs.board.get(s);
+    Colour c = colour(p);
+    int rank = (c == WHITE ? 3 : 4);
+
+    // check we have a pawn on the correct square
+    if (!gs.board.get_ep_exists()
+        || type(p) != PAWN
+        || s.x != gs.board.get_ep_file()
+        || s.y != rank) {
+        return false;
+    }
+
+    // check there is indeed a pawn to capture it
+    Square l_sq = mksq(s.x + 1, s.y);
+    Square r_sq = mksq(s.x - 1, s.y);
+    Piece enemy_pawn = (c == WHITE ? B_PAWN : W_PAWN);
+
+    return gs.board.get(l_sq) == enemy_pawn
+        || gs.board.get(r_sq) == enemy_pawn;
+}

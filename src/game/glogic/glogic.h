@@ -84,6 +84,8 @@ bool zero_or_worse_control(const Gamestate &, const Square);
 bool totally_undefended(const Gamestate &, const Colour, const Square);
 void find_invalidated_squares(const Board &, Square *, const Move);
 
+bool pawn_is_en_passantable(const Gamestate &, const Square);
+
 /**
  * More efficient versions of the board API (eg, for legal moves etc)
  */
