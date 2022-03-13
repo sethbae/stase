@@ -83,22 +83,23 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
  * Todo (GM-88): extend this to threaten a valuable piece where possible.
  */
 void play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    if (ff->conf_2 == 1) {
-        // check is required
-        for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[check_hook.id][i].centre); ++i) {
-            if (equal(ff->centre, gs.frames[check_hook.id][i].centre)) {
-                if (counter.has_space()) {
-                    Move m{ff->centre, gs.frames[check_hook.id][i].secondary, 0};
-                    m.set_score(
-                        discovered_score(gs.board.get(itosq(ff->conf_1))));
-                    moves[counter.inc()] = m;
-                } else {
-                    return;
-                }
+
+    // always do checks
+    for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[check_hook.id][i].centre); ++i) {
+        if (equal(ff->centre, gs.frames[check_hook.id][i].centre)) {
+            if (counter.has_space()) {
+                Move m{ff->centre, gs.frames[check_hook.id][i].secondary, 0};
+                m.set_score(
+                    discovered_score(gs.board.get(itosq(ff->conf_1))));
+                moves[counter.inc()] = m;
+            } else {
+                return;
             }
         }
-    } else {
-        // check is not required
+    }
+
+    // if check is not required, do desperado as well
+    if (ff->conf_2 == 0) {
         desperado_resp.resp(gs, ff, moves, counter);
     }
 }
