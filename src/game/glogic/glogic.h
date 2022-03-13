@@ -81,6 +81,7 @@ bool would_be_unsafe_after(const Gamestate &, const Square s, const Move m);
 
 bool move_is_safe(const Gamestate &, const Move);
 bool zero_or_worse_control(Gamestate &, const Square);
+bool totally_undefended(Gamestate &, const Colour, const Square);
 void find_invalidated_squares(const Board &, Square *, const Move);
 
 /**

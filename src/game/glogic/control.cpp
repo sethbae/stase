@@ -77,3 +77,14 @@ bool zero_or_worse_control(Gamestate & gs, const Square s) {
         return status.balance >= 0 && status.min_b > piece_value(PAWN);
     }
 }
+
+/**
+ * Returns true iff the given colour does not defend the given square whatsoever.
+ * A defender is counted even if it is pinned.
+ */
+bool totally_undefended(Gamestate & gs, const Colour c, const Square s) {
+    SquareControlStatus status = gs.control_cache->get_control_status(s);
+    return c == WHITE
+        ? status.min_w == NOT_ATTACKED_AT_ALL
+        : status.min_b == NOT_ATTACKED_AT_ALL;
+}
