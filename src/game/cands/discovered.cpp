@@ -2,12 +2,23 @@
 #include "hook.hpp"
 #include "../gamestate.hpp"
 
-bool seek_discoveries(Gamestate & gs, const Square s, const int start, const int stop) {
+/**
+ * Looks for situations where a piece is blocking a potential discovery. Does not
+ * consider pins or how best to profit from the discovery.
+ * Format of FeatureFrames written:
+ * centre: the piece blocking the discovery
+ * secondary: the enemy piece which would be discovered 'against'
+ * conf1: int-ised version of the (blocked) attacker's square
+ * conf2: 1 if a check is required to play the discovery, 0 otherwise. This is considered to be
+ *          when the attacking piece would become unsafe or when the attacked piece could just
+ *          trade without losing any material.
+ */
+bool discovered_attack_hook(Gamestate & gs, const Square s) {
 
     const Piece p = gs.board.get(s);
     const Colour c = colour(p);
 
-    for (int i = start; i < stop; ++i) {
+    for (int i = 0; i < 8; ++i) {
         const Delta d = D[i];
         const Square sq1 = gs.first_piece_encountered(s, d);
         const Square sq2 = gs.first_piece_encountered(s, delta(-d.dx, -d.dy));
@@ -51,10 +62,10 @@ bool seek_discoveries(Gamestate & gs, const Square s, const int start, const int
                 if (!gs.add_frame(
                         discovered_hook.id,
                         FeatureFrame{
-                                s,
-                                sq2,
-                                sqtoi(sq1),
-                                check_flag
+                            s,
+                            sq2,
+                            sqtoi(sq1),
+                            check_flag
                         })) {
                     return false;
                 }
@@ -62,36 +73,6 @@ bool seek_discoveries(Gamestate & gs, const Square s, const int start, const int
         }
     }
     return true;
-}
-
-/**
- * Looks for situations where a piece is blocking a potential discovery. Does not
- * consider pins or how best to profit from the discovery.
- * Format of FeatureFrames written:
- * centre: the piece blocking the discovery
- * secondary: the enemy piece which would be discovered 'against'
- * conf1: int-ised version of the (blocked) attacker's square
- * conf2: 1 if a check is required to play the discovery, 0 otherwise. This is considered to be
- *          when the attacking piece would become unsafe or when the attacked piece could just
- *          trade without losing any material.
- */
-bool discovered_attack_hook(Gamestate & gs, const Square s) {
-    switch (type(gs.board.get(s))) {
-        case BISHOP:
-            return seek_discoveries(gs, s, ORTHO_START, ORTHO_STOP);
-        case ROOK:
-            return seek_discoveries(gs, s, DIAG_START, DIAG_STOP);
-        case QUEEN:
-            return seek_discoveries(gs, s, ALL_DIRS_START, ALL_DIRS_STOP);
-        case KNIGHT:
-            return true;
-        case PAWN:
-            return true;
-        case KING:
-            return true;
-        default:
-            return true;
-    }
 }
 
 const Hook discovered_hook{
