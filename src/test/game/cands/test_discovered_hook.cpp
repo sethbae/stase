@@ -63,6 +63,11 @@ const TestSet<HookTestCase> discovered_hook_test_set{
                 ExpectedFeatureFrame{"e3", "b6", sqtoi(stosq("f2")), 0}
             }
         },
+        // doesn't 'discover' with piece that can move in that direction
+        HookTestCase{
+            "8/8/8/P1r1r3/8/8/8/8 w - - 0 1",
+            {}
+        },
     }
 };
 

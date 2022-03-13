@@ -21,6 +21,8 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
 
     for (int i = 0; i < 8; ++i) {
         const Delta d = D[i];
+        if (can_move_in_direction(p, d)) { continue; }
+
         const Square sq1 = gs.first_piece_encountered(s, d);
         const Square sq2 = gs.first_piece_encountered(s, delta(-d.dx, -d.dy));
 
