@@ -84,6 +84,10 @@ constexpr Colour colour(const Piece p) {
     return (Colour) (p & COLOUR_MASK);
 }
 
+constexpr Colour opposite_colour(const Piece p) {
+    return (p & COLOUR_MASK) ? BLACK : WHITE;
+}
+
 /**
  * Other helpers: minor/major pieces
  */
