@@ -84,6 +84,7 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
  */
 void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
 
+    Piece desperado = gs.board.get(ff->centre);
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
 
@@ -95,8 +96,10 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
 
     for (int i = 0; i < piece_moves.size(); ++i) {
         Piece p = gs.board.get(piece_moves[i].to);
-        if (p != EMPTY && piece_value(p) > max_val
-                && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
+        if (p != EMPTY
+            && piece_value(p) > max_val
+            && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))
+            && (type(desperado) != KING || totally_undefended(gs, opposite_colour(desperado), piece_moves[i].to))) {
             max_val = piece_value(p);
             max_move = piece_moves[i];
         }
