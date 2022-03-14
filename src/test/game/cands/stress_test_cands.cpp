@@ -67,7 +67,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         for (int j = 0; j < moves.size(); ++j) {
 
             if (!val(moves[j].from) || !val(moves[j].to)) {
-                cout << "\n[" << i << "] FAILED: Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
+                cout << "\n[" << i << "] FAILED(invalid): Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
                 cout << board_to_fen(gs.board) << "\n";
                 pr_board(gs.board);
                 return false;
@@ -82,7 +82,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
             }
 
             if (!is_legal) {
-                cout << "\n[" << i << "] FAILED: Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
+                cout << "\n[" << i << "] FAILED(illegal): Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
                 cout << board_to_fen(gs.board) << "\n";
                 pr_board(gs.board);
                 return false;
