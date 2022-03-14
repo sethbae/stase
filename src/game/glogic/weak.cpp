@@ -84,7 +84,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
                 continue;
             }
 
-            bool moves_in_right_dir = (p != EMPTY) && can_move_in_direction(p, dir);
+            bool moves_in_right_dir = can_move_in_direction(p, dir);
 
             if (!moves_in_right_dir && type(p) == PAWN && dir == DIAG) {
 
@@ -159,7 +159,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
                 x_ray = true;
                 x_ray_colour = colour(p);
 
-            } else  if (p != EMPTY) {
+            } else {
                 // blocking piece: abort
                 cont = false;
             }
@@ -241,7 +241,8 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
         } else {
             min_value_w = NOT_ATTACKED_AT_ALL;
         }
-    } else if (min_value_b > piece_value(B_KING)) {
+    }
+    if (min_value_b > piece_value(B_KING)) {
         if (attacked_by_pinned_b_piece) {
             min_value_b = ATTACKED_BY_PINNED_PIECE;
         } else {
