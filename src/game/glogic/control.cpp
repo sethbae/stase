@@ -97,13 +97,11 @@ bool pawn_is_en_passantable(const Gamestate & gs, const Square s) {
 
     Piece p = gs.board.get(s);
     Colour c = colour(p);
-    int rank = (c == WHITE ? 3 : 4);
 
     // check we have a pawn on the correct square
     if (!gs.board.get_ep_exists()
         || type(p) != PAWN
-        || s.x != gs.board.get_ep_file()
-        || s.y != rank) {
+        || !equal(s, gs.board.get_ep_pawn_square())) {
         return false;
     }
 
