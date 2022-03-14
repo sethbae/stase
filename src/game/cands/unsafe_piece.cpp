@@ -9,11 +9,17 @@
  */
 bool is_unsafe_piece_hook(Gamestate & gs, const Square s) {
 
-    if (gs.board.get(s) == EMPTY) { return true; }
+    Piece p = gs.board.get(s);
+    Colour c = colour(p);
+    if (p == EMPTY) { return true; }
 
     SquareControlStatus ss = gs.control_cache->get_control_status(s);
 
-    if (is_weak_status(gs, s, colour(gs.board.get(s)), ss)) {
+    if (is_weak_status(gs, s, c, ss)) {
+        return gs.add_frame(unsafe_piece_hook.id, FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});
+    }
+
+    if (pawn_is_en_passantable(gs, s)) {
         return gs.add_frame(unsafe_piece_hook.id, FeatureFrame{s, SQUARE_SENTINEL, ss.min_w, ss.min_b});
     }
 
