@@ -110,7 +110,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
 
             if (moves_in_right_dir) {
 
-                if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                if (!x_ray && gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
                     cont = false;
                     if (colour(p) == WHITE) {
                         attacked_by_pinned_w_piece = true;
