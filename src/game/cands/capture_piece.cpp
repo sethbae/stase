@@ -17,11 +17,10 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     const Square s = ff->centre;
     const Board & b = gs.board;
     const int local_reset_point = counter.idx();
-    const Colour capturing_colour = (colour(b.get(s)) == WHITE) ? BLACK : WHITE;
-    const int weakest_defender = (capturing_colour == WHITE) ? ff->conf_2 : ff->conf_1;
+    const Colour capturing_colour = opposite_colour(gs.board.get(s));
+    const int weakest_defender = (capturing_colour == WHITE ? ff->conf_2 : ff->conf_1);
     const bool totally_undefended = weakest_defender > piece_value(W_KING);
     const Piece captured_piece = gs.board.get(s);
-    const int cap_val = piece_value(captured_piece);
 
     int min_value_seen = NOT_ATTACKED_AT_ALL;
     int x, y;
@@ -160,7 +159,7 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             counter.current_index = local_reset_point;
             Move m{temp, s, 0};
             m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
-            moves[counter.inc()] = m;;
+            moves[counter.inc()] = m;
         } else if (pawn_val == min_value_seen) {
             // equal lowest value; append
             if (counter.has_space()) {
@@ -228,6 +227,59 @@ void capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         }
     }
 
+    // en passant
+    if (gs.board.get_ep_exists() && equal(s, gs.board.get_ep_pawn_square())) {
+
+        // square on one side
+        temp = mksq(s.x - 1, s.y);
+        if (type(gs.board.get(temp)) == PAWN
+                && colour(gs.board.get(temp)) == capturing_colour
+                && !gs.is_kpinned_piece(temp, get_delta_between(temp, s))) {
+            // IMPLICIT: pawns are always <= weakest defender
+            if (pawn_val < min_value_seen) {
+                // new lowest value; reset and add to the list
+                min_value_seen = pawn_val;
+                counter.current_index = local_reset_point;
+                Move m{temp, gs.board.get_ep_sq(), 0};
+                m.set_ep();
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                moves[counter.inc()] = m;
+            } else if (pawn_val == min_value_seen) {
+                // equal lowest value; append
+                if (counter.has_space()) {
+                    Move m{temp, gs.board.get_ep_sq(), 0};
+                    m.set_ep();
+                    m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                    moves[counter.inc()] = m;
+                }
+            }
+        }
+
+        // and on the other
+        temp = mksq(s.x + 1, s.y);
+        if (type(gs.board.get(temp)) == PAWN
+                && colour(gs.board.get(temp)) == capturing_colour
+                && !gs.is_kpinned_piece(temp, get_delta_between(temp, s))) {
+            // IMPLICIT: pawns are always <= weakest defender
+            if (pawn_val < min_value_seen) {
+                // new lowest value; reset and add to the list
+                min_value_seen = pawn_val;
+                counter.current_index = local_reset_point;
+                Move m{temp, gs.board.get_ep_sq(), 0};
+                m.set_ep();
+                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                moves[counter.inc()] = m;
+            } else if (pawn_val == min_value_seen) {
+                // equal lowest value; append
+                if (counter.has_space()) {
+                    Move m{temp, gs.board.get_ep_sq(), 0};
+                    m.set_ep();
+                    m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                    moves[counter.inc()] = m;
+                }
+            }
+        }
+    }
 }
 
 const Responder capture_resp{
