@@ -539,13 +539,7 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
 
-//   // original benchmark position
-//    const std::string fen =
-//            std::string(
-//                "r1bqk2r/1p2bppp/p1nppn2/2p5/2B1P3/2NP1Q2/PPP1NPPP/R1B2RK1 w kq - 0 8"
-//            );
-
-    const std::string fen = "1rr3k1/R4R2/3q2pQ/2pP4/2Pb4/1P3B2/5PPP/6K1 b - - 0 27";
+    const std::string fen = "4r1k1/p5b1/6Q1/1p1P2N1/qPp1p3/8/PK1B4/4R2R w - - 0 37";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -562,16 +556,16 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_with_node_limit(fen, 25000);
-    std::cout << fetch_node_count() << "\n";
+//    run_with_node_limit(fen, 25000);
+//    std::cout << fetch_node_count() << "\n";
 
 //    greedy_search(fen, 15);
 
-//    show_hook_frames(gs, &fork_hook);
+//    show_hook_frames(gs, &unsafe_piece_hook);
 
 //    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("c4"), {0, 0}, 0, 0});
 
-//    cands_report(gs);
+    cands_report(gs);
 
 //    Eval score = heur_with_description(gs);
 
