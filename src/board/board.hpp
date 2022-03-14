@@ -227,8 +227,13 @@ struct Board {
     }
     inline Square get_ep_sq() const {
         return get_white()
-               ? Square{ get_ep_file(), 5}
-               : Square{get_ep_file(), 2};
+            ? mksq(get_ep_file(), 5)
+            : mksq(get_ep_file(), 2);
+    }
+    inline Square get_ep_pawn_square() const {
+        return get_white()
+            ? mksq(get_ep_file(), 3)
+            : mksq(get_ep_file(), 4);
     }
 
     /**
