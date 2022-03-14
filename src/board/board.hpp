@@ -225,15 +225,19 @@ struct Board {
     inline void set_ep_file(Byte u) {
         conf = (conf & ~__bit_masks::EP_FILE_MASK) | (u << 6);
     }
+    /** Returns the square on which an en-passant capture could take place */
     inline Square get_ep_sq() const {
         return get_white()
             ? mksq(get_ep_file(), 5)
             : mksq(get_ep_file(), 2);
     }
+    /** Returns the square on which the pawn stands which can now be captured en-passant */
     inline Square get_ep_pawn_square() const {
+        // on white's turn, we're looking for the black pawn's square
+        // on black's turn, we're looking for the white pawn's square
         return get_white()
-            ? mksq(get_ep_file(), 3)
-            : mksq(get_ep_file(), 4);
+            ? mksq(get_ep_file(), 4)
+            : mksq(get_ep_file(), 3);
     }
 
     /**
