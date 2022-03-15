@@ -1,7 +1,6 @@
 #include <iostream>
 using std::cout;
 
-#include "game.h"
 #include "board.h"
 #include "../heur/heur.h"
 #include "glogic.h"
@@ -94,27 +93,28 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
                 // the only square they can capture the target from
                 if (x == get_x(s) + x_inc && y == get_y(s) + y_inc) {
 
-                    // if the pawn is pinned, this diagonal is finished.
-                    if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
-                        cont = false;
-                        if (colour(p) == WHITE) {
-                            attacked_by_pinned_w_piece = true;
-                        } else {
-                            attacked_by_pinned_b_piece = true;
-                        }
-                        continue;
-                    }
-
                     // otherwise, the diagonal has to be going in the right direction for their colour
                     if (colour(p) == WHITE && y_inc == -1) {
                         // white pawns can capture up the board, so if we are working out from
                         // the target and moving down the board, a white pawn is able to take
-                        moves_in_right_dir = true;
+                        // it may however be pinned of course, in which case the diagonal is done.
+                        if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                            cont = false;
+                            attacked_by_pinned_w_piece = true;
+                            continue;
+                        } else {
+                            moves_in_right_dir = true;
+                        }
                     } else if (colour(p) == BLACK && y_inc == 1) {
                         // vice versa
-                        moves_in_right_dir = true;
+                        if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                            cont = false;
+                            attacked_by_pinned_b_piece = true;
+                            continue;
+                        } else {
+                            moves_in_right_dir = true;
+                        }
                     }
-
                 }
             }
 
