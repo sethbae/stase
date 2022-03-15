@@ -719,7 +719,12 @@ const Responder play_fork_resp{
 /**
  * Assesses whether the given move, assumed to be a capture, is also a fork.
  */
-bool capture_is_fork(Gamestate & gs, const Move m) {
+[[maybe_unused]] bool capture_is_fork(Gamestate & gs, const Move m) {
+
+    /*
+     * This function could be used to reprioritise captures which are also forks.
+     * They should always be found by the unsafe_piece hook regardless.
+     */
 
     Piece p = gs.board.get(m.from);
     int forkable = 0;
