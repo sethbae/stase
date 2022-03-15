@@ -57,7 +57,7 @@ template <typename T> struct TestSet {
 bool assert_string_lists_equal(const std::vector<std::string> &, const std::vector<std::string> &);
 bool expected_frame_matches_actual(const ExpectedFeatureFrame &, const FeatureFrame &);
 bool evaluate_responder_test_case(const Responder *p, const ResponderTestCase *);
-bool evaluate_hook_test_case(const Hook *, const HookTestCase *);
+bool evaluate_hook_test_case(const Hook &, const HookTestCase *);
 
 Piece random_piece();
 Piece random_piece(Colour);
@@ -137,7 +137,7 @@ bool test_discovered_hook();
 
 bool stress_test_main();
 
-bool stress_test_individual_hook(std::vector<Gamestate> &, const Hook *);
+bool stress_test_individual_hook(std::vector<Gamestate> &, const Hook &);
 bool stress_test_cands(std::vector<Gamestate> &);
 
 #endif //STASE_TEST_H

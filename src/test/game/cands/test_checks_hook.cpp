@@ -76,7 +76,7 @@ bool evaluate_test_case_check_hook(const StringTestCase *tc) {
 
     Gamestate gs(tc->fen);
 
-    discover_feature_frames(gs, &check_hook);
+    discover_feature_frames(gs, check_hook);
 
     std::vector<std::string> strings;
 

@@ -92,7 +92,7 @@ const TestSet<HookTestCase> pin_skewer_hook_test_set{
 };
 
 bool evaluate_pin_skewer_hook_test_case(const HookTestCase * tc) {
-    return evaluate_hook_test_case(&pin_skewer_hook, tc);
+    return evaluate_hook_test_case(pin_skewer_hook, tc);
 }
 
 bool test_pin_skewer_hook() {

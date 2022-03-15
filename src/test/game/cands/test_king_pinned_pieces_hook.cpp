@@ -58,7 +58,7 @@ const TestSet<HookTestCase> king_pinned_pieces_hook_test_set{
 };
 
 bool evaluate_king_pinned_pieces_hook_test_case(const HookTestCase * tc) {
-    return evaluate_hook_test_case(&king_pinned_pieces_hook, tc);
+    return evaluate_hook_test_case(king_pinned_pieces_hook, tc);
 }
 
 bool test_king_pinned_pieces_hook() {

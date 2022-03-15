@@ -9,7 +9,7 @@ struct Hook {
     bool (*hook)(Gamestate &, const Square centre);
 };
 
-void discover_feature_frames(Gamestate &, const Hook *);
+void discover_feature_frames(Gamestate &, const Hook &);
 
 extern const Hook unsafe_piece_hook;
 extern const Hook develop_hook;
@@ -21,16 +21,16 @@ extern const Hook king_pinned_pieces_hook;
 extern const Hook promotion_hook;
 extern const Hook discovered_hook;
 
-const std::vector<const Hook *> ALL_HOOKS {
-        &king_pinned_pieces_hook,
-        &unsafe_piece_hook,
-        &develop_hook,
-        &fork_hook,
-        &queen_fork_hook,
-        &check_hook,
-        &pin_skewer_hook,
-        &promotion_hook,
-        &discovered_hook
+const std::vector<Hook> ALL_HOOKS {
+    king_pinned_pieces_hook,
+    unsafe_piece_hook,
+    develop_hook,
+    fork_hook,
+    queen_fork_hook,
+    check_hook,
+    pin_skewer_hook,
+    promotion_hook,
+    discovered_hook
 };
 
 // in order to allocate the feature frames array statically, we cannot take the value

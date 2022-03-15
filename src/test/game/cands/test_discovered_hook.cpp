@@ -72,7 +72,7 @@ const TestSet<HookTestCase> discovered_hook_test_set{
 };
 
 bool evaluate_discovered_hook_test_case(const HookTestCase * tc) {
-    return evaluate_hook_test_case(&discovered_hook, tc);
+    return evaluate_hook_test_case(discovered_hook, tc);
 }
 
 bool test_discovered_hook() {

@@ -61,7 +61,7 @@ bool evaluate_test_case_development_hook(const StringTestCase *tc) {
 
     Gamestate gs(tc->fen);
 
-    discover_feature_frames(gs, &develop_hook);
+    discover_feature_frames(gs, develop_hook);
 
     std::vector<std::string> strings;
 

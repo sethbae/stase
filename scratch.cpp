@@ -108,7 +108,7 @@ inline int count_frames(const Gamestate & gs, int hook_id) {
     return sum;
 }
 
-void number_of_frames_hist(const Hook * h) {
+void number_of_frames_hist(const Hook & h) {
 
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
@@ -122,12 +122,12 @@ void number_of_frames_hist(const Hook * h) {
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
         cands(states[i], new CandSet);
-        int size = count_frames(states[i], h->id);
+        int size = count_frames(states[i], h.id);
         max_size = std::max(size, max_size);
         num_frames[i] = (double)size;
     }
 
-    cout << "For " << h->name << ":\n";
+    cout << "For " << h.name << ":\n";
 
     double sum = 0.0;
     for (int i = 0; i < N; ++i) {
@@ -373,21 +373,21 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
 /**
  * Shows the feature frames discovered by the given hook on the gamestate
  */
-void show_hook_frames(Gamestate & gs, const Hook * h) {
+void show_hook_frames(Gamestate & gs, const Hook & h) {
 
     discover_feature_frames(gs, h);
 
     pr_board(gs.board);
-    cout << "\nFeatureFrames found for " << h->name << ":\n";
-    for (int i = 0; !is_sentinel(gs.frames[h->id][i].centre) && i < MAX_FRAMES; ++i) {
-        FeatureFrame ff = gs.frames[h->id][i];
+    cout << "\nFeatureFrames found for " << h.name << ":\n";
+    for (int i = 0; !is_sentinel(gs.frames[h.id][i].centre) && i < MAX_FRAMES; ++i) {
+        FeatureFrame ff = gs.frames[h.id][i];
         cout << "FeatureFrame: " << sqtos(ff.centre) << " " << sqtos(ff.secondary);
-        cout << " c1: " << ff.conf_1 << " c2: " << ff.conf_2 << "\n";
+        cout << " c1: " << sqtos(itosq(ff.conf_1)) << " c2: " << sqtos(itosq(ff.conf_2)) << "\n";
     }
 
 }
 
-void show_hook_frames(const std::string & fen, const Hook * h) {
+void show_hook_frames(const std::string & fen, const Hook & h) {
     Gamestate gs(fen);
     show_hook_frames(gs, h);
 }
@@ -539,7 +539,7 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
 
-    const std::string fen = "4r1k1/p5b1/6Q1/1p1P2N1/qPp1p3/8/PK1B4/4R2R w - - 0 37";
+    const std::string fen = "4k3/8/4b3/8/8/8/r7/4R2K w - - 0 1";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -561,11 +561,14 @@ int main(int argc, char** argv) {
 
 //    greedy_search(fen, 15);
 
-//    show_hook_frames(gs, &unsafe_piece_hook);
+    discover_feature_frames(gs, king_pinned_pieces_hook);
+    show_hook_frames(gs, fork_hook);
+//
+//    evaluate_square_control(gs, stosq("d5")).print();
 
-//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("c4"), {0, 0}, 0, 0});
+//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("d7"), {0, 0}, r, r});
 
-    cands_report(gs);
+//    cands_report(gs);
 
 //    Eval score = heur_with_description(gs);
 

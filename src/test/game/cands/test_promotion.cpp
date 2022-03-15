@@ -69,7 +69,7 @@ const TestSet<HookTestCase> promotion_hook_test_set{
 };
 
 bool evaluate_promotion_hook_test_case(const HookTestCase * tc) {
-    return evaluate_hook_test_case(&promotion_hook, tc);
+    return evaluate_hook_test_case(promotion_hook, tc);
 }
 
 bool test_promotion_hook() {

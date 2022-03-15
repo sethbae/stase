@@ -100,11 +100,11 @@ const TestSet<StringTestCase> hook_test_cases = {
     }
 };
 
-bool evaluate_test_case_unsafe_piece_hook(const StringTestCase *tc) {
+bool evaluate_test_case_unsafe_piece_hook(const StringTestCase * tc) {
 
     Gamestate gs(tc->fen);
 
-    discover_feature_frames(gs, &unsafe_piece_hook);
+    discover_feature_frames(gs, unsafe_piece_hook);
 
     std::vector<std::string> strings;
 
