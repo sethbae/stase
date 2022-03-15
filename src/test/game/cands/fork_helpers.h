@@ -88,6 +88,7 @@ inline bool evaluate_sliding_fork_test_case(const SlidingForkTestCase * tc) {
 
     Gamestate gs(tc->fen);
 
+    discover_feature_frames(gs, &king_pinned_pieces_hook);
     discover_feature_frames(gs, &fork_hook);
 
     int actual_frames_encountered = 0;

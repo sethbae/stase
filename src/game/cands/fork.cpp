@@ -3,10 +3,6 @@
 #include "cands.h"
 #include "responder.hpp"
 
-// TODO: interrupting poly x-rays
-
-// TODO: defence along the line of the fork: 8/8/4Q3/8/8/1K3b2/8/8 b - - 0 1
-
 /**
  * Checks whether from this square, there are two pieces which can be forked.
  * This is done regardless of whether there is actually a piece threatening to
@@ -47,9 +43,8 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
         // queens are the only piece you want to fork along a direction they can move:
         //  - bishops along diagonal: don't fork with another bishop or with a queen
         //  - rooks along straight: don't fork with rooks or queens, obviously.
-        // TODO: check here for pins.
-        if (type(p) != QUEEN && can_move_in_direction(p, d)) { continue; }
-        if (type(p2) != QUEEN && can_move_in_direction(p2, d)) { continue; }
+        if (type(p) != QUEEN && can_move_in_direction(p, d) && !gs.is_kpinned_piece(s, d)) { continue; }
+        if (type(p2) != QUEEN && can_move_in_direction(p2, d) && !gs.is_kpinned_piece(s2, d)) { continue; }
 
         bool unconditional1 = zero_or_worse_control(gs, s);
         bool unconditional2 = zero_or_worse_control(gs, s2);

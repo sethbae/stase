@@ -183,6 +183,13 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
                 SlidingForkFrame{"d1", "h5", r},
             }
         },
+        // can fork a pinned piece along a direction it could normally move
+        SlidingForkTestCase{
+            "8/4k3/4b3/8/8/8/r7/4R2K w - - 0 1",
+            {
+                SlidingForkFrame{"a2", "e6", NOT_ATTACKED_AT_ALL}
+            }
+        }
     }
 };
 
