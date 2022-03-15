@@ -60,6 +60,7 @@ set(SOURCE_FILES
         src/game/cands/pin_skewer.cpp
         src/game/cands/promote.cpp
         src/game/cands/discovered.cpp
+        src/game/cands/position.cpp
 
         src/game/glogic/geometry.cpp
         src/game/glogic/piece.cpp
