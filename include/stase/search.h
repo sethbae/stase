@@ -22,9 +22,10 @@ struct SearchNode {
 
 };
 
-std::vector<Move> iterative_deepening_search(const std::string &, int);
-std::vector<Move> greedy_search(const std::string &, int);
-std::vector<Move> greedy_search(SearchNode *, int);
+class Observer;
+
+std::vector<Move> greedy_search(const std::string &, int, Observer * o = nullptr);
+std::vector<Move> greedy_search(SearchNode *, int, Observer * o = nullptr);
 
 void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);

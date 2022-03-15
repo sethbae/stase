@@ -240,26 +240,26 @@ bool visit_best_line(SearchNode * node, bool in_swing) {
 
 }
 
-std::vector<Move> greedy_search(const std::string & fen, int cycles) {
+std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer * obs) {
 
     // set up the root node
     Gamestate root_gs(fen);
     SearchNode root{
-            &root_gs,
-            cands(root_gs, new CandSet),
-            heur(root_gs),
-            MOVE_SENTINEL,
-            {},
-            nullptr,
-            nullptr,
-            0
+        &root_gs,
+        cands(root_gs, new CandSet),
+        heur(root_gs),
+        MOVE_SENTINEL,
+        {},
+        nullptr,
+        nullptr,
+        0
     };
 
     return greedy_search(&root, cycles);
 
 }
 
-std::vector<Move> greedy_search(SearchNode * root, int cycles) {
+std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer * obs) {
 
     if (root->score == zero()) {
         root->score = heur(*root->gs);
@@ -296,7 +296,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles) {
     }
 
     std::string name = "stase_tree";
-    //record_tree_in_file(name, root);
+    // record_tree_in_file(name, root);
 
     return moves;
 }
