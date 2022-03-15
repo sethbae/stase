@@ -54,8 +54,8 @@ const std::vector<FeatureHandler> feature_handlers = {
     },
     FeatureHandler{
         positional_hook,
-        { &trade_resp, &retreat_resp },
-        { &trade_resp, &retreat_resp }
+        { &trade_resp },
+        { &trade_resp }
     },
     FeatureHandler{
         develop_hook,
