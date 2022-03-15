@@ -95,8 +95,8 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {
                     present = true;
-                    // combine the scores: 1 + max
-                    all_moves[k].set_score(max(1 + all_moves[k].get_score(), moves[j].get_score()));
+                    // combine the scores
+                    all_moves[k].set_score(max(all_moves[k].get_score(), moves[j].get_score()));
                     break;
                 }
             }
@@ -240,8 +240,8 @@ CandSet * cands_report(Gamestate & gs) {
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {
                     present = true;
-                    // combine the scores: 1 + max
-                    all_moves[k].set_score(max(1 + all_moves[k].get_score(), moves[j].get_score()));
+                    // combine the scores
+                    all_moves[k].set_score(max(all_moves[k].get_score(), moves[j].get_score()));
                     break;
                 }
             }
