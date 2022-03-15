@@ -8,6 +8,8 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
     Move moves[MAX_MOVES_PER_HOOK];
     IndexCounter move_counter(MAX_MOVES_PER_HOOK);
 
+    discover_feature_frames(gs, &king_pinned_pieces_hook);
+
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
         resp->resp(gs, &ff, &moves[0], move_counter);
@@ -27,6 +29,9 @@ bool evaluate_hook_test_case(const Hook * h, const HookTestCase * tc) {
 
     Gamestate gs(tc->fen);
 
+    if (h->id != king_pinned_pieces_hook.id) {
+        discover_feature_frames(gs, &king_pinned_pieces_hook);
+    }
     discover_feature_frames(gs, h);
 
     int num_features = 0;
