@@ -431,10 +431,15 @@ bool find_knight_forks(Gamestate & gs, const Square s) {
  * Returns true if the second, enemy piece differs to colour to the first (pawn) piece,
  * and if the enemy is also not a pawn.
  */
-inline bool non_pawn_enemy(const Piece pawn, const Piece enemy) {
-    // TODO: it is relevant here whether the piece is pinned or not, if it were pinned,
-    //  it would be allowed to be a pawn.
-    return enemy != EMPTY && colour(enemy) != colour(pawn) && type(enemy) != PAWN;
+inline bool forkable_by_pawn(const Gamestate & gs, const Square forking_sq, const Square forked_sq) {
+
+    Piece pawn = gs.board.get(forking_sq);
+    Piece enemy = gs.board.get(forked_sq);
+    if (enemy == EMPTY) { return false; }
+    if (colour(enemy) == colour(pawn)) { return false; }
+
+    if (type(enemy) != PAWN) { return true; }
+    return gs.is_kpinned_piece(forked_sq, get_delta_between(forking_sq, forked_sq));
 }
 
 /**
@@ -493,8 +498,8 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
             Square l_sq = mksq(fork_square.x - 1, fork_square.y + FORWARD);
             Square r_sq = mksq(fork_square.x + 1, fork_square.y + FORWARD);
 
-            if (val(l_sq) && non_pawn_enemy(pawn, gs.board.get(l_sq))
-                && val(r_sq) && non_pawn_enemy(pawn, gs.board.get(r_sq))) {
+            if (val(l_sq) && forkable_by_pawn(gs, s, l_sq)
+                && val(r_sq) && forkable_by_pawn(gs, s, r_sq)) {
                 if (!gs.add_frame(
                         fork_hook.id,
                         FeatureFrame{

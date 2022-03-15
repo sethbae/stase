@@ -53,6 +53,7 @@ inline bool evaluate_fork_test_case(const ForkTestCase * tc, const Ptype expecte
     Gamestate gs(tc->fen);
     const Hook & h = (expected == QUEEN) ? queen_fork_hook : fork_hook;
 
+    discover_feature_frames(gs, &king_pinned_pieces_hook);
     discover_feature_frames(gs, &h);
 
     int actual_frames_encountered = 0;

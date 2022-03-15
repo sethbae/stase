@@ -98,6 +98,13 @@ TestSet<ForkTestCase> pawn_fork_hook_test_cases = {
                 ForkFrame{"e4", "g4", "f5", "f6"}
             }
         },
+        // PAWN: forks pinned pawn
+        ForkTestCase{
+            "8/8/3r4/8/4p3/8/3P1N2/3K4 w - - 0 1",
+            {
+                ForkFrame{"d2", "f2", "e3", "e4"}
+            }
+        }
     }
 };
 

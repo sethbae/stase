@@ -92,11 +92,10 @@ TestSet<ForkTestCase> queen_fork_hook_test_cases = {
                 ForkFrame{"f7", "e4", "f5", "g4"}
             }
         },
-        // puzzle #2 (it finds an extra fork, on b3)
+        // puzzle #2
         ForkTestCase{
             "r1b1k2r/ppq2ppp/5n2/3p4/1b1P4/2NBB3/PP3PPP/R2QK2R w KQkq - 3 11",
             {
-                ForkFrame{"d5", "b4", "b3", "d1"},
                 ForkFrame{"e8", "b4", "a4", "d1"},
             }
         },

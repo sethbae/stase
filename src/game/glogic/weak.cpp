@@ -94,8 +94,18 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
                 // the only square they can capture the target from
                 if (x == get_x(s) + x_inc && y == get_y(s) + y_inc) {
 
-                    // the diagonal has to be going in the right direction for their colour
+                    // if the pawn is pinned, this diagonal is finished.
+                    if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                        cont = false;
+                        if (colour(p) == WHITE) {
+                            attacked_by_pinned_w_piece = true;
+                        } else {
+                            attacked_by_pinned_b_piece = true;
+                        }
+                        continue;
+                    }
 
+                    // otherwise, the diagonal has to be going in the right direction for their colour
                     if (colour(p) == WHITE && y_inc == -1) {
                         // white pawns can capture up the board, so if we are working out from
                         // the target and moving down the board, a white pawn is able to take
@@ -442,6 +452,15 @@ bool move_is_safe(const Gamestate & gs, const Move m) {
         // if the square is not controlled, the move is safe.
         if (status.min_b > piece_value(B_KING)) { return true; }
 
+        // if the square is only controlled by a king, special care is needed
+        if (status.min_b == piece_value(B_KING)) {
+            // pawn forward moves do not affect the control, so we can use the min attacker
+            if (type(p) == PAWN && m.from.x == m.to.x) {
+                return status.min_w <= ATTACKED_BY_PINNED_PIECE;
+            }
+            return status.balance >= 0;
+        }
+
         // if it's attacked only by more valuable pieces, then:
         if (status.min_b > piece_value(p)) {
             // uncontrolled square: unsafe
@@ -472,6 +491,14 @@ bool move_is_safe(const Gamestate & gs, const Move m) {
 
         // if the square is not controlled, the move is safe.
         if (status.min_w > piece_value(W_KING)) { return true; }
+
+        // if the square is only controlled by a king, special care is needed
+        if (status.min_w == piece_value(W_KING)) {
+            if (type(p) == PAWN && m.from.x == m.to.x) {
+                return status.min_b <= ATTACKED_BY_PINNED_PIECE;
+            }
+            return status.balance <= 0;
+        }
 
         // if it's attacked only by more valuable pieces, then:
         if (status.min_w > piece_value(p)) {
