@@ -41,13 +41,6 @@ void add_legal_moves(SearchNode * node) {
 
     for (int i = 0; i < legals.size(); ++i) {
 
-        // check in existing lists
-        if (is_present_in_list(node->cand_set->critical, legals[i])
-            || is_present_in_list(node->cand_set->medial, legals[i])
-            || is_present_in_list(node->cand_set->final, legals[i])) {
-            continue;
-        }
-
         // check in children
         bool already_created = false;
         for (int j = 0; j < node->children.size(); ++j) {
@@ -72,7 +65,7 @@ void add_legal_moves(SearchNode * node) {
  * If given a depth of 0, nothing will happen.
  * Returns true if new nodes are created, false otherwise.
  */
-bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) {
+bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false, Observer * obs = nullptr) {
 
     // exit conditions
     check_abort();
@@ -143,7 +136,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false) 
  * about the node except to update its score.
  * Returns true if new nodes were deepened and false otherwise.
  */
-bool visit_node(SearchNode * node) {
+bool visit_node(SearchNode * node, Observer * obs = nullptr) {
 
     if (node->gs->has_been_mated) {
         return false;
@@ -160,7 +153,7 @@ bool visit_node(SearchNode * node) {
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
-            return deepen(node, LEGAL, LEGAL_DEPTH);
+            return deepen(node, LEGAL, LEGAL_DEPTH, obs);
         default:
             ++node->visit_count;
             update_score(node);
@@ -222,15 +215,15 @@ bool force_visit_best_line(SearchNode * node) {
  * Returns true if any descendant of the given node was materially updated (ie new
  * moves + nodes), and false otherwise.
  */
-bool visit_best_line(SearchNode * node, bool in_swing) {
+bool visit_best_line(SearchNode * node, bool in_swing, Observer * obs = nullptr) {
 
     if (node == nullptr) { return false; }
 
     Eval prior = node->score;
 
     // recurse first so that the line is visited bottom (deepest) first
-    bool changes = visit_best_line(node->best_child, in_swing);
-    changes = visit_node(node) || changes;
+    bool changes = visit_best_line(node->best_child, in_swing, obs);
+    changes = visit_node(node, obs) || changes;
 
     if (!in_swing && is_swing(prior, node->score)) {
         changes = force_visit_best_line(node) || changes;
@@ -255,7 +248,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer * 
         0
     };
 
-    return greedy_search(&root, cycles);
+    return greedy_search(&root, cycles, obs);
 
 }
 
@@ -274,7 +267,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer * obs) {
     auto start = std::chrono::high_resolution_clock::now();
 
     while (i++ < cycles || cycles < 0) {
-        visit_best_line(root, false);
+        visit_best_line(root, false, obs);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
 //        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
