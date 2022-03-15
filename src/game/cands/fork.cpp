@@ -721,11 +721,6 @@ const Responder play_fork_resp{
  */
 bool capture_is_fork(Gamestate & gs, const Move m) {
 
-    // TODO: fork with capture?? 8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1
-    //  "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1"
-    //  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
-    //  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
-
     Piece p = gs.board.get(m.from);
     int forkable = 0;
     MoveType dir_array[2] = {ORTHO, DIAG};

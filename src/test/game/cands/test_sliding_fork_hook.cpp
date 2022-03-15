@@ -54,15 +54,6 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
             "5r2/8/8/p7/1n6/4B3/8/8 w - - 0 1",
             {}
         },
-//        // BISHOP: forks with capture
-//        SlidingForkTestCase{
-//            "8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1",
-//            {
-//                SlidingForkFrame{"a1", "e1", k},
-//                SlidingForkFrame{"c3", "e1", k},
-//                SlidingForkFrame{"a1", "c3", NOT_ATTACKED_AT_ALL},
-//            }
-//        },
         // BISHOP: doesn't fork pieces already attacked
         SlidingForkTestCase{
             "8/8/1K6/8/8/2b5/8/R7 b - - 0 1",
@@ -76,18 +67,6 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
                 SlidingForkFrame{"a8", "e8", NOT_ATTACKED_AT_ALL}
             }
         },
-//        // BISHOP: puzzle #1 TODO
-//        SlidingForkTestCase{
-//            "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
-//            {
-//                // the actual puzzle: not working
-//                SlidingForkFrame{"a8", "c8", NOT_ATTACKED_AT_ALL},
-//                // incidental other forks threatened
-//                SlidingForkFrame{"a2", "c4", NOT_ATTACKED_AT_ALL},
-//                SlidingForkFrame{"c1", "c4", k},
-//                SlidingForkFrame{"c5", "f8", k},
-//            }
-//        },
         // BISHOP: puzzle #2
         SlidingForkTestCase{
             "r1b2rk1/pp3ppp/2p3n1/8/2P5/q3B3/4BQPP/1R3RK1 w - - 0 21",
@@ -99,9 +78,6 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
                 SlidingForkFrame{"a3", "a7", NOT_ATTACKED_AT_ALL}
             }
         },
-        // TODO does not fork adjacent pieces
-        // TODO does not fork pinned pieces..?
-
         // ROOK: basic undefended pieces #1
         SlidingForkTestCase{
             "4r3/8/8/1P4P1/8/8/8/8 w - - 0 1",
@@ -133,13 +109,6 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
             "8/8/3r4/8/8/2R3K1/8/8 b - - 0 1",
             {}
         },
-//        // ROOK: forks with capture
-//        SlidingForkTestCase{
-//            "7k/8/8/6Rp/6P1/8/8/7q w - - 0 1",
-//            {
-//                SlidingForkFrame{"h1", "h8", NOT_ATTACKED_AT_ALL}
-//            }
-//        },
         // ROOK: doesn't fork pieces already attacked
         SlidingForkTestCase{
             "8/8/3r4/N7/8/3B4/8/8 w - - 0 1",
@@ -151,6 +120,7 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
             {}
         },
 //        // ROOK: puzzle #1
+//        // TODO (GM-91): this fork involves interrupting a line of defence and isn't found
 //        SlidingForkTestCase{
 //            "4r2k/3q2p1/6Qp/p3p3/8/2P2R1P/6PK/8 w - - 2 37",
 //            {
@@ -192,6 +162,50 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
         }
     }
 };
+
+/*
+ * Currently, forks which are also captures are not detected by the fork hook.
+ * They should always be detected by the unsafe_piece hook, so it is an issue
+ * of scoring/prioritising that candidate differently, not of finding/not finding
+ * the move. Below are some test cases which can be used if the functionality ever
+ * changes.
+ *
+ *  "8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1"
+ *  "rnbqkbnr/pp2pppp/2pp4/P5B1/8/N2P4/1PP1PPPP/R2QKBNR b KQkq - 0 1"
+ *  "r3kbnr/p3pppp/n1p5/8/2P5/1P2PQ2/PB3PPP/RN3RK1 w - - 0 1"
+ *  "7r/8/8/2Q1b3/8/6p1/8/8 w - - 0 1"
+ *
+ *        // ROOK: forks with capture
+ *        SlidingForkTestCase{
+ *            "7k/8/8/6Rp/6P1/8/8/7q w - - 0 1",
+ *            {
+ *                SlidingForkFrame{"h1", "h8", NOT_ATTACKED_AT_ALL}
+ *            }
+ *        },
+ *
+ *        // BISHOP: forks with capture
+ *        SlidingForkTestCase{
+ *            "8/8/8/4b3/8/2P5/8/R3K3 w - - 0 1",
+ *            {
+ *                SlidingForkFrame{"a1", "e1", k},
+ *                SlidingForkFrame{"c3", "e1", k},
+ *                SlidingForkFrame{"a1", "c3", NOT_ATTACKED_AT_ALL},
+ *            }
+ *        },
+ *
+ *        // BISHOP: puzzle #1
+ *        SlidingForkTestCase{
+ *            "rbr2k2/ppn2ppp/8/2p5/2P2P2/P5P1/R3N1BP/2K4R w - - 0 22",
+ *            {
+ *                // the actual puzzle: not working
+ *                SlidingForkFrame{"a8", "c8", NOT_ATTACKED_AT_ALL},
+ *                // incidental other forks threatened
+ *                SlidingForkFrame{"a2", "c4", NOT_ATTACKED_AT_ALL},
+ *                SlidingForkFrame{"c1", "c4", k},
+ *                SlidingForkFrame{"c5", "f8", k},
+ *            }
+ *        },
+ */
 
 bool test_sliding_fork_hook() {
     return evaluate_test_set(&sliding_fork_hook_test_cases, &evaluate_sliding_fork_test_case);
