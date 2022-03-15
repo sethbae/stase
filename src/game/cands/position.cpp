@@ -3,7 +3,7 @@
 #include "../gamestate.hpp"
 
 bool positional_move_hook(Gamestate & gs, const Square s) {
-    if (is_not_pk(gs.board.get(s))) {
+    if (is_not_pk(gs.board.get(s)) && !gs.is_kpinned_piece(s)) {
         return gs.add_frame(positional_hook.id, FeatureFrame{s, SQUARE_SENTINEL, 0, 0});
     }
     return true;
