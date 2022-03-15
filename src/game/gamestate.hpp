@@ -366,6 +366,13 @@ public:
     }
 
     /**
+     * Checks if the piece has been pinned in any direction at all.
+     */
+    inline bool is_kpinned_piece(const Square s) {
+        return is_valid_delta(delta_of_kpinned_piece(s));
+    }
+
+    /**
      * Mark a piece as no longer pinned to its king, so that it is able to move once more.
      */
     void remove_kpinned_piece(const Square s) {
