@@ -1,17 +1,17 @@
 #include "search.h"
 
+enum SearchEvent {
+    VISIT,
+    VISIT_LINE,
+    FORCE_VISIT,
+    FORCE_VISIT_LINE,
+    DEEPEN
+};
+
 class NullObserver {
 public:
-    inline void open_visit(const SearchNode * node) {}
-    inline void close_visit(const SearchNode * node) {}
-    inline void open_visit_line(const SearchNode * node) {}
-    inline void close_visit_line(const SearchNode * node) {}
-    inline void open_force_visit(const SearchNode * node) {}
-    inline void close_force_visit(const SearchNode * node) {}
-    inline void open_force_visit_line(const SearchNode * node) {}
-    inline void close_force_visit_line(const SearchNode * node) {}
-    inline void open_deepen(const SearchNode * node) {}
-    inline void close_deepen(const SearchNode * node) {}
+    inline void open_event(const SearchNode * node, SearchEvent ev) {}
+    inline void close_event(const SearchNode * node, SearchEvent ev) {}
 };
 
 
@@ -26,15 +26,7 @@ public:
 
     Observer(const std::string & filepath) : filepath(filepath) {}
 
-    inline void open_visit(const SearchNode * node) {}
-    inline void close_visit(const SearchNode * node) {}
-    inline void open_visit_line(const SearchNode * node) {}
-    inline void close_visit_line(const SearchNode * node) {}
-    inline void open_force_visit(const SearchNode * node) {}
-    inline void close_force_visit(const SearchNode * node) {}
-    inline void open_force_visit_line(const SearchNode * node) {}
-    inline void close_force_visit_line(const SearchNode * node) {}
-    inline void open_deepen(const SearchNode * node) {}
-    inline void close_deepen(const SearchNode * node) {}
+    inline void open_event(const SearchNode * node, SearchEvent ev) {}
+    inline void close_event(const SearchNode * node, SearchEvent ev) {}
 
 };

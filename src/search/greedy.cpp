@@ -65,27 +65,27 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burs
     check_abort();
     if (node->gs->has_been_mated) { return false; }
 
-    obs.open_deepen(node);
+    obs.open_event(node, DEEPEN);
 
     if (depth == 0) {
 
         if (burst) {
-            obs.close_deepen(node);
+            obs.close_event(node, DEEPEN);
             return false;
         }
 
         if (quiess(*node->gs) >= QUIESS_THRESHOLD) {
             bool result = deepen(node, CRITICAL, BURST_DEPTH, obs, true);
-            obs.close_deepen(node);
+            obs.close_event(node, DEEPEN);
             return result;
         } else {
-            obs.close_deepen(node);
+            obs.close_event(node, DEEPEN);
             return false;
         }
     }
 
     if (burst && quiess(*node->gs) < QUIESS_THRESHOLD) {
-        obs.close_deepen(node);
+        obs.close_event(node, DEEPEN);
         return false;
     }
 
@@ -102,7 +102,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burs
                         || changes;
         }
         update_score(node);
-        obs.close_deepen(node);
+        obs.close_event(node, DEEPEN);
         return changes;
     }
 
@@ -131,7 +131,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burs
     }
 
     update_score(node);
-    obs.close_deepen(node);
+    obs.close_event(node, DEEPEN);
     return changes;
 }
 
@@ -148,34 +148,34 @@ bool visit_node(SearchNode * node, O & obs) {
         return false;
     }
 
-    obs.open_visit(node);
+    obs.open_event(node, VISIT);
 
     bool result;
 
     switch (node->visit_count) {
         case CRITICAL_THRESHOLD:
             result = deepen(node, CRITICAL, CRITICAL_DEPTH, obs);
-            obs.close_visit(node);
+            obs.close_event(node, VISIT);
             return result;
         case MEDIAL_THRESHOLD:
             result = deepen(node, MEDIAL, MEDIAL_DEPTH, obs);
-            obs.close_visit(node);
+            obs.close_event(node, VISIT);
             return result;
         case FINAL_THRESHOLD:
             result = deepen(node, FINAL, FINAL_DEPTH, obs);
-            obs.close_visit(node);
+            obs.close_event(node, VISIT);
             return result;
         case LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
             result = deepen(node, LEGAL, LEGAL_DEPTH, obs);
-            obs.close_visit(node);
+            obs.close_event(node, VISIT);
             return result;
         default:
             ++node->visit_count;
             update_score(node);
-            obs.close_visit(node);
+            obs.close_event(node, VISIT);
             return false;
     }
 
@@ -192,7 +192,7 @@ bool force_visit(SearchNode * node, O & obs) {
 
     bool changes = false;
 
-    obs.open_force_visit(node);
+    obs.open_event(node, FORCE_VISIT);
 
     if (node->visit_count <= CRITICAL_THRESHOLD) {
         changes = deepen(node, CRITICAL, CRITICAL_DEPTH, obs);
@@ -209,7 +209,7 @@ bool force_visit(SearchNode * node, O & obs) {
         node->visit_count = FINAL_THRESHOLD + 1;
     }
 
-    obs.close_force_visit(node);
+    obs.close_event(node, FORCE_VISIT);
 
     return changes;
 }
@@ -225,11 +225,11 @@ bool force_visit_best_line(SearchNode * node, O & obs) {
 
     if (node == nullptr) { return false; }
 
-    obs.open_force_visit_line(node);
+    obs.open_event(node, FORCE_VISIT_LINE);
     bool changes = force_visit(node->best_child, obs);
     changes = force_visit(node, obs) || changes;
 
-    obs.close_force_visit_line(node);
+    obs.close_event(node, FORCE_VISIT_LINE);
     return changes;
 }
 
@@ -248,7 +248,7 @@ bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
     if (node == nullptr) { return false; }
 
     Eval prior = node->score;
-    obs.open_visit_line(node);
+    obs.open_event(node, VISIT_LINE);
 
     // recurse first so that the line is visited bottom (deepest) first
     bool changes = visit_best_line(node->best_child, in_swing, obs);
@@ -258,7 +258,7 @@ bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
         changes = force_visit_best_line(node, obs) || changes;
     }
 
-    obs.close_visit_line(node);
+    obs.close_event(node, VISIT_LINE);
     return changes;
 
 }
