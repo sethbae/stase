@@ -4,8 +4,6 @@
 #include "board.h"
 #include "game.h"
 
-class Observer;
-
 struct SearchNode {
 
     Gamestate * gs;
@@ -19,8 +17,10 @@ struct SearchNode {
 
 };
 
-std::vector<Move> greedy_search(const std::string &, int, Observer * o = nullptr);
-std::vector<Move> greedy_search(SearchNode *, int, Observer * o = nullptr);
+template <typename O>
+std::vector<Move> greedy_search(const std::string &, int, O &);
+template <typename O>
+std::vector<Move> greedy_search(SearchNode *, int, O &);
 
 void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);

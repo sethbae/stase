@@ -58,24 +58,34 @@ void add_legal_moves(SearchNode * node) {
  * If given a depth of 0, nothing will happen.
  * Returns true if new nodes are created, false otherwise.
  */
-bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false, Observer * obs = nullptr) {
+template <typename O>
+bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burst=false) {
 
     // exit conditions
     check_abort();
     if (node->gs->has_been_mated) { return false; }
 
+    obs.open_deepen(node);
+
     if (depth == 0) {
 
-        if (burst) { return false; }
+        if (burst) {
+            obs.close_deepen(node);
+            return false;
+        }
 
         if (quiess(*node->gs) >= QUIESS_THRESHOLD) {
-            return deepen(node, CRITICAL, BURST_DEPTH, true);
+            bool result = deepen(node, CRITICAL, BURST_DEPTH, obs, true);
+            obs.close_deepen(node);
+            return result;
         } else {
+            obs.close_deepen(node);
             return false;
         }
     }
 
     if (burst && quiess(*node->gs) < QUIESS_THRESHOLD) {
+        obs.close_deepen(node);
         return false;
     }
 
@@ -88,10 +98,11 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false, 
         // we still need to recurse up to the given depth
         bool changes = false;
         for (int i = 0; i < node->children.size(); ++i) {
-            changes = deepen(node->children[i], cand_list, depth - 1, burst)
+            changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
                         || changes;
         }
         update_score(node);
+        obs.close_deepen(node);
         return changes;
     }
 
@@ -115,11 +126,12 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false, 
     // recurse as appropriate
     bool changes = (node->children.size() != c);
     for (int i = 0; i < node->children.size(); ++i) {
-        changes = deepen(node->children[i], cand_list, depth - 1, burst)
+        changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
                     || changes;
     }
 
     update_score(node);
+    obs.close_deepen(node);
     return changes;
 }
 
@@ -129,21 +141,22 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, bool burst=false, 
  * about the node except to update its score.
  * Returns true if new nodes were deepened and false otherwise.
  */
-bool visit_node(SearchNode * node, Observer * obs = nullptr) {
+template <typename O>
+bool visit_node(SearchNode * node, O & obs) {
 
     if (node->gs->has_been_mated) {
         return false;
     }
 
-    if (obs) { obs->open_visit(node); }
+    obs.open_visit(node);
 
     switch (node->visit_count) {
         case CRITICAL_THRESHOLD:
-            return deepen(node, CRITICAL, CRITICAL_DEPTH);
+            return deepen(node, CRITICAL, CRITICAL_DEPTH, obs);
         case MEDIAL_THRESHOLD:
-            return deepen(node, MEDIAL, MEDIAL_DEPTH);
+            return deepen(node, MEDIAL, MEDIAL_DEPTH, obs);
         case FINAL_THRESHOLD:
-            return deepen(node, FINAL, FINAL_DEPTH);
+            return deepen(node, FINAL, FINAL_DEPTH, obs);
         case LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
@@ -163,22 +176,23 @@ bool visit_node(SearchNode * node, Observer * obs = nullptr) {
  * excluding legal moves.
  * Returns true if any new nodes were in fact extended.
  */
-bool force_visit(SearchNode * node) {
+template <typename O>
+bool force_visit(SearchNode * node, O & obs) {
 
     bool changes = false;
 
     if (node->visit_count <= CRITICAL_THRESHOLD) {
-        changes = deepen(node, CRITICAL, CRITICAL_DEPTH);
+        changes = deepen(node, CRITICAL, CRITICAL_DEPTH, obs);
         node->visit_count = CRITICAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < MEDIAL_THRESHOLD) {
-        changes = deepen(node, MEDIAL, MEDIAL_DEPTH);
+        changes = deepen(node, MEDIAL, MEDIAL_DEPTH, obs);
         node->visit_count = MEDIAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < FINAL_THRESHOLD) {
-        changes = deepen(node, FINAL, FINAL_DEPTH);
+        changes = deepen(node, FINAL, FINAL_DEPTH, obs);
         node->visit_count = FINAL_THRESHOLD + 1;
     }
 
@@ -191,12 +205,13 @@ bool force_visit(SearchNode * node) {
  * so the line visited is that which is the best line in the initial position.
  * Returns true if any changes were made, false otherwise.
  */
-bool force_visit_best_line(SearchNode * node) {
+template<typename O>
+bool force_visit_best_line(SearchNode * node, O & obs) {
 
     if (node == nullptr) { return false; }
 
-    bool changes = force_visit(node->best_child);
-    changes = force_visit(node) || changes;
+    bool changes = force_visit(node->best_child, obs);
+    changes = force_visit(node, obs) || changes;
 
     return changes;
 }
@@ -210,7 +225,8 @@ bool force_visit_best_line(SearchNode * node) {
  * Returns true if any descendant of the given node was materially updated (ie new
  * moves + nodes), and false otherwise.
  */
-bool visit_best_line(SearchNode * node, bool in_swing, Observer * obs = nullptr) {
+ template <typename O>
+bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
 
     if (node == nullptr) { return false; }
 
@@ -221,33 +237,15 @@ bool visit_best_line(SearchNode * node, bool in_swing, Observer * obs = nullptr)
     changes = visit_node(node, obs) || changes;
 
     if (!in_swing && is_swing(prior, node->score)) {
-        changes = force_visit_best_line(node) || changes;
+        changes = force_visit_best_line(node, obs) || changes;
     }
 
     return changes;
 
 }
 
-std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer * obs) {
-
-    // set up the root node
-    Gamestate root_gs(fen);
-    SearchNode root{
-        &root_gs,
-        cands(root_gs, new CandSet),
-        heur(root_gs),
-        MOVE_SENTINEL,
-        {},
-        nullptr,
-        nullptr,
-        0
-    };
-
-    return greedy_search(&root, cycles, obs);
-
-}
-
-std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer * obs) {
+template <typename O>
+std::vector<Move> greedy_search(SearchNode * root, int cycles, O & obs) {
 
     if (root->score == zero()) {
         root->score = heur(*root->gs);
@@ -288,6 +286,29 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer * obs) {
 
     return moves;
 }
+
+template <typename O>
+std::vector<Move> greedy_search(const std::string & fen, int cycles, O & obs) {
+
+    // set up the root node
+    Gamestate root_gs(fen);
+    SearchNode root{
+            &root_gs,
+            cands(root_gs, new CandSet),
+            heur(root_gs),
+            MOVE_SENTINEL,
+            {},
+            nullptr,
+            nullptr,
+            0
+    };
+
+    return greedy_search(&root, cycles, obs);
+
+}
+template std::vector<Move> greedy_search<NullObserver>(const std::string &, int, NullObserver &);
+template std::vector<Move> greedy_search<Observer>(const std::string &, int, Observer &);
+
 
 Eval trust_score(SearchNode * node, bool is_white) {
 

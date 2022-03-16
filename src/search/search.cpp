@@ -276,7 +276,8 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
  * is intended to be used in a multi-threaded context only.
  */
 void search_indefinite(SearchNode * root) {
-    greedy_search(root, -1);
+    NullObserver n;
+    greedy_search(root, -1, n);
 }
 
 /**

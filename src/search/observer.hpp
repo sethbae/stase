@@ -1,5 +1,14 @@
 #include "search.h"
 
+class NullObserver {
+public:
+    inline void open_visit(const SearchNode * node) {}
+    inline void close_visit(const SearchNode * node) {}
+    inline void open_deepen(const SearchNode * node) {}
+    inline void close_deepen(const SearchNode * node) {}
+};
+
+
 class Observer {
 
 private:

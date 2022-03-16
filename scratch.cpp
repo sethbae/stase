@@ -18,6 +18,8 @@ using std::ofstream;
 #include "src/bench/bench.h"
 #include "src/game/cands/responder.hpp"
 #include "src/test/test.h"
+#include "src/search/search_tools.h"
+#include "src/search/metrics.h"
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"
 
@@ -423,7 +425,8 @@ SearchNode * repl_cycles(const std::string & fen) {
             0
     };
 
-    greedy_search(root, cycles);
+    NullObserver n;
+    greedy_search(root, cycles, n);
     cout << "done\n";
 
     return root;
@@ -539,7 +542,7 @@ int main(int argc, char** argv) {
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
 
-    const std::string fen = "4k3/8/4b3/8/8/8/r7/4R2K w - - 0 1";
+    const std::string fen = "r1b1kb1r/pp1p1ppp/4pn2/2q5/1n2P3/3Q1N2/PPPB1PPP/RN2KB1R w KQkq - 2 8";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -556,14 +559,14 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-//    run_with_node_limit(fen, 25000);
-//    std::cout << fetch_node_count() << "\n";
+    run_with_node_limit(fen, 25000);
+    std::cout << fetch_node_count() << "\n";
 
-//    greedy_search(fen, 15);
+//    greedy_search(fen, 5);
 
-    discover_feature_frames(gs, king_pinned_pieces_hook);
-    show_hook_frames(gs, fork_hook);
-//
+//    discover_feature_frames(gs, king_pinned_pieces_hook);
+//    show_hook_frames(gs, fork_hook);
+
 //    evaluate_square_control(gs, stosq("d5")).print();
 
 //    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("d7"), {0, 0}, r, r});
