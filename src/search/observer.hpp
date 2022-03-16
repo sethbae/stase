@@ -11,9 +11,9 @@ public:
 
     Observer(const std::string & filepath) : filepath(filepath) {}
 
-    void open_visit(const SearchNode * node) {}
-    void close_visit(const SearchNode * node) {}
-    void open_deepen(const SearchNode * node) {}
-    void close_deepen(const SearchNode * node) {}
+    inline void open_visit(const SearchNode * node) {}
+    inline void close_visit(const SearchNode * node) {}
+    inline void open_deepen(const SearchNode * node) {}
+    inline void close_deepen(const SearchNode * node) {}
 
 };

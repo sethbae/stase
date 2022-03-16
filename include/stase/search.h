@@ -4,10 +4,7 @@
 #include "board.h"
 #include "game.h"
 
-#include <chrono>
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-#include <pthread.h>
+class Observer;
 
 struct SearchNode {
 
@@ -21,8 +18,6 @@ struct SearchNode {
     unsigned short visit_count;
 
 };
-
-class Observer;
 
 std::vector<Move> greedy_search(const std::string &, int, Observer * o = nullptr);
 std::vector<Move> greedy_search(SearchNode *, int, Observer * o = nullptr);

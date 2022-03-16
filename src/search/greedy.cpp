@@ -1,9 +1,11 @@
 #include <iostream>
+#include <chrono>
+
 #include "search.h"
 #include "game.h"
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
-#include "metrics.h"
+#include "observer.hpp"
 
 const int CRITICAL_THRESHOLD = 0;
 const int MEDIAL_THRESHOLD = 2;
@@ -18,15 +20,6 @@ const int CRITICAL_DEPTH = 2;
 const int MEDIAL_DEPTH = 1;
 const int FINAL_DEPTH = 1;
 const int LEGAL_DEPTH = 1;
-
-inline bool is_present_in_list(const std::vector<Move> & list, const Move m) {
-    for (int i = 0; i < list.size(); ++i) {
-        if (equal(list[i], m)) {
-            return true;
-        }
-    }
-    return false;
-}
 
 /**
  * Extends the CandSet of the given node to include legal moves. It removes from this list
@@ -141,6 +134,8 @@ bool visit_node(SearchNode * node, Observer * obs = nullptr) {
     if (node->gs->has_been_mated) {
         return false;
     }
+
+    if (obs) { obs->open_visit(node); }
 
     switch (node->visit_count) {
         case CRITICAL_THRESHOLD:
