@@ -5,7 +5,7 @@
 #include "game.h"
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
-#include "observer.hpp"
+#include "metrics.h"
 
 const int CRITICAL_THRESHOLD = 0;
 const int MEDIAL_THRESHOLD = 2;
