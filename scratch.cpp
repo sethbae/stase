@@ -559,11 +559,13 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_with_node_limit(fen, 25000);
-    std::cout << fetch_node_count() << "\n";
+//    run_with_node_limit(fen, 25000);
+//    std::cout << fetch_node_count() << "\n";
 
-//    greedy_search(fen, 5);
+    Observer o("stase_stack");
+    greedy_search(fen, 4, o);
 
+    o.write();
 //    discover_feature_frames(gs, king_pinned_pieces_hook);
 //    show_hook_frames(gs, fork_hook);
 
