@@ -242,7 +242,7 @@ bool force_visit_best_line(SearchNode * node, O & obs) {
  * Returns true if any descendant of the given node was materially updated (ie new
  * moves + nodes), and false otherwise.
  */
- template <typename O>
+template <typename O>
 bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
 
     if (node == nullptr) { return false; }
