@@ -58,8 +58,7 @@ void add_legal_moves(SearchNode * node) {
  * If given a depth of 0, nothing will happen.
  * Returns true if new nodes are created, false otherwise.
  */
-template <typename O>
-bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burst=false) {
+bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bool burst=false) {
 
     // exit conditions
     check_abort();
@@ -141,8 +140,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, O & obs, bool burs
  * about the node except to update its score.
  * Returns true if new nodes were deepened and false otherwise.
  */
-template <typename O>
-bool visit_node(SearchNode * node, O & obs) {
+bool visit_node(SearchNode * node, Observer & obs) {
 
     if (node->gs->has_been_mated) {
         return false;
@@ -187,8 +185,7 @@ bool visit_node(SearchNode * node, O & obs) {
  * excluding legal moves.
  * Returns true if any new nodes were in fact extended.
  */
-template <typename O>
-bool force_visit(SearchNode * node, O & obs) {
+bool force_visit(SearchNode * node, Observer & obs) {
 
     bool changes = false;
 
@@ -220,8 +217,7 @@ bool force_visit(SearchNode * node, O & obs) {
  * so the line visited is that which is the best line in the initial position.
  * Returns true if any changes were made, false otherwise.
  */
-template<typename O>
-bool force_visit_best_line(SearchNode * node, O & obs) {
+bool force_visit_best_line(SearchNode * node, Observer & obs) {
 
     if (node == nullptr) { return false; }
 
@@ -242,8 +238,7 @@ bool force_visit_best_line(SearchNode * node, O & obs) {
  * Returns true if any descendant of the given node was materially updated (ie new
  * moves + nodes), and false otherwise.
  */
-template <typename O>
-bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
+bool visit_best_line(SearchNode * node, bool in_swing, Observer & obs) {
 
     if (node == nullptr) { return false; }
 
@@ -263,8 +258,7 @@ bool visit_best_line(SearchNode * node, bool in_swing, O & obs) {
 
 }
 
-template <typename O>
-std::vector<Move> greedy_search(SearchNode * root, int cycles, O & obs) {
+std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 
     if (root->score == zero()) {
         root->score = heur(*root->gs);
@@ -306,8 +300,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, O & obs) {
     return moves;
 }
 
-template <typename O>
-std::vector<Move> greedy_search(const std::string & fen, int cycles, O & obs) {
+std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer & obs) {
 
     // set up the root node
     Gamestate root_gs(fen);
@@ -325,9 +318,6 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles, O & obs) {
     return greedy_search(&root, cycles, obs);
 
 }
-template std::vector<Move> greedy_search<NullObserver>(const std::string &, int, NullObserver &);
-template std::vector<Move> greedy_search<Observer>(const std::string &, int, Observer &);
-
 
 Eval trust_score(SearchNode * node, bool is_white) {
 

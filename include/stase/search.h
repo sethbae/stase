@@ -17,10 +17,35 @@ struct SearchNode {
 
 };
 
-template <typename O>
-std::vector<Move> greedy_search(const std::string &, int, O &);
-template <typename O>
-std::vector<Move> greedy_search(SearchNode *, int, O &);
+enum SearchEvent {
+    VISIT,
+    VISIT_LINE,
+    FORCE_VISIT,
+    FORCE_VISIT_LINE,
+    DEEPEN
+};
+
+inline std::string name(SearchEvent ev) {
+    switch (ev) {
+        case VISIT: return "visit";
+        case VISIT_LINE: return "visit_l";
+        case FORCE_VISIT: return "f_visit";
+        case FORCE_VISIT_LINE: return "f_visit_l";
+        case DEEPEN: return "deepen";
+        default: return "unknown event";
+    }
+}
+
+class Observer {
+
+public:
+    virtual void open_event(const SearchNode *, const SearchEvent) = 0;
+    virtual void close_event(const SearchNode *, const SearchEvent) = 0;
+
+};
+
+std::vector<Move> greedy_search(const std::string &, int, Observer &);
+std::vector<Move> greedy_search(SearchNode *, int, Observer &);
 
 void search_indefinite(SearchNode *);
 void delete_tree(SearchNode *);

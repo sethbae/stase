@@ -2,7 +2,6 @@
 #define STASE_METRICS_H
 
 #include "search_tools.h"
-#include "observer.hpp"
 
 int node_count();
 void register_new_node();

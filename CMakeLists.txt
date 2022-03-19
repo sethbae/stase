@@ -43,7 +43,9 @@ set(SOURCE_FILES
         src/search/thread.h
         src/search/search_tools.h
         src/search/search_tools.cpp
-        src/search/observer.hpp
+        src/search/observers/xml_observer.hpp
+        src/search/observers/observers.hpp
+        src/search/observers/null_observer.hpp
 
         src/game/cands/cands.h
         src/game/cands/score.h
@@ -128,7 +130,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_in_check.cpp
         src/test/board/test_castling.cpp
         src/test/board/test_mutate.cpp
-        src/test/board/test_move.cpp)
+        src/test/board/test_move.cpp src/test/search/test_observer.hpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

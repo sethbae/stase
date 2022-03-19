@@ -20,6 +20,8 @@ using std::ofstream;
 #include "src/test/test.h"
 #include "src/search/search_tools.h"
 #include "src/search/metrics.h"
+#include "src/search/observers/observers.hpp"
+
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"
 
@@ -562,7 +564,7 @@ int main(int argc, char** argv) {
 //    run_with_node_limit(fen, 25000);
 //    std::cout << fetch_node_count() << "\n";
 
-    Observer o("stase_stack");
+    XMLObserver o("stase_stack");
     greedy_search(fen, 4, o);
 
     o.write();

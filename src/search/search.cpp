@@ -5,6 +5,7 @@
 #include "../game/gamestate.hpp"
 #include "../game/eval.hpp"
 #include "metrics.h"
+#include "observers/observers.hpp"
 
 #include <vector>
 using std::vector;
