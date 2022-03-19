@@ -6,8 +6,8 @@
 class NullObserver : public Observer {
 
 public:
-    inline void open_event(const SearchNode * node, SearchEvent ev) {}
-    inline void close_event(const SearchNode * node, SearchEvent ev) {}
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList *) {}
+    inline void close_event(const SearchNode * node, const SearchEvent ev, const CandList *) {}
 
 };
 

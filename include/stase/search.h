@@ -39,8 +39,8 @@ inline std::string name(SearchEvent ev) {
 class Observer {
 
 public:
-    virtual void open_event(const SearchNode *, const SearchEvent) = 0;
-    virtual void close_event(const SearchNode *, const SearchEvent) = 0;
+    virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
+    virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
 
 };
 

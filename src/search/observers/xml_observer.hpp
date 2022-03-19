@@ -18,7 +18,7 @@ public:
 
     XMLObserver(const std::string & filepath) : filepath(filepath) {}
 
-    inline void open_event(const SearchNode * node, const SearchEvent ev) {
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
         const std::string move = (is_sentinel(node->move))
                 ? ""
                 : '"' + move2uci(node->move) + '"';
@@ -27,7 +27,7 @@ public:
         ++indent_level;
     }
 
-    inline void close_event(const SearchNode * node, const SearchEvent ev) {
+    inline void close_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
         const std::string move = (is_sentinel(node->move))
                  ? ""
                  : '"' + move2uci(node->move) + '"';
