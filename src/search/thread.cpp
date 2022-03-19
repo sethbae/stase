@@ -7,17 +7,19 @@
 struct EngineParams {
     pthread_t t_id;
     SearchNode * root;
+    Observer * obs;
     Move best_move;
     int nodes;
 };
 
 EngineParams current_running_config =
-        {
-            0,
-            nullptr,
-            MOVE_SENTINEL,
-            0
-        };
+    {
+        0,
+        nullptr,
+        nullptr,
+        MOVE_SENTINEL,
+        0
+    };
 
 /**
  * Interrupts the calling thread. Immediately exits with no cleanup.
@@ -33,7 +35,7 @@ void * start(void *) {
 
     reset_node_count();
     reset_abort_flag();
-    search_indefinite(current_running_config.root);
+    search_indefinite(current_running_config.root, current_running_config.obs);
 
     return nullptr;
 }
@@ -42,19 +44,21 @@ void * start(void *) {
  * Starts analysing the given fen in the background. Returns a handle to the thread used
  * which can be used to cancel it later.
  */
-void run_in_background(const std::string & fen) {
+void run_in_background(const std::string & fen, Observer * obs) {
 
     current_running_config.root =
-            new SearchNode{
-                    fresh_gamestate(fen),
-                    new CandSet,
-                    zero(),
-                    MOVE_SENTINEL,
-                    {},
-                    nullptr,
-                    nullptr,
-                    0
-            };
+        new SearchNode{
+            fresh_gamestate(fen),
+            new CandSet,
+            zero(),
+            MOVE_SENTINEL,
+            {},
+            nullptr,
+            nullptr,
+            0
+        };
+
+    current_running_config.obs = obs;
 
     pthread_t t_id;
 
@@ -68,9 +72,9 @@ void run_in_background(const std::string & fen) {
     current_running_config.t_id = t_id;
 }
 
-void run_with_node_limit(const std::string & fen, int node_limit) {
+void run_with_node_limit(const std::string & fen, int node_limit, Observer * obs) {
     set_node_limit(node_limit);
-    run_in_background(fen);
+    run_in_background(fen, obs);
     pthread_join(current_running_config.t_id, nullptr);
     clear_node_limit();
 }
