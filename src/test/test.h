@@ -137,6 +137,7 @@ bool test_promotion_hook();
 bool test_discovered_hook();
 
 bool test_cand_list_ordering();
+bool test_cand_list_visit_counts();
 
 bool stress_test_main();
 

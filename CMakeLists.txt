@@ -132,8 +132,9 @@ set(TEST_SOURCE_FILES
         src/test/board/test_mutate.cpp
         src/test/board/test_move.cpp
 
+        src/test/search/test_search.cpp
         src/test/search/test_cand_list_ordering.cpp
-        src/test/search/test_search.cpp)
+        src/test/search/test_cand_list_visit_counts.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)
