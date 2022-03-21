@@ -53,13 +53,29 @@ struct Move {
 /**
  * Some basic special values and utility functions.
  */
+
 const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, SQUARE_SENTINEL, 0};
+
 constexpr Move empty_move() {
     return Move{0, 0, 0, 0, 0};
-};
-inline bool is_sentinel(const Move m) { return equal(m.from, SQUARE_SENTINEL); }
+}
+
+inline bool is_sentinel(const Move m) {
+    return equal(m.from, SQUARE_SENTINEL);
+}
+
+/**
+ * Returns true iff the two moves start from and end at the same squares.
+ */
 inline bool equal(const Move m1, const Move m2) {
     return equal(m1.from, m2.from) && equal(m1.to, m2.to);
+}
+
+/**
+ * Returns true if the two moves are equal (qv) and if their promotion pieces match.
+ */
+inline bool equal_exactly(const Move m1, const Move m2) {
+    return equal(m1, m2) && m1.get_prom_shift() == m2.get_prom_shift();
 }
 
 /**
