@@ -12,12 +12,17 @@ private:
     const std::string filepath;
     std::vector<std::string> current_line;
     std::vector<std::string> buffer;
+    // we count indents from 1 so that the <main> tag can sit at the global level
     int indent_level = 1;
 
 public:
 
     XMLObserver(const std::string & filepath) : filepath(filepath) {}
 
+    /**
+     * Opens a new tag for the given event, and records some text on the same line. Causes a nested
+     * layer in the output.
+     */
     inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
         const std::string move = to_string(node) + " " +
                 ((is_sentinel(node->move))
@@ -29,10 +34,22 @@ public:
         ++indent_level;
     }
 
+    /**
+     * Closes a previously opened tag without any other text and reduces the indentation accordingly.
+     */
     inline void close_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
         --indent_level;
         buffer.push_back(indent(indent_level) + "</" + name(ev) + ">");
         current_line.pop_back();
+    }
+
+    /**
+     * Prints a single line for the event, eg <begin_burst>0x123456789</begin_burst>
+     */
+    inline void register_event(const SearchNode * node, const SearchEvent ev) {
+        buffer.push_back(
+            indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + "</" + name(ev) + ">\n"
+        );
     }
 
     inline void write() {
@@ -45,8 +62,6 @@ public:
         file << "</main>\n";
         file.close();
     }
-
-    inline void register_event(const SearchNode * node, const SearchEvent ev) {}
 
 private:
 
