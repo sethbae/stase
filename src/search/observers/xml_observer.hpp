@@ -18,21 +18,20 @@ public:
 
     XMLObserver(const std::string & filepath) : filepath(filepath) {}
 
-    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
-        const std::string move = (is_sentinel(node->move))
-                ? ""
-                : '"' + move2uci(node->move) + '"';
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+        const std::string move = to_string(node) + " " +
+                ((is_sentinel(node->move))
+                    ? ""
+                    : move2uci(node->move) + " ")
+                + (cand_list ? name(*cand_list) : "");
         current_line.push_back(move2uci(node->move));
         buffer.push_back(indent(indent_level) + "<" + name(ev) + ">" + move);
         ++indent_level;
     }
 
     inline void close_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
-        const std::string move = (is_sentinel(node->move))
-                 ? ""
-                 : '"' + move2uci(node->move) + '"';
         --indent_level;
-        buffer.push_back(indent(indent_level) + "</" + name(ev) + ">" + move);
+        buffer.push_back(indent(indent_level) + "</" + name(ev) + ">");
         current_line.pop_back();
     }
 
