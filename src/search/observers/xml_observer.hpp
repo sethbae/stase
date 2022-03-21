@@ -48,7 +48,7 @@ public:
      */
     inline void register_event(const SearchNode * node, const SearchEvent ev) {
         buffer.push_back(
-            indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + "</" + name(ev) + ">\n"
+            indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + "</" + name(ev) + ">"
         );
     }
 
