@@ -22,7 +22,7 @@ public:
             return;
         }
 
-        if (ev == DEEPEN) {
+        if (ev == DEEPEN || ev == BURST_DEEPEN) {
             switch (*cand_list) {
                 case CRITICAL:
                     break;
@@ -96,8 +96,6 @@ const TestSet<std::string> search_cand_list_test_set{
 };
 
 bool evaluate_cand_list_test_case(const std::string * fen) {
-
-    std::cout << "Evaluating test case\n";
 
     CandListOrderingObserver obs;
     run_with_node_limit(*fen, 25000, obs);
