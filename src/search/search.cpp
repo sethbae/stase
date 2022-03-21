@@ -276,14 +276,6 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
  * Extends the search tree indefinitely from the root. This function will never return and
  * is intended to be used in a multi-threaded context only.
  */
-void search_indefinite(SearchNode * root) {
-    search_indefinite(root, DEFAULT_OBSERVER);
-}
-
-/**
- * Extends the search tree indefinitely from the root. This function will never return and
- * is intended to be used in a multi-threaded context only.
- */
 void search_indefinite(SearchNode * root, Observer & o) {
     greedy_search(root, -1, o);
 }

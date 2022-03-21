@@ -66,10 +66,6 @@ void * start(void *) {
  * Starts analysing the given fen in the background. Returns a handle to the thread used
  * which can be used to cancel it later.
  */
-void run_in_background(const std::string & fen) {
-    run_in_background(fen, DEFAULT_OBSERVER);
-}
-
 void run_in_background(const std::string & fen, Observer & obs) {
 
     delete current_running_config;
@@ -85,10 +81,6 @@ void run_in_background(const std::string & fen, Observer & obs) {
     );
 
     current_running_config->t_id = t_id;
-}
-
-void run_with_node_limit(const std::string & fen, int node_limit) {
-    run_with_node_limit(fen, node_limit, DEFAULT_OBSERVER);
 }
 
 void run_with_node_limit(const std::string & fen, int node_limit, Observer & obs) {
