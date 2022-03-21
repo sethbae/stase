@@ -46,7 +46,7 @@ void add_legal_moves(SearchNode * node) {
         // check in children
         bool already_created = false;
         for (int j = 0; j < node->children.size(); ++j) {
-            if (equal(node->children[j]->move, legals[i])) {
+            if (equal_exactly(node->children[j]->move, legals[i])) {
                 already_created = true;
                 break;
             }
