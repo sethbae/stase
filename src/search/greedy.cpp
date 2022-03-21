@@ -64,27 +64,27 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     check_abort();
     if (node->gs->has_been_mated) { return false; }
 
-    obs.open_event(node, DEEPEN);
+    obs.open_event(node, DEEPEN, &cand_list);
 
     if (depth == 0) {
 
         if (burst) {
-            obs.close_event(node, DEEPEN);
+            obs.close_event(node, DEEPEN, &cand_list);
             return false;
         }
 
         if (quiess(*node->gs) >= QUIESS_THRESHOLD) {
             bool result = deepen(node, CRITICAL, BURST_DEPTH, obs, true);
-            obs.close_event(node, DEEPEN);
+            obs.close_event(node, DEEPEN, &cand_list);
             return result;
         } else {
-            obs.close_event(node, DEEPEN);
+            obs.close_event(node, DEEPEN, &cand_list);
             return false;
         }
     }
 
     if (burst && quiess(*node->gs) < QUIESS_THRESHOLD) {
-        obs.close_event(node, DEEPEN);
+        obs.close_event(node, DEEPEN, &cand_list);
         return false;
     }
 
@@ -101,7 +101,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
                         || changes;
         }
         update_score(node);
-        obs.close_event(node, DEEPEN);
+        obs.close_event(node, DEEPEN, &cand_list);
         return changes;
     }
 
@@ -130,7 +130,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     update_score(node);
-    obs.close_event(node, DEEPEN);
+    obs.close_event(node, DEEPEN, &cand_list);
     return changes;
 }
 

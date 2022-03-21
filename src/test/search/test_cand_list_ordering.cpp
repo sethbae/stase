@@ -5,13 +5,18 @@
 
 class CandListOrderingObserver : public Observer {
 
-public:
+private:
+    unsigned null_count = 0;
+    unsigned visit_count = 0;
     bool passed = true;
-    int null_count = 0;
+
+public:
     std::vector<std::string> diagnostics;
 
     inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
 
+        // update the counters
+        ++visit_count;
         if (!node || !node->cand_set || !cand_list) {
             ++null_count;
             return;
@@ -46,6 +51,14 @@ public:
     inline void close_event(const SearchNode * node, const SearchEvent, const CandList *) {}
 
     inline bool passed_test() {
+        if (visit_count == 0) {
+            diagnostics.push_back("Test failed because the observer was not visited.\n");
+            return false;
+        }
+        double null_rate = null_count / visit_count;
+        if (null_rate > 0.25) {
+            diagnostics.push_back("Test failed because the observer received more than 25% of visits with nullptr.\n");
+        }
         return passed;
     }
 
@@ -54,7 +67,7 @@ private:
     inline void fail_test(const SearchNode * node, const CandList * cand_list) {
         diagnostics.push_back(
             board_to_fen(node->gs->board)
-            + ": Called with " + name(*cand_list) + " with CandSet sizes ("
+            + ": Deepened " + name(*cand_list) + " with CandSet sizes ("
             + std::to_string(node->cand_set->critical.size()) + ","
             + std::to_string(node->cand_set->medial.size()) + ","
             + std::to_string(node->cand_set->final.size()) + ","
@@ -80,8 +93,6 @@ bool evaluate_cand_list_test_case(const std::string * fen) {
 
     CandListOrderingObserver obs;
     run_with_node_limit(*fen, 25000, obs);
-
-    std::cout << "Nulls: " << obs.null_count << "\n";
 
     if (!obs.passed_test()) {
         for (const std::string & diag : obs.diagnostics) {
