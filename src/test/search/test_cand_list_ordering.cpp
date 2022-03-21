@@ -61,6 +61,12 @@ public:
         if (null_rate > 0.25) {
             diagnostics.push_back("Test failed because the observer received more than 25% of visits with nullptr.\n");
         }
+
+        diagnostics.push_back(
+            "There were "
+            + std::to_string(diagnostics.size())
+            + " errors encountered.\n"
+        );
         return passed;
     }
 
