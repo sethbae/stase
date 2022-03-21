@@ -456,20 +456,41 @@ SearchNode * repl_seconds(const std::string & fen) {
 
 }
 
+SearchNode * repl_nodes(const std::string & fen) {
+    std::string input;
+
+    cout << "Enter number of nodes to analyse for: ";
+    std::cin >> input;
+    int n = std::stoi(input);
+
+    cout << "\nAnalysing...";
+    cout.flush();
+
+    run_with_node_limit(fen, n);
+    cout << "done\n";
+
+    return fetch_root();
+}
+
 void repl(const std::string & fen) {
 
     std::string input;
 
-    cout << "Run engine for cycles or for seconds (c/s)? ";
+    cout << "Run engine for cycles/seconds/nodes (c/s/n)? ";
     std::cin >> input;
     bool use_seconds = (input == "s");
 
-    SearchNode * root;
-
-    if (use_seconds) {
-        root = repl_seconds(fen);
-    } else {
-        root = repl_cycles(fen);
+    SearchNode * root = nullptr;
+    while (!root) {
+        if (input == "s") {
+            root = repl_seconds(fen);
+        } else if (input == "c") {
+            root = repl_cycles(fen);
+        } else if (input == "n") {
+            root = repl_nodes(fen);
+        } else {
+            cout << "unknown unit\n";
+        }
     }
 
     bool cont = true;
@@ -559,15 +580,17 @@ int main(int argc, char** argv) {
 
 //    q_scores();
 
-//    repl(fen);
+    repl(fen);
 
 //    run_with_node_limit(fen, 25000);
 //    std::cout << fetch_node_count() << "\n";
 
-    XMLObserver o("stase_stack");
-    greedy_search(fen, 4, o);
+//    XMLObserver o("stase_stack");
+//    greedy_search(fen, 4, o);
+//
+//    o.write();
 
-    o.write();
+
 //    discover_feature_frames(gs, king_pinned_pieces_hook);
 //    show_hook_frames(gs, fork_hook);
 
