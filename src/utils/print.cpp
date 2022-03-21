@@ -1,5 +1,4 @@
 #include <string>
-using std::string;
 #include <cstring>
 
 #include "utils.h"
@@ -20,7 +19,7 @@ std::string dp_2(double d) {
 
     if (i + 1 >= original.size()) {
         characters[i + 2] = '\0';
-        string str(&characters[0]);
+        std::string str(&characters[0]);
         return str;
     }
 
@@ -33,7 +32,7 @@ std::string dp_2(double d) {
         } else {
             // does overflow
             characters[i - 1] = '\0';
-            string str(&characters[0]);
+            std::string str(&characters[0]);
             int num = std::stoi(str);  // to int
             ++num;
             str = std::to_string(num);  // to string
@@ -45,7 +44,7 @@ std::string dp_2(double d) {
     }
 
     characters[i + 2] = '\0';
-    string str(&characters[0]);
+    std::string str(&characters[0]);
     return str;
 
 }
