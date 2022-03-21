@@ -98,6 +98,7 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 bool test_board();
 bool test_game();
+bool test_search();
 
 bool test_pieces();
 bool test_set_get_square();
@@ -134,6 +135,8 @@ bool test_pin_skewer_hook();
 bool test_king_pinned_pieces_hook();
 bool test_promotion_hook();
 bool test_discovered_hook();
+
+bool test_cand_list_ordering();
 
 bool stress_test_main();
 

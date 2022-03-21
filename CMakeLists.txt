@@ -130,7 +130,10 @@ set(TEST_SOURCE_FILES
         src/test/board/test_in_check.cpp
         src/test/board/test_castling.cpp
         src/test/board/test_mutate.cpp
-        src/test/board/test_move.cpp src/test/search/test_observer.hpp)
+        src/test/board/test_move.cpp
+
+        src/test/search/test_cand_list_ordering.cpp
+        src/test/search/test_search.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)
