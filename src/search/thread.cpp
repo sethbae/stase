@@ -3,10 +3,6 @@
 #include <search.h>
 #include "metrics.h"
 #include "thread.h"
-#include "observers/null_observer.hpp"
-
-static NullObserver default_obs;
-
 
 class EngineConfiguration {
 
@@ -20,28 +16,10 @@ public:
     EngineConfiguration():
         t_id(0),
         root(nullptr),
-        obs(default_obs),
+        obs(DEFAULT_OBSERVER),
         best_move(MOVE_SENTINEL),
         nodes(0)
     {}
-
-    EngineConfiguration(const std::string & fen):
-        t_id(0),
-        obs(default_obs),
-        best_move(MOVE_SENTINEL),
-        nodes(0)
-    {
-        root = new SearchNode{
-            fresh_gamestate(fen),
-            new CandSet,
-            zero(),
-            MOVE_SENTINEL,
-            {},
-            nullptr,
-            nullptr,
-            0
-        };
-    }
 
     EngineConfiguration(const std::string & fen, Observer & o):
         t_id(0),
@@ -89,7 +67,7 @@ void * start(void *) {
  * which can be used to cancel it later.
  */
 void run_in_background(const std::string & fen) {
-    run_in_background(fen, default_obs);
+    run_in_background(fen, DEFAULT_OBSERVER);
 }
 
 void run_in_background(const std::string & fen, Observer & obs) {
@@ -110,7 +88,7 @@ void run_in_background(const std::string & fen, Observer & obs) {
 }
 
 void run_with_node_limit(const std::string & fen, int node_limit) {
-    run_with_node_limit(fen, node_limit, default_obs);
+    run_with_node_limit(fen, node_limit, DEFAULT_OBSERVER);
 }
 
 void run_with_node_limit(const std::string & fen, int node_limit, Observer & obs) {

@@ -38,9 +38,6 @@ public:
         }
     }
 
-    void close_event(const SearchNode *, const SearchEvent, const CandList *) {}
-    void register_event(const SearchNode *, const SearchEvent) {}
-
     bool passed_test() {
         diagnostics.push_back(
             "There were "

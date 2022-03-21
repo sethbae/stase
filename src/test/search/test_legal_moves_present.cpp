@@ -12,8 +12,6 @@ private:
 public:
     std::vector<std::string> diagnostics;
 
-    void open_event(const SearchNode *, const SearchEvent, const CandList *) {}
-
     void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
 
         if (!cand_list) { return; }
@@ -43,8 +41,6 @@ public:
             }
         }
     }
-
-    void register_event(const SearchNode *, const SearchEvent) {}
 
     bool passed_test() {
         if (!total) {

@@ -277,8 +277,7 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
  * is intended to be used in a multi-threaded context only.
  */
 void search_indefinite(SearchNode * root) {
-    NullObserver n;
-    search_indefinite(root, n);
+    search_indefinite(root, DEFAULT_OBSERVER);
 }
 
 /**

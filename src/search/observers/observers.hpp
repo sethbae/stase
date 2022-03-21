@@ -10,8 +10,6 @@
  *
  */
 
-#include "null_observer.hpp"
-
 #include "xml_observer.hpp"
 
 

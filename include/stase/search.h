@@ -40,14 +40,25 @@ inline std::string name(SearchEvent ev) {
     }
 }
 
+/**
+ * The Observer class can be used to monitor a search at runtime. Potential applications
+ * include recording the order of paths explored (XMLObserver) or various correctness tests.
+ * It is an abstract class whose methods can be selectively overridden as required.
+ */
 class Observer {
 
 public:
-    virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
-    virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
-    virtual void register_event(const SearchNode *, const SearchEvent) = 0;
+    virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) {}
+    virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) {}
+    virtual void register_event(const SearchNode *, const SearchEvent) {}
 
 };
+
+/**
+ * The default observer should be used when an observer is not required: it does nothing and
+ * should get optimised away with no performance cost at all.
+ */
+static Observer DEFAULT_OBSERVER;
 
 std::vector<Move> greedy_search(const std::string &, int, Observer &);
 std::vector<Move> greedy_search(SearchNode *, int, Observer &);

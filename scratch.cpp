@@ -427,8 +427,7 @@ SearchNode * repl_cycles(const std::string & fen) {
             0
     };
 
-    NullObserver n;
-    greedy_search(root, cycles, n);
+    greedy_search(root, cycles, DEFAULT_OBSERVER);
     cout << "done\n";
 
     return root;

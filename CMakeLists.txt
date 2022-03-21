@@ -45,7 +45,6 @@ set(SOURCE_FILES
         src/search/search_tools.cpp
         src/search/observers/xml_observer.hpp
         src/search/observers/observers.hpp
-        src/search/observers/null_observer.hpp
 
         src/game/cands/cands.h
         src/game/cands/score.h
