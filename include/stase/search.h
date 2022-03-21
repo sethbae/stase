@@ -47,16 +47,19 @@ public:
 std::vector<Move> greedy_search(const std::string &, int, Observer &);
 std::vector<Move> greedy_search(SearchNode *, int, Observer &);
 
-void search_indefinite(SearchNode *, Observer * = nullptr);
+void search_indefinite(SearchNode *);
+void search_indefinite(SearchNode *, Observer &);
 void delete_tree(SearchNode *);
 
 int subtree_size(SearchNode *);
 int subtree_depth(SearchNode *);
-void write_to_file(SearchNode*, std::ostream &);
+void write_to_file(SearchNode *, std::ostream &);
 void write_to_file_recursively(SearchNode*, std::ostream &);
 
-void run_in_background(const std::string & fen, Observer * = nullptr);
-void run_with_node_limit(const std::string & fen, int, Observer * = nullptr);
+void run_in_background(const std::string & fen);
+void run_in_background(const std::string & fen, Observer &);
+void run_with_node_limit(const std::string & fen, int);
+void run_with_node_limit(const std::string & fen, int, Observer &);
 
 void stop_engine(bool cleanup=true);
 Move fetch_best_move();

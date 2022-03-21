@@ -3,23 +3,67 @@
 #include <search.h>
 #include "metrics.h"
 #include "thread.h"
+#include "observers/null_observer.hpp"
 
-struct EngineParams {
+static NullObserver default_obs;
+
+
+class EngineConfiguration {
+
+public:
     pthread_t t_id;
     SearchNode * root;
-    Observer * obs;
+    Observer & obs;
     Move best_move;
     int nodes;
+
+    EngineConfiguration():
+        t_id(0),
+        root(nullptr),
+        obs(default_obs),
+        best_move(MOVE_SENTINEL),
+        nodes(0)
+    {}
+
+    EngineConfiguration(const std::string & fen):
+        t_id(0),
+        obs(default_obs),
+        best_move(MOVE_SENTINEL),
+        nodes(0)
+    {
+        root = new SearchNode{
+            fresh_gamestate(fen),
+            new CandSet,
+            zero(),
+            MOVE_SENTINEL,
+            {},
+            nullptr,
+            nullptr,
+            0
+        };
+    }
+
+    EngineConfiguration(const std::string & fen, Observer & o):
+        t_id(0),
+        obs(o),
+        best_move(MOVE_SENTINEL),
+        nodes(0)
+    {
+        root = new SearchNode{
+            fresh_gamestate(fen),
+            new CandSet,
+            zero(),
+            MOVE_SENTINEL,
+            {},
+            nullptr,
+            nullptr,
+            0
+        };
+    }
+
 };
 
-EngineParams current_running_config =
-    {
-        0,
-        nullptr,
-        nullptr,
-        MOVE_SENTINEL,
-        0
-    };
+EngineConfiguration * current_running_config = nullptr;
 
 /**
  * Interrupts the calling thread. Immediately exits with no cleanup.
@@ -35,7 +79,7 @@ void * start(void *) {
 
     reset_node_count();
     reset_abort_flag();
-    search_indefinite(current_running_config.root, current_running_config.obs);
+    search_indefinite(current_running_config->root, current_running_config->obs);
 
     return nullptr;
 }
@@ -44,38 +88,35 @@ void * start(void *) {
  * Starts analysing the given fen in the background. Returns a handle to the thread used
  * which can be used to cancel it later.
  */
-void run_in_background(const std::string & fen, Observer * obs) {
+void run_in_background(const std::string & fen) {
+    run_in_background(fen, default_obs);
+}
 
-    current_running_config.root =
-        new SearchNode{
-            fresh_gamestate(fen),
-            new CandSet,
-            zero(),
-            MOVE_SENTINEL,
-            {},
-            nullptr,
-            nullptr,
-            0
-        };
+void run_in_background(const std::string & fen, Observer & obs) {
 
-    current_running_config.obs = obs;
+    delete current_running_config;
+    current_running_config = new EngineConfiguration(fen, obs);
 
     pthread_t t_id;
 
     pthread_create(
-            &t_id,
-            nullptr,
-            &start,
-            nullptr
+        &t_id,
+        nullptr,
+        &start,
+        nullptr
     );
 
-    current_running_config.t_id = t_id;
+    current_running_config->t_id = t_id;
 }
 
-void run_with_node_limit(const std::string & fen, int node_limit, Observer * obs) {
+void run_with_node_limit(const std::string & fen, int node_limit) {
+    run_with_node_limit(fen, node_limit, default_obs);
+}
+
+void run_with_node_limit(const std::string & fen, int node_limit, Observer & obs) {
     set_node_limit(node_limit);
     run_in_background(fen, obs);
-    pthread_join(current_running_config.t_id, nullptr);
+    pthread_join(current_running_config->t_id, nullptr);
     clear_node_limit();
 }
 
@@ -87,17 +128,17 @@ void stop_engine(bool cleanup) {
 
     // kill the thread and wait for it to exit
     abort_analysis();
-    pthread_join(current_running_config.t_id, nullptr);
+    pthread_join(current_running_config->t_id, nullptr);
     reset_abort_flag();
 
     // retrieve info from the run
-    if (current_running_config.root) {
-        current_running_config.nodes = node_count();
-        current_running_config.best_move = current_best_move(current_running_config.root);
+    if (current_running_config->root) {
+        current_running_config->nodes = node_count();
+        current_running_config->best_move = current_best_move(current_running_config->root);
     }
 
     // and delete the search tree
-    if (cleanup) { delete_tree(current_running_config.root); }
+    if (cleanup) { delete_tree(current_running_config->root); }
 
 }
 
@@ -107,7 +148,7 @@ void stop_engine(bool cleanup) {
  * likely to be meaningful.
  */
 Move fetch_best_move() {
-    return current_running_config.best_move;
+    return current_running_config->best_move;
 }
 
 /**
@@ -115,11 +156,11 @@ Move fetch_best_move() {
  * only safe to use after the engine has been stopped.
  */
 int fetch_node_count() {
-    return current_running_config.nodes;
+    return current_running_config->nodes;
 }
 
 SearchNode * fetch_root() {
-    return current_running_config.root;
+    return current_running_config->root;
 }
 
 bool engine_abort = false;
