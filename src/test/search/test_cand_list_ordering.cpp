@@ -87,7 +87,7 @@ private:
 };
 
 const TestSet<std::string> search_cand_list_test_set{
-    "search-cand-list",
+    "search-cand-list-ordering",
     {
         "r2qkbnr/pp1bpppp/3p4/2p5/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 5",
         "3r1rk1/p1q2ppp/2bbpn2/1pp5/8/1P1P1NP1/PBPN1P1P/R2Q1RK1 w - - 0 14",
