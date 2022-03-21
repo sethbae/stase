@@ -84,8 +84,12 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     obs.open_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
 
-    // if no early exit, this counts as a visit
-    ++node->visit_count;
+    // no early exits: this counts as a visit unless in a burst (bursts
+    // will only extend CRITICAL, so it doesn't make sense to count
+    // higher than that).
+    if (!burst || node->visit_count <= CRITICAL_THRESHOLD) {
+        ++node->visit_count;
+    }
 
     // fetch list to extend
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
