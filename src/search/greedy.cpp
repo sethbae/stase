@@ -201,18 +201,18 @@ bool force_visit(SearchNode * node, Observer & obs) {
     obs.open_event(node, FORCE_VISIT);
 
     if (node->visit_count <= __constants::CRITICAL_THRESHOLD) {
+        node->visit_count = __constants::CRITICAL_THRESHOLD;
         changes = deepen(node, CRITICAL, __constants::CRITICAL_DEPTH, obs);
-        node->visit_count = __constants::CRITICAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < __constants::MEDIAL_THRESHOLD) {
+        node->visit_count = __constants::MEDIAL_THRESHOLD;
         changes = deepen(node, MEDIAL, __constants::MEDIAL_DEPTH, obs);
-        node->visit_count = __constants::MEDIAL_THRESHOLD + 1;
     }
 
     if (!changes && node->visit_count < __constants::FINAL_THRESHOLD) {
+        node->visit_count = __constants::FINAL_THRESHOLD;
         changes = deepen(node, FINAL, __constants::FINAL_DEPTH, obs);
-        node->visit_count = __constants::FINAL_THRESHOLD + 1;
     }
 
     obs.close_event(node, FORCE_VISIT);
