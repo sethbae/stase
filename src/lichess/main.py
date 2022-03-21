@@ -119,7 +119,6 @@ def play_games(max_concurrent: int) -> None:
     print("Waiting for incoming challenges.")
 
     for event in stream_incoming_events(token):
-        print(f"Received event {event}")
         if "error" in event:
             print(f"Received error: {event}")
         elif event["type"] == "challenge":
