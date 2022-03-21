@@ -5,6 +5,7 @@
 #include "../game/gamestate.hpp"
 #include "../game/eval.hpp"
 #include "metrics.h"
+#include "observers/observers.hpp"
 
 #include <vector>
 using std::vector;
@@ -272,11 +273,11 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
 }
 
 /**
- * Extends the search tree indefinitely from the root. This method will never return and
+ * Extends the search tree indefinitely from the root. This function will never return and
  * is intended to be used in a multi-threaded context only.
  */
-void search_indefinite(SearchNode * root) {
-    greedy_search(root, -1);
+void search_indefinite(SearchNode * root, Observer & o) {
+    greedy_search(root, -1, o);
 }
 
 /**

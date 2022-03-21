@@ -26,12 +26,16 @@ def play_game(token: str, game_id: str):
             print("No move possible")
             return True
         else:
-            print(f"{move}")
+            # print(f"{move}")
             return make_move(token, game_id, move)
 
     as_white: bool = False
 
     for event in stream_game_events(token, game_id):
+
+        if "error" in event:
+            print(f"play game for {game_id} received error")
+            return
 
         if event["type"] == "gameFull":
 
@@ -70,7 +74,7 @@ def _get_move(game_id: str, moves_played: str, think_time: int) -> str:
     with open(f"{GAME_FILE_DIR}/{game_id}.game", "w") as file:
         file.write(moves_played)
 
-    print("Fetching move...", end="")
+    # print("Fetching move...", end="")
 
     exec_stase_command: str = f"./stase -t {think_time} -g {game_id}"
     engine_process = subprocess.Popen(

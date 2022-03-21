@@ -3,12 +3,17 @@ using std::cout;
 #include <cstring>
 using std::strcmp;
 #include <iomanip>
+#include <csignal>
+
 using std::setw;
 
 #include "test.h"
 
 
 int main(int argc, char** argv) {
+
+    signal(SIGSEGV, print_stack_trace);
+    signal(SIGABRT, print_stack_trace);
 
     unsigned modules_tested = 0;
     bool passed = true;
@@ -22,7 +27,11 @@ int main(int argc, char** argv) {
             cout << "\nTesting game\n";
             passed = test_game() && passed;
             ++modules_tested;
-        } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-stress") == 0) {
+        } else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-search") == 0) {
+            cout << "\nTesting search\n";
+            passed = test_search() && passed;
+            ++modules_tested;
+        } else if (strcmp(argv[i], "-stress") == 0) {
             cout << "\nRunning stress tests\n";
             passed = stress_test_main() && passed;
             ++modules_tested;

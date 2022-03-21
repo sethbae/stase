@@ -3,6 +3,29 @@
 
 #include "search.h"
 
+namespace __constants {
+
+    /**
+     * These constants control certain behaviours of the search algorithm.
+     * THRESHOLDs determine at what visit count a set of candidates is expanded.
+     * DEPTHs determine how deep a tree will be extended at once.
+     * QUIESS_THRESHOLD determines the value at which positions become non-quiescent.
+     */
+
+    extern const int CRITICAL_THRESHOLD;
+    extern const int MEDIAL_THRESHOLD;
+    extern const int FINAL_THRESHOLD;
+    extern const int LEGAL_THRESHOLD;
+
+    extern const float QUIESS_THRESHOLD;
+
+    extern const int CRITICAL_DEPTH;
+    extern const int MEDIAL_DEPTH;
+    extern const int FINAL_DEPTH;
+    extern const int LEGAL_DEPTH;
+
+}
+
 SearchNode *new_node(const Gamestate & gs, Move m);
 SearchNode *new_node(const std::string &);
 

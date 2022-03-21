@@ -21,7 +21,7 @@ jobs:
 
     - name: Run module tests
       working-directory: ${{github.workspace}}
-      run: ./test -b -g
+      run: ./test -b -g -s
       
 #    - name: Run stress tests
 #      working-directory: ${{github.workspace}}
