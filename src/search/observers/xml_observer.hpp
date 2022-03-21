@@ -46,6 +46,8 @@ public:
         file.close();
     }
 
+    inline void register_event(const SearchNode * node, const SearchEvent ev) {}
+
 private:
 
     inline std::string content(const SearchNode * node, SearchEvent ev) {

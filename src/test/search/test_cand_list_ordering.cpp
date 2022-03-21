@@ -50,6 +50,8 @@ public:
 
     inline void close_event(const SearchNode * node, const SearchEvent, const CandList *) {}
 
+    inline void register_event(const SearchNode *, const SearchEvent) {}
+
     inline bool passed_test() {
         if (visit_count == 0) {
             diagnostics.push_back("Test failed because the observer was not visited.\n");

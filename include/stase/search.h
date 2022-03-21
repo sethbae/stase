@@ -41,6 +41,7 @@ class Observer {
 public:
     virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
     virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) = 0;
+    virtual void register_event(const SearchNode *, const SearchEvent) = 0;
 
 };
 
