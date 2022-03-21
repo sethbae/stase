@@ -138,6 +138,7 @@ bool test_discovered_hook();
 
 bool test_cand_list_ordering();
 bool test_cand_list_visit_counts();
+bool test_legal_moves_present();
 
 bool stress_test_main();
 

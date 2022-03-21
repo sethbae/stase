@@ -6,6 +6,7 @@ bool test_search() {
 
     passed = test_cand_list_ordering() && passed;
     passed = test_cand_list_visit_counts() && passed;
+    passed = test_legal_moves_present() && passed;
 
     return passed;
 
