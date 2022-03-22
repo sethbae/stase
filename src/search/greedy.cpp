@@ -280,7 +280,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 //        std::vector<SearchNode *> best_line = retrieve_best_line(root);
 //        print_line(best_line);
 
-        if (root->terminal) {
+        if (root->terminal || soft_exit_criteria(root)) {
             break;
         }
     }
