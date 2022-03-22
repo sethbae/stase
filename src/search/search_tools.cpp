@@ -1,6 +1,7 @@
 #include "search_tools.h"
 #include "thread.h"
 #include "metrics.h"
+#include "../game/gamestate.hpp"
 
 namespace __constants {
 
@@ -49,21 +50,17 @@ void update_terminal(SearchNode * node) {
     // all candidates explored
     if (!node->cand_set->empty()) { return; }
 
-    // legal list has been added (and expanded)
-    if (node->visit_count < __constants::LEGAL_THRESHOLD) { return; }
+    // legal list has been added (and expanded). In check gamestates do not have had to reach the legal threshold.
+    if (node->visit_count < __constants::LEGAL_THRESHOLD && !node->gs->in_check) { return; }
 
     // check children
-    bool all_children_terminal = true;
     for (int i = 0; i < node->children.size(); ++i) {
-        if (abs((int)node->children[i]->score - (int)node->best_child->score) < __constants::EXPLORATION_THRESHOLD) {
+        if (millipawn_diff(node->children[i]->score, node->best_child->score) < __constants::EXPLORATION_THRESHOLD) {
             if (!node->children[i]->terminal) {
-                all_children_terminal = false;
-                break;
+                return;
             }
         }
     }
 
-    if (all_children_terminal) {
-        node->terminal = true;
-    }
+    node->terminal = true;
 }
