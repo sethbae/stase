@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <signal.h>
 #include <string>
 #include <search.h>
 #include "metrics.h"
@@ -133,6 +134,17 @@ int fetch_node_count() {
 
 SearchNode * fetch_root() {
     return current_running_config->root;
+}
+
+/**
+ * Returns true iff there is no running engine thread. Callers should still go on to call
+ * stop_engine before exiting or starting another.
+ */
+bool engine_has_stopped() {
+    // in order to check whether the thread is still running, you can send a kill signal
+    // with zero as the signo. This is intended for error checking: if the thread has
+    // exited, pthread_kill won't be able to find and kill it, and so returns ESRCH (Error SeaRCHing)
+    return current_running_config && (pthread_kill(current_running_config->t_id, 0) == ESRCH);
 }
 
 bool engine_abort = false;

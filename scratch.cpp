@@ -6,6 +6,9 @@ using std::vector;
 #include <csignal>
 #include <unistd.h>
 #include <cstring>
+#include <chrono>
+#include <thread>
+#include "src/search/thread.h"
 
 using std::ofstream;
 
@@ -397,8 +400,17 @@ void show_hook_frames(const std::string & fen, const Hook & h) {
 }
 
 void run_engine(const std::string & fen, const double seconds) {
+
     run_in_background(fen);
-    sleep(seconds);
+
+    int n = (int) (seconds / 0.1);
+    for (int i = 0; i < n; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        if (engine_has_stopped()) {
+            break;
+        }
+    }
+
     stop_engine(false);
     Move m = fetch_best_move();
     cout << "Engine played: " << mtos(fen_to_board(fen), m) << "\n";
@@ -566,7 +578,7 @@ int main(int argc, char** argv) {
     signal(SIGABRT, print_stack_trace);
     signal(SIGKILL, print_stack_trace);
 
-    const std::string fen = "r1bqk1nr/1pp2ppp/p1pb4/4p3/3PP3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 6";
+    const std::string fen = "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -576,13 +588,14 @@ int main(int argc, char** argv) {
 //    }
 //    cout << "\n";
 
-    CandSet * c = cands(gs, new CandSet);
-    print_cand_set(gs, *c, cout);
+//    CandSet * c = cands(gs, new CandSet);
+//    print_cand_set(gs, *c, cout);
 
 //    q_scores();
 
 //    repl(fen);
 
+    run_engine(fen, 10);
 //    run_with_node_limit(fen, 25000);
 //    std::cout << fetch_node_count() << "\n";
 
