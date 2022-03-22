@@ -14,12 +14,27 @@ constexpr T max(const T a, const T b) {
     if (a > b) { return a; }
     return b;
 }
+template <typename T>
+constexpr T max(const T a, const T b, const T c) {
+    if (a > b) {
+        return a > c ? a : c;
+    }
+    return b > c ? b : c;
+}
 
 template <typename T>
 constexpr T min(const T a, const T b) {
     if (a < b) { return a; }
     return b;
 }
+template <typename T>
+constexpr T min(const T a, const T b, const T c) {
+    if (a < b) {
+        return a < c ? a : c;
+    }
+    return b < c ? b : c;
+}
+
 
 Move uci2move(const std::string &);
 std::string move2uci(const Move);

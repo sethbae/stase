@@ -608,7 +608,7 @@ bool find_forks_hook(Gamestate & gs, const Square s) {
  * could be forked. It tries to move a piece onto the line between them and finds all such possible
  * moves.
  */
-void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
+int find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, int idx, int end) {
 
     Colour forked_piece_colour = colour(gs.board.get(ff->centre));
     Delta d = get_delta_between(ff->centre, ff->secondary);
@@ -658,24 +658,25 @@ void find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m,
                     || !move_is_safe(gs, Move{temp, fork_sq, 0})) {
                     continue;
                 }
-                if (counter.has_space()) {
+                if (idx < end) {
                     Move move{temp, fork_sq, 0};
                     move.set_score(fork_score(piece_value(gs.board.get(ff->centre)), piece_value(gs.board.get(ff->secondary))));
-                    m[counter.inc()] = move;
+                    m[idx++] = move;
                 } else {
-                    return;
+                    return idx;
                 }
             }
 
         }
     }
+    return idx;
 }
 
 /**
  * This function responds to FeatureFrames of the second type, where the exact move has already been
  * found. It plays that move provided that it is to a safe square and does not violate any pins.
  */
-void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
+int play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, int idx, int end) {
 
     Square forker_square = itosq(ff->conf_2);
     Square fork_square = itosq(ff->conf_1);
@@ -683,19 +684,20 @@ void play_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCou
     if (!gs.is_kpinned_piece(forker_square, get_delta_between(forker_square, fork_square))
         && move_is_safe(gs, Move{forker_square, fork_square, 0})) {
 
-        if (counter.has_space()) {
+        if (idx < end) {
             Move move{forker_square, fork_square, 0};
             move.set_score(fork_score(piece_value(gs.board.get(ff->centre)), piece_value(gs.board.get(ff->secondary))));
-            m[counter.inc()] = move;
+            m[idx++] = move;
         }
     }
+    return idx;
 }
 
-void respond_to_fork_frame(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
+int respond_to_fork_frame(const Gamestate & gs, const FeatureFrame * ff, Move * m, int idx, int end) {
     if (ff->conf_2 == sq_sentinel_as_int()) {
-        find_piece_to_fork(gs, ff, m, counter);
+        return find_piece_to_fork(gs, ff, m, idx, end);
     } else {
-        play_fork(gs, ff, m, counter);
+        return play_fork(gs, ff, m, idx, end);
     }
 }
 

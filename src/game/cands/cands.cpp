@@ -60,9 +60,8 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
-        IndexCounter counter(MAX_MOVES_PER_HOOK);
+        int n = 0;
 
-        // run the predicate over the board
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
@@ -76,21 +75,19 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
-            counter.clear_soft_limit();
-            counter.add_allowance(MAX_MOVES_PER_FRAME);
-
-            for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
-                responders[k]->resp(gs, &ff, moves, counter);
+            int max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
+            for (int k = 0; k < responders.size() && n < max_idx; ++k) {
+                n = responders[k]->resp(gs, &ff, moves, n, max_idx);
+                max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
             }
 
-            counter.clear_soft_limit();
-            if (!counter.has_space()) {
+            if (n >= MAX_MOVES_PER_HOOK || m + n >= MAX_TOTAL_CANDS) {
                 break;
             }
         }
 
         // add moves not yet present
-        for (int j = 0; j < counter.idx(); ++j) {
+        for (int j = 0; j < n; ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {
@@ -176,7 +173,7 @@ CandSet * cands_report(Gamestate & gs) {
 
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
-        IndexCounter counter(MAX_MOVES_PER_HOOK);
+        int n = 0;
 
         std::string friends = "";
         std::string enems = "";
@@ -210,17 +207,16 @@ CandSet * cands_report(Gamestate & gs) {
                     ? fh.friendly_responses
                     : fh.enemy_responses;
 
-            counter.clear_soft_limit();
-            counter.add_allowance(MAX_MOVES_PER_FRAME);
-
-            for (int k = 0; k < responders.size() && counter.has_space(); ++k) {
+            int max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
+            for (int k = 0; k < responders.size() && n < max_idx; ++k) {
                 cout << "   Applying " << responders[k]->name << "\n";
-                int prev_num = counter.idx();
+                int prev_num = n;
 
-                responders[k]->resp(gs, &ff, moves, counter);
+                n = responders[k]->resp(gs, &ff, moves, n, max_idx);
+                max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
 
-                if (counter.idx() > prev_num) {
-                    for (int l = prev_num; l < counter.idx(); ++l) {
+                if (n > prev_num) {
+                    for (int l = prev_num; l < n; ++l) {
                         cout << "      " << mtos(gs.board, moves[l]) << " [" << (int) moves[l].get_score() << "]\n";
                     }
                 } else {
@@ -228,14 +224,13 @@ CandSet * cands_report(Gamestate & gs) {
                 }
             }
 
-            counter.clear_soft_limit();
-            if (!counter.has_space()) {
+            if (n >= MAX_MOVES_PER_HOOK || m + n >= MAX_TOTAL_CANDS) {
                 break;
             }
         }
 
         // add moves not yet present
-        for (int j = 0; j < counter.idx(); ++j) {
+        for (int j = 0; j < n; ++j) {
             bool present = false;
             for (int k = 0; k < m; ++k) {
                 if (equal(all_moves[k], moves[j])) {

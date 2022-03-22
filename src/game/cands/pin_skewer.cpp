@@ -190,17 +190,11 @@ bool find_pin_skewer_hook(Gamestate & gs, const Square s) {
     return true;
 }
 
-const Hook pin_skewer_hook{
-    "pin-skewer",
-    4,
-    &find_pin_skewer_hook
-};
-
 /**
  * This responder plays the move as described in the given FeatureFrame.
  */
-void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    if (counter.has_space()){
+int pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
+    if (idx < end) {
         Move m = Move{ff->centre, ff->secondary};
         m.set_score(
             pin_skewer_score(
@@ -209,8 +203,9 @@ void pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * m
                 ff->conf_2
             )
         );
-        moves[counter.inc()] = m;
+        moves[idx++] = m;
     }
+    return idx;
 }
 
 /**
@@ -261,6 +256,12 @@ const Hook king_pinned_pieces_hook {
     "king-pinned-pieces",
     5,
     &identify_king_pinned_pieces_hook
+};
+
+const Hook pin_skewer_hook{
+        "pin-skewer",
+        4,
+        &find_pin_skewer_hook
 };
 
 const Responder pin_skewer_resp{

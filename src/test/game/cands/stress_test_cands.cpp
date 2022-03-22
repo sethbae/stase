@@ -43,6 +43,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
 
     cout << "Stress testing candidates\n";
     cout << "|                   |\n";
+    cout.flush();
 
     for (int i = 0; i < states.size(); ++i) {
 

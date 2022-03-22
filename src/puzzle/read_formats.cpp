@@ -36,8 +36,8 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
     if (cache.empty()) {
         std::vector<std::string> fens;
         read_all_fens(fens);
-        for (std::string & fen : fens) {
-            cache.push_back(*fresh_gamestate(fen));
+        for (int i = 0; i < fens.size(); ++i) {
+            cache.push_back(Gamestate(fens[i]));
         }
     }
 
