@@ -10,7 +10,7 @@
  * increasing strength (it starts with the weakest/least valuable piece).
  *
  * Reads the information needed from the given FeatureFrame and writes moves to the pointer given,
- * while space remains in the counter.
+ * working from idx up until the end index is reached.
  */
 int capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
