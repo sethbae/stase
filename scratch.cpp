@@ -421,6 +421,7 @@ SearchNode * repl_cycles(const std::string & fen) {
             cands(*root_gs, new CandSet),
             heur(*root_gs),
             MOVE_SENTINEL,
+            false,
             {},
             nullptr,
             nullptr,

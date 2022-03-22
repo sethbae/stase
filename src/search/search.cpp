@@ -182,6 +182,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
         new CandSet,
         zero(),
         m,
+        false,
         {},
         nullptr,
         nullptr,

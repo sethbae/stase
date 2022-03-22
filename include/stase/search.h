@@ -10,6 +10,7 @@ struct SearchNode {
     CandSet * cand_set;
     Eval score;
     Move move;
+    bool terminal;
     std::vector<SearchNode*> children;
     SearchNode * best_child;
     SearchNode * best_trust_child;

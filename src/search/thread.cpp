@@ -33,6 +33,7 @@ public:
             new CandSet,
             zero(),
             MOVE_SENTINEL,
+            false,
             {},
             nullptr,
             nullptr,
