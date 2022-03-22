@@ -43,8 +43,6 @@ CandSet * cands_in_check(const Gamestate & gs, CandSet * cand_set) {
  */
 CandSet * cands(Gamestate & gs, CandSet * cand_set) {
 
-    std::cout << "cands!\n"; std::cout.flush();
-
     // if we're in check, handle the candidates differently
     if (!has_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
         cands_in_check(gs, cand_set);

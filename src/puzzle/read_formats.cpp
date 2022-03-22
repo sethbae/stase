@@ -41,9 +41,8 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
         }
     }
 
-    std::cout << "about to copy\n"; std::cout.flush();
     vec = cache;
-    std::cout << "just copied\n"; std::cout.flush();
+
 }
 
 /**
