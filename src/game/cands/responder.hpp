@@ -5,7 +5,7 @@
 
 struct Responder {
     const std::string name;
-    void (*resp)(const Gamestate &, const FeatureFrame *, Move *, IndexCounter &);
+    int (*resp)(const Gamestate &, const FeatureFrame *, Move *, int, int);
 };
 
 extern const Responder defend_centre_resp;

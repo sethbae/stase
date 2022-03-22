@@ -46,8 +46,8 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
     return true;
 }
 
-void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    if (counter.has_space() && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
+int play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
+    if (idx < end && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
 
         Move m{ff->centre, ff->secondary, 0};
         int score;
@@ -58,8 +58,9 @@ void play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, Ind
         }
         m.set_score(score);
 
-        moves[counter.inc()] = m;
+        moves[idx++] = m;
     }
+    return idx;
 }
 
 const Hook check_hook{

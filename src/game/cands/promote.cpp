@@ -39,12 +39,13 @@ bool can_promote_hook(Gamestate & gs, const Square s) {
 /**
  * Pushes the pawn one square forward, if space allows.
  */
-void promote_pawn(const Gamestate & gs, const FeatureFrame * ff, Move * m, IndexCounter & counter) {
-    if (counter.has_space()) {
+int promote_pawn(const Gamestate & gs, const FeatureFrame * ff, Move * m, int idx, int end) {
+    if (idx < end) {
         Move move{ff->centre, ff->secondary, 0};
         move.set_score(promotion_score());
-        m[counter.inc()] = move;
+        m[idx++] = move;
     }
+    return idx;
 }
 
 const Hook promotion_hook{

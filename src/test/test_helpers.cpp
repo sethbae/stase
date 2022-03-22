@@ -6,18 +6,18 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
 
     Gamestate gs(tc->fen);
     Move moves[MAX_MOVES_PER_HOOK];
-    IndexCounter move_counter(MAX_MOVES_PER_HOOK);
+    int m = 0;
 
     discover_feature_frames(gs, king_pinned_pieces_hook);
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
-        resp->resp(gs, &ff, &moves[0], move_counter);
+        resp->resp(gs, &ff, &moves[0], m, MAX_MOVES_PER_HOOK);
     }
 
     // convert the output to a vector of strings
     std::vector<std::string> strings;
-    for (int i = 0; i < move_counter.idx(); ++i) {
+    for (int i = 0; i < m; ++i) {
         strings.push_back(sqtos(moves[i].from) + sqtos(moves[i].to));
     }
 

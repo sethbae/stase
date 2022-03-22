@@ -102,51 +102,51 @@ Square best_square(const Gamestate & gs, Square s, const int xd, const int yd, c
 
 }
 
-void best_diag_squares(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
+int best_diag_squares(const Gamestate & gs, Square s, Move * moves, int idx, int end, const int * scores) {
 
     int yd = gs.board.get_white() ? 1 : -1;
 
     // negative diagonal
     Square sq = best_square(gs, s, -1, yd, scores);
-    if (!is_sentinel(sq) && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, sq, 0};
+    if (!is_sentinel(sq) && idx < end) {
+        moves[idx++] = Move{s, sq, 0};
     }
 
     // positive diagonal
     sq = best_square(gs, s, 1, yd, scores);
-    if (!is_sentinel(sq) && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, sq, 0};
+    if (!is_sentinel(sq) && idx < end) {
+        moves[idx++] = Move{s, sq, 0};
     }
 
-    return;
+    return idx;
 }
 
-void best_ortho_squares(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter, const int * scores) {
+int best_ortho_squares(const Gamestate & gs, Square s, Move * moves, int idx, int end, const int * scores) {
 
     int yd = gs.board.get_white() ? 1 : -1;
 
     // vertical
     Square sq = best_square(gs, s, 0, yd, scores);
-    if (!is_sentinel(sq) && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, sq, 0};
+    if (!is_sentinel(sq) && idx < end) {
+        moves[idx++] = Move{s, sq, 0};
     }
 
     // left
     sq = best_square(gs, s, -1, 0, scores);
-    if (!is_sentinel(sq) && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, sq, 0};
+    if (!is_sentinel(sq) && idx < end) {
+        moves[idx++] = Move{s, sq, 0};
     }
 
     // right
     sq = best_square(gs, s, 1, 0, scores);
-    if (!is_sentinel(sq) && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, sq, 0};
+    if (!is_sentinel(sq) && idx < end) {
+        moves[idx++] = Move{s, sq, 0};
     }
 
-    return;
+    return idx;
 }
 
-void best_knight_square(const Gamestate & gs, Square s, Move * moves, IndexCounter & move_counter) {
+int best_knight_square(const Gamestate & gs, Square s, Move * moves, int idx, int end) {
 
     const bool white = (colour(gs.board.get(s)) == WHITE);
     const int * xd = white ? XKN_LEGAL_W : XKN_LEGAL_B;
@@ -156,7 +156,7 @@ void best_knight_square(const Gamestate & gs, Square s, Move * moves, IndexCount
     int best_val = 0;
     
     if (gs.is_kpinned_piece(s, KNIGHT_DELTA)) {
-        return;
+        return idx;
     }
 
     for (int i = 0; i < 4; ++i) {
@@ -168,11 +168,11 @@ void best_knight_square(const Gamestate & gs, Square s, Move * moves, IndexCount
         }
     }
 
-    if (best_val > 0 && move_counter.has_space()) {
-        moves[move_counter.inc()] = Move{s, best_sq, 0};
+    if (best_val > 0 && idx < end) {
+        moves[idx++] = Move{s, best_sq, 0};
     }
 
-    return;
+    return idx;
 
 }
 
@@ -198,58 +198,61 @@ bool check_squares_for_castling(
 /**
  * Tries to castle. Returns true if at least one move is suggested.
  */
-bool castling_moves(const Gamestate & gs, const Square s, Move * moves, IndexCounter & counter) {
-
-    bool found = false;
+int castling_moves(const Gamestate & gs, const Square s, Move * moves, int idx, int end) {
 
     if (gs.board.get_white() && equal(s, stosq("e1"))) {
         if (gs.board.get_cas_ws() && check_squares_for_castling(gs, stosq("f1"), stosq("g1"), SQUARE_SENTINEL)) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 Move m{stosq("e1"), stosq("g1"), 0};
                 m.set_cas();
                 m.set_cas_short();
-                moves[counter.inc()] = m;
-                found = true;
+                moves[idx++] = m;
+            } else {
+                return idx;
             }
+            // todo: early exits here?
         }
         if (gs.board.get_cas_wl() && check_squares_for_castling(gs, stosq("d1"), stosq("c1"), stosq("b1"))) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 Move m{stosq("e1"), stosq("c1"), 0};
                 m.set_cas();
                 m.unset_cas_short();
-                moves[counter.inc()] = m;
-                found = true;
+                moves[idx++] = m;
+            } else {
+                return idx;
             }
         }
     } else if (!gs.board.get_white() && equal(s, stosq("e8"))) {
         if (gs.board.get_cas_bs() && check_squares_for_castling(gs, stosq("f8"), stosq("g8"), SQUARE_SENTINEL)) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 Move m{stosq("e8"), stosq("g8"), 0};
                 m.set_cas();
                 m.set_cas_short();
-                moves[counter.inc()] = m;
-                found = true;
+                moves[idx++] = m;
+            } else {
+                return idx;
             }
         }
         if (gs.board.get_cas_bl() && check_squares_for_castling(gs, stosq("d8"), stosq("c8"), stosq("b8"))) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 Move m{stosq("e8"), stosq("c8"), 0};
                 m.set_cas();
                 m.unset_cas_short();
-                moves[counter.inc()] = m;
-                found = true;
+                moves[idx++] = m;
+            } else {
+                return idx;
             }
         }
     }
 
-    return found;
+    return idx;
 }
 
 /**
  * Suggests plausible pawn moves. Moves forward to supported (not necessarily safe) squares
  * including double moves.
  */
-void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounter & counter) {
+int pawn_moves(const Gamestate & gs, const Square sq, Move * moves, int idx, int end) {
 
     /*
      * Currently recommended moves are:
@@ -269,33 +272,33 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
                 || (!gs.board.get_white() && b_pawn_defence_count(gs, temp) > 0)) {
             // check it's not pinned
             if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
-                if (counter.has_space()) {
-                    moves[counter.inc()] = Move{sq, temp, 0};
+                if (idx < end) {
+                    moves[idx++] = Move{sq, temp, 0};
                 } else {
                     // no more space, all done
-                    return;
+                    return idx;
                 }
             }
         }
     } else {
         // square in front is not empty, no moves
-        return;
+        return idx;
     }
 
     // don't double move on the wings
-    if (x < 2 || x > 5) { return; }
+    if (x < 2 || x > 5) { return idx; }
 
     bool first_rank = gs.board.get_white() ? (y == 1) : (y == 6);
     if (first_rank && gs.board.get(temp = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
         if (!gs.is_kpinned_piece(sq, get_delta_between(sq, temp))) {
-            if (counter.has_space()) {
-                moves[counter.inc()] = Move{sq, temp, 0};
+            if (idx < end) {
+                moves[idx++] = Move{sq, temp, 0};
             } else {
-                return;
+                return idx;
             }
         }
     }
-
+    return idx;
 }
 
 /**
@@ -303,35 +306,34 @@ void pawn_moves(const Gamestate & gs, const Square sq, Move * moves, IndexCounte
  * up to the position of the pieces, it may return more than one square for all pieces which
  * are not knights.
  */
-void develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & move_counter) {
+int develop_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     bool is_white_piece = colour(gs.board.get(ff->centre)) == WHITE;
     if (gs.board.get_white() != is_white_piece) {
-        return;
+        return idx;
     }
 
+    int new_idx;
     switch (type(gs.board.get(ff->centre))) {
         case BISHOP:
-            best_diag_squares(gs, ff->centre, moves, move_counter, BISHOPS);
-            return;
+            return best_diag_squares(gs, ff->centre, moves, idx, end, BISHOPS);
         case KNIGHT:
-            best_knight_square(gs, ff->centre, moves, move_counter);
-            return;
+            return best_knight_square(gs, ff->centre, moves, idx, end);
         case ROOK:
-            best_ortho_squares(gs, ff->centre, moves, move_counter, ROOKS);
-            return;
+            return best_ortho_squares(gs, ff->centre, moves, idx, end, ROOKS);
         case QUEEN:
-            best_diag_squares(gs, ff->centre, moves, move_counter, QUEENS);
-            best_ortho_squares(gs, ff->centre, moves, move_counter, QUEENS);
-            return;
+            new_idx = best_diag_squares(gs, ff->centre, moves, idx, end, QUEENS);
+            if (new_idx < end) {
+                return best_ortho_squares(gs, ff->centre, moves, new_idx, end, QUEENS);
+            } else {
+                return new_idx;
+            }
         case KING:
-            castling_moves(gs, ff->centre, moves, move_counter);
-            return;
+            return castling_moves(gs, ff->centre, moves, idx, end);
         case PAWN:
-            pawn_moves(gs, ff->centre, moves, move_counter);
-            return;
+            return pawn_moves(gs, ff->centre, moves, idx, end);
         default:
-            return;
+            return idx;
     }
 
 }
