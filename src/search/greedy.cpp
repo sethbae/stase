@@ -6,30 +6,6 @@
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
 
-namespace __constants {
-
-    /**
-     * These constants control certain behaviours of the search algorithm.
-     * THRESHOLDs determine at what visit count a set of candidates is expanded.
-     * DEPTHs determine how deep a tree will be extended at once.
-     * QUIESS_THRESHOLD determines the value at which positions become non-quiescent.
-     */
-
-    const int CRITICAL_THRESHOLD = 0;
-    const int MEDIAL_THRESHOLD = 2;
-    const int FINAL_THRESHOLD = 8;
-    const int LEGAL_THRESHOLD = 256;
-
-    const float QUIESS_THRESHOLD = 2.0f;
-
-    const int BURST_DEPTH = 5;
-    const int CRITICAL_DEPTH = 2;
-    const int MEDIAL_DEPTH = 1;
-    const int FINAL_DEPTH = 1;
-    const int LEGAL_DEPTH = 1;
-
-}
-
 /**
  * Extends the CandSet of the given node to include legal moves. It removes from this list
  * all legal moves which (i) are already present in another list (ii) belong to an existing
