@@ -363,12 +363,12 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
     pr_board(gs.board);
 
     Move moves[100];
-    IndexCounter counter(100);
+    int idx = 0;
 
-    resp.resp(gs, &ff, moves, counter);
+    idx = resp.resp(gs, &ff, moves, idx, 100);
 
     cout << "Responder moves (" << resp.name << "):\n";
-    for (int i = 0; i < counter.idx(); ++i) {
+    for (int i = 0; i < idx; ++i) {
         cout << mtos(gs.board, moves[i]) << "\n";
     }
 
@@ -563,8 +563,9 @@ int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace);
     signal(SIGABRT, print_stack_trace);
+    signal(SIGKILL, print_stack_trace);
 
-    const std::string fen = "r1b1kb1r/pp1p1ppp/4pn2/2q5/1n2P3/3Q1N2/PPPB1PPP/RN2KB1R w KQkq - 2 8";
+    const std::string fen = "r1bqk1nr/1pp2ppp/p1pb4/4p3/3PP3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 6";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -574,12 +575,12 @@ int main(int argc, char** argv) {
 //    }
 //    cout << "\n";
 
-//    CandSet * c = cands(gs);
-//    print_cand_set(gs, *c, cout);
+    CandSet * c = cands(gs, new CandSet);
+    print_cand_set(gs, *c, cout);
 
 //    q_scores();
 
-    repl(fen);
+//    repl(fen);
 
 //    run_with_node_limit(fen, 25000);
 //    std::cout << fetch_node_count() << "\n";
@@ -597,6 +598,7 @@ int main(int argc, char** argv) {
 
 //    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("d7"), {0, 0}, r, r});
 
+//    CandSet c;
 //    cands_report(gs);
 
 //    Eval score = heur_with_description(gs);

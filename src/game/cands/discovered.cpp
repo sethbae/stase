@@ -84,7 +84,7 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
  * desperado the piece.
  * Todo (GM-88): extend this to threaten a valuable piece where possible.
  */
-void play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+int play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     // always do checks
     for (int i = 0; i < MAX_FRAMES && !is_sentinel(gs.frames[check_hook.id][i].centre); ++i) {
@@ -92,21 +92,22 @@ void play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves
         if (equal(ff->centre, gs.frames[check_hook.id][i].centre)
             && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, gs.frames[check_hook.id][i].secondary))) {
 
-            if (counter.has_space()) {
+            if (idx < end) {
                 Move m{ff->centre, gs.frames[check_hook.id][i].secondary, 0};
                 m.set_score(
                     discovered_score(gs.board.get(itosq(ff->conf_1))));
-                moves[counter.inc()] = m;
+                moves[idx++] = m;
             } else {
-                return;
+                return idx;
             }
         }
     }
 
     // if check is not required, do desperado as well
-    if (ff->conf_2 == 0) {
-        desperado_resp.resp(gs, ff, moves, counter);
+    if (ff->conf_2 == 0 && idx < end) {
+        return desperado_resp.resp(gs, ff, moves, idx, end);
     }
+    return idx;
 }
 
 const Hook discovered_hook{

@@ -6,7 +6,7 @@
  * Tries to trade off the unsafe piece with any piece of greater or equal value. Suggests all
  * pieces sharing the maximum value available.
  */
-void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+int trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
@@ -24,31 +24,31 @@ void trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, In
     }
 
     if (max_val < piece_value(gs.board.get(ff->centre))) {
-        return;
+        return idx;
     }
 
     // return a trade with all pieces of this maximum value
     for (int i = 0; i < piece_moves.size(); ++i) {
         if (piece_value(gs.board.get(piece_moves[i].to)) == max_val
                 && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 Piece trade_this = gs.board.get(ff->centre);
                 Piece for_this = gs.board.get(piece_moves[i].to);
                 piece_moves[i].set_score(trade_score(trade_this, for_this));
-                moves[counter.inc()] = piece_moves[i];
+                moves[idx++] = piece_moves[i];
             } else {
-                return;
+                return idx;
             }
         }
     }
-
+    return idx;
 }
 
 /**
  * Tries to move the piece to a safe square. This square may be backwards or forwards, as long as
  * it is safe.
  */
-void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+int retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     std::vector<Move> piece_moves;
     piece_moves.reserve(32);
@@ -69,20 +69,21 @@ void retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
         }
 
         if (!would_be_unsafe && !gs.is_kpinned_piece(ff->centre, get_delta_between(piece_moves[i].from, piece_moves[i].to))) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 piece_moves[i].set_score(retreat_score(gs.board.get(piece_moves[i].from)));
-                moves[counter.inc()] = piece_moves[i];
+                moves[idx++] = piece_moves[i];
             } else {
-                return;
+                return idx;
             }
         }
     }
+    return idx;
 }
 
 /**
  * Tries to capture absolutely any piece available. If none are available, does nothing.
  */
-void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
+int desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     Piece desperado = gs.board.get(ff->centre);
     std::vector<Move> piece_moves;
@@ -106,13 +107,11 @@ void desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves
     }
 
     // return a trade with the piece of maximum value
-    if (counter.has_space() && !is_sentinel(max_move)) {
+    if (idx < end && !is_sentinel(max_move)) {
         max_move.set_score(desperado_score(max_val));
-        moves[counter.inc()] = max_move;
-    } else {
-        return;
+        moves[idx++] = max_move;
     }
-
+    return idx;
 }
 
 const Responder trade_resp{

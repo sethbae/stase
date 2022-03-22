@@ -181,7 +181,7 @@ void find_sliding_cover_squares(
     }
 }
 
-void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCounter & counter) {
+int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, int end) {
 
     const Colour defending_colour = gs.board.get_white() ? WHITE : BLACK;
 
@@ -216,12 +216,12 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
 
             if (move_is_safe(gs, Move{p_sq, c_sq, 0})
                     && !gs.is_kpinned_piece(p_sq, get_delta_between(p_sq, c_sq))) {
-                if (counter.has_space()) {
+                if (idx < end) {
                     Move m{p_sq, c_sq, 0};
                     m.set_score(defend_score(gs.board.get(s)));
-                    moves[counter.inc()] = m;
+                    moves[idx++] = m;
                 } else {
-                    return;
+                    return idx;
                 }
             }
         }
@@ -236,26 +236,29 @@ void defend_square(const Gamestate & gs, const Square s, Move * moves, IndexCoun
     for (Move & m : covering_moves) {
         Delta d = get_delta_between(m.from, m.to);
         if (!gs.is_kpinned_piece(m.from, d) && move_is_safe(gs, m)) {
-            if (counter.has_space()) {
+            if (idx < end) {
                 m.set_score(defend_score(gs.board.get(s)));
-                moves[counter.inc()] = m;
+                moves[idx++] = m;
+            } else {
+                return idx;
             }
         }
     }
+    return idx;
 }
 
 /**
  * Responder which tries to defend the centre square of the given feature frame.
  */
-void defend_centre(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    defend_square(gs, ff->centre, moves, counter);
+int defend_centre(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
+    return defend_square(gs, ff->centre, moves, idx, end);
 }
 
 /**
  * Responder which tries to defend the secondary square of the given feature frame.
  */
-void defend_secondary(const Gamestate & gs, const FeatureFrame * ff, Move * moves, IndexCounter & counter) {
-    defend_square(gs, ff->secondary, moves, counter);
+int defend_secondary(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
+    return defend_square(gs, ff->secondary, moves, idx, end);
 }
 
 const Responder defend_centre_resp{

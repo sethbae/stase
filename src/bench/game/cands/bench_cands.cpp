@@ -66,9 +66,8 @@ struct BenchResponderParam {
 };
 
 int wrap_responder(const BenchResponderParam & params) {
-    IndexCounter counter(MAX_TOTAL_CANDS);
-    params.r->resp(*params.gs, params.ff, params.m, counter);
-    return counter.idx();
+    int idx = 0;
+    return params.r->resp(*params.gs, params.ff, params.m, idx, MAX_TOTAL_CANDS);
 }
 
 void bench_responder(std::vector<Gamestate> & gamestates, const Responder * resp) {
