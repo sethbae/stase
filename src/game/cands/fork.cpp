@@ -541,7 +541,7 @@ bool find_king_forks(Gamestate & gs, const Square s) {
 
                 Square forked_sq = mksq(fork_sq.x + XD[j], fork_sq.y + YD[j]);
 
-                // TODO (GM-34): until beta-covers correctly handles knights, pawns and kings,
+                // TODO (ST-34): until beta-covers correctly handles knights, pawns and kings,
                 //  this check is necessary. If the total distance from the king's starting
                 //  square is less than 1 in all directions, the piece was already attacked.
                 int xd = forked_sq.x - s.x, yd = forked_sq.y - s.y;

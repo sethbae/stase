@@ -120,7 +120,7 @@ TestSet<SlidingForkTestCase> sliding_fork_hook_test_cases = {
             {}
         },
 //        // ROOK: puzzle #1
-//        // TODO (GM-91): this fork involves interrupting a line of defence and isn't found
+//        // TODO (ST-91): this fork involves interrupting a line of defence and isn't found
 //        SlidingForkTestCase{
 //            "4r2k/3q2p1/6Qp/p3p3/8/2P2R1P/6PK/8 w - - 2 37",
 //            {

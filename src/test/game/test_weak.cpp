@@ -136,7 +136,7 @@ const TestSet<WeakTestCase> weak_test_cases = {
             {"white", "black"},
             {false, true}
         },
-        // TODO (GM-35) the poly x-ray logic cannot handle this situation.
+        // TODO (ST-35) the poly x-ray logic cannot handle this situation.
 //        // (AFTER MOVE) poly x-ray
 //        WeakTestCase{
 //            "8/2q1Qr2/8/8/8/8/8/3R4 w - - 0 1",
@@ -192,7 +192,7 @@ const TestSet<UnsafeTestCase> unsafe_test_cases = {
             {"none"},
             {true}
         },
-        // TODO (GM-36) this logic isn't quite working as intended
+        // TODO (ST-36) this logic isn't quite working as intended
 //        // under-defended, attacked by weaker piece than defended by
 //        UnsafeTestCase{
 //            "8/3r4/8/3p2q1/8/4N3/B7/8 w - - 0 1",

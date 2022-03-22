@@ -82,7 +82,7 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
  * Responds to a discovered FeatureFrame by attempting to maximise the damage done. If check
  * is required, this will recommend every appropriate check. Otherwise, it will currently
  * desperado the piece.
- * Todo (GM-88): extend this to threaten a valuable piece where possible.
+ * Todo (ST-88): extend this to threaten a valuable piece where possible.
  */
 int play_discovered(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
