@@ -5,11 +5,10 @@
 #include "../game/gamestate.hpp"
 #include "search.h"
 #include "../search/search_tools.h"
-#include "../search/thread.h"
 
 bool score_puzzle_against_cands(const Puzzle & puzzle) {
 
-    Gamestate gs = *fresh_gamestate(puzzle.fen);
+    Gamestate gs(puzzle.fen);
 
     for (int i = 0; i < puzzle.solution_moves.size(); ++i) {
 

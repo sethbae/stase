@@ -3,6 +3,7 @@
 #include <search.h>
 #include "metrics.h"
 #include "thread.h"
+#include "../game/gamestate.hpp"
 
 class EngineConfiguration {
 
@@ -28,7 +29,7 @@ public:
         nodes(0)
     {
         root = new SearchNode{
-            fresh_gamestate(fen),
+            new Gamestate(fen),
             new CandSet,
             zero(),
             MOVE_SENTINEL,
