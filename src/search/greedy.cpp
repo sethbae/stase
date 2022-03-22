@@ -55,15 +55,15 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
             return false;
         }
 
-        if (quiess(*node->gs) >= __constants::QUIESS_THRESHOLD) {
+        if (quiess(*node->gs) >= __engine_params::QUIESS_THRESHOLD) {
             obs.register_event(node, BEGIN_BURST);
-            return deepen(node, CRITICAL, __constants::BURST_DEPTH, obs, true);
+            return deepen(node, CRITICAL, __engine_params::BURST_DEPTH, obs, true);
         } else {
             return false;
         }
     }
 
-    if (burst && quiess(*node->gs) < __constants::QUIESS_THRESHOLD) {
+    if (burst && quiess(*node->gs) < __engine_params::QUIESS_THRESHOLD) {
         return false;
     }
 
@@ -72,7 +72,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     // no early exits: this counts as a visit unless in a burst (bursts
     // will only extend CRITICAL, so it doesn't make sense to count
     // higher than that).
-    if (!burst || node->visit_count <= __constants::CRITICAL_THRESHOLD) {
+    if (!burst || node->visit_count <= __engine_params::CRITICAL_THRESHOLD) {
         ++node->visit_count;
     }
 
@@ -136,23 +136,23 @@ bool visit_node(SearchNode * node, Observer & obs) {
     bool result;
 
     switch (node->visit_count) {
-        case __constants::CRITICAL_THRESHOLD:
-            result = deepen(node, CRITICAL, __constants::CRITICAL_DEPTH, obs);
+        case __engine_params::CRITICAL_THRESHOLD:
+            result = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::MEDIAL_THRESHOLD:
-            result = deepen(node, MEDIAL, __constants::MEDIAL_DEPTH, obs);
+        case __engine_params::MEDIAL_THRESHOLD:
+            result = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::FINAL_THRESHOLD:
-            result = deepen(node, FINAL, __constants::FINAL_DEPTH, obs);
+        case __engine_params::FINAL_THRESHOLD:
+            result = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::LEGAL_THRESHOLD:
+        case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
-            result = deepen(node, LEGAL, __constants::LEGAL_DEPTH, obs);
+            result = deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
         default:
@@ -176,19 +176,19 @@ bool force_visit(SearchNode * node, Observer & obs) {
 
     obs.open_event(node, FORCE_VISIT);
 
-    if (node->visit_count <= __constants::CRITICAL_THRESHOLD) {
-        node->visit_count = __constants::CRITICAL_THRESHOLD;
-        changes = deepen(node, CRITICAL, __constants::CRITICAL_DEPTH, obs);
+    if (node->visit_count <= __engine_params::CRITICAL_THRESHOLD) {
+        node->visit_count = __engine_params::CRITICAL_THRESHOLD;
+        changes = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
     }
 
-    if (!changes && node->visit_count < __constants::MEDIAL_THRESHOLD) {
-        node->visit_count = __constants::MEDIAL_THRESHOLD;
-        changes = deepen(node, MEDIAL, __constants::MEDIAL_DEPTH, obs);
+    if (!changes && node->visit_count < __engine_params::MEDIAL_THRESHOLD) {
+        node->visit_count = __engine_params::MEDIAL_THRESHOLD;
+        changes = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
     }
 
-    if (!changes && node->visit_count < __constants::FINAL_THRESHOLD) {
-        node->visit_count = __constants::FINAL_THRESHOLD;
-        changes = deepen(node, FINAL, __constants::FINAL_DEPTH, obs);
+    if (!changes && node->visit_count < __engine_params::FINAL_THRESHOLD) {
+        node->visit_count = __engine_params::FINAL_THRESHOLD;
+        changes = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
     }
 
     obs.close_event(node, FORCE_VISIT);

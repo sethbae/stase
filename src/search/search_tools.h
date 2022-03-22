@@ -3,7 +3,7 @@
 
 #include "search.h"
 
-namespace __constants {
+namespace __engine_params {
 
     /**
      * These constants control certain behaviours of the search algorithm.
@@ -15,19 +15,20 @@ namespace __constants {
      * considered before a node is marked terminal.
      */
 
-    extern const int CRITICAL_THRESHOLD;
-    extern const int MEDIAL_THRESHOLD;
-    extern const int FINAL_THRESHOLD;
-    extern const int LEGAL_THRESHOLD;
+    const int CRITICAL_THRESHOLD = 0;
+    const int MEDIAL_THRESHOLD = 2;
+    const int FINAL_THRESHOLD = 8;
+    const int LEGAL_THRESHOLD = 256;
 
-    extern const int SWING_THRESHOLD;  // (millipawns)
-    extern const float QUIESS_THRESHOLD;
-    extern const int EXPLORATION_THRESHOLD;  // (millipawns)
+    const int SWING_THRESHOLD = 2000;  // (millipawns)
+    const float QUIESS_THRESHOLD = 2.0f;
+    const int EXPLORATION_THRESHOLD = 1500;  // (millipawns)
 
-    extern const int CRITICAL_DEPTH;
-    extern const int MEDIAL_DEPTH;
-    extern const int FINAL_DEPTH;
-    extern const int LEGAL_DEPTH;
+    const int BURST_DEPTH = 5;
+    const int CRITICAL_DEPTH = 2;
+    const int MEDIAL_DEPTH = 1;
+    const int FINAL_DEPTH = 1;
+    const int LEGAL_DEPTH = 1;
 
 }
 
@@ -40,7 +41,7 @@ std::vector<SearchNode *> retrieve_best_line(SearchNode *);
 std::vector<SearchNode *> retrieve_trust_line(SearchNode *);
 
 inline bool is_swing(const Eval a, const Eval b) {
-    return millipawn_diff(a, b) > __constants::SWING_THRESHOLD;
+    return millipawn_diff(a, b) > __engine_params::SWING_THRESHOLD;
 }
 
 void update_terminal(SearchNode *);
