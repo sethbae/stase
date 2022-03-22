@@ -6,30 +6,46 @@
 namespace __engine_params {
 
     /**
-     * These constants control certain behaviours of the search algorithm.
-     * THRESHOLDs determine at what visit count a set of candidates is expanded.
-     * DEPTHs determine how deep a tree will be extended at once.
-     * SWING_THRESHOLD determines after what deterioration a swing will be triggered.
-     * QUIESS_THRESHOLD determines the value at which positions become non-quiescent.
-     * EXPLORATION_THRESHOLD determines the margin within which inferior alternatives will be
-     * considered before a node is marked terminal.
+     * These thresholds determine after how many visits a node expands the corresponding set of candidates.
      */
-
     const int CRITICAL_THRESHOLD = 0;
     const int MEDIAL_THRESHOLD = 2;
     const int FINAL_THRESHOLD = 8;
     const int LEGAL_THRESHOLD = 256;
 
+    /**
+     * SWING_THRESHOLD determines how big a swing is required to trigger a BURST_DEEPEN event.
+     */
     const int SWING_THRESHOLD = 2000;  // (millipawns)
-    const float QUIESS_THRESHOLD = 2.0f;
-    const int EXPLORATION_THRESHOLD = 1500;  // (millipawns)
 
+    /**
+     * QUIESS_THRESHOLD determines when a position becomes viewed as non-quiescent.
+     */
+    const float QUIESS_THRESHOLD = 2.0f;
+
+    /**
+     * In order for a node to be marked terminal, all children within TERMINAL_MARGIN millipawns of the
+     * best child must be already marked as terminal.
+     */
+    const int TERMINAL_MARGIN = 1500;  // (millipawns)
+
+    /**
+     * These depths determine how large a tree is extended from a node when the corresponding candidate
+     * list is expanded.
+     */
     const int BURST_DEPTH = 5;
     const int CRITICAL_DEPTH = 2;
     const int MEDIAL_DEPTH = 1;
     const int FINAL_DEPTH = 1;
     const int LEGAL_DEPTH = 1;
 
+    /**
+     * Soft exits are applicable when further exploration is unlikely to change the move selected.
+     * The engine will not exit if fewer than SOFT_EXIT_NODE_COUNT nodes have been expanded, or if
+     * there is a second-best move within SOFT_EXIT_EVAL_MARGIN millipawns of the best option.
+     */
+    const int SOFT_EXIT_NODE_COUNT = 25000;
+    const int SOFT_EXIT_EVAL_MARGIN = 2000;  // (millipawns)
 }
 
 SearchNode *new_node(const Gamestate & gs, Move m);
@@ -45,6 +61,7 @@ inline bool is_swing(const Eval a, const Eval b) {
 }
 
 void update_terminal(SearchNode *);
+bool soft_exit_criteria(SearchNode * root);
 
 void check_abort();
 

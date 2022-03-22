@@ -35,7 +35,7 @@ void update_terminal(SearchNode * node) {
 
     // check children
     for (int i = 0; i < node->children.size(); ++i) {
-        if (millipawn_diff(node->children[i]->score, node->best_child->score) < __engine_params::EXPLORATION_THRESHOLD) {
+        if (millipawn_diff(node->children[i]->score, node->best_child->score) < __engine_params::TERMINAL_MARGIN) {
             if (!node->children[i]->terminal) {
                 return;
             }
@@ -43,4 +43,36 @@ void update_terminal(SearchNode * node) {
     }
 
     node->terminal = true;
+}
+
+/**
+ * Determines whether or not a soft exit is warranted. This takes into account the number of nodes searched,
+ * the number of children the root has, and the gap between the best and second best option. See __engine_params
+ * in search_tools.h for specifics.
+ */
+bool soft_exit_criteria(SearchNode * root) {
+
+    if (node_count() < __engine_params::SOFT_EXIT_NODE_COUNT) { return false; }
+    if (!root->best_child) { return false; }
+    if (root->children.size() <= 1) { return true; }
+
+    Eval second_best;
+    if (root->best_child == root->children[0]) {
+        second_best = root->children[1]->score;
+    } else {
+        second_best = root->children[0]->score;
+    }
+
+    for (int i = 0; i < root->children.size(); ++i) {
+        if (root->children[i] != root->best_child) {
+            Eval score = root->children[i]->score;
+            if (root->gs->board.get_white() && score > root->score) {
+                second_best = score;
+            } else if (!root->gs->board.get_white() && score < root->score) {
+                second_best = score;
+            }
+        }
+    }
+
+    return millipawn_diff(root->best_child->score, second_best) >= __engine_params::SOFT_EXIT_EVAL_MARGIN;
 }
