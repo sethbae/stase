@@ -399,23 +399,6 @@ void show_hook_frames(const std::string & fen, const Hook & h) {
     show_hook_frames(gs, h);
 }
 
-void run_engine(const std::string & fen, const double seconds) {
-
-    run_in_background(fen);
-
-    int n = (int) (seconds / 0.1);
-    for (int i = 0; i < n; ++i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        if (engine_has_stopped()) {
-            break;
-        }
-    }
-
-    stop_engine(false);
-    Move m = fetch_best_move();
-    cout << "Engine played: " << mtos(fen_to_board(fen), m) << "\n";
-}
-
 SearchNode * repl_cycles(const std::string & fen) {
 
     std::string input;
@@ -595,7 +578,7 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_engine(fen, 10);
+    run_with_timeout(fen, 10, 0.1);
 //    run_with_node_limit(fen, 25000);
 //    std::cout << fetch_node_count() << "\n";
 

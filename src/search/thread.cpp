@@ -1,4 +1,6 @@
 #include <pthread.h>
+#include <thread>
+#include <chrono>
 #include <signal.h>
 #include <string>
 #include <search.h>
@@ -91,6 +93,27 @@ void run_with_node_limit(const std::string & fen, int node_limit, Observer & obs
     run_in_background(fen, obs);
     pthread_join(current_running_config->t_id, nullptr);
     clear_node_limit();
+}
+
+/**
+ * Runs the engine in a blocking fashion. Waits for at most [time_out_seconds] seconds, checking every
+ * [poll_every_seconds] whether the engine has exited early or not. If so, kills the engine and returns
+ * the best move. Cleanup is performed when killing the engine according to the flag [cleanup].
+ */
+Move run_with_timeout(const std::string & fen, double time_out_seconds, double poll_every_seconds, bool cleanup) {
+
+    run_in_background(fen);
+
+    int n = (int) (time_out_seconds / poll_every_seconds);
+    for (int i = 0; i < n; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds((int)(poll_every_seconds * 1000)));
+        if (engine_has_stopped()) {
+            break;
+        }
+    }
+
+    stop_engine(cleanup);
+    return fetch_best_move();
 }
 
 /**
