@@ -47,7 +47,10 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     // exit conditions
     check_abort();
-    if (node->gs->has_been_mated) { return false; }
+    if (node->gs->has_been_mated) {
+        update_terminal(node);
+        return false;
+    }
 
     if (depth == 0) {
 
@@ -78,14 +81,16 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     // fetch list to extend
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
+
     if (list.empty()) {
-        // we still need to recurse up to the given depth
+        // even if the list is empty, we still need to recurse up to the given depth
         bool changes = false;
         for (int i = 0; i < node->children.size(); ++i) {
             changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
                         || changes;
         }
         update_score(node);
+        update_terminal(node);
         obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
         return changes;
     }
@@ -115,6 +120,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     update_score(node);
+    update_terminal(node);
     obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
     return changes;
 }
@@ -127,7 +133,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  */
 bool visit_node(SearchNode * node, Observer & obs) {
 
-    if (node->gs->has_been_mated) {
+    if (node->gs->has_been_mated || node->terminal) {
         return false;
     }
 
@@ -158,6 +164,7 @@ bool visit_node(SearchNode * node, Observer & obs) {
         default:
             ++node->visit_count;
             update_score(node);
+            update_terminal(node);
             obs.close_event(node, VISIT);
             return false;
     }
@@ -171,6 +178,10 @@ bool visit_node(SearchNode * node, Observer & obs) {
  * Returns true if any new nodes were in fact extended.
  */
 bool force_visit(SearchNode * node, Observer & obs) {
+
+    if (node->gs->has_been_mated || node->terminal) {
+        return false;
+    }
 
     bool changes = false;
 
@@ -258,6 +269,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
     auto start = std::chrono::high_resolution_clock::now();
 
     while (i++ < cycles || cycles < 0) {
+
         visit_best_line(root, false, obs);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
@@ -267,6 +279,10 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 //        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
 //        std::vector<SearchNode *> best_line = retrieve_best_line(root);
 //        print_line(best_line);
+
+        if (root->terminal) {
+            break;
+        }
     }
 
     std::vector<SearchNode *> best_line = retrieve_trust_line(root);

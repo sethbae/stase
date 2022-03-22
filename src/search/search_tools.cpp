@@ -18,11 +18,20 @@ void check_abort() {
  */
 void update_terminal(SearchNode * node) {
 
+    if (node->gs->has_been_mated) {
+        node->terminal = true;
+        return;
+    }
+
     // all candidates explored
-    if (!node->cand_set->empty()) { return; }
+    if (!node->cand_set->empty() || node->terminal) {
+        return;
+    }
 
     // legal list has been added (and expanded). In check gamestates do not have had to reach the legal threshold.
-    if (node->visit_count < __engine_params::LEGAL_THRESHOLD && !node->gs->in_check) { return; }
+    if (node->visit_count < __engine_params::LEGAL_THRESHOLD && !node->gs->in_check) {
+        return;
+    }
 
     // check children
     for (int i = 0; i < node->children.size(); ++i) {
