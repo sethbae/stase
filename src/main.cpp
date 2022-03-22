@@ -204,10 +204,7 @@ void handle_analysis_request(const std::string & game_id, const int seconds_per_
     const std::string fen = board_to_fen(gs.board);
 
     // analyse the position
-    run_in_background(fen);
-    sleep(seconds_per_move);
-    stop_engine();
-    const Move move = fetch_best_move();
+    const Move move = run_with_timeout(fen, seconds_per_move, 0.1);
 
     // write the UCI back into the file
     std::ofstream file_out;

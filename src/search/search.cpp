@@ -96,6 +96,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "\nScore: " << etos(node->score) << "\n";
     output << "Trust score: " << etos(trust_line[trust_line.size() - 1]->score) << "\n";
     output << "Has been mated? " << (node->gs->has_been_mated ? "true\n" : "false\n");
+    output << "Is terminal? " << (node->terminal ? "true\n" : "false\n");
     output << "Is in check? " << (node->gs->in_check ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
 
@@ -182,6 +183,7 @@ SearchNode *new_node(const Gamestate & gs, Move m) {
         new CandSet,
         zero(),
         m,
+        false,
         {},
         nullptr,
         nullptr,
@@ -273,8 +275,8 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
 }
 
 /**
- * Extends the search tree indefinitely from the root. This function will never return and
- * is intended to be used in a multi-threaded context only.
+ * Extends the search tree indefinitely from the root. This function will only return if the root
+ * becomes terminal (eg with forced mate).
  */
 void search_indefinite(SearchNode * root, Observer & o) {
     greedy_search(root, -1, o);

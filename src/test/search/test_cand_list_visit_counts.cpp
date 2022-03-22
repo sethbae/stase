@@ -15,22 +15,22 @@ public:
         if (ev == DEEPEN) {
             switch (*cand_list) {
                 case CRITICAL:
-                    if (node->visit_count != __constants::CRITICAL_THRESHOLD) {
+                    if (node->visit_count != __engine_params::CRITICAL_THRESHOLD) {
                         fail_test(node, cand_list);
                     }
                     break;
                 case MEDIAL:
-                    if (node->visit_count != __constants::MEDIAL_THRESHOLD) {
+                    if (node->visit_count != __engine_params::MEDIAL_THRESHOLD) {
                         fail_test(node, cand_list);
                     }
                     break;
                 case FINAL:
-                    if (node->visit_count != __constants::FINAL_THRESHOLD) {
+                    if (node->visit_count != __engine_params::FINAL_THRESHOLD) {
                         fail_test(node, cand_list);
                     }
                     break;
                 case LEGAL:
-                    if (node->visit_count != __constants::LEGAL_THRESHOLD) {
+                    if (node->visit_count != __engine_params::LEGAL_THRESHOLD) {
                         fail_test(node, cand_list);
                     }
                     break;

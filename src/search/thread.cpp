@@ -1,8 +1,12 @@
 #include <pthread.h>
+#include <thread>
+#include <chrono>
+#include <signal.h>
 #include <string>
 #include <search.h>
 #include "metrics.h"
 #include "thread.h"
+#include "../game/gamestate.hpp"
 
 class EngineConfiguration {
 
@@ -28,10 +32,11 @@ public:
         nodes(0)
     {
         root = new SearchNode{
-            fresh_gamestate(fen),
+            new Gamestate(fen),
             new CandSet,
             zero(),
             MOVE_SENTINEL,
+            false,
             {},
             nullptr,
             nullptr,
@@ -91,6 +96,27 @@ void run_with_node_limit(const std::string & fen, int node_limit, Observer & obs
 }
 
 /**
+ * Runs the engine in a blocking fashion. Waits for at most [time_out_seconds] seconds, checking every
+ * [poll_every_seconds] whether the engine has exited early or not. If so, kills the engine and returns
+ * the best move. Cleanup is performed when killing the engine according to the flag [cleanup].
+ */
+Move run_with_timeout(const std::string & fen, double time_out_seconds, double poll_every_seconds, bool cleanup) {
+
+    run_in_background(fen);
+
+    int n = (int) (time_out_seconds / poll_every_seconds);
+    for (int i = 0; i < n; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds((int)(poll_every_seconds * 1000)));
+        if (engine_has_stopped()) {
+            break;
+        }
+    }
+
+    stop_engine(cleanup);
+    return fetch_best_move();
+}
+
+/**
  * Cancels the given thread and fetches the best move it found. Responsible for cleaning up
  * the memory the engine was using etc.
  */
@@ -131,6 +157,17 @@ int fetch_node_count() {
 
 SearchNode * fetch_root() {
     return current_running_config->root;
+}
+
+/**
+ * Returns true iff there is no running engine thread. Callers should still go on to call
+ * stop_engine before exiting or starting another.
+ */
+bool engine_has_stopped() {
+    // in order to check whether the thread is still running, you can send a kill signal
+    // with zero as the signo. This is intended for error checking: if the thread has
+    // exited, pthread_kill won't be able to find and kill it, and so returns ESRCH (Error SeaRCHing)
+    return current_running_config && (pthread_kill(current_running_config->t_id, 0) == ESRCH);
 }
 
 bool engine_abort = false;

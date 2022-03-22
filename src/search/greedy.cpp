@@ -6,30 +6,6 @@
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
 
-namespace __constants {
-
-    /**
-     * These constants control certain behaviours of the search algorithm.
-     * THRESHOLDs determine at what visit count a set of candidates is expanded.
-     * DEPTHs determine how deep a tree will be extended at once.
-     * QUIESS_THRESHOLD determines the value at which positions become non-quiescent.
-     */
-
-    const int CRITICAL_THRESHOLD = 0;
-    const int MEDIAL_THRESHOLD = 2;
-    const int FINAL_THRESHOLD = 8;
-    const int LEGAL_THRESHOLD = 256;
-
-    const float QUIESS_THRESHOLD = 2.0f;
-
-    const int BURST_DEPTH = 5;
-    const int CRITICAL_DEPTH = 2;
-    const int MEDIAL_DEPTH = 1;
-    const int FINAL_DEPTH = 1;
-    const int LEGAL_DEPTH = 1;
-
-}
-
 /**
  * Extends the CandSet of the given node to include legal moves. It removes from this list
  * all legal moves which (i) are already present in another list (ii) belong to an existing
@@ -71,7 +47,10 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     // exit conditions
     check_abort();
-    if (node->gs->has_been_mated) { return false; }
+    if (node->gs->has_been_mated) {
+        update_terminal(node);
+        return false;
+    }
 
     if (depth == 0) {
 
@@ -79,15 +58,15 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
             return false;
         }
 
-        if (quiess(*node->gs) >= __constants::QUIESS_THRESHOLD) {
+        if (quiess(*node->gs) >= __engine_params::QUIESS_THRESHOLD) {
             obs.register_event(node, BEGIN_BURST);
-            return deepen(node, CRITICAL, __constants::BURST_DEPTH, obs, true);
+            return deepen(node, CRITICAL, __engine_params::BURST_DEPTH, obs, true);
         } else {
             return false;
         }
     }
 
-    if (burst && quiess(*node->gs) < __constants::QUIESS_THRESHOLD) {
+    if (burst && quiess(*node->gs) < __engine_params::QUIESS_THRESHOLD) {
         return false;
     }
 
@@ -96,20 +75,22 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     // no early exits: this counts as a visit unless in a burst (bursts
     // will only extend CRITICAL, so it doesn't make sense to count
     // higher than that).
-    if (!burst || node->visit_count <= __constants::CRITICAL_THRESHOLD) {
+    if (!burst || node->visit_count <= __engine_params::CRITICAL_THRESHOLD) {
         ++node->visit_count;
     }
 
     // fetch list to extend
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
+
     if (list.empty()) {
-        // we still need to recurse up to the given depth
+        // even if the list is empty, we still need to recurse up to the given depth
         bool changes = false;
         for (int i = 0; i < node->children.size(); ++i) {
             changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
                         || changes;
         }
         update_score(node);
+        update_terminal(node);
         obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
         return changes;
     }
@@ -139,6 +120,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     update_score(node);
+    update_terminal(node);
     obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
     return changes;
 }
@@ -151,7 +133,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  */
 bool visit_node(SearchNode * node, Observer & obs) {
 
-    if (node->gs->has_been_mated) {
+    if (node->gs->has_been_mated || node->terminal) {
         return false;
     }
 
@@ -160,28 +142,29 @@ bool visit_node(SearchNode * node, Observer & obs) {
     bool result;
 
     switch (node->visit_count) {
-        case __constants::CRITICAL_THRESHOLD:
-            result = deepen(node, CRITICAL, __constants::CRITICAL_DEPTH, obs);
+        case __engine_params::CRITICAL_THRESHOLD:
+            result = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::MEDIAL_THRESHOLD:
-            result = deepen(node, MEDIAL, __constants::MEDIAL_DEPTH, obs);
+        case __engine_params::MEDIAL_THRESHOLD:
+            result = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::FINAL_THRESHOLD:
-            result = deepen(node, FINAL, __constants::FINAL_DEPTH, obs);
+        case __engine_params::FINAL_THRESHOLD:
+            result = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
-        case __constants::LEGAL_THRESHOLD:
+        case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
             }
-            result = deepen(node, LEGAL, __constants::LEGAL_DEPTH, obs);
+            result = deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
             obs.close_event(node, VISIT);
             return result;
         default:
             ++node->visit_count;
             update_score(node);
+            update_terminal(node);
             obs.close_event(node, VISIT);
             return false;
     }
@@ -196,23 +179,27 @@ bool visit_node(SearchNode * node, Observer & obs) {
  */
 bool force_visit(SearchNode * node, Observer & obs) {
 
+    if (node->gs->has_been_mated || node->terminal) {
+        return false;
+    }
+
     bool changes = false;
 
     obs.open_event(node, FORCE_VISIT);
 
-    if (node->visit_count <= __constants::CRITICAL_THRESHOLD) {
-        node->visit_count = __constants::CRITICAL_THRESHOLD;
-        changes = deepen(node, CRITICAL, __constants::CRITICAL_DEPTH, obs);
+    if (node->visit_count <= __engine_params::CRITICAL_THRESHOLD) {
+        node->visit_count = __engine_params::CRITICAL_THRESHOLD;
+        changes = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
     }
 
-    if (!changes && node->visit_count < __constants::MEDIAL_THRESHOLD) {
-        node->visit_count = __constants::MEDIAL_THRESHOLD;
-        changes = deepen(node, MEDIAL, __constants::MEDIAL_DEPTH, obs);
+    if (!changes && node->visit_count < __engine_params::MEDIAL_THRESHOLD) {
+        node->visit_count = __engine_params::MEDIAL_THRESHOLD;
+        changes = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
     }
 
-    if (!changes && node->visit_count < __constants::FINAL_THRESHOLD) {
-        node->visit_count = __constants::FINAL_THRESHOLD;
-        changes = deepen(node, FINAL, __constants::FINAL_DEPTH, obs);
+    if (!changes && node->visit_count < __engine_params::FINAL_THRESHOLD) {
+        node->visit_count = __engine_params::FINAL_THRESHOLD;
+        changes = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
     }
 
     obs.close_event(node, FORCE_VISIT);
@@ -282,6 +269,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
     auto start = std::chrono::high_resolution_clock::now();
 
     while (i++ < cycles || cycles < 0) {
+
         visit_best_line(root, false, obs);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
@@ -291,6 +279,10 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 //        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
 //        std::vector<SearchNode *> best_line = retrieve_best_line(root);
 //        print_line(best_line);
+
+        if (root->terminal || soft_exit_criteria(root)) {
+            break;
+        }
     }
 
     std::vector<SearchNode *> best_line = retrieve_trust_line(root);
@@ -318,6 +310,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer & 
             cands(root_gs, new CandSet),
             heur(root_gs),
             MOVE_SENTINEL,
+            false,
             {},
             nullptr,
             nullptr,

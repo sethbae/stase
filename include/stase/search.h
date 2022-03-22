@@ -10,6 +10,7 @@ struct SearchNode {
     CandSet * cand_set;
     Eval score;
     Move move;
+    bool terminal;
     std::vector<SearchNode*> children;
     SearchNode * best_child;
     SearchNode * best_trust_child;
@@ -73,6 +74,7 @@ void write_to_file_recursively(SearchNode*, std::ostream &);
 
 void run_in_background(const std::string & fen, Observer & = DEFAULT_OBSERVER);
 void run_with_node_limit(const std::string & fen, int, Observer & = DEFAULT_OBSERVER);
+Move run_with_timeout(const std::string & fen, double time_out_seconds, double poll_every_seconds, bool cleanup=true);
 
 void stop_engine(bool cleanup=true);
 Move fetch_best_move();
