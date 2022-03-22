@@ -31,7 +31,7 @@ void retrieve_all_puzzle_fens(std::vector<std::string> & vec) {
  */
 void puzzle_gamestates(std::vector<Gamestate> & vec) {
 
-    std::vector<Gamestate> cache;
+    static std::vector<Gamestate> cache;
 
     if (cache.empty()) {
         std::vector<std::string> fens;

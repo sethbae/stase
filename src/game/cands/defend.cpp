@@ -242,7 +242,6 @@ int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, i
             } else {
                 return idx;
             }
-            // todo: else here?
         }
     }
     return idx;

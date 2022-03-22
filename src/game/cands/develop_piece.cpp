@@ -210,7 +210,6 @@ int castling_moves(const Gamestate & gs, const Square s, Move * moves, int idx, 
             } else {
                 return idx;
             }
-            // todo: early exits here?
         }
         if (gs.board.get_cas_wl() && check_squares_for_castling(gs, stosq("d1"), stosq("c1"), stosq("b1"))) {
             if (idx < end) {

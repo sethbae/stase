@@ -61,8 +61,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
         FeatureHandler fh = feature_handlers[i];
         Move moves[MAX_MOVES_PER_HOOK];
         int n = 0;
-//        std::cout << "reset (m=" << m << ")\n";
-        // run the predicate over the board
+
         discover_feature_frames(gs, fh.hook);
 
         // for each feature frame, run either enemy or friendly responders over it
@@ -77,11 +76,9 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
                     : fh.enemy_responses;
 
             int max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
-//            std::cout << "[m=" << m << ",n=" << n << "] (" << MAX_TOTAL_CANDS - m << "," << MAX_MOVES_PER_HOOK << "," << n + MAX_MOVES_PER_FRAME << ")->" << max_idx << "\n";
             for (int k = 0; k < responders.size() && n < max_idx; ++k) {
                 n = responders[k]->resp(gs, &ff, moves, n, max_idx);
                 max_idx = min(MAX_TOTAL_CANDS - m, MAX_MOVES_PER_HOOK, n + MAX_MOVES_PER_FRAME);
-//                std::cout << "[m=" << m << ",n=" << n << "] (" << MAX_TOTAL_CANDS - m << "," << MAX_MOVES_PER_HOOK << "," << n + MAX_MOVES_PER_FRAME << ")->" << max_idx << "\n";
             }
 
             if (n >= MAX_MOVES_PER_HOOK || m + n >= MAX_TOTAL_CANDS) {
