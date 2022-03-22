@@ -12,7 +12,7 @@ bool evaluate_responder_test_case(const Responder * resp, const ResponderTestCas
 
     // run the responder on the feature frames
     for (FeatureFrame ff : tc->feature_frames) {
-        resp->resp(gs, &ff, &moves[0], m, MAX_MOVES_PER_HOOK);
+        m = resp->resp(gs, &ff, &moves[0], m, MAX_MOVES_PER_HOOK);
     }
 
     // convert the output to a vector of strings
