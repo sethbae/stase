@@ -31,13 +31,13 @@ void retrieve_all_puzzle_fens(std::vector<std::string> & vec) {
  */
 void puzzle_gamestates(std::vector<Gamestate> & vec) {
 
-    static std::vector<Gamestate> cache;
+    std::vector<Gamestate> cache;
 
     if (cache.empty()) {
         std::vector<std::string> fens;
         read_all_fens(fens);
-        for (int i = 0; i < fens.size() && i < 10000; ++i) {
-            cache.push_back(*fresh_gamestate(fens[i]));
+        for (int i = 0; i < fens.size(); ++i) {
+            cache.push_back(Gamestate(fens[i]));
         }
     }
 

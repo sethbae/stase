@@ -16,9 +16,9 @@ bool stress_test_main() {
     std::vector<Gamestate> states;
     puzzle_gamestates(states);
 
-//    for (const Hook & h : ALL_HOOKS) {
-//        passed = stress_test_individual_hook(states, h) && passed;
-//    }
+    for (const Hook & h : ALL_HOOKS) {
+        passed = stress_test_individual_hook(states, h) && passed;
+    }
 
     passed = stress_test_cands(states) && passed;
 
