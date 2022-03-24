@@ -140,6 +140,7 @@ bool test_cand_list_ordering();
 bool test_cand_list_visit_counts();
 bool test_legal_moves_present();
 bool test_terminal_not_deepened();
+bool test_terminal_updated();
 
 bool stress_test_main();
 
