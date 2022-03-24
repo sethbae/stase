@@ -2,21 +2,18 @@
 #include "../../search/observers/observers.hpp"
 #include "../../game/gamestate.hpp"
 #include "../test.h"
+#include "test_observer.h"
 
-class CandListOrderingObserver : public Observer {
+class CandListOrderingObserver : public TestObserver {
 
 private:
     unsigned null_count = 0;
-    unsigned visit_count = 0;
-    bool passed = true;
 
 public:
-    std::vector<std::string> diagnostics;
-
     inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
 
         // update the counters
-        ++visit_count;
+        TestObserver::register_applicable_event();
         if (!node || !node->cand_set || !cand_list) {
             ++null_count;
             return;
@@ -49,35 +46,26 @@ public:
     }
 
     inline bool passed_test() {
-        if (visit_count == 0) {
-            diagnostics.push_back("Test failed because the observer was not visited.\n");
+        if (!TestObserver::passed_test()) {
             return false;
         }
         double null_rate = null_count / visit_count;
         if (null_rate > 0.25) {
             diagnostics.push_back("Test failed because the observer received more than 25% of visits with nullptr.\n");
+            return false;
         }
-
-        diagnostics.push_back(
-            "There were "
-            + std::to_string(diagnostics.size())
-            + " errors encountered.\n"
-        );
-        return passed;
+        return true;
     }
 
 private:
 
     inline void fail_test(const SearchNode * node, const CandList * cand_list) {
-        diagnostics.push_back(
-            board_to_fen(node->gs->board)
-            + ": Deepened " + name(*cand_list) + " with CandSet sizes ("
-            + std::to_string(node->cand_set->critical.size()) + ","
-            + std::to_string(node->cand_set->medial.size()) + ","
-            + std::to_string(node->cand_set->final.size()) + ","
-            + std::to_string(node->cand_set->legal.size()) + ")\n"
-        );
-        passed = false;
+        TestObserver::fail_test(node,
+            "Deepened " + name(*cand_list) + " with CandSet sizes ("
+                + std::to_string(node->cand_set->critical.size()) + ","
+                + std::to_string(node->cand_set->medial.size()) + ","
+                + std::to_string(node->cand_set->final.size()) + ","
+                + std::to_string(node->cand_set->legal.size()) + ")\n");
     }
 
 };

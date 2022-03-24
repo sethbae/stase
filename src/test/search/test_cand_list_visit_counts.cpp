@@ -2,17 +2,14 @@
 #include "search.h"
 #include "../../search/search_tools.h"
 #include "../../game/gamestate.hpp"
+#include "test_observer.h"
 
-class CandListVisitCountObserver : public Observer {
+class CandListVisitCountObserver : public TestObserver {
 
-private:
-    bool passed = true;
-    int failures = 0;
 public:
-    std::vector<std::string> diagnostics;
-
     void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
         if (ev == DEEPEN) {
+            TestObserver::register_applicable_event();
             switch (*cand_list) {
                 case CRITICAL:
                     if (node->visit_count != __engine_params::CRITICAL_THRESHOLD) {
@@ -38,24 +35,13 @@ public:
         }
     }
 
-    bool passed_test() {
-        diagnostics.push_back(
-            "There were "
-            + std::to_string(failures)
-            + " failures encountered.\n"
-        );
-        return passed;
-    }
-
 private:
-
     void fail_test(const SearchNode * node, const CandList * c) {
-        passed = false;
-        ++failures;
-        diagnostics.push_back(
-            board_to_fen(node->gs->board)
-            + ": Deepened " + name(*c) + " with a visit count of " + std::to_string(node->visit_count) + ".\n"
-        );
+        TestObserver::fail_test(node,
+            "Deepened "
+            + name(*c)
+            + " with a visit count of "
+            + std::to_string(node->visit_count) + ".\n");
     }
 };
 

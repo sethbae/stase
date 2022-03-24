@@ -2,23 +2,18 @@
 #include "search.h"
 #include "board.h"
 #include "../../game/gamestate.hpp"
+#include "test_observer.h"
 
-class LegalMovesObserver : public Observer {
+class LegalMovesObserver : public TestObserver {
 
-private:
-    bool passed = true;
-    int failures = 0;
-    int total = 0;
 public:
-    std::vector<std::string> diagnostics;
-
     void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
 
         if (!cand_list) { return; }
         if (ev == DEEPEN || ev == BURST_DEEPEN) {
             if (*cand_list == LEGAL) {
 
-                ++total;
+                TestObserver::register_applicable_event();
                 std::vector<Move> expected_legals = legal_moves(node->gs->board);
 
                 for (int i = 0; i < expected_legals.size(); ++i) {
@@ -42,36 +37,13 @@ public:
         }
     }
 
-    bool passed_test() {
-        if (!total) {
-            diagnostics.push_back(
-                "Test failed: no cases at all were encountered with legal moves.\n"
-            );
-            return false;
-        }
-        diagnostics.push_back(
-                "There were " + std::to_string(failures) + " errors encountered.\n"
-        );
-        return passed;
-    }
-
 private:
     void fail_test(const SearchNode * node, const Move m) {
-        passed = false;
-        ++failures;
         if (!is_sentinel(m)) {
-            diagnostics.push_back(
-                board_to_fen(node->gs->board)
-                + ": "
-                + move2uci(m)
-                + " was not found among children.\n"
-            );
+            TestObserver::fail_test(node, move2uci(m) + " was not found among children.\n");
         } else {
             // if the move given was sentinel, it means too many children were found
-            diagnostics.push_back(
-                board_to_fen(node->gs->board)
-                + ": more children were found than there exist legal moves.\n"
-            );
+            TestObserver::fail_test(node, "more children were found than there exist legal moves.\n");
         }
     }
 };
