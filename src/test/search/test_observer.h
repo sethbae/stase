@@ -2,6 +2,7 @@
 #define STASE_TEST_OBSERVER_H
 
 #include "search.h"
+#include "../../game/gamestate.hpp"
 
 class TestObserver : public Observer {
 
@@ -41,5 +42,18 @@ protected:
     }
 };
 
+template <typename T>
+bool evaluate_observer_test_case(const std::string * fen, T & obs) {
+
+    run_with_node_limit(*fen, 25000, obs);
+
+    if (!obs.passed_test()) {
+        for (const std::string & diag : obs.diagnostics) {
+            std::cout << diag;
+        }
+        return false;
+    }
+    return true;
+}
 
 #endif //STASE_TEST_OBSERVER_H

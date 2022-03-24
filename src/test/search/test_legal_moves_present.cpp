@@ -1,7 +1,6 @@
 #include "../test.h"
 #include "search.h"
 #include "board.h"
-#include "../../game/gamestate.hpp"
 #include "test_observer.h"
 
 class LegalMovesObserver : public TestObserver {
@@ -57,17 +56,8 @@ const TestSet<std::string> legal_moves_test_set{
 };
 
 bool evaluate_legal_moves_test_case(const std::string * fen) {
-
     LegalMovesObserver obs;
-    run_with_node_limit(*fen, 25000, obs);
-
-    if (!obs.passed_test()) {
-        for (const std::string & diag : obs.diagnostics) {
-            std::cout << diag;
-        }
-        return false;
-    }
-    return true;
+    return evaluate_observer_test_case(fen, obs);
 }
 
 bool test_legal_moves_present() {

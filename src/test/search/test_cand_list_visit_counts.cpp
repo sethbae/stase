@@ -1,7 +1,6 @@
 #include "../test.h"
 #include "search.h"
 #include "../../search/search_tools.h"
-#include "../../game/gamestate.hpp"
 #include "test_observer.h"
 
 class CandListVisitCountObserver : public TestObserver {
@@ -55,17 +54,8 @@ const TestSet<std::string> cand_list_visit_count_test_set{
 };
 
 bool evaluate_cand_list_vc_test_case(const std::string * fen) {
-
     CandListVisitCountObserver obs;
-    run_with_node_limit(*fen, 25000, obs);
-
-    if (!obs.passed_test()) {
-        for (const std::string & diag : obs.diagnostics) {
-            std::cout << diag;
-        }
-        return false;
-    }
-    return true;
+    return evaluate_observer_test_case(fen, obs);
 }
 
 bool test_cand_list_visit_counts() {

@@ -1,6 +1,4 @@
 #include "search.h"
-#include "../../search/observers/observers.hpp"
-#include "../../game/gamestate.hpp"
 #include "../test.h"
 #include "test_observer.h"
 
@@ -80,17 +78,8 @@ const TestSet<std::string> search_cand_list_test_set{
 };
 
 bool evaluate_cand_list_test_case(const std::string * fen) {
-
     CandListOrderingObserver obs;
-    run_with_node_limit(*fen, 25000, obs);
-
-    if (!obs.passed_test()) {
-        for (const std::string & diag : obs.diagnostics) {
-            std::cout << diag;
-        }
-        return false;
-    }
-    return true;
+    return evaluate_observer_test_case(fen, obs);
 }
 
 bool test_cand_list_ordering() {
