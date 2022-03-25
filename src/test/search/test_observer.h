@@ -32,7 +32,7 @@ protected:
         ++visit_count;
     }
 
-    inline void fail_test(const SearchNode * node, const std::string & error) {
+    inline void fail_test(const SearchNode * node, const std::string error) {
         diagnostics.push_back(
             board_to_fen(node->gs->board)
             + ": "
