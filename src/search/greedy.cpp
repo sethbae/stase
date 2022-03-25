@@ -202,8 +202,14 @@ bool force_visit(SearchNode * node, Observer & obs) {
         changes = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
     }
 
-    obs.close_event(node, FORCE_VISIT);
+    if (!changes) {
+        // there may have been changes to other nodes in the line being force-visited,
+        // and if there were no changes here then deepen won't have called the updates.
+        update_score(node);
+        update_terminal(node);
+    }
 
+    obs.close_event(node, FORCE_VISIT);
     return changes;
 }
 
