@@ -1,19 +1,47 @@
 #include "../test.h"
 #include "test_observer.h"
 #include "search.h"
+#include "../../search/search_tools.h"
 
 class BestChildUpdatedObserver : public TestObserver {
 
 public:
     void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
 
-        if (!node || node->children.empty()) { return; }
+        if (!node || node->children.empty() || !node->best_child) { return; }
 
         TestObserver::register_applicable_event();
 
+        if (is_mate(node->score)) {
+            /*
+             * Mate is annoying because it may need to have been incremented by one between
+             * nodes, but it may not have. These are represented by the two assignments to
+             * failed. A white mate should've been incremented when the node has black to play.
+             * A black mate should've been incremented when the node has white to play.
+             */
+            bool failed;
+            if (white_is_mated(node->score) != node->gs->board.get_white()) {
+                failed = (node->score != mate_in_one_more(node->best_child->score));
+            } else {
+                failed = (node->score == mate_in_one_more(node->best_child->score));
+            }
+
+            if (failed) {
+                TestObserver::fail_test(node,
+                    " mating distance has not been increased correctly: parent has "
+                    + etos(node->score)
+                    + " and child has "
+                    + etos(node->best_child->score) + "\n"
+                );
+            }
+
+            return;
+        }
+
         // check that the best child has the score the node says it does
         if (node->score != node->best_child->score) {
-            TestObserver::fail_test(node, " node's score differs from the score of the best child.\n");
+            TestObserver::fail_test(node, name(ev) + " node's score differs from the score of the best child.\n");
+            return;
         }
 
         // check that there is no child with a better score than the node's score
@@ -21,8 +49,10 @@ public:
             Eval score = node->children[i]->score;
             if (node->gs->board.get_white() && score > node->score) {
                 fail_test(node, node->best_child, node->children[i]);
+                return;
             } else if (!node->gs->board.get_white() && score < node->score) {
                 fail_test(node, node->best_child, node->children[i]);
+                return;
             }
         }
     }
