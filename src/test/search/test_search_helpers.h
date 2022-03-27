@@ -1,5 +1,5 @@
-#ifndef STASE_TEST_OBSERVER_H
-#define STASE_TEST_OBSERVER_H
+#ifndef STASE_TEST_SEARCH_HELPERS_H
+#define STASE_TEST_SEARCH_HELPERS_H
 
 #include "search.h"
 #include "../../game/gamestate.hpp"
@@ -56,4 +56,4 @@ bool evaluate_observer_test_case(const std::string * fen, T & obs) {
     return true;
 }
 
-#endif //STASE_TEST_OBSERVER_H
+#endif //STASE_TEST_SEARCH_HELPERS_H

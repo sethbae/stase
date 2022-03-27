@@ -1,6 +1,6 @@
 #include "../test.h"
 #include "search.h"
-#include "test_observer.h"
+#include "test_search_helpers.h"
 #include "../../search/search_tools.h"
 
 class TerminalNotDeepenedObserver : public TestObserver {

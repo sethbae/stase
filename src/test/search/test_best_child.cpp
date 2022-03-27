@@ -1,5 +1,5 @@
 #include "../test.h"
-#include "test_observer.h"
+#include "test_search_helpers.h"
 #include "search.h"
 #include "../../search/search_tools.h"
 

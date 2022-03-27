@@ -1,6 +1,6 @@
 #include "search.h"
 #include "../test.h"
-#include "test_observer.h"
+#include "test_search_helpers.h"
 
 class CandListOrderingObserver : public TestObserver {
 

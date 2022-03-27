@@ -131,7 +131,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_move.cpp
 
         src/test/search/test_search.cpp
-        src/test/search/test_observer.h
+        src/test/search/test_search_helpers.h
         src/test/search/test_cand_list_ordering.cpp
         src/test/search/test_cand_list_visit_counts.cpp
         src/test/search/test_legal_moves_present.cpp
