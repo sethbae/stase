@@ -35,6 +35,7 @@ bool evaluate_predicate(SearchLinePredicate pred, SearchNode * root, const std::
     switch (pred) {
         case MUST_APPEAR: return entire_line_present(root, moves);
         case MUST_NT_APPEAR: return !entire_line_present(root, moves);
+        default: return false;
     }
 }
 

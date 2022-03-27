@@ -10,6 +10,7 @@ bool test_search() {
     passed = test_terminal_not_deepened() && passed;
     passed = test_terminal_updated() && passed;
     passed = test_best_child_updated() && passed;
+    passed = test_past_blunders() && passed;
 
     return passed;
 
