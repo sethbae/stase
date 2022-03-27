@@ -1,7 +1,7 @@
 #include <cstring>
 #include "test_search_helpers.h"
 
-bool entire_line_present(SearchNode * root, std::vector<std::string> & move_strs) {
+bool entire_line_present(SearchNode * root, std::vector<std::string> & move_strs, bool print_on_absent = true) {
 
     SearchNode * current = root;
 
@@ -20,7 +20,9 @@ bool entire_line_present(SearchNode * root, std::vector<std::string> & move_strs
         }
 
         if (!present) {
-            std::cout << "Required move was not present: " << move_str << "\n";
+            if (print_on_absent) {
+                std::cout << "Required move was not present: " << move_str << "\n";
+            }
             return false;
         } else {
             current = next;
@@ -34,7 +36,7 @@ bool evaluate_predicate(SearchLinePredicate pred, SearchNode * root, const std::
     split(moves, move_str);
     switch (pred) {
         case MUST_APPEAR: return entire_line_present(root, moves);
-        case MUST_NT_APPEAR: return !entire_line_present(root, moves);
+        case MUST_NT_APPEAR: return !entire_line_present(root, moves, false);
         default: return false;
     }
 }

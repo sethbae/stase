@@ -5,11 +5,15 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
     "search-past-blunders",
     {
         SearchLineTestCase{
-            "",
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
             {
                 SearchLineRequirement{
                     MUST_APPEAR,
-                    ""
+                    "e4 c5"
+                },
+                SearchLineRequirement{
+                    MUST_NT_APPEAR,
+                    "e4 c5 Ke2"
                 }
             }
         }
