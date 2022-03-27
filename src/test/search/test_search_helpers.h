@@ -4,6 +4,23 @@
 #include "search.h"
 #include "../../game/gamestate.hpp"
 
+enum SearchLinePredicate {
+    MUST_APPEAR,
+    MUST_NT_APPEAR
+};
+
+struct SearchLineRequirement{
+    SearchLinePredicate pred;
+    const std::string move_str;
+};
+
+struct SearchLineTestCase {
+    const std::string fen;
+    std::vector<SearchLineRequirement> reqs;
+};
+
+bool evaluate_search_line_test_case(const SearchLineTestCase *);
+
 class TestObserver : public Observer {
 
 protected:
