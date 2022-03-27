@@ -20,8 +20,7 @@ constexpr int capture_piece_score(const bool totally_undefended, const Piece cap
     if (totally_undefended) {
         return piece_value(captured);
     }
-    int diff = piece_value(captured) - piece_value(capturing);
-    return max(2 + diff, 0);
+    return 5;
 }
 
 constexpr int fork_score(const int value_a, const int value_b) {
