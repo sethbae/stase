@@ -52,4 +52,15 @@ inline std::string to_string(const T * ptr) {
     return ss.str();
 }
 
+/**
+ * Splits a string around a given delimiter, by default space.
+ */
+inline void split(std::vector<std::string> & output, const std::string & s, const char delim = ' ') {
+    std::istringstream iss(s);
+    std::string item;
+    while (std::getline(iss, item, delim)) {
+        output.push_back(item);
+    }
+}
+
 #endif //STASE_UTILS_H
