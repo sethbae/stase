@@ -1,12 +1,12 @@
 import subprocess
 import time
 
-from client import (
+from src.lichess.client import (
     stream_game_events,
     make_move,
     resign_game
 )
-from info import (
+from src.lichess.info import (
     ROOT_DIR,
     GAME_FILE_DIR,
     ENGINE_USERNAME

@@ -1,7 +1,7 @@
 import json
 import requests
 from typing import Dict, List
-from info import API_BASE
+from src.lichess.info import API_BASE
 
 
 def register_account_as_bot(token: str) -> bool:

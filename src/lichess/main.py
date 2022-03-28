@@ -1,17 +1,16 @@
 import multiprocessing
 import subprocess
-import sys
 import os
 import time
 from typing import List, Any, Dict
 
-from client import (
+from src.lichess.client import (
     respond_to_challenge,
     stream_incoming_events,
     make_move,
 )
-from play import play_game
-from info import read_access_token, ROOT_DIR, ENV_FILE, InvalidTokenException
+from src.lichess.play import play_game
+from src.lichess.info import read_access_token, ROOT_DIR, ENV_FILE, InvalidTokenException
 
 
 def rebuild_stase(pr: bool = True) -> None:
@@ -168,6 +167,8 @@ def main():
     play_games(tk, 5)
 
 
-if __name__ == "__main__":
+def run_driver() -> None:
+    """
+    Run the lichess driver.
+    """
     main()
-    sys.exit(0)
