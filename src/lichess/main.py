@@ -17,9 +17,9 @@ from info import (
 
 
 def rebuild_stase() -> None:
-    subprocess.Popen("git pull".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
-    subprocess.Popen("cmake .".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
-    subprocess.Popen("make stase".split(), cwd=STASE_SRC_DIR, stdout=subprocess.PIPE).wait()
+    subprocess.Popen("git pull".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+    subprocess.Popen("cmake .".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen("make stase".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL).wait()
 
 
 def repl_game():
