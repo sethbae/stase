@@ -80,6 +80,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     // fetch list to extend
+    if (cand_list == CRITICAL) { node->cand_set->order_list(cand_list); }
     const std::vector<Move> & list = node->cand_set->get_list(cand_list);
 
     if (list.empty()) {

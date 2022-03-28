@@ -93,25 +93,29 @@ set(BENCH_SOURCE_FILES
         src/bench/game/heur/bench_heur.cpp)
 
 set(TEST_SOURCE_FILES
+
         src/test/test.h
-        src/test/stress_test_main.cpp
-        src/test/board/test_board.cpp
-        src/test/game/test_game.cpp
         src/test/test_helpers.cpp
-        src/test/game/cands/fork_helpers.h
+
+        src/test/stress_test_main.cpp
+        src/test/game/cands/stress_test_cands.cpp
+
+        src/test/game/test_game.cpp
         src/test/game/test_piece.cpp
         src/test/game/test_gs_piece_lists.cpp
+        src/test/game/test_weak.cpp
+        src/test/game/test_cands_sorting.cpp
+
         src/test/game/cands/test_capture_piece.cpp
         src/test/game/cands/test_unsafe_piece_hook.cpp
         src/test/game/cands/test_defend.cpp
         src/test/game/cands/test_development_hook.cpp
         src/test/game/cands/test_develop_piece.cpp
-        src/test/game/cands/stress_test_cands.cpp
+        src/test/game/cands/fork_helpers.h
         src/test/game/cands/test_knight_fork_hook.cpp
         src/test/game/cands/test_sliding_fork_hook.cpp
         src/test/game/cands/test_queen_fork_hook.cpp
         src/test/game/cands/test_kp_forks.cpp
-        src/test/game/test_weak.cpp
         src/test/game/cands/test_trade_resp.cpp
         src/test/game/cands/test_retreat_resp.cpp
         src/test/game/cands/test_desperado_resp.cpp
@@ -122,6 +126,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_fork_responder.cpp
         src/test/game/cands/test_discovered_hook.cpp
 
+        src/test/board/test_board.cpp
         src/test/board/test_pieces.cpp
         src/test/board/test_square.cpp
         src/test/board/test_fens.cpp

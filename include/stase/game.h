@@ -57,22 +57,40 @@ struct CandSet {
         }
         return critical.size() + medial.size() + final.size();
     }
-    inline std::vector<Move> get_list(CandList cand_list) {
+
+    inline std::vector<Move> & get_list(CandList cand_list) {
         switch (cand_list) {
             case CRITICAL: return critical;
             case MEDIAL: return medial;
             case FINAL: return final;
             case LEGAL: return legal;
+            default: return critical;
         }
-        // impossible
-        return {};
     }
+
     inline void clear_list(CandList cand_list) {
         switch (cand_list) {
             case CRITICAL: critical.clear(); break;
             case MEDIAL: medial.clear(); break;
             case FINAL: final.clear(); break;
             case LEGAL: legal.clear(); break;
+        }
+    }
+
+    /**
+     * Sorts the specified list by order of decreasing score.
+     */
+    inline void order_list(CandList cand_list) {
+        std::vector<Move> & list = get_list(cand_list);
+        for (int i = 0; i < list.size(); ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (list[i].get_score() > list[j].get_score()) {
+                    Move temp;
+                    temp = list[j];
+                    list[j] = list[i];
+                    list[i] = temp;
+                }
+            }
         }
     }
 };

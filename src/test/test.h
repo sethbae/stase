@@ -104,7 +104,7 @@ inline bool evaluate_test_function(const std::string name, bool (*func)(void)) {
     }
 
     std::cout << std::left << std::setw(30) << name << ":   ";
-    std::cout << (passed ? "passed" : "failed");
+    std::cout << (passed ? "passed\n" : "failed\n");
 
     if (!passed) {
         std::cout << "*****SOME TESTS FAILED***** (" << name << ")\n";
@@ -117,6 +117,7 @@ bool test_board();
 bool test_game();
 bool test_search();
 
+// board tests
 bool test_pieces();
 bool test_set_get_square();
 bool test_read_write_fens();
@@ -126,15 +127,18 @@ bool test_mutate_hard();
 bool test_mutate();
 bool test_move_scores();
 
-bool test_unsafe_piece_hook();
-bool test_development_hook();
-bool test_capture_piece();
-bool test_defend_square();
+// top level game tests
 bool test_alpha_covers();
 bool test_beta_covers();
 bool test_gamma_covers();
 bool test_kpinned_piece_list();
+bool test_cands_sorting();
 
+// hooks and responders
+bool test_unsafe_piece_hook();
+bool test_development_hook();
+bool test_capture_piece();
+bool test_defend_square();
 bool test_develop_piece();
 bool test_knight_fork_hook();
 bool test_sliding_fork_hook();
@@ -153,6 +157,7 @@ bool test_king_pinned_pieces_hook();
 bool test_promotion_hook();
 bool test_discovered_hook();
 
+// search tests
 bool test_cand_list_ordering();
 bool test_cand_list_visit_counts();
 bool test_legal_moves_present();

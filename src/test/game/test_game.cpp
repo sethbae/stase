@@ -4,13 +4,14 @@ bool test_game() {
 
     bool passed = true;
 
-    // piece
+    // top level
     passed = test_alpha_covers() && passed;
     passed = test_beta_covers() && passed;
     passed = test_gamma_covers() && passed;
     passed = test_weak_square() && passed;
     passed = test_unsafe_piece() && passed;
     passed = test_kpinned_piece_list() && passed;
+    passed = test_cands_sorting() && passed;
 
     // cands
     passed = test_unsafe_piece_hook() && passed;
