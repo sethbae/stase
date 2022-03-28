@@ -28,11 +28,10 @@ constexpr std::string_view starting_fen() {
  * Legal moves. These functions provide all legal moves, those only for a certain piece
  * as well as checking whether you're in check or not.
  */
-void piecemoves(const Board &, const Square, std::vector<Move> &);
+
 void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
 bool in_check_hard(const Board &);
 bool in_check_hard(const Board &, Colour);
-void legal_piecemoves(const Board &, const Square, std::vector<Move> &);
 void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
 
@@ -40,6 +39,7 @@ std::vector<Move> legal_moves(const Board &);
  * Reading and writing helpers: into and out of FEN and displaying usefully
  * either to stdout or to a given ostream.
  */
+
 Board fen_to_board(const std::string_view & fen);
 std::string board_to_fen(const Board &);
 std::vector<std::string> read_pgn(const std::string &s);

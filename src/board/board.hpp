@@ -9,47 +9,16 @@
 using std::stringstream;
 using std::string;
 
-/***************************************************************************
- * This file defines a board representation and piece type (enum).
+/*
+ * This file defines a board representation.
  * 
  * It defines a basic interface for interacting with a chess board:
- *  
- *   -Square: a coordinate on the board
- *      
- *      -mksq():        makes a square out of regular coordinates (a, b)
- *      -inc_row():     (in-/de-)crement a square to point further along a row/col
- *          dec_row()
- *          inc_col()
- *          dec_col()
- *      -reset_row():   return row or column to zero
- *          reset_col()
- *      -row():         return the current row or column
- *          col()
- *      -val_row():     query whether the square pointed to is on the board (or just off)
- *          val_col()
  *
- *   -Board: 64 squares and a configuration word (move, castling, ep, half moves, whole moves)
- *      
- *      -b.get():       return the current piece on a square
- *      -b.set():       set the piece of a square
- * 
- *      -pr(b):         print out a human readable ascii grid chess board
- *      -pr_raw(b):     print out the numeric values in a grid
- *      -fen_to_board():convert a string in FEN to a board instance.
- *      
- *   -Piece: an enum for each piece type (W_KING, B_QUEEN, EMPTY etc).
- *          
-        -PIECE[p]       equals e.g. W_KING
-        -TYPE[p]        equals e.g. KING
-        -COLOUR[p]      equals e.g. WHITE
- *      -is_white():    returns true iff the piece is white
- *      -ptoc():        returns a character depicting the piece (K, q etc)
-            ctop()
+ *   64 squares and a configuration word (move, castling, ep, half moves, whole moves)
  *
- *  Implementation details:
- *  
- *  Board:
- *      -> 4 bits per square of board
+ *      -Board::get():       return the current piece on a square
+ *      -Board::set():       set the piece of a square
+ *
  *      -> the board struct stores a 2d array of bytes
  *      -> the config word is 32 bits
  *      -> Config bits:
@@ -59,32 +28,12 @@ using std::string;
  *          Bit 6-8:        En-passant file
  *          Bit 9 - 15:     Half move counter
  *          Bit 16 - 31:    Full move counter
- *      
- *  Square:
- *      -> 8 bits per square
- *      -> 4 high bits store one coordinate (0-8 inc)
- *      -> 4 low bits store another (0-8 inc)
  *
- *  Piece:
- *      -> Each piece is a number as defined at the start of the Ptype enum. This number defines
- *          an index into the three look up tables, which record:
- *              TYPE:   the type and colour of a piece: White king
- *              PIECE:  the piece type only; king
- *              COLOUR: the colour only
- *      -> Values needed in the lookup tables (e.g. WHITE) which do not in themselves define a 
- *          piece, and hence aren't indexes into the tables, appear in the same enum without
- *          specified values.
- *      -> Any logically possible square value (e.g. empty or a chess piece) can fit in 4 bits,
- *          and can therefore be written to a square.
- *      -> White pieces have the MSB set.
- *      -> EMPTY is white, as it goes (value 14).
- *      
- *  Note: To decide which half of a byte is addressed, we use even/oddness.
- *          So for a 3 bit index n, n/2 is used to get the byte (i.e. n >> 1),
- *          and then n % 2 == 0 is used to decide between high and low (i.e. n & 1).
- *      
- *****************************************************************************/
+ */
 
+/**
+ * Namespace containing the bitmasks used to read and write the config word.
+ */
 namespace __bit_masks {
     const unsigned WHITE_MASK = 1 << 0;
     const unsigned CAS_WS_MASK = 1 << 1;

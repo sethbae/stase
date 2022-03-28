@@ -617,10 +617,6 @@ bool in_check_hard(const Board & b) {
  *  Legal move functions
  ************************************************************************/
 
-void legal_piecemoves(const Board & b, const Square s, vector<Move> & moves) {
-    b.get(s); moves.size();
-}
-
 void legal_moves(const Board & b, vector<Move> & moves) {
     
     Colour col = b.get_white() ? WHITE : BLACK;
