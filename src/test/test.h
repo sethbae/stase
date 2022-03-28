@@ -96,6 +96,23 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 }
 
+inline bool evaluate_test_function(const std::string name, bool (*func)(void)) {
+
+    bool passed = false;
+    if (func) {
+        passed = (*func)();
+    }
+
+    std::cout << std::left << std::setw(30) << name << ":   ";
+    std::cout << (passed ? "passed" : "failed");
+
+    if (!passed) {
+        std::cout << "*****SOME TESTS FAILED***** (" << name << ")\n";
+        return false;
+    }
+    return true;
+}
+
 bool test_board();
 bool test_game();
 bool test_search();
