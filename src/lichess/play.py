@@ -7,8 +7,8 @@ from client import (
     resign_game
 )
 from info import (
+    ROOT_DIR,
     GAME_FILE_DIR,
-    STASE_SRC_DIR,
     ENGINE_USERNAME
 )
 
@@ -79,7 +79,7 @@ def _get_move(game_id: str, moves_played: str, think_time: int) -> str:
     exec_stase_command: str = f"./stase -t {think_time} -g {game_id}"
     engine_process = subprocess.Popen(
         exec_stase_command.split(),
-        cwd=STASE_SRC_DIR,
+        cwd=ROOT_DIR,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )

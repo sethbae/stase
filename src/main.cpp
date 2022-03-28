@@ -18,7 +18,7 @@ using std::string;
 #include "utils/utils.h"
 #include "game/gamestate.hpp"
 
-const std::string GAME_FILE_DIR = "/home/seth/Documents/stase_lichess";
+const std::string GAME_FILE_DIR = "./src/lichess/deployment/game_files";
 
 const std::string welcome_message =
         "Welcome to Stase v4.0\n";

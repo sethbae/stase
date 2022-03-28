@@ -1,6 +1,7 @@
 import multiprocessing
 import subprocess
 import sys
+import os
 import time
 from typing import List, Any, Dict
 
@@ -10,16 +11,35 @@ from client import (
     make_move,
 )
 from play import play_game
-from info import (
-    read_access_token,
-    STASE_SRC_DIR,
-)
+from info import read_access_token, ROOT_DIR, ENV_FILE, InvalidTokenException
 
 
-def rebuild_stase() -> None:
-    subprocess.Popen("git pull".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
-    subprocess.Popen("cmake .".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL).wait()
-    subprocess.Popen("make stase".split(), cwd=STASE_SRC_DIR, stdout=subprocess.DEVNULL).wait()
+def rebuild_stase(pr: bool = True) -> None:
+    """
+    Pulls the latest version from master and builds the C++ executable.
+    """
+    if pr: print("Pulling changes...", end="")
+    subprocess.Popen("git pull".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+    if pr: print("done")
+
+    if pr: print("Building engine...", end="")
+    subprocess.Popen("cmake .".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen("make stase".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
+    if pr: print("done")
+
+
+def configure_dirs(pr: bool = True) -> None:
+    if pr: print("Checking dirs...", end="")
+
+    if not os.path.isdir("deployment"):
+        os.mkdir("deployment")
+    if not os.path.isdir("deployment/game_files"):
+        os.mkdir("deployment/game_files")
+    if not os.path.exists(ENV_FILE):
+        with open(ENV_FILE, "w") as file:
+            file.close()
+
+    if pr: print("done")
 
 
 def repl_game():
@@ -107,13 +127,12 @@ class ChallengePool:
             self.proc_names[self.procs[i]] = challenge["challenge"]["id"]
 
 
-def play_games(max_concurrent: int) -> None:
+def play_games(token: str, max_concurrent: int) -> None:
     """
     Accepts all challenges. Plays up to :param max_concurrent: games at once, queueing
     other challenges and accepting in order received.
     """
 
-    token: str = read_access_token()
     cpool: ChallengePool = ChallengePool(max_concurrent, token)
 
     print("Waiting for incoming challenges.")
@@ -136,10 +155,17 @@ def play_games(max_concurrent: int) -> None:
 
 
 def main():
-    print("Building engine...", end="")
+
     rebuild_stase()
-    print("done!")
-    play_games(5)
+    configure_dirs()
+
+    try:
+        tk: str = read_access_token()
+    except InvalidTokenException:
+        print("Could not read access token: please place in a file called \"env\" in the root directory.")
+        return
+
+    play_games(tk, 5)
 
 
 if __name__ == "__main__":

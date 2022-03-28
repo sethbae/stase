@@ -1,18 +1,29 @@
 
 """Some file paths used for the engine and for talking to it"""
-GAME_FILE_DIR = "/home/seth/Documents/stase_lichess"
-STASE_SRC_DIR = "/home/seth/Documents/stase_lichess/stase"
+ROOT_DIR = "../.."
+GAME_FILE_DIR = "deployment/game_files"
+ENV_FILE = "../../env"
 ENGINE_USERNAME = "queen_stase_approx"
 
 """Base URL for hitting the lichess api"""
 API_BASE: str = "https://lichess.org/api"
 
 
+class InvalidTokenException(Exception):
+    pass
+
+
 def read_access_token() -> str:
     """
     Reads the lichess personal access token required to access stase's account.
     """
-    with open(".env", "r") as file:
-        token = file.read()
+    try:
+        with open(ENV_FILE, "r") as file:
+            token = file.read()
+    except FileNotFoundError:
+        raise InvalidTokenException("Could not read .env file.")
+
+    if not token.strip():
+        raise InvalidTokenException("Auth token is not valid.")
 
     return token.strip()
