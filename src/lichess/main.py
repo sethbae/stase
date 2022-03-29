@@ -12,6 +12,31 @@ from src.lichess.client import (
 from src.lichess.play import play_game
 from src.lichess.info import read_access_token, ROOT_DIR, ENV_FILE, InvalidTokenException
 
+STASE_SPLASH = \
+    r"""
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>      ____    __________              ____                >
+>     /    \  |          |            /    \      \  / |_| >
+>    /  /\  \ |___    ___|           /  /\  \      \/    | >
+>    |  ||__|     |  |               |  ||__|              >
+>    \  \         |  |    _______    \  \       ______     >
+>     \  \        |  |   /       \    \  \     /   _  \    >
+>      \  \       |  |  |   __   |     \  \   /   /_\  \   >
+>    __ \  \      |  |  |  |  |  |   __ \  \  |   _____|   >
+>   |  ||  |      |  |  |  |__|  |  |  ||  |  |  |    _    >
+>   \  \/  /      |  |  |        |  \      /   \  \__| |   >
+>    \____/       |__|   \____/\_|   \____/     \______/   >
+>                                                          >
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>                                                          >
+>         the open source chess engine                     >
+>                                                          >
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+"""
+
 
 def rebuild_stase(pr: bool = True) -> None:
     """
@@ -163,6 +188,8 @@ def main():
     except InvalidTokenException:
         print("Could not read access token: please place in a file called \"env\" in the root directory.")
         return
+
+    print(STASE_SPLASH)
 
     play_games(tk, 5)
 
