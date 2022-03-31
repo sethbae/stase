@@ -2,5 +2,8 @@ import sys
 from src.lichess.main import run_driver
 
 if __name__ == "__main__":
-    run_driver()
+    try:
+        run_driver()
+    except KeyboardInterrupt:
+        pass
     sys.exit(0)

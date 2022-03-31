@@ -178,8 +178,10 @@ def play_games(token: str, max_concurrent: int) -> None:
         cpool.refresh_challenges()
 
 
-def main():
-
+def run_driver() -> None:
+    """
+    Run the lichess driver.
+    """
     rebuild_stase()
     configure_dirs()
 
@@ -192,10 +194,3 @@ def main():
     print(STASE_SPLASH)
 
     play_games(tk, 5)
-
-
-def run_driver() -> None:
-    """
-    Run the lichess driver.
-    """
-    main()
