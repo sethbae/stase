@@ -39,7 +39,7 @@ constexpr T min(const T a, const T b, const T c) {
 Move uci2move(const std::string &);
 std::string move2uci(const Move);
 
-void print_stack_trace(int sig);
+void print_stack_trace_and_abort(int sig);
 
 /**
  * Returns a string representation of the memory address pointed to by the given pointer.

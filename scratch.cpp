@@ -557,9 +557,9 @@ void repl(const std::string & fen) {
 
 int main(int argc, char** argv) {
 
-    signal(SIGSEGV, print_stack_trace);
-    signal(SIGABRT, print_stack_trace);
-    signal(SIGKILL, print_stack_trace);
+    signal(SIGSEGV, print_stack_trace_and_abort);
+    signal(SIGABRT, print_stack_trace_and_abort);
+    signal(SIGKILL, print_stack_trace_and_abort);
 
     const std::string fen = "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1";
 

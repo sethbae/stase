@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 
-void print_stack_trace(int sig) {
+void print_stack_trace_and_abort(int sig) {
 
     void *array[25];
     size_t size;

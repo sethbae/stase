@@ -12,8 +12,8 @@ using std::setw;
 
 int main(int argc, char** argv) {
 
-    signal(SIGSEGV, print_stack_trace);
-    signal(SIGABRT, print_stack_trace);
+    signal(SIGSEGV, print_stack_trace_and_abort);
+    signal(SIGABRT, print_stack_trace_and_abort);
 
     unsigned modules_tested = 0;
     bool passed = true;

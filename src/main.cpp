@@ -216,7 +216,7 @@ void handle_analysis_request(const std::string & game_id, const int seconds_per_
 
 int main(int argc, char** argv) {
 
-    signal(SIGSEGV, print_stack_trace);
+    signal(SIGSEGV, print_stack_trace_and_abort);
 
     bool interactive = true;
     int t = 10;

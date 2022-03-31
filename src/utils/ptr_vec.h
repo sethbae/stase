@@ -57,7 +57,7 @@ public:
 private:
     inline void exit_with_failure() const {
         std::cout << "*****Illegal ptr_vec usage: aborting\n";
-        print_stack_trace(0);
+        print_stack_trace_and_abort(0);
     }
 };
 
