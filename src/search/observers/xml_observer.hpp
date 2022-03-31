@@ -29,7 +29,8 @@ public:
                     ? ""
                     : move2uci(node->move) + " ")
                 + (cand_list ? name(*cand_list) + " " : "")
-                + "(vc: " + std::to_string(node->visit_count) + ") ";
+                + "(vc: " + std::to_string(node->visit_count) + ") "
+                + board_to_fen(node->gs->board);
         current_line.push_back(move2uci(node->move));
         buffer.push_back(indent(indent_level) + "<" + name(ev) + ">" + move);
         ++indent_level;
