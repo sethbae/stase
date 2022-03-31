@@ -109,7 +109,7 @@ inline Square __manual_first_piece_encountered(const Board & b, const Square sta
  * Writes to the given PieceEncounteredCache so that it can be used to answer queries about the
  * board given.
  */
-inline void  compute_cache(const Board & b, PieceEncounteredCache * cache) {
+inline void compute_cache(const Board & b, PieceEncounteredCache * cache) {
     for (int i = 0; i < 8; ++i) {
         Delta d = delta(XD[i], YD[i]);
         __internal::create_cache(b, cache->d[d.dx + 1][d.dy + 1], d);
