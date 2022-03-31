@@ -16,6 +16,8 @@ using std::ofstream;
 #include <ostream>
 using std::ostream;
 
+Observer DEFAULT_OBSERVER;
+
 /**
  * Recursively counts the number of nodes in the subtree rooted at the given node.
  */

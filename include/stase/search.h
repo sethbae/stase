@@ -59,7 +59,7 @@ public:
  * The default observer should be used when an observer is not required: it does nothing and
  * should get optimised away with no performance cost at all.
  */
-static Observer DEFAULT_OBSERVER;
+extern Observer DEFAULT_OBSERVER;
 
 std::vector<Move> greedy_search(const std::string &, int, Observer & = DEFAULT_OBSERVER);
 std::vector<Move> greedy_search(SearchNode *, int, Observer & = DEFAULT_OBSERVER);
