@@ -14,6 +14,20 @@
 void add_legal_moves(SearchNode * node) {
 
     std::vector<Move> legals = legal_moves(node->gs->board);
+    if (legals.empty()) {
+        if (node->gs->in_check) {
+            node->gs->has_been_mated = true;
+            node->terminal = true;
+            node->score =
+                node->gs->board.get_white()
+                    ? white_has_been_mated()
+                    : black_has_been_mated();
+        } else {
+            node->terminal = true;
+            node->score = zero();
+        }
+    }
+
     std::vector<Move> approved;
     approved.reserve(legals.size());
 
@@ -158,6 +172,11 @@ bool visit_node(SearchNode * node, Observer & obs) {
         case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
+                if (node->terminal) {
+                    // stalemate could have been detected
+                    obs.close_event(node, VISIT);
+                    return true;
+                }
             }
             result = deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
             obs.close_event(node, VISIT);
