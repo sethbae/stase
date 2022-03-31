@@ -11,6 +11,7 @@ bool test_search() {
     passed = test_terminal_updated() && passed;
     passed = test_best_child_updated() && passed;
     passed = test_past_blunders() && passed;
+    passed = test_past_crashes() && passed;
 
     return passed;
 

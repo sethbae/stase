@@ -165,6 +165,7 @@ bool test_terminal_not_deepened();
 bool test_terminal_updated();
 bool test_best_child_updated();
 bool test_past_blunders();
+bool test_past_crashes();
 
 bool stress_test_main();
 
