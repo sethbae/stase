@@ -17,7 +17,7 @@ public:
     inline void push(T elem) {
 #ifdef SAFE_STACK_VEC
         if (i >= n) {
-            exit_with_failure();
+            exit_with_failure("pushing to full stack");
         }
 #endif
         ptr[i++] = elem;
@@ -26,7 +26,7 @@ public:
     inline T pop() {
 #ifdef SAFE_STACK_VEC
         if (i <= 0) {
-            exit_with_failure();
+            exit_with_failure("popping from empty stack");
         }
 #endif
         return ptr[--i];
@@ -39,7 +39,7 @@ public:
     inline T operator[] (short unsigned j) const {
 #ifdef SAFE_STACK_VEC
         if (j < 0 || j >= n) {
-            exit_with_failure();
+            exit_with_failure("accessing " + std::to_string(j) + " at " + std::to_string(i) + "/" + std::to_string(n));
         }
 #endif
         return ptr[j];
@@ -48,15 +48,15 @@ public:
     inline T & operator[] (short unsigned j) {
 #ifdef SAFE_STACK_VEC
         if (j < 0 || j >= n) {
-            exit_with_failure();
+            exit_with_failure("assigning " + std::to_string(j) + " at " + std::to_string(i) + "/" + std::to_string(n));
         }
 #endif
         return ptr[j];
     }
 
 private:
-    inline void exit_with_failure() const {
-        std::cout << "*****Illegal ptr_vec usage: aborting\n";
+    inline void exit_with_failure(const std::string message) const {
+        std::cout << "*****Illegal ptr_vec usage: " + message + "*****\n";
         print_stack_trace_and_abort(0);
     }
 };
