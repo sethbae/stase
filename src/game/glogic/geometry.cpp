@@ -131,7 +131,7 @@ std::vector<Square> squares_piece_can_reach_on_line(
  * Finds squares moving in one direction according to gamma-logic. Writes to squares starting from the given
  * index.
  */
-inline void gamma_explore(const Board & b, const Square s, Square * squares, int & i, Delta d, MoveType dir) {
+inline void gamma_explore(const Board & b, const Square s, ptr_vec<Square> & squares, Delta d, MoveType dir) {
 
     Colour c = colour(b.get(s));
     Square temp = s;
@@ -142,7 +142,7 @@ inline void gamma_explore(const Board & b, const Square s, Square * squares, int
 
     while (val(temp) && cont) {
 
-        squares[i++] = temp;
+        squares.push(temp);
 
         Piece otherp = b.get(temp);
         if (otherp != EMPTY) {
@@ -163,34 +163,35 @@ inline void gamma_explore(const Board & b, const Square s, Square * squares, int
  * Board state should be prior to the playing of the move.
  * The squares pointer should have space for 80 (=64 + 8 + 8) squares.
  */
-void find_invalidated_squares(const Board & b, Square * squares, const Move m) {
-    int i = 0;
+void find_invalidated_squares(const Board & b, const Move m, ptr_vec<Square> & squares) {
+
     for (int j = 0; j < 8; ++j) {
         Delta d = D[j];
-        gamma_explore(b, m.from, squares, i, d, direction_of_delta(d));
-        gamma_explore(b, m.to, squares, i, d, direction_of_delta(d));
+        gamma_explore(b, m.from, squares, d, direction_of_delta(d));
+        gamma_explore(b, m.to, squares, d, direction_of_delta(d));
     }
+
     if (type(b.get(m.from)) == KNIGHT) {
         for (int j = 0; j < 8; ++j) {
             Square temp = mksq(m.from.x + XKN[j], m.from.y + YKN[j]);
             if (val(temp)) {
-                squares[i++] = temp;
+                squares.push(temp);
             }
             temp = mksq(m.to.x + XKN[j], m.to.y + YKN[j]);
             if (val(temp)) {
-                squares[i++] = temp;
+                squares.push(temp);
             }
         }
     }
+
     else if (type(b.get(m.to)) == KNIGHT) {
         for (int j = 0; j < 8; ++j) {
             Square temp = mksq(m.to.x + XKN[j], m.to.y + YKN[j]);
             if (val(temp)) {
-                squares[i++] = temp;
+                squares.push(temp);
             }
         }
     }
-    squares[i] = SQUARE_SENTINEL;
 }
 
 bool is_knight_move(const Square a, const Square b) {

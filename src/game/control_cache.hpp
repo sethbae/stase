@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "glogic/glogic.h"
+#include "../utils/ptr_vec.h"
 
 /**
  * Caches a set of SquareControlStates by the square to which they refer.
@@ -43,8 +44,9 @@ struct ControlCache {
      */
     inline void update(const Board & b, const ControlCache & o, const Move m) {
 
-        Square invalidated[64];
-        find_invalidated_squares(b, &invalidated[0], m);
+        Square invalidated[128];
+        ptr_vec<Square> inval_sqs(invalidated, 128);
+        find_invalidated_squares(b, m, inval_sqs);
 
         status_present = o.status_present;
         count_present = o.count_present;
@@ -53,7 +55,7 @@ struct ControlCache {
             control_count_cache[i] = o.control_count_cache[i];
         }
 
-        for (int i = 0; i < 64 && !is_sentinel(invalidated[i]); ++i) {
+        for (int i = 0; i < inval_sqs.size(); ++i) {
             const uint64_t MASK = ~(1l << index(invalidated[i]));
             status_present &= MASK;
             count_present &= MASK;
