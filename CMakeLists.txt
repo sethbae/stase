@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 project(stase)
 set(CMAKE_CXX_STANDARD 20)
 
-set(OPT_FLAGS -Ofast)
+set(OPT_FLAGS "-Ofast -DSAFE_STACK_VEC")
 
 SET(CMAKE_CXX_FLAGS "-pthread -g -rdynamic -fno-exceptions ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fno-unwind-tables")
@@ -79,7 +79,8 @@ set(SOURCE_FILES
         src/utils/utils.h
         src/utils/print.cpp
         src/utils/uci.cpp
-        src/utils/signal.cpp)
+        src/utils/signal.cpp
+        src/utils/ptr_vec.h)
 
 set(STASE_SOURCE_FILES)
 
