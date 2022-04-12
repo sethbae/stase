@@ -12,7 +12,7 @@ private:
     struct SearchArgs{
         SearchNode * root;
         int cycles;
-        Observer & o;
+        Observer * o;
         double seconds;
         int * nodes_out;
         Move * move_out;
@@ -46,15 +46,15 @@ public:
         nodes(0)
     {
         root = new SearchNode{
-                new Gamestate(fen),
-                new CandSet,
-                zero(),
-                MOVE_SENTINEL,
-                false,
-                {},
-                nullptr,
-                nullptr,
-                0
+            new Gamestate(fen),
+            new CandSet,
+            zero(),
+            MOVE_SENTINEL,
+            false,
+            {},
+            nullptr,
+            nullptr,
+            0
         };
     }
 
@@ -87,7 +87,7 @@ class EngineBuilder {
 
 private:
     std::string fen;
-    Observer obs;
+    Observer & obs;
     int nodes;
     int cycles;
     double seconds;

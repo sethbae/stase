@@ -13,12 +13,11 @@ bool thread_has_stopped(pthread_t thread) {
 
 void * Engine::start(void * args) {
 
-    std::cout << "start\n";
     SearchArgs * search_args = (SearchArgs *) args;
 
     reset_node_count();
     reset_abort_flag();
-    greedy_search(search_args->root, search_args->cycles, search_args->o);
+    greedy_search(search_args->root, search_args->cycles, *search_args->o);
 
     *search_args->nodes_out = node_count();
     *search_args->move_out = current_best_move(search_args->root);
@@ -28,7 +27,6 @@ void * Engine::start(void * args) {
 
 void * Engine::start_with_timeout(void * args) {
 
-    std::cout << "start with timeout " << ((SearchArgs *) args)->seconds << "\n";
     SearchArgs * search_args = (SearchArgs *) args;
 
     reset_node_count();
@@ -68,7 +66,7 @@ void Engine::run() {
         new SearchArgs{
             root,
             cycle_limit,
-            obs,
+            &obs,
             timeout_seconds,
             &nodes,
             &best_move
