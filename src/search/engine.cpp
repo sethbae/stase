@@ -7,20 +7,11 @@
 #include "search_tools.h"
 #include "metrics.h"
 
-struct SearchArgs {
-    SearchNode * root;
-    int cycles;
-    Observer & o;
-    double seconds;
-    int * nodes_out;
-    Move * move_out;
-};
-
 bool thread_has_stopped(pthread_t thread) {
     return pthread_kill(thread, 0) == ESRCH;
 }
 
-void * start(void * args) {
+void * Engine::start(void * args) {
 
     SearchArgs * search_args = (SearchArgs *) args;
 
@@ -31,12 +22,10 @@ void * start(void * args) {
     *search_args->nodes_out = node_count();
     *search_args->move_out = current_best_move(search_args->root);
 
-    delete search_args;
     return nullptr;
-
 }
 
-void * start_with_timeout(void * args) {
+void * Engine::start_with_timeout(void * args) {
 
     SearchArgs * search_args = (SearchArgs *) args;
 
@@ -66,7 +55,6 @@ void * start_with_timeout(void * args) {
     *search_args->nodes_out = node_count();
     *search_args->move_out = current_best_move(search_args->root);
 
-    delete search_args;
     return nullptr;
 }
 
@@ -74,7 +62,7 @@ void Engine::run() {
 
     if (root == nullptr) { return; }
 
-    SearchArgs * search_args =
+    search_args =
         new SearchArgs{
             root,
             cycle_limit,
@@ -90,14 +78,14 @@ void Engine::run() {
         pthread_create(
             &t_id,
             nullptr,
-            &start,
+            &Engine::start,
             search_args
         );
     } else {
         pthread_create(
             &t_id,
             nullptr,
-            &start_with_timeout,
+            &Engine::start_with_timeout,
             search_args
         );
     }

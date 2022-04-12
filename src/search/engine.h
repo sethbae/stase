@@ -8,9 +8,20 @@
 class Engine {
 
 private:
+
+    struct SearchArgs{
+        SearchNode * root;
+        int cycles;
+        Observer & o;
+        double seconds;
+        int * nodes_out;
+        Move * move_out;
+    };
+
     const std::string fen;
     SearchNode * root;
     Observer & obs;
+    SearchArgs * search_args;
 
     pthread_t t_id;
     int node_limit;
@@ -24,6 +35,7 @@ public:
     Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds):
         fen(fen),
         obs(o),
+        search_args(nullptr),
 
         t_id(0),
         node_limit(node_limit),
@@ -46,6 +58,10 @@ public:
         };
     }
 
+    ~Engine() {
+        delete search_args;
+    }
+
     Observer & get_obs() const { return obs; }
     std::string get_fen() const { return fen; }
     SearchNode * get_root() const { return root; }
@@ -61,6 +77,9 @@ public:
     int get_nodes_explored() { return nodes; }
     void delete_tree() { ::delete_tree(root); root = nullptr; }
 
+private:
+    static void * start(void *);
+    static void * start_with_timeout(void *);
 };
 
 
