@@ -13,6 +13,7 @@ bool thread_has_stopped(pthread_t thread) {
 
 void * Engine::start(void * args) {
 
+    std::cout << "start\n";
     SearchArgs * search_args = (SearchArgs *) args;
 
     reset_node_count();
@@ -27,6 +28,7 @@ void * Engine::start(void * args) {
 
 void * Engine::start_with_timeout(void * args) {
 
+    std::cout << "start with timeout " << ((SearchArgs *) args)->seconds << "\n";
     SearchArgs * search_args = (SearchArgs *) args;
 
     reset_node_count();

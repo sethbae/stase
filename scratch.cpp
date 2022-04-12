@@ -569,7 +569,7 @@ int main(int argc, char** argv) {
 
 //    const std::string fen = "5b1r/p4kpp/8/2nQ4/5p2/1P6/PB3PPP/3R1RK1 b - - 1 24";
 //    const std::string fen = "8/6p1/8/K7/3k4/1r6/8/1b6 w - - 20 74";
-    const std::string fen = "2k5/8/1PK5/8/8/8/8/8 w - - 0 1";
+    const std::string fen = "rnbqr1k1/p1p2ppp/1p2p3/3n4/3PN3/6P1/PPPQ1P1P/R3KBNR w KQ - 0 10";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
@@ -594,14 +594,12 @@ int main(int argc, char** argv) {
     Engine engine =
         EngineBuilder::for_position(fen)
             .with_timeout(10)
-            .with_node_limit(25000)
-            .with_obs(observer)
             .build();
 
     engine.blocking_run();
     observer.write();
 
-    std::cout << move2uci(engine.get_best_move()) << "\n";
+//    std::cout << move2uci(engine.get_best_move()) << "\n";
 
 //    XMLObserver o("stase_stack");
 //    greedy_search(fen, 4, o);
