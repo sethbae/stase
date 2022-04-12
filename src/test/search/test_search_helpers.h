@@ -1,6 +1,7 @@
 #ifndef STASE_TEST_SEARCH_HELPERS_H
 #define STASE_TEST_SEARCH_HELPERS_H
 
+#include "../../search/engine.h"
 #include "search.h"
 #include "../../game/gamestate.hpp"
 
@@ -62,7 +63,12 @@ protected:
 template <typename T>
 bool evaluate_observer_test_case(const std::string * fen, T & obs) {
 
-    run_with_node_limit(*fen, 25000, obs);
+    Engine engine =
+        EngineBuilder::for_position(*fen)
+            .with_node_limit(25000)
+            .with_obs(obs)
+            .build();
+    engine.blocking_run();
 
     if (!obs.passed_test()) {
         for (const std::string & diag : obs.diagnostics) {

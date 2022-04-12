@@ -1,3 +1,6 @@
+#ifndef STASE_GAMESTATE_HPP
+#define STASE_GAMESTATE_HPP
+
 #include "game.h"
 #include "../board/board.hpp"
 #include "cands/cands.h"
@@ -472,3 +475,5 @@ private:
     }
 
 };
+
+#endif  // STASE_GAMESTATE_HPP

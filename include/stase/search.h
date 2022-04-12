@@ -64,21 +64,11 @@ extern Observer DEFAULT_OBSERVER;
 std::vector<Move> greedy_search(const std::string &, int, Observer & = DEFAULT_OBSERVER);
 std::vector<Move> greedy_search(SearchNode *, int, Observer & = DEFAULT_OBSERVER);
 
-void search_indefinite(SearchNode *, Observer & = DEFAULT_OBSERVER);
 void delete_tree(SearchNode *);
 
 int subtree_size(SearchNode *);
 int subtree_depth(SearchNode *);
 void write_to_file(SearchNode *, std::ostream &);
 void write_to_file_recursively(SearchNode*, std::ostream &);
-
-void run_in_background(const std::string & fen, Observer & = DEFAULT_OBSERVER);
-void run_with_node_limit(const std::string & fen, int, Observer & = DEFAULT_OBSERVER);
-Move run_with_timeout(const std::string & fen, double time_out_seconds, double poll_every_seconds, bool cleanup=true);
-
-void stop_engine(bool cleanup=true);
-Move fetch_best_move();
-int fetch_node_count();
-SearchNode * fetch_root();
 
 #endif //STASE_SEARCH_H

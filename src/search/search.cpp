@@ -1,6 +1,5 @@
 #include "game.h"
 #include "search.h"
-#include "thread.h"
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
 #include "../game/eval.hpp"

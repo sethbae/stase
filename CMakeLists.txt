@@ -35,11 +35,11 @@ set(SOURCE_FILES
         src/puzzle/evaluate_rating.cpp
 
         src/search/search.cpp
-        src/search/thread.cpp
+        src/search/engine.h
+        src/search/engine.cpp
         src/search/greedy.cpp
         src/search/metrics.h
         src/search/metrics.cpp
-        src/search/thread.h
         src/search/search_tools.h
         src/search/search_tools.cpp
         src/search/observers/xml_observer.hpp

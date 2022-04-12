@@ -43,11 +43,14 @@ bool evaluate_predicate(SearchLinePredicate pred, SearchNode * root, const std::
 
 bool evaluate_search_line_test_case(const SearchLineTestCase * tc) {
 
-    run_with_node_limit(tc->fen, 25000);
-    SearchNode * root = fetch_root();
+    Engine engine =
+        EngineBuilder::for_position(tc->fen)
+            .with_node_limit(25000)
+            .build();
+    engine.blocking_run();
 
     for (const SearchLineRequirement req : tc->reqs) {
-        if (!evaluate_predicate(req.pred, root, req.move_str)) {
+        if (!evaluate_predicate(req.pred, engine.get_root(), req.move_str)) {
             return false;
         }
     }

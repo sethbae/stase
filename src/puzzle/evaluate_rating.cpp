@@ -3,8 +3,9 @@
 #include "game.h"
 #include "../utils/utils.h"
 #include "../game/gamestate.hpp"
-#include "search.h"
+#include "../search/engine.h"
 #include "../search/search_tools.h"
+#include "search.h"
 
 bool score_puzzle_against_cands(const Puzzle & puzzle) {
 
@@ -75,10 +76,14 @@ bool score_engine_against_puzzle(const Puzzle & puzzle, int positions_allowed) {
     gs.next_in_place(puzzle.solution_moves[0]);
 
     // then run the engine
-    run_with_node_limit(board_to_fen(gs.board), positions_allowed);
+    Engine engine =
+        EngineBuilder::for_position(board_to_fen(gs.board))
+            .with_node_limit(positions_allowed)
+            .build();
+    engine.blocking_run();
 
     // get the UCI moves it played
-    std::vector<SearchNode *> line_played = retrieve_trust_line(fetch_root());
+    std::vector<SearchNode *> line_played = retrieve_trust_line(engine.get_root());
 
     pr_board_conf(fen_to_board(puzzle.fen));
     std::cout << "Rating: " << puzzle.rating << "\n";

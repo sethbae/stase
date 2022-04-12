@@ -8,7 +8,7 @@ using std::vector;
 #include <cstring>
 #include <chrono>
 #include <thread>
-#include "src/search/thread.h"
+#include "src/utils/ptr_vec.h"
 
 using std::ofstream;
 
@@ -24,6 +24,7 @@ using std::ofstream;
 #include "src/search/search_tools.h"
 #include "src/search/metrics.h"
 #include "src/search/observers/observers.hpp"
+#include "src/search/engine.h"
 
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"
@@ -441,14 +442,15 @@ SearchNode * repl_seconds(const std::string & fen) {
     cout << "\nAnalysing...";
     cout.flush();
 
-    run_in_background(fen);
-    sleep(secs);
-    stop_engine(false);
+    Engine engine =
+        EngineBuilder::for_position(fen)
+            .with_timeout(secs)
+            .build();
+    engine.blocking_run();
 
     cout << "done\n";
 
-    return fetch_root();
-
+    return engine.get_root();
 }
 
 SearchNode * repl_nodes(const std::string & fen) {
@@ -461,10 +463,14 @@ SearchNode * repl_nodes(const std::string & fen) {
     cout << "\nAnalysing...";
     cout.flush();
 
-    run_with_node_limit(fen, n);
+    Engine engine =
+        EngineBuilder::for_position(fen)
+            .with_node_limit(n)
+            .build();
+    engine.blocking_run();
     cout << "done\n";
 
-    return fetch_root();
+    return engine.get_root();
 }
 
 void repl(const std::string & fen) {
@@ -561,10 +567,16 @@ int main(int argc, char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGKILL, print_stack_trace_and_abort);
 
-    const std::string fen = "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1";
+//    const std::string fen = "5b1r/p4kpp/8/2nQ4/5p2/1P6/PB3PPP/3R1RK1 b - - 1 24";
+//    const std::string fen = "8/6p1/8/K7/3k4/1r6/8/1b6 w - - 20 74";
+    const std::string fen = "2k5/8/1PK5/8/8/8/8/8 w - - 0 1";
 
     Gamestate gs(fen, MIDGAME);
     pr_board(gs.board);
+//
+//    Gamestate next(gs, Move{stosq("c5"), stosq("e4")});
+//    std::cout << "back in main\n";
+//    pr_board(next.board);
 
 //    for (const Move m : legal_moves(gs.board)) {
 //        cout << mtos(gs.board, m) << " ";
@@ -578,8 +590,10 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-    run_with_timeout(fen, 10, 0.1);
-//    run_with_node_limit(fen, 25000);
+//    run_with_timeout(fen, 1, 0.1);
+    XMLObserver observer("debug_pos");
+//    run_with_timeout(fen, 1, observer);
+    observer.write();
 //    std::cout << fetch_node_count() << "\n";
 
 //    XMLObserver o("stase_stack");

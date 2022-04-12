@@ -1,7 +1,7 @@
+#include "test_search_helpers.h"
 #include "../test.h"
 #include "search.h"
 #include "board.h"
-#include "test_search_helpers.h"
 
 class LegalMovesObserver : public TestObserver {
 

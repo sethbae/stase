@@ -65,6 +65,16 @@ bool soft_exit_criteria(SearchNode * root);
 
 void check_abort();
 
+void abort_analysis();
+bool get_abort_flag();
+void reset_abort_flag();
+
+void set_node_limit(int nodes);
+int get_node_limit();
+void clear_node_limit();
+
+void interrupt_execution(int);
+
 void print_line(std::vector<SearchNode *> & line);
 void record_tree_in_file(const std::string & filename, SearchNode * root);
 

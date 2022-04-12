@@ -1,5 +1,5 @@
 #include "search_tools.h"
-#include "thread.h"
+#include <pthread.h>
 #include "metrics.h"
 #include "../game/gamestate.hpp"
 
@@ -7,7 +7,7 @@
  * Checks whether the engine abort flag has been set and gracefully exits if so.
  */
 void check_abort() {
-    if (abort_flag() || (get_node_limit() != -1 && node_count() >= get_node_limit())) {
+    if (get_abort_flag() || (get_node_limit() != -1 && node_count() >= get_node_limit())) {
         interrupt_execution(0);
     }
 }
@@ -76,3 +76,20 @@ bool soft_exit_criteria(SearchNode * root) {
 
     return millipawn_diff(root->best_child->score, second_best) >= __engine_params::SOFT_EXIT_EVAL_MARGIN;
 }
+
+/**
+ * Interrupts the calling thread. Immediately exits with no cleanup.
+ */
+void interrupt_execution(int) {
+    pthread_exit(nullptr);
+}
+
+bool engine_abort = false;
+bool get_abort_flag() { return engine_abort; }
+void abort_analysis() { engine_abort = true; }
+void reset_abort_flag() { engine_abort = false; }
+
+int max_nodes = -1;
+int get_node_limit() { return max_nodes; }
+void set_node_limit(int limit) { max_nodes = limit; }
+void clear_node_limit() { max_nodes = -1; }
