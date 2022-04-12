@@ -590,11 +590,18 @@ int main(int argc, char** argv) {
 
 //    repl(fen);
 
-//    run_with_timeout(fen, 1, 0.1);
     XMLObserver observer("debug_pos");
-//    run_with_timeout(fen, 1, observer);
+    Engine engine =
+        EngineBuilder::for_position(fen)
+            .with_timeout(10)
+            .with_node_limit(25000)
+            .with_obs(observer)
+            .build();
+
+    engine.blocking_run();
     observer.write();
-//    std::cout << fetch_node_count() << "\n";
+
+    std::cout << move2uci(engine.get_best_move()) << "\n";
 
 //    XMLObserver o("stase_stack");
 //    greedy_search(fen, 4, o);

@@ -17,6 +17,7 @@ using std::string;
 #include "search.h"
 #include "utils/utils.h"
 #include "game/gamestate.hpp"
+#include "search/engine.h"
 
 const std::string GAME_FILE_DIR = "./src/lichess/deployment/game_files";
 
@@ -108,12 +109,14 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
             cout << "Stase has " << seconds_per_move << " seconds to think\n";
 
-            run_in_background(fen);
-            sleep(seconds_per_move);
-            stop_engine();
+            Engine engine =
+                EngineBuilder::for_position(fen)
+                    .with_timeout(seconds_per_move)
+                    .build();
+            engine.blocking_run();
 
-            const Move cmove = fetch_best_move();
-            const int nodes = fetch_node_count();
+            const Move cmove = engine.get_best_move();
+            const int nodes = engine.get_nodes_explored();
 
             cout << "Running speed: " << ((double)nodes) / ((double)seconds_per_move) << " n/sec\n";
 
@@ -204,7 +207,11 @@ void handle_analysis_request(const std::string & game_id, const int seconds_per_
     const std::string fen = board_to_fen(gs.board);
 
     // analyse the position
-    const Move move = run_with_timeout(fen, seconds_per_move, 0.1);
+    Engine engine =
+        EngineBuilder::for_position(fen)
+            .with_timeout(seconds_per_move)
+            .build();
+    const Move move = engine.blocking_run();
 
     // write the UCI back into the file
     std::ofstream file_out;
