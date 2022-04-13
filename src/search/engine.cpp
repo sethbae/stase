@@ -94,11 +94,15 @@ void Engine::run() {
 Move Engine::blocking_run() {
     run();
     pthread_join(t_id, nullptr);
+    reset_abort_flag();
+    reset_node_count();
     return best_move;
 }
 
 Move Engine::await() {
     pthread_join(t_id, nullptr);
+    reset_abort_flag();
+    reset_node_count();
     return best_move;
 }
 
@@ -107,6 +111,7 @@ void Engine::kill() {
     pthread_join(t_id, nullptr);
     reset_abort_flag();
     nodes = node_count();
+    reset_node_count();
     best_move = current_best_move(root);
 }
 
