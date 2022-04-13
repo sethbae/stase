@@ -112,3 +112,26 @@ def resign_game(token: str, game_id: str) -> bool:
     )
 
     return r.status_code == 200
+
+
+def post_to_chat(token: str, game_id: str, message: str, player: bool = True, spectator: bool = True) -> bool:
+    """
+    Sends a message to the chat for a particular game. By default, sends to both
+    player and spectator chats.
+    :param player: send the message to the player chat.
+    :param spectator: send the message to the spectator chat.
+    """
+    def _send_message(room: str) -> bool:
+        r = requests.post(
+            f"{API_BASE}/bot/game/{game_id}/chat",
+            headers={"Authorization": f"Bearer {token}"},
+            data={"room": room, "text": message}
+        )
+        return r.status_code == 200
+
+    success: bool = True
+    if player:
+        success = success and _send_message("player")
+    if spectator:
+        success = success and _send_message("spectator")
+    return success

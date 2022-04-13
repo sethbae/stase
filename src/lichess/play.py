@@ -4,7 +4,8 @@ import time
 from src.lichess.client import (
     stream_game_events,
     make_move,
-    resign_game
+    resign_game,
+    post_to_chat
 )
 from src.lichess.info import (
     ROOT_DIR,
@@ -28,6 +29,8 @@ def play_game(token: str, game_id: str):
         else:
             # print(f"{move}")
             return make_move(token, game_id, move)
+
+    post_to_chat(token, game_id, "Hello there!")
 
     as_white: bool = False
 
