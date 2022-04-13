@@ -32,24 +32,12 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
             }
         },
         SearchLineTestCase{
-            // bizarre underpromotion
-            "1r4k1/3Pq1p1/4p2p/4Pp2/5P2/3QN1P1/5KB1/4N3 w - - 3 48",
+            // ends line too early (misses capture)
+            "1k4r1/pppnR1bp/8/Q5p1/2br4/2N3B1/1P3PPP/6K1 b - - 2 25",
             {
                 SearchLineRequirement{
                     MUST_APPEAR,
-                    "d8=Q Rxd8"
-                },
-                SearchLineRequirement{
-                    MUST_APPEAR,
-                    "d8=R Rxd8"
-                },
-                SearchLineRequirement{
-                    MUST_APPEAR,
-                    "d8=B Rxd8"
-                },
-                SearchLineRequirement{
-                    MUST_APPEAR,
-                    "d8=N Rxd8"
+                    "g4 Qxc7 Ka8 Rxd7"
                 }
             }
         },
