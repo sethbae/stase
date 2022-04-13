@@ -44,7 +44,7 @@ float quiess(Gamestate & gs) {
         if (is_sentinel(ff.centre)) {
             break;
         }
-        if (is_major_piece(gs.board.get(ff.centre))) {
+        if (is_not_pk(gs.board.get(ff.centre))) {
             return piece_value(gs.board.get(ff.centre));
         }
         ++unsafe;
