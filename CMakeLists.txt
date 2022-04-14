@@ -15,8 +15,6 @@ set(SOURCE_FILES
         src/board/helper.cpp
         src/board/move.cpp
 
-        src/display/display.cpp
-
         src/game/eval.hpp
         src/game/control_cache.hpp
         src/game/quiet.cpp
@@ -65,7 +63,6 @@ set(SOURCE_FILES
 
         src/game/glogic/geometry.cpp
         src/game/glogic/piece.cpp
-        src/game/glogic/helper.cpp
         src/game/glogic/weak.cpp
         src/game/glogic/king.cpp
         src/game/glogic/glogic.h
@@ -161,3 +158,7 @@ add_executable(scratch ${SCRATCH_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${ST
 add_executable(bench ${BENCH_MAIN} ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
 
 add_executable(test ${TEST_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES})
+
+add_library(engine_client
+            SHARED
+            ${SOURCE_FILES} src/lichess/engine_client.cpp)
