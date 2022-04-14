@@ -11,16 +11,26 @@ public:
     EngineClient() : gs(starting_pos()) {}
     EngineClient(const char * fen) : gs(std::string(fen)) {}
 
+    /**
+     * Fetches a move in the current position and updates the engine to the resulting position.
+     * Thinks for the given time.
+     */
     const char * get_move(double think_time) {
         Engine engine =
             EngineBuilder::for_position(board_to_fen(gs.board))
                 .with_timeout(think_time)
                 .build();
-        return (new string(move2uci(engine.blocking_run())))->c_str();
+        std::string * uci = new string(move2uci(engine.blocking_run()));
+        gs = Gamestate(gs, uci2move(*uci));
+        return uci->c_str();
     }
 
+    /**
+     * Updates the engine according to the given move (eg played by an opponent) so that
+     * subsequent get_move calls reference the resulting position.
+     */
     void advance_position(const char * uci) {
-        gs.next_in_place(uci2move(string(uci)));
+        gs = Gamestate(gs, uci2move(string(uci)));
     }
 };
 
