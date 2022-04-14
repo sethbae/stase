@@ -1,8 +1,8 @@
 #ifndef STASE_CANDS_H
 #define STASE_CANDS_H
 
-#include "game.h"
-#include "board.h"
+#include "../../../include/stase/game.h"
+#include "../../../include/stase/board.h"
 #include "score.h"
 #include <iostream>
 

@@ -2,7 +2,7 @@
 #define STASE_PIECE_MOVES_HPP
 
 #include "glogic.h"
-#include "board.h"
+#include "../../../include/stase/board.h"
 
 namespace __bools {
     const bool PIECE_MOVE_TYPES[][6] = {

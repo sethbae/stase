@@ -1,5 +1,5 @@
-#include "game.h"
-#include "board.h"
+#include "../../../include/stase/game.h"
+#include "../../../include/stase/board.h"
 #include "glogic.h"
 #include "../gamestate.hpp"
 

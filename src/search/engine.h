@@ -1,8 +1,8 @@
 #ifndef STASE_ENGINE_H
 #define STASE_ENGINE_H
 
-#include "search.h"
-#include "game.h"
+#include "../../include/stase/search.h"
+#include "../../include/stase/game.h"
 #include "../game/gamestate.hpp"
 
 class Engine {

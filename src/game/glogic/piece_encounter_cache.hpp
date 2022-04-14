@@ -2,7 +2,7 @@
 #define STASE_PIECE_ENCOUNTER_CACHE_HPP
 
 #include <iostream>
-#include "board.h"
+#include "../../../include/stase/board.h"
 #include "../../board/board.hpp"
 
 struct DirCache {

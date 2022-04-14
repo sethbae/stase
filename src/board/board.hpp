@@ -1,7 +1,7 @@
 #ifndef STASE_BOARD_HPP
 #define STASE_BOARD_HPP
 
-#include "board.h"
+#include "../../include/stase/board.h"
 
 #include <stdint.h>
 #include <string>

@@ -1,7 +1,7 @@
 #ifndef STASE_HEUR_H
 #define STASE_HEUR_H
 
-#include "game.h"
+#include "../../../include/stase/game.h"
 
 /**
  * Metrics measure concretely some element of the board and score it as in favour of white

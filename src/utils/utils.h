@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "board.h"
+#include "../../include/stase/board.h"
 
 // converts floating point to two decimal places
 std::string dp_2(double);

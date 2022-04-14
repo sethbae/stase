@@ -1,4 +1,4 @@
-#include "game.h"
+#include "../../../include/stase/game.h"
 #include "cands.h"
 #include "../gamestate.hpp"
 

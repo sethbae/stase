@@ -1,7 +1,7 @@
 #ifndef STASE_MOVE_H
 #define STASE_MOVE_H
 
-#include "board.h"
+#include "../../include/stase/board.h"
 
 /**
  * The Move struct stores a starting square and an ending square.

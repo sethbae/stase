@@ -1,6 +1,6 @@
 #include "../heur/heur.h"
 #include "cands.h"
-#include "game.h"
+#include "../../../include/stase/game.h"
 #include "../gamestate.hpp"
 #include "responder.hpp"
 

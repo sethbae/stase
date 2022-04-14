@@ -1,5 +1,5 @@
 #include "board.h"
-#include "game.h"
+#include "../../../include/stase/game.h"
 #include "cands.h"
 #include "hook.hpp"
 #include "responder.hpp"

@@ -1,8 +1,8 @@
 #ifndef STASE_GLOGIC_H
 #define STASE_GLOGIC_H
 
-#include "game.h"
-#include "board.h"
+#include "../../../include/stase/game.h"
+#include "../../../include/stase/board.h"
 #include "piece_moves.hpp"
 #include "piece_encounter_cache.hpp"
 #include "edge_of_board_lookup.h"

@@ -5,8 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include "board.h"
-#include "game.h"
+#include "../../include/stase/board.h"
+#include "../../include/stase/game.h"
 #include "../../src/game/cands/cands.h"
 #include "../../src/game/cands/hook.hpp"
 #include "../../src/game/cands/responder.hpp"

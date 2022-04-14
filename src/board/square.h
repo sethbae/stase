@@ -1,7 +1,7 @@
 #ifndef STASE_SQUARE_H
 #define STASE_SQUARE_H
 
-#include "board.h"
+#include "../../include/stase/board.h"
 
 /**
  * The Square struct is a coordinate pair. It's easier than passing two parameters

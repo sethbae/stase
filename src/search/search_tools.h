@@ -1,7 +1,7 @@
 #ifndef STASE_SEARCH_TOOLS_H
 #define STASE_SEARCH_TOOLS_H
 
-#include "search.h"
+#include "../../include/stase/search.h"
 
 namespace __engine_params {
 

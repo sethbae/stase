@@ -1,7 +1,7 @@
 #ifndef STASE_CONTROL_CACHE_HPP
 #define STASE_CONTROL_CACHE_HPP
 
-#include "game.h"
+#include "../../include/stase/game.h"
 #include "glogic/glogic.h"
 #include "../utils/ptr_vec.h"
 

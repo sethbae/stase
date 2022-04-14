@@ -1,7 +1,7 @@
 #ifndef STASE_GAMESTATE_HPP
 #define STASE_GAMESTATE_HPP
 
-#include "game.h"
+#include "../../include/stase/game.h"
 #include "../board/board.hpp"
 #include "cands/cands.h"
 #include "cands/hook.hpp"
