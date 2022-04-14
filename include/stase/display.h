@@ -1,4 +1,0 @@
-#ifndef STASE_DISPLAY_H
-#define STASE_DISPLAY_H
-
-#endif //STASE_DISPLAY_H
