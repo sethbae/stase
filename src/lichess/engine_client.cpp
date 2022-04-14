@@ -15,7 +15,7 @@ public:
      * Fetches a move in the current position and updates the engine to the resulting position.
      * Thinks for the given time.
      */
-    const char * get_move(double think_time) {
+    const char * get_computer_move(double think_time) {
         Engine engine =
             EngineBuilder::for_position(board_to_fen(gs.board))
                 .with_timeout(think_time)
@@ -29,7 +29,7 @@ public:
      * Updates the engine according to the given move (eg played by an opponent) so that
      * subsequent get_move calls reference the resulting position.
      */
-    void advance_position(const char * uci) {
+    void register_opponent_move(const char * uci) {
         gs = Gamestate(gs, uci2move(string(uci)));
     }
 };
@@ -41,10 +41,10 @@ extern "C" {
     EngineClient * get_client_for_position(const char * fen) {
         return new EngineClient(fen);
     }
-    void advance_position(EngineClient * client, const char * uci) {
-        client->advance_position(uci);
+    void register_opponent_move(EngineClient * client, const char * uci) {
+        client->register_opponent_move(uci);
     }
-    const char * get_move(EngineClient * client, double seconds) {
-        return client->get_move(seconds);
+    const char * get_computer_move(EngineClient * client, double seconds) {
+        return client->get_computer_move(seconds);
     }
 }

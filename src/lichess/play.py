@@ -15,7 +15,7 @@ THINK_TIME_PROPORTION: float = 0.025
 def play_game(token: str, game_id: str):
 
     def play_a_move(think_time) -> bool:
-        move: str = engine.get_move(think_time)
+        move: str = engine.get_computer_move(think_time)
         if move == "ERROR":
             print("Encountered engine error")
             return False
@@ -63,7 +63,7 @@ def play_game(token: str, game_id: str):
             if (as_white and half_move_count % 2 == 0)\
                     or (not as_white and half_move_count % 2 == 1):
                 # update the engine with the opponent's move
-                engine.advance_position(move_played)
+                engine.register_opponent_move(move_played)
                 # play a move of our own
                 if not play_a_move(int((millis_remaining * THINK_TIME_PROPORTION) / 1000)):
                     print("Error encountered: resigning the game")

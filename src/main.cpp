@@ -7,9 +7,7 @@ using std::vector;
 #include <string>
 using std::string;
 #include <cstring>
-#include <unistd.h>
 
-#include <execinfo.h>
 #include <signal.h>
 #include <fstream>
 
@@ -18,8 +16,6 @@ using std::string;
 #include "utils/utils.h"
 #include "game/gamestate.hpp"
 #include "search/engine.h"
-
-const std::string GAME_FILE_DIR = "./src/lichess/deployment/game_files";
 
 const std::string welcome_message =
         "Welcome to Stase v4.0\n";
@@ -156,85 +152,15 @@ void play_game(bool engine_is_white, int seconds_per_move) {
 
 }
 
-/**
- * Designed for handling a request which can be sent to the lichess API. This looks for
- * a file in the GAME_FILE_DIR called [game_id].game and reads in UCI moves from it.
- * Then it analyses the given position and replaces the file contents with the UCI for that move.
- * @param game_id the id of the game, used in the file name
- * @param seconds_per_move number of seconds to think for
- */
-void handle_analysis_request(const std::string & game_id, const int seconds_per_move) {
-
-    // open the file and read in the moves played
-    std::ifstream file;
-    const std::string file_path = GAME_FILE_DIR + "/" + game_id + ".game";
-    file.open(file_path, std::ios::in | std::ios::binary | std::ios::ate);
-    if (!file) {
-        std::cout << "Could not open file: " << GAME_FILE_DIR + "/" + game_id + ".game\n";
-        return;
-    }
-
-    std::ifstream::pos_type file_size = file.tellg();
-    std::vector<char> bytes(file_size);
-
-    // read all the bytes into a string
-    file.seekg(0, std::ios::beg);
-    file.read(bytes.data(), file_size);
-    file.close();
-    const std::string moves_played(bytes.data(), file_size);
-
-    // read the UCI into a vec of moves
-    std::vector<Move> moves;
-
-    int i = 0;
-    while (i < moves_played.size()) {
-        int j;
-        for (j = i; j < moves_played.size() && moves_played[j] != ' '; ++j)
-            ;
-
-        // i...j is now a substring containing a single UCI move
-        std::string uci = moves_played.substr(i, j-i);
-        moves.push_back(uci2move(uci));
-
-        i = j + 1;
-    }
-
-    // pull out the FEN of the position after all moves have been played
-    Gamestate gs(starting_pos());
-    for (const Move & m : moves) {
-        gs.board = gs.board.successor_hard(m);
-    }
-    const std::string fen = board_to_fen(gs.board);
-
-    // analyse the position
-    Engine engine =
-        EngineBuilder::for_position(fen)
-            .with_timeout(seconds_per_move)
-            .build();
-    const Move move = engine.blocking_run();
-
-    // write the UCI back into the file
-    std::ofstream file_out;
-    file_out.open(file_path, std::fstream::out);
-    file_out << move2uci(move);
-    file_out.close();
-
-}
-
 int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace_and_abort);
     signal(SIGABRT, print_stack_trace_and_abort);
 
-    bool interactive = true;
     int t = 10;
 
     for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "-g") == 0) {
-            const std::string game_id(argv[++i]);
-            handle_analysis_request(game_id, t);
-            interactive = false;
-        } else if (strcmp(argv[i], "-t") == 0) {
+        if (strcmp(argv[i], "-t") == 0) {
             const std::string time(argv[++i]);
             t = stoi(time);
         } else {
@@ -242,10 +168,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (interactive) {
-        cout << welcome_message;
-        play_game(false, t);
-    }
+    cout << welcome_message;
+    play_game(false, t);
 
     pthread_exit(nullptr);
 
