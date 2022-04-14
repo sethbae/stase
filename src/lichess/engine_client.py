@@ -2,7 +2,7 @@ import ctypes
 
 _ec_lib = ctypes.CDLL("../../libengine_client.so")
 
-_ec_lib.get_move.restype = ctypes.c_char_p
+_ec_lib.get_computer_move.restype = ctypes.c_char_p
 
 
 class EngineClient:
@@ -18,7 +18,13 @@ class EngineClient:
             self._engine_client = _ec_lib.get_client()
 
     def register_opponent_move(self, uci: str) -> None:
+        """
+        Update the engine so that it is aware of a move made by the opponent.
+        """
         _ec_lib.register_opponent_move(self._engine_client, ctypes.c_char_p(uci.encode("utf8")))
 
     def get_computer_move(self, seconds: float) -> str:
+        """
+        Get the computer's move, with the given time to think.
+        """
         return _ec_lib.get_computer_move(self._engine_client, ctypes.c_double(seconds)).decode("utf8")

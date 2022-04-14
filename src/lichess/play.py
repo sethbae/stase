@@ -23,7 +23,7 @@ def play_game(token: str, game_id: str):
             print("No move possible")
             return True
         else:
-            print(f"{move}")
+            # print(f"{move}")
             return make_move(token, game_id, move)
 
     post_to_chat(token, game_id, "Hello there!")
@@ -57,8 +57,6 @@ def play_game(token: str, game_id: str):
             move_played: str = event["moves"].split()[-1]
             half_move_count = event["moves"].count(' ') + 1
             millis_remaining = event["wtime"] if as_white else event["btime"]
-            print(f"{move_played} played")
-            print(f"{half_move_count} half moves")
 
             if (as_white and half_move_count % 2 == 0)\
                     or (not as_white and half_move_count % 2 == 1):
