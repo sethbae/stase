@@ -16,12 +16,18 @@ public:
      * Thinks for the given time.
      */
     const char * get_computer_move(double think_time) {
+#ifdef PYBIND_DEBUG_LOG
+        std::cout << "[C++] entering get_computer_move\n";
+#endif
         Engine engine =
             EngineBuilder::for_position(board_to_fen(gs.board))
                 .with_timeout(think_time)
                 .build();
         std::string * uci = new string(move2uci(engine.blocking_run()));
         gs = Gamestate(gs, uci2move(*uci));
+#ifdef PYBIND_DEBUG_LOG
+        std::cout << "[C++] exiting get_computer_move\n";
+#endif
         return uci->c_str();
     }
 
@@ -30,7 +36,13 @@ public:
      * subsequent get_move calls reference the resulting position.
      */
     void register_opponent_move(const char * uci) {
+#ifdef PYBIND_DEBUG_LOG
+        std::cout << "[C++] entering register_opponent_move\n";
+#endif
         gs = Gamestate(gs, uci2move(string(uci)));
+#ifdef PYBIND_DEBUG_LOG
+        std::cout << "[C++] exiting register_opponent_move\n";
+#endif
     }
 };
 
