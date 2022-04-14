@@ -1,7 +1,6 @@
 
 """Some file paths used for the engine and for talking to it"""
 ROOT_DIR = "../.."
-GAME_FILE_DIR = "deployment/game_files"
 ENV_FILE = "../../env"
 ENGINE_USERNAME = "queen_stase_approx"
 

@@ -48,7 +48,7 @@ def rebuild_stase(pr: bool = True) -> None:
 
     if pr: print("Building engine...", end="")
     subprocess.Popen("cmake .".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
-    subprocess.Popen("make stase".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen("make engine_client".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
     if pr: print("done")
 
 
