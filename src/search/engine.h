@@ -16,6 +16,7 @@ private:
         double seconds;
         int * nodes_out;
         Move * move_out;
+        Eval * score_out;
     };
 
     const std::string fen;
@@ -30,6 +31,7 @@ private:
 
     Move best_move;
     int nodes;
+    Eval score;
 
 public:
     Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds):
@@ -75,6 +77,7 @@ public:
 
     Move get_best_move() { return best_move; }
     int get_nodes_explored() { return nodes; }
+    Eval get_score() { return score; }
     void delete_tree() { ::delete_tree(root); root = nullptr; }
 
 private:

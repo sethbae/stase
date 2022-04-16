@@ -6,6 +6,8 @@ class EngineClient {
 
 private:
     Gamestate gs;
+    int nodes;
+    std::string eval_str;
 
 public:
     EngineClient() : gs(starting_pos()) {}
@@ -25,6 +27,8 @@ public:
                 .build();
         std::string * uci = new string(move2uci(engine.blocking_run()));
         gs = Gamestate(gs, uci2move(*uci));
+        nodes = engine.get_nodes_explored();
+        eval_str = etos(engine.get_score());
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] exiting get_computer_move\n";
 #endif
@@ -44,6 +48,14 @@ public:
         std::cout << "[C++] exiting register_opponent_move\n";
 #endif
     }
+
+    int get_node_count() {
+        return nodes;
+    }
+
+    const char * get_eval_str() {
+        return eval_str.c_str();
+    }
 };
 
 extern "C" {
@@ -58,5 +70,11 @@ extern "C" {
     }
     const char * get_computer_move(EngineClient * client, double seconds) {
         return client->get_computer_move(seconds);
+    }
+    int get_node_count(EngineClient * client) {
+        return client->get_node_count();
+    }
+    const char * get_eval_str(EngineClient * client) {
+        return client->get_eval_str();
     }
 }

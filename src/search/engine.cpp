@@ -21,6 +21,7 @@ void * Engine::start(void * args) {
 
     *search_args->nodes_out = node_count();
     *search_args->move_out = current_best_move(search_args->root);
+    *search_args->score_out = search_args->root->score;
 
     return nullptr;
 }
@@ -54,6 +55,7 @@ void * Engine::start_with_timeout(void * args) {
 
     *search_args->nodes_out = node_count();
     *search_args->move_out = current_best_move(search_args->root);
+    *search_args->score_out = search_args->root->score;
 
     return nullptr;
 }
@@ -69,7 +71,8 @@ void Engine::run() {
             &obs,
             timeout_seconds,
             &nodes,
-            &best_move
+            &best_move,
+            &score
         };
 
     set_node_limit(node_limit);
