@@ -46,6 +46,7 @@ bool evaluate_search_line_test_case(const SearchLineTestCase * tc) {
     Engine engine =
         EngineBuilder::for_position(tc->fen)
             .with_node_limit(25000)
+            .with_timeout(5)
             .build();
     engine.blocking_run();
 

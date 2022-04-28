@@ -66,6 +66,7 @@ bool evaluate_observer_test_case(const std::string * fen, T & obs) {
     Engine engine =
         EngineBuilder::for_position(*fen)
             .with_node_limit(25000)
+            .with_timeout(5)
             .with_obs(obs)
             .build();
     engine.blocking_run();
