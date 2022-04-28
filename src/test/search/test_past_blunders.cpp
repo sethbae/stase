@@ -41,6 +41,17 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
                 }
             }
         },
+        SearchLineTestCase{
+            // missed knight discovery against queen
+            "rnb2br1/p1p1kppp/1p3n2/2qP4/2PN4/2N1BB2/PP2Q1PP/R4RK1 w - - 3 16",
+            {
+                SearchLineRequirement{
+                    MUST_APPEAR,
+                    "Nf5 Kd7 Bxc5"
+                }
+            },
+            75000  // nodes allowed
+        },
     }
 };
 
