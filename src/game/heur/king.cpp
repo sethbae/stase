@@ -246,3 +246,17 @@ int one_king_exposure(const Gamestate & gs, const Square s) {
 float __metrics::__king_exposure_metric(const Gamestate & gs) {
     return (((float)one_king_exposure(gs, gs.w_king)) + ((float)one_king_exposure(gs, gs.b_king))) / 6.0f;
 }
+
+float __metrics::__unconventional_king_metric(const Gamestate & gs) {
+    Square w_ksq = gs.w_king;
+    Square b_ksq = gs.b_king;
+    bool w_conventional = equal(w_ksq, stosq("b1")) || equal(w_ksq, stosq("c1")) || equal(w_ksq, stosq("g1")) || equal(w_ksq, stosq("h1"));
+    bool b_conventional = equal(b_ksq, stosq("b8")) || equal(b_ksq, stosq("c8")) || equal(b_ksq, stosq("g8")) || equal(b_ksq, stosq("h8"));
+    if (w_conventional && !b_conventional) {
+        return 1.0f;
+    } else if (!w_conventional && b_conventional) {
+        return -1.0f;
+    } else {
+        return 0.0f;
+    }
+}
