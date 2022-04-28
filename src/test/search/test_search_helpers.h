@@ -18,6 +18,7 @@ struct SearchLineRequirement{
 struct SearchLineTestCase {
     const std::string fen;
     std::vector<SearchLineRequirement> reqs;
+    const int nodes_allowed = 0;
 };
 
 bool evaluate_search_line_test_case(const SearchLineTestCase *);
