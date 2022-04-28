@@ -109,6 +109,10 @@ public:
         return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1);
     }
 
+    static EngineBuilder for_starting_position() {
+        return for_position(std::string(starting_fen()));
+    }
+
     EngineBuilder with_obs(Observer & observer) {
         return EngineBuilder(fen, observer, nodes, cycles, seconds);
     }
