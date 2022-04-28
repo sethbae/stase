@@ -43,9 +43,13 @@ namespace __engine_params {
      * Soft exits are applicable when further exploration is unlikely to change the move selected.
      * The engine will not exit if fewer than SOFT_EXIT_NODE_COUNT nodes have been expanded, or if
      * there is a second-best move within SOFT_EXIT_EVAL_MARGIN millipawns of the best option.
+     * It also checks that a subtree of depth SOFT_EXIT_EXPLORED_DEPTH has been explored with visit counts
+     * of at least SOFT_EXIT_EXPLORED_VC.
      */
     const int SOFT_EXIT_NODE_COUNT = 25000;
     const int SOFT_EXIT_EVAL_MARGIN = 2000;  // (millipawns)
+    const int SOFT_EXIT_EXPLORED_DEPTH = 4;
+    const int SOFT_EXIT_EXPLORED_VC = MEDIAL_THRESHOLD;
 }
 
 SearchNode *new_node(const Gamestate & gs, Move m);

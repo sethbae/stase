@@ -46,6 +46,25 @@ void update_terminal(SearchNode * node) {
 }
 
 /**
+ * Checks that a subtree of the given depth rooted at the given root has visit counts
+ * of at least the given threshold, ignoring terminal nodes and nodes with no candidates.
+ */
+bool check_vc_subtree(SearchNode * root, int threshold, int depth) {
+    if (depth == 0 || root->terminal || root->cand_set->empty()) {
+        return true;
+    }
+    if (root->visit_count < threshold) {
+        return false;
+    }
+    for (int i = 0; i < root->children.size(); ++i) {
+        if (!check_vc_subtree(root->children[i], threshold, depth - 1)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * Determines whether or not a soft exit is warranted. This takes into account the number of nodes searched,
  * the number of children the root has, and the gap between the best and second best option. See __engine_params
  * in search_tools.h for specifics.
@@ -74,7 +93,11 @@ bool soft_exit_criteria(SearchNode * root) {
         }
     }
 
-    return millipawn_diff(root->best_child->score, second_best) >= __engine_params::SOFT_EXIT_EVAL_MARGIN;
+    if (millipawn_diff(root->best_child->score, second_best) < __engine_params::SOFT_EXIT_EVAL_MARGIN) {
+        return false;
+    }
+
+    return check_vc_subtree(root, __engine_params::SOFT_EXIT_EXPLORED_VC, __engine_params::SOFT_EXIT_EXPLORED_DEPTH);
 }
 
 /**
