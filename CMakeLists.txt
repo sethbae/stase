@@ -162,3 +162,8 @@ add_executable(test ${TEST_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES}
 add_library(engine_client
             SHARED
             ${SOURCE_FILES} src/lichess/engine_client.cpp)
+
+# these two lines are apparently a workaround which force the library to be rebuilt whenever
+# the sources change.
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
