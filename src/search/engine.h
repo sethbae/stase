@@ -28,13 +28,14 @@ private:
     int node_limit;
     int cycle_limit;
     double timeout_seconds;
+    bool cleanup;
 
     Move best_move;
     int nodes;
     Eval score;
 
 public:
-    Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds):
+    Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds, bool cleanup):
         fen(fen),
         obs(o),
         search_args(nullptr),
@@ -43,6 +44,7 @@ public:
         node_limit(node_limit),
         cycle_limit(cycle_limit),
         timeout_seconds(timeout_seconds),
+        cleanup(cleanup),
 
         best_move(MOVE_SENTINEL),
         nodes(0)
@@ -94,19 +96,21 @@ private:
     int nodes;
     int cycles;
     double seconds;
+    bool cleanup;
 
-    EngineBuilder(std::string fen, Observer & obs, int node_limit, int cycle_limit, double timeout_seconds) :
+    EngineBuilder(std::string fen, Observer & obs, int node_limit, int cycle_limit, double timeout_seconds, bool cleanup) :
         fen(fen),
         obs(obs),
         nodes(node_limit),
         cycles(cycle_limit),
-        seconds(timeout_seconds)
+        seconds(timeout_seconds),
+        cleanup(cleanup)
     {}
 
 public:
 
     static EngineBuilder for_position(std::string fen_string) {
-        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1);
+        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true);
     }
 
     static EngineBuilder for_starting_position() {
@@ -114,23 +118,27 @@ public:
     }
 
     EngineBuilder with_obs(Observer & observer) {
-        return EngineBuilder(fen, observer, nodes, cycles, seconds);
+        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup);
     }
 
     EngineBuilder with_node_limit(int node_limit) {
-        return EngineBuilder(fen, obs, node_limit, cycles, seconds);
+        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup);
     }
 
     EngineBuilder with_cycle_limit(int cycle_limit) {
-        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds);
+        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup);
     }
 
     EngineBuilder with_timeout(double secs) {
-        return EngineBuilder(fen, obs, nodes, cycles, secs);
+        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup);
+    }
+
+    EngineBuilder with_cleanup(bool auto_cleanup) {
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup);
     }
 
     Engine build() {
-        return Engine(fen, obs, nodes, cycles, seconds);
+        return Engine(fen, obs, nodes, cycles, seconds, cleanup);
     }
 };
 

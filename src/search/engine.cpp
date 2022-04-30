@@ -99,6 +99,7 @@ Move Engine::blocking_run() {
     pthread_join(t_id, nullptr);
     reset_abort_flag();
     reset_node_count();
+    if (cleanup) { delete_tree(); }
     return best_move;
 }
 
@@ -106,6 +107,7 @@ Move Engine::await() {
     pthread_join(t_id, nullptr);
     reset_abort_flag();
     reset_node_count();
+    if (cleanup) { delete_tree(); }
     return best_move;
 }
 
@@ -116,6 +118,7 @@ void Engine::kill() {
     nodes = node_count();
     reset_node_count();
     best_move = current_best_move(root);
+    if (cleanup) { delete_tree(); }
 }
 
 bool Engine::has_finished() {

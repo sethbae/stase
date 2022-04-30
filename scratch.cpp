@@ -445,6 +445,7 @@ SearchNode * repl_seconds(const std::string & fen) {
     Engine engine =
         EngineBuilder::for_position(fen)
             .with_timeout(secs)
+            .with_cleanup(false)
             .build();
     engine.blocking_run();
 
@@ -466,6 +467,7 @@ SearchNode * repl_nodes(const std::string & fen) {
     Engine engine =
         EngineBuilder::for_position(fen)
             .with_node_limit(n)
+            .with_cleanup(false)
             .build();
     engine.blocking_run();
     cout << "done\n";
