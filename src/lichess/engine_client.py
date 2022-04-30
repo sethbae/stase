@@ -1,8 +1,12 @@
 import ctypes
 
-_ec_lib = ctypes.CDLL("../../libengine_client.so")
+_ec_lib = None
 
-_ec_lib.get_computer_move.restype = ctypes.c_char_p
+
+def setup_binding() -> None:
+    global _ec_lib
+    _ec_lib = ctypes.CDLL("../../libengine_client.so")
+    _ec_lib.get_computer_move.restype = ctypes.c_char_p
 
 
 class EngineClient:
@@ -12,6 +16,8 @@ class EngineClient:
     to a move made by an opponent.
     """
     def __init__(self, fen: str = ""):
+        if not _ec_lib:
+            setup_binding()
         if fen:
             self._engine_client = _ec_lib.get_client(ctypes.c_char_p(bytes(fen)))
         else:
