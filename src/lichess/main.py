@@ -1,6 +1,5 @@
 import multiprocessing
 import subprocess
-import os
 import time
 from typing import List, Any, Dict
 
@@ -9,8 +8,8 @@ from src.lichess.client import (
     stream_incoming_events,
     make_move,
 )
+from src.lichess.info import read_access_token, ROOT_DIR, InvalidTokenException
 from src.lichess.play import play_game
-from src.lichess.info import read_access_token, ROOT_DIR, ENV_FILE, InvalidTokenException
 
 STASE_SPLASH = \
     r"""
@@ -49,20 +48,6 @@ def rebuild_stase(pr: bool = True) -> None:
     if pr: print("Building engine...", end="")
     subprocess.Popen("cmake .".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
     subprocess.Popen("make engine_client".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
-    if pr: print("done")
-
-
-def configure_dirs(pr: bool = True) -> None:
-    if pr: print("Checking dirs...", end="")
-
-    if not os.path.isdir("deployment"):
-        os.mkdir("deployment")
-    if not os.path.isdir("deployment/game_files"):
-        os.mkdir("deployment/game_files")
-    if not os.path.exists(ENV_FILE):
-        with open(ENV_FILE, "w") as file:
-            file.close()
-
     if pr: print("done")
 
 
@@ -183,7 +168,6 @@ def run_driver() -> None:
     Run the lichess driver.
     """
     rebuild_stase()
-    configure_dirs()
 
     try:
         tk: str = read_access_token()
