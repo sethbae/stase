@@ -13,14 +13,13 @@ class Gamestate {
 
 public:
     Board board;
-    bool has_been_mated = false;
-    bool w_cas = false;
-    bool b_cas = false;
-    bool in_check = false;
+    bool has_been_mated;
+    bool w_cas;
+    bool b_cas;
+    bool in_check;
     GamePhase phase;
 
     Move last_move;
-    Piece last_capture;
     mutable Square w_king;
     mutable Square b_king;
     Square * wpieces;
@@ -35,42 +34,38 @@ public:
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
     Gamestate()
-            : w_king(SQUARE_SENTINEL),
-              b_king(SQUARE_SENTINEL),
-              phase(OPENING),
+            : has_been_mated(false),
               w_cas(false),
               b_cas(false),
-              in_check(false) {
+              in_check(false),
+              phase(OPENING),
+              w_king(SQUARE_SENTINEL),
+              b_king(SQUARE_SENTINEL)
+    {
         alloc();
     }
 
     Gamestate(const Board & b)
             : board(b),
-              phase(OPENING),
+              has_been_mated(false),
               w_cas(false),
               b_cas(false),
-              in_check(false) {
+              in_check(false),
+              phase(OPENING)
+    {
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
     }
 
     Gamestate(const Gamestate & o, const Move m)
-            : board(o.board.successor_hard(m)), last_move(m) {
-
+            : board(o.board.successor_hard(m)),
+              has_been_mated(false),
+              in_check(false),
+              phase(o.phase),
+              last_move(m)
+    {
         alloc();
-
-        // copy pdir_cache contents across and then update it
-        copy_cache(o.pdir_cache, pdir_cache);
-        update_cache(board, pdir_cache, m);
-
-        phase = o.phase;
-        update_phase(m);
-
-        this->control_cache->update(o.board, *o.control_cache, m);
-
-        // this may not be true: it gets set by cands()
-        in_check = false;
 
         if (o.board.get(m.from) == W_KING) {
             w_king = m.to;
@@ -94,14 +89,21 @@ public:
             b_cas = o.b_cas;
         }
 
+        // copy pdir_cache contents across and then update it
+        copy_cache(o.pdir_cache, pdir_cache);
+        update_cache(board, pdir_cache, m);
+        update_phase(m);
+        this->control_cache->update(o.board, *o.control_cache, m);
     }
 
     Gamestate(const std::string & fen)
             : board(fen_to_board(fen)),
-              phase(OPENING),
+              has_been_mated(false),
               w_cas(false),
               b_cas(false),
-              in_check(false) {
+              in_check(false),
+              phase(OPENING)
+    {
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
@@ -109,17 +111,41 @@ public:
 
     Gamestate(const std::string & fen, GamePhase phase)
             : board(fen_to_board(fen)),
-              phase(phase),
+              has_been_mated(false),
               w_cas(false),
               b_cas(false),
-              in_check(false) {
+              in_check(false),
+              phase(phase)
+    {
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
     }
 
-    Gamestate(Gamestate && o) {
+    Gamestate(Gamestate && o)
+    {
         board = o.board;
+        has_been_mated = o.has_been_mated;
+        w_cas = o.w_cas;
+        b_cas = o.b_cas;
+        in_check = o.in_check;
+        phase = o.phase;
+
+        last_move = o.last_move;
+        w_king = o.w_king;
+        b_king = o.b_king;
+        wpieces = o.wpieces; o.wpieces = nullptr;
+        bpieces = o.bpieces; o.bpieces = nullptr;
+        w_kpinned_pieces = o.w_kpinned_pieces; o.w_kpinned_pieces = nullptr;
+        w_kpin_dirs = o.w_kpin_dirs; o.w_kpin_dirs = nullptr;
+        b_kpinned_pieces = o.b_kpinned_pieces;  o.b_kpinned_pieces = nullptr;
+        b_kpin_dirs = o.b_kpin_dirs; o.b_kpin_dirs = nullptr;
+
+        control_cache = o.control_cache;
+        control_cache->gs = this;
+        o.control_cache = nullptr;
+        pdir_cache = o.pdir_cache; o.pdir_cache = nullptr;
+
         // copy contents of feature frames across
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
             for (int j = 0; j < MAX_FRAMES; ++j) {
@@ -127,28 +153,6 @@ public:
                 if (is_sentinel(o.frames[i][j].centre)) { break; }
             }
         }
-        control_cache = o.control_cache; control_cache->gs = this;
-        pdir_cache = o.pdir_cache;
-        wpieces = o.wpieces;
-        bpieces = o.bpieces;
-        w_kpinned_pieces = o.w_kpinned_pieces;
-        w_kpin_dirs = o.w_kpin_dirs;
-        b_kpinned_pieces = o.b_kpinned_pieces;
-        b_kpin_dirs = o.b_kpin_dirs;
-        w_cas = o.w_cas;
-        b_cas = o.b_cas;
-        w_king = o.w_king;
-        b_king = o.b_king;
-        in_check = o.in_check;
-        phase = o.phase;
-        o.control_cache = nullptr;
-        o.pdir_cache = nullptr;
-        o.wpieces = nullptr;
-        o.bpieces = nullptr;
-        o.w_kpinned_pieces = nullptr;
-        o.w_kpin_dirs = nullptr;
-        o.b_kpinned_pieces = nullptr;
-        o.b_kpin_dirs = nullptr;
     }
 
     /**
@@ -156,9 +160,48 @@ public:
      * Currently, it's one use case is when caching the puzzles read from file: they need
      * to be copied when a second or later benchmark asks for them.
      */
-    Gamestate(const Gamestate & o) {
+    Gamestate(const Gamestate & o)
+    {
         alloc();
         board = o.board;
+        has_been_mated = o.has_been_mated;
+        w_cas = o.w_cas;
+        b_cas = o.b_cas;
+        in_check = o.in_check;
+        phase = o.phase;
+
+        last_move = o.last_move;
+        w_king = o.w_king;
+        b_king = o.b_king;
+        for (int i = 0; i < 16; ++i) {
+            wpieces[i] = o.wpieces[i];
+            if (is_sentinel(wpieces[i])) { break; }
+        }
+        for (int i = 0; i < 16; ++i) {
+            bpieces[i] = o.bpieces[i];
+            if (is_sentinel(bpieces[i])) { break; }
+        }
+        for (int i = 0; i < 16; ++i) {
+            w_kpinned_pieces[i] = o.w_kpinned_pieces[i];
+            if (is_sentinel(w_kpinned_pieces[i])) { break; }
+        }
+        for (int i = 0; i < 16; ++i) {
+            w_kpin_dirs[i] = o.w_kpin_dirs[i];
+            if (!is_valid_delta(w_kpin_dirs[i])) { break; }
+        }
+        for (int i = 0; i < 16; ++i) {
+            b_kpinned_pieces[i] = o.b_kpinned_pieces[i];
+            if (is_sentinel(b_kpinned_pieces[i])) { break; }
+        }
+        for (int i = 0; i < 16; ++i) {
+            b_kpin_dirs[i] = o.b_kpin_dirs[i];
+            if (!is_valid_delta(b_kpin_dirs[i])) { break; }
+        }
+
+        // copy the caches
+        control_cache->copy(*o.control_cache);
+        copy_cache(o.pdir_cache, pdir_cache);
+
         // copy contents of feature frames across
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
             for (int j = 0; j < MAX_FRAMES; ++j) {
@@ -166,16 +209,6 @@ public:
                 if (is_sentinel(o.frames[i][j].centre)) { break; }
             }
         }
-        // copy the piece encountered cache across
-        copy_cache(o.pdir_cache, pdir_cache);
-        w_cas = o.w_cas;
-        b_cas = o.b_cas;
-        in_check = o.in_check;
-        w_king = o.w_king;
-        b_king = o.b_king;
-        last_move = o.last_move;
-        last_capture = o.last_capture;
-        phase = o.phase;
     }
 
     ~Gamestate() {
@@ -414,8 +447,6 @@ private:
      * Allocates memory for all the fields in a gamestate which need it.
      */
     void alloc() {
-        control_cache = new ControlCache; control_cache->gs = this;
-        pdir_cache = new PieceEncounteredCache;
         wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         w_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
@@ -423,16 +454,21 @@ private:
         b_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
         b_kpin_dirs = static_cast<Delta*> (operator new(sizeof(Delta) * 16));
 
-        // set all pointers to null
-        for (int i = 0; i < ALL_HOOKS.size(); ++i) {
-            frames[i][0] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
-        }
-
         // add sentinels to the pieces lists
         *wpieces = SQUARE_SENTINEL;
         *bpieces = SQUARE_SENTINEL;
         *w_kpinned_pieces = SQUARE_SENTINEL;
+        *w_kpin_dirs = INVALID_DELTA;
         *b_kpinned_pieces = SQUARE_SENTINEL;
+        *b_kpin_dirs = INVALID_DELTA;
+
+        control_cache = new ControlCache; control_cache->gs = this;
+        pdir_cache = new PieceEncounteredCache;
+
+        // add sentinel to start of every list
+        for (int i = 0; i < ALL_HOOKS.size(); ++i) {
+            frames[i][0] = FeatureFrame{SQUARE_SENTINEL, SQUARE_SENTINEL, 0, 0};
+        }
     }
 
     /**

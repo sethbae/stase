@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(OPT_FLAGS "-Ofast -DSAFE_STACK_VEC")
 
-SET(CMAKE_CXX_FLAGS "-pthread -g -rdynamic -fno-exceptions ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
+SET(CMAKE_CXX_FLAGS "-pthread -g -rdynamic -fno-exceptions -Werror=return-type -Wall -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fno-unwind-tables")
 
 set(SOURCE_FILES

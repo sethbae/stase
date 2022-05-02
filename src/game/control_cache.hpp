@@ -62,6 +62,19 @@ struct ControlCache {
         }
     }
 
+    /**
+     * Copies data from the given cache without modification. Does not update the Gamestate pointer
+     * which the cache maintains: if desired, this must be updated manually.
+     */
+    inline void copy(const ControlCache & o) {
+        status_present = o.status_present;
+        count_present = o.count_present;
+        for (int i = 0; i < 64; ++i) {
+            status_cache[i] = o.status_cache[i];
+            control_count_cache[i] = o.control_count_cache[i];
+        }
+    }
+
 private:
     constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);
