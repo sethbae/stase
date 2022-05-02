@@ -66,7 +66,6 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
         return false;
 
     // kings
-    Piece enemy_king = (king_colour == WHITE) ? B_KING : W_KING;
     if (val(temp = mksq(x + 1, y + 1)) && (type(gs.board.get(temp)) == KING))
         return false;
     if (val(temp = mksq(x + 1, y + 0)) && (type(gs.board.get(temp)) == KING))

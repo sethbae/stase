@@ -292,7 +292,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 
     int i = 0;
 
-    auto start = std::chrono::high_resolution_clock::now();
+//    auto start = std::chrono::high_resolution_clock::now();
 
     while (i++ < cycles || cycles < 0) {
 

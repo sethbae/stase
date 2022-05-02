@@ -535,7 +535,7 @@ bool find_king_forks(Gamestate & gs, const Square s) {
             && would_be_safe_king_square(gs, fork_sq, king_col)) {
 
             int count = 0;
-            Square sq1, sq2;
+            Square sq1 = SQUARE_SENTINEL, sq2 = SQUARE_SENTINEL;
 
             for (int j = 0; j < 8; ++j) {
 
@@ -552,12 +552,11 @@ bool find_king_forks(Gamestate & gs, const Square s) {
                     && colour(gs.board.get(forked_sq)) != king_col
                     && zero_or_worse_control(gs, forked_sq)) {
 
-                    if (count % 2 == 0) {
+                    if (count++ == 0) {
                         sq1 = forked_sq;
                     } else {
                         sq2 = forked_sq;
                     }
-                    ++count;
                 }
 
             }

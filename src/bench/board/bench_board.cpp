@@ -63,23 +63,23 @@ int write_config_individually(const BoardPairParam & param) {
     int sum = 0;
     int t;
 
-    param.blank_board.set_white(t = param.board.get_white());
+    param.blank_board.set_white((t = param.board.get_white()));
     sum += t;
-    param.blank_board.set_cas_ws(t = param.board.get_cas_ws());
+    param.blank_board.set_cas_ws((t = param.board.get_cas_ws()));
     sum += t;
-    param.blank_board.set_cas_wl(t = param.board.get_cas_wl());
+    param.blank_board.set_cas_wl((t = param.board.get_cas_wl()));
     sum += t;
-    param.blank_board.set_cas_bs(t = param.board.get_cas_bs());
+    param.blank_board.set_cas_bs((t = param.board.get_cas_bs()));
     sum += t;
-    param.blank_board.set_cas_bl(t = param.board.get_cas_bl());
+    param.blank_board.set_cas_bl((t = param.board.get_cas_bl()));
     sum += t;
-    param.blank_board.set_ep_exists(t = param.board.get_ep_exists());
+    param.blank_board.set_ep_exists((t = param.board.get_ep_exists()));
     sum += t;
-    param.blank_board.set_ep_file(t = param.board.get_ep_file());
+    param.blank_board.set_ep_file((t = param.board.get_ep_file()));
     sum += t;
-    param.blank_board.set_halfmoves(t = param.board.get_halfmoves());
+    param.blank_board.set_halfmoves((t = param.board.get_halfmoves()));
     sum += t;
-    param.blank_board.set_wholemoves(t = param.board.get_wholemoves());
+    param.blank_board.set_wholemoves((t = param.board.get_wholemoves()));
 
     return sum + t;
 

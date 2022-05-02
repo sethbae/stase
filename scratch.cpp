@@ -53,6 +53,10 @@ void number_of_cands_hist(CandList cand_list) {
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
             case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
             case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
+            default:
+                // impossible
+                std::cout << "illegal CandList encountered\n";
+                abort();
         }
         max_size = std::max(size, max_size);
         num_cands[i] = (double)size;
@@ -197,6 +201,10 @@ void number_of_cands(CandList cand_list) {
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
             case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
             case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
+            default:
+                // impossible
+                std::cout << "illegal CandList encountered\n";
+                abort();
         }
         max_size = max(size, max_size);
         num_cands[i] = (double)size;
@@ -330,6 +338,10 @@ void find_cands_outliers(CandList cand_list) {
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
             case FINAL: size = cands(states[i], new CandSet)->final.size(); break;
             case LEGAL: size = cands(states[i], new CandSet)->legal.size(); break;
+            default:
+                // impossible
+                std::cout << "illegal CandList encountered\n";
+                abort();
         }
 
         max_size = max(size, max_size);
@@ -481,7 +493,6 @@ void repl(const std::string & fen) {
 
     cout << "Run engine for cycles/seconds/nodes (c/s/n)? ";
     std::cin >> input;
-    bool use_seconds = (input == "s");
 
     SearchNode * root = nullptr;
     while (!root) {

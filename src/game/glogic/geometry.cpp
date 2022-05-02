@@ -195,8 +195,8 @@ void find_invalidated_squares(const Board & b, const Move m, ptr_vec<Square> & s
 }
 
 bool is_knight_move(const Square a, const Square b) {
-    return abs(b.x - a.x) == 1 && abs(b.y - a.y) == 2
-        || abs(b.x - a.x) == 2 && abs(b.y - a.y) == 1;
+    return (abs(b.x - a.x) == 1 && abs(b.y - a.y) == 2)
+        || (abs(b.x - a.x) == 2 && abs(b.y - a.y) == 1);
 }
 
 bool is_king_move(const Square a, const Square b) {
