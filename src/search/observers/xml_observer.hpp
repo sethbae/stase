@@ -39,7 +39,7 @@ public:
     /**
      * Closes a previously opened tag without any other text and reduces the indentation accordingly.
      */
-    inline void close_event(const SearchNode * node, const SearchEvent ev, const CandList *) {
+    inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *) {
         --indent_level;
         buffer.push_back(indent(indent_level) + "</" + name(ev) + ">");
         current_line.pop_back();
@@ -66,12 +66,6 @@ public:
     }
 
 private:
-
-    inline std::string content(const SearchNode * node, SearchEvent ev) {
-        if (ev == DEEPEN) {
-            return "";
-        }
-    }
 
     inline std::string position_string() {
         std::string s = "";

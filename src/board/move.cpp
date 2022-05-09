@@ -634,7 +634,7 @@ void legal_moves(const Board & b, vector<Move> & moves) {
     // for each, check whether it leaves us in check
     
     auto itr = moves.begin();
-    Move m{0, 0, 0};
+    Move m = empty_move();
     
     while (itr != moves.end()) {
         m = *itr;

@@ -11,7 +11,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "5b2/8/8/8/8/8/8/5B2 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("f1"), 0, 0, 0}
+                FeatureFrame{stosq("f1"), SQUARE_SENTINEL, 0, 0}
             },
             { "f1e2", "f1g2" }
         },
@@ -19,7 +19,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "5b2/8/8/8/8/8/8/5B2 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("f8"), 0, 0, 0}
+                FeatureFrame{stosq("f8"), SQUARE_SENTINEL, 0, 0}
             },
             { "f8e7", "f8g7" }
         },
@@ -27,7 +27,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "6n1/8/8/8/8/8/8/6N1 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("g1"), 0, 0, 0}
+                FeatureFrame{stosq("g1"), SQUARE_SENTINEL, 0, 0}
             },
             { "g1f3" }
         },
@@ -35,7 +35,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "6n1/8/8/8/8/8/8/6N1 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("g8"), 0, 0, 0}
+                FeatureFrame{stosq("g8"), SQUARE_SENTINEL, 0, 0}
             },
             { "g8f6" }
         },
@@ -43,7 +43,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "r7/p7/8/8/8/8/P7/R7 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("a1"), 0, 0, 0}
+                FeatureFrame{stosq("a1"), SQUARE_SENTINEL, 0, 0}
             },
             { "a1c1" }
         },
@@ -51,7 +51,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "r7/p7/8/8/8/8/P7/R7 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("a8"), 0, 0, 0}
+                FeatureFrame{stosq("a8"), SQUARE_SENTINEL, 0, 0}
             },
             { "a8c8" }
         },
@@ -59,7 +59,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "7r/p7/8/8/8/8/P7/7R w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("h1"), 0, 0, 0}
+                FeatureFrame{stosq("h1"), SQUARE_SENTINEL, 0, 0}
             },
             { "h1f1", "h1h3" }
         },
@@ -67,7 +67,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "7r/8/8/8/8/8/8/7R b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("h8"), 0, 0, 0}
+                FeatureFrame{stosq("h8"), SQUARE_SENTINEL, 0, 0}
             },
             { "h8f8", "h8h6" }
         },
@@ -75,7 +75,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "3q4/8/8/8/8/8/8/3Q4 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("d1"), 0, 0, 0}
+                FeatureFrame{stosq("d1"), SQUARE_SENTINEL, 0, 0}
             },
             { "d1c2", "d1d2", "d1e2" }
         },
@@ -83,7 +83,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "3q4/8/8/8/8/8/8/3Q4 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("d8"), 0, 0, 0}
+                FeatureFrame{stosq("d8"), SQUARE_SENTINEL, 0, 0}
             },
             { "d8c7", "d8d7", "d8e7" }
         },
@@ -91,7 +91,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "6n1/8/8/8/8/8/8/6N1 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("g1"), 0, 0, 0}
+                FeatureFrame{stosq("g1"), SQUARE_SENTINEL, 0, 0}
             },
             { "g1f3" }
         },
@@ -99,7 +99,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "6n1/8/5n2/8/8/8/8/8 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("g8"), 0, 0, 0}
+                FeatureFrame{stosq("g8"), SQUARE_SENTINEL, 0, 0}
             },
             { "g8e7" }
         },
@@ -107,7 +107,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "r3k2r/p1pppppp/1p6/8/8/5B2/PPPPPPPP/R3K2R w KQkq - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("e1")}
+                FeatureFrame{stosq("e1"), SQUARE_SENTINEL, 0, 0}
             },
             { "e1g1", "e1c1" }
         },
@@ -115,7 +115,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "r3k2r/pBpppppp/1p6/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("e8")}
+                FeatureFrame{stosq("e8"), SQUARE_SENTINEL, 0, 0}
             },
             { "e8g8" }
         },
@@ -123,7 +123,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
           "8/8/6pp/8/8/8/PPPPPPPP/8 w - - 0 1",
           std::vector<FeatureFrame>{
-              FeatureFrame{stosq("f2")}
+              FeatureFrame{stosq("f2"), SQUARE_SENTINEL, 0, 0}
           },
           { "f2f3", "f2f4" }
         },
@@ -131,7 +131,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "8/8/6pp/8/8/8/PPPPPPPP/8 b - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("g6")}
+                FeatureFrame{stosq("g6"), SQUARE_SENTINEL, 0, 0}
             },
             { "g6g5" }
         },
@@ -139,7 +139,7 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "8/8/4p3/8/8/8/8/8 w - - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("d6")}
+                FeatureFrame{stosq("d6"), SQUARE_SENTINEL, 0, 0}
             },
             { }
         },
@@ -147,14 +147,14 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "rnbqkbnr/ppp2ppp/3p4/3Pp3/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("a1"), 0, 0, 0},
-                FeatureFrame{stosq("b1"), 0, 0, 0},
-                FeatureFrame{stosq("c1"), 0, 0, 0},
-                FeatureFrame{stosq("d1"), 0, 0, 0},
-                FeatureFrame{stosq("e1"), 0, 0, 0},
-                FeatureFrame{stosq("f1"), 0, 0, 0},
-                FeatureFrame{stosq("g1"), 0, 0, 0},
-                FeatureFrame{stosq("h1"), 0, 0, 0},
+                FeatureFrame{stosq("a1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("b1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("c1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("d1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("e1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("f1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("g1"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("h1"), SQUARE_SENTINEL, 0, 0},
             },
             { "b1c3", "f1e2", "c1d2", "d1d2", "d1e2" }
         },
@@ -162,14 +162,14 @@ const TestSet<ResponderTestCase> develop_test_cases = {
         ResponderTestCase{
             "rnbqkb1r/ppp1pp1p/3p1np1/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
             std::vector<FeatureFrame>{
-                FeatureFrame{stosq("a8"), 0, 0, 0},
-                FeatureFrame{stosq("b8"), 0, 0, 0},
-                FeatureFrame{stosq("c8"), 0, 0, 0},
-                FeatureFrame{stosq("d8"), 0, 0, 0},
-                FeatureFrame{stosq("e8"), 0, 0, 0},
-                FeatureFrame{stosq("f8"), 0, 0, 0},
-                FeatureFrame{stosq("g8"), 0, 0, 0},
-                FeatureFrame{stosq("h8"), 0, 0, 0},
+                FeatureFrame{stosq("a8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("b8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("c8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("d8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("e8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("f8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("g8"), SQUARE_SENTINEL, 0, 0},
+                FeatureFrame{stosq("h8"), SQUARE_SENTINEL, 0, 0},
             },
             { "b8c6", "c8d7", "d8d7", "f8g7" }
         }

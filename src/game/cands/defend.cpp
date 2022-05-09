@@ -141,7 +141,7 @@ void find_king_cover(const Gamestate & gs, std::vector<Move> & moves, const Colo
                         && (colour(gs.board.get(temp)) == c)
                         && !equal(temp, c_sq)
                         && would_be_safe_king_square(gs, defend_from_square, c)) {
-                    moves.push_back(Move{temp, defend_from_square});
+                    moves.push_back(Move{temp, defend_from_square, 0});
                 }
             }
         }

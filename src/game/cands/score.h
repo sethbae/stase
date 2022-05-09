@@ -5,7 +5,7 @@
 #include "../heur/heur.h"
 #include "../../utils/utils.h"
 
-constexpr int safe_check_score(const Piece p) {
+constexpr int safe_check_score([[maybe_unused]] const Piece p) {
     return 2;
 }
 constexpr int unsafe_check_score(const Piece p) {
@@ -16,7 +16,7 @@ constexpr int unsafe_check_score(const Piece p) {
     }
 }
 
-constexpr int capture_piece_score(const bool totally_undefended, const Piece capturing, const Piece captured) {
+constexpr int capture_piece_score(const bool totally_undefended, [[maybe_unused]] const Piece capturing, const Piece captured) {
     if (totally_undefended) {
         return piece_value(captured);
     }

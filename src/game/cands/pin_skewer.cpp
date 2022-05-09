@@ -195,7 +195,7 @@ bool find_pin_skewer_hook(Gamestate & gs, const Square s) {
  */
 int pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
     if (idx < end) {
-        Move m = Move{ff->centre, ff->secondary};
+        Move m = Move{ff->centre, ff->secondary, 0};
         m.set_score(
             pin_skewer_score(
                 piece_value(gs.board.get(ff->centre)),

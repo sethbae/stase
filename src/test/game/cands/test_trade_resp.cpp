@@ -6,49 +6,49 @@ const TestSet<ResponderTestCase> trade_test_cases = {
         // straightforward capture
         ResponderTestCase{
             "8/3r2p1/5b2/8/3B4/8/8/8 w - - 0 1",
-            {FeatureFrame{stosq("d4")}},
+            {FeatureFrame{stosq("d4"), SQUARE_SENTINEL, 0, 0}},
             {"d4f6"}
         },
         // doesn't capture undefended, weaker piece (this is not a trade)
         ResponderTestCase{
             "8/8/8/4b3/8/2P5/4R3/8 b - - 0 1",
-            {FeatureFrame{stosq("e5")}},
+            {FeatureFrame{stosq("e5"), SQUARE_SENTINEL, 0, 0}},
             {}
         },
         // does capture more valuable piece
         ResponderTestCase{
             "8/8/8/4n3/5q2/3N4/8/8 w - - 0 1",
-            {FeatureFrame{stosq("d3")}},
+            {FeatureFrame{stosq("d3"), SQUARE_SENTINEL, 0, 0}},
             {"d3f4"}
         },
         // white rook trades
         ResponderTestCase{
             "8/1p1n4/2r5/2R5/8/8/5Q2/8 w - - 0 1",
-            {FeatureFrame{stosq("c5")}},
+            {FeatureFrame{stosq("c5"), SQUARE_SENTINEL, 0, 0}},
             {"c5c6"}
         },
         // black rook trades
         ResponderTestCase{
             "8/4p3/3r4/8/8/6B1/2RR4/8 b - - 0 1",
-            {FeatureFrame{stosq("d6")}},
+            {FeatureFrame{stosq("d6"), SQUARE_SENTINEL, 0, 0}},
             {"d6d2"}
         },
         // white queen trades
         ResponderTestCase{
             "8/8/5q2/8/4n3/8/3R1Q2/8 w - - 0 1",
-            {FeatureFrame{stosq("f2")}},
+            {FeatureFrame{stosq("f2"), SQUARE_SENTINEL, 0, 0}},
             {"f2f6"}
         },
         // black queen trades
         ResponderTestCase{
             "8/8/5q2/8/4N3/8/3R1Q2/8 b - - 0 1",
-            {FeatureFrame{stosq("f6")}},
+            {FeatureFrame{stosq("f6"), SQUARE_SENTINEL, 0, 0}},
             {"f6f2"}
         },
         // puzzle #1
         ResponderTestCase{
             "2rb2k1/3n1ppp/3N4/1P2p3/qP2Pn2/B3QN1P/5PP1/2R3K1 b - - 0 25",
-            {FeatureFrame{stosq("c8")}},
+            {FeatureFrame{stosq("c8"), SQUARE_SENTINEL, 0, 0}},
             {"c8c1"}
         }
     }

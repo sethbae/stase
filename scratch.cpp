@@ -574,7 +574,7 @@ void repl(const std::string & fen) {
     }
 }
 
-int main(int argc, char** argv) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
     signal(SIGSEGV, print_stack_trace_and_abort);
     signal(SIGABRT, print_stack_trace_and_abort);

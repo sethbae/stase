@@ -6,7 +6,7 @@
 class BestChildUpdatedObserver : public TestObserver {
 
 public:
-    void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+    void close_event(const SearchNode * node, const SearchEvent ev, [[maybe_unused]] const CandList * cand_list) {
 
         if (!node || node->children.empty() || !node->best_child) { return; }
 
