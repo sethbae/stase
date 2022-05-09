@@ -4,6 +4,7 @@
 #include "../../include/stase/search.h"
 #include "../../include/stase/game.h"
 #include "../game/gamestate.hpp"
+#include <csignal>
 
 class Engine {
 
@@ -60,6 +61,11 @@ public:
             nullptr,
             0
         };
+#ifdef ENGINE_STACK_TRACE
+        signal(SIGSEGV, print_stack_trace_and_abort);
+        signal(SIGABRT, print_stack_trace_and_abort);
+        signal(SIGTERM, print_stack_trace_and_abort);
+#endif
     }
 
     ~Engine() {
