@@ -578,15 +578,15 @@ int main(int argc, char** argv) {
 
     signal(SIGSEGV, print_stack_trace_and_abort);
     signal(SIGABRT, print_stack_trace_and_abort);
-    signal(SIGKILL, print_stack_trace_and_abort);
+    signal(SIGTERM, print_stack_trace_and_abort);
 
-//    const std::string fen = "5b1r/p4kpp/8/2nQ4/5p2/1P6/PB3PPP/3R1RK1 b - - 1 24";
-//    const std::string fen = "8/6p1/8/K7/3k4/1r6/8/1b6 w - - 20 74";
-    const std::string fen = "rnbqr1k1/p1p2ppp/1p2p3/3n4/3PN3/6P1/PPPQ1P1P/R3KBNR w KQ - 0 10";
+    const std::string fen = "2r2rk1/1p1bbppp/pP2pn2/3p4/1n6/1PN1PN2/P1PBBPPP/3R1RK1 w - - 1 15";
 
-    Gamestate gs(fen, MIDGAME);
+    Gamestate gs(fen, OPENING);
     pr_board(gs.board);
 //
+//    heur_with_description(gs);
+
 //    Gamestate next(gs, Move{stosq("c5"), stosq("e4")});
 //    std::cout << "back in main\n";
 //    pr_board(next.board);
@@ -606,11 +606,12 @@ int main(int argc, char** argv) {
     XMLObserver observer("debug_pos");
     Engine engine =
         EngineBuilder::for_position(fen)
-            .with_timeout(10)
+            .with_timeout(5)
+            .with_obs(observer)
             .build();
 
     engine.blocking_run();
-    observer.write();
+//    observer.write();
 
 //    std::cout << move2uci(engine.get_best_move()) << "\n";
 
