@@ -47,6 +47,7 @@ bool evaluate_search_line_test_case(const SearchLineTestCase * tc) {
         EngineBuilder::for_position(tc->fen)
             .with_node_limit(tc->nodes_allowed == 0 ? 25000 : tc->nodes_allowed)
             .with_timeout(5)
+            .with_cleanup(false)
             .build();
     engine.blocking_run();
 
