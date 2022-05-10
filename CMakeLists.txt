@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project(stase)
 set(CMAKE_CXX_STANDARD 20)
 
-set(OPT_FLAGS "-Ofast -DSAFE_STACK_VEC -DPYBIND_DEBUG_LOG -DENGINE_STACK_TRACE")
-
-SET(CMAKE_CXX_FLAGS "-pthread -g -rdynamic -fno-exceptions -Werror=return-type -Wall -Wextra -Wno-sign-compare ${CMAKE_CXX_FLAGS} ${OPT_FLAGS}")
-SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fno-unwind-tables")
-
 set(SOURCE_FILES
         src/board/square.h
         src/board/base_types.h
@@ -167,3 +162,12 @@ add_library(engine_client
 # the sources change.
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+
+
+SET(CMAKE_CXX_FLAGS "-pthread -rdynamic ${CMAKE_CXX_FLAGS}")
+
+if(DEBUG)
+    SET(CMAKE_CXX_FLAGS " -O0 -DSAFE_STACK_VEC -DPYBIND_DEBUG_LOG -DENGINE_STACK_TRACE -g -Wall -Wextra -Wno-sign-compare -Werror -fsanitize=address -fsanitize=undefined ${CMAKE_CXX_FLAGS}")
+else()
+    SET(CMAKE_CXX_FLAGS "-Ofast -fno-exceptions -DENGINE_STACK_TRACE ${CMAKE_CXX_FLAGS}")
+endif()
