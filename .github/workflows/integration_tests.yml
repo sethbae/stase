@@ -1,4 +1,4 @@
-name: CMake
+name: Integration tests
 
 on:
   push:
@@ -19,11 +19,6 @@ jobs:
     - name: Build
       run: make test
 
-    - name: Run module tests
+    - name: Run integration tests
       working-directory: ${{github.workspace}}
-      run: ./test -b -g -s
-      
-#    - name: Run stress tests
-#      working-directory: ${{github.workspace}}
-#      run: ./test -stress
-      
+      run: ./test -i

@@ -1,0 +1,29 @@
+name: Module tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      run: cmake .
+
+    - name: Build
+      run: make test
+
+    - name: Run module tests
+      working-directory: ${{github.workspace}}
+      run: ./test -b -g -s
+      
+#    - name: Run stress tests
+#      working-directory: ${{github.workspace}}
+#      run: ./test -stress
+      
