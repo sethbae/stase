@@ -12,8 +12,15 @@ from src.lichess.info import (
 THINK_TIME_PROPORTION: float = 0.025
 
 
-def play_game(token: str, game_id: str):
+def post_update(token: str, game_id: str, engine: EngineClient, seconds_given: float) -> None:
+    """
+    Posts an update to the lichess chat with the engine's speed + evaluation.
+    """
+    post_to_chat(token, game_id,
+                 f"Evaluation: {engine.get_eval_str()} ({int(engine.get_node_count() / seconds_given)}n/s)")
 
+
+def play_game(token: str, game_id: str, chat_updates=True):
     def play_a_move(think_time) -> bool:
         move: str = engine.get_computer_move(think_time)
         if move == "ERROR":
@@ -23,10 +30,11 @@ def play_game(token: str, game_id: str):
             print("No move possible")
             return True
         else:
-            # print(f"{move}")
+            if chat_updates:
+                post_update(token, game_id, engine, think_time)
             return make_move(token, game_id, move)
 
-    post_to_chat(token, game_id, "Hello there!")
+    post_to_chat(token, game_id, "Hello there! I'll post regular updates. If you want me to stop, say \"mute\"!")
     engine: EngineClient = EngineClient()
 
     as_white: bool = False
@@ -48,7 +56,13 @@ def play_game(token: str, game_id: str):
                     resign_game(token, game_id)
                     return
 
-        elif event["status"] != "started":
+        elif event["type"] == "chatLine":
+            if event["text"] in ["m", "mute"]:
+                chat_updates = False
+            elif event["text"] == "unmute":
+                chat_updates = True
+
+        elif "status" in event and event["status"] != "started":
             print(f"Game {game_id} has ended")
             return
 
