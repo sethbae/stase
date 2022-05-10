@@ -160,9 +160,12 @@ int best_knight_square(const Gamestate & gs, Square s, Move * moves, int idx, in
     }
 
     for (int i = 0; i < 4; ++i) {
+
         Square temp = mksq(get_x(s) + xd[i], get_y(s) + yd[i]);
-        int score = KNIGHTS[get_y(temp)*8 + get_x(temp)];
-        if (val(temp) && score > best_val && colour(gs.board.get(temp)) != colour(gs.board.get(s))) {
+        if (!val(temp)) { continue; }
+
+        int score = KNIGHTS[temp.y*8 + temp.x];
+        if (score > best_val && colour(gs.board.get(temp)) != colour(gs.board.get(s))) {
             best_sq = temp;
             best_val = score;
         }
