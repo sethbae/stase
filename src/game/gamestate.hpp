@@ -214,12 +214,12 @@ public:
     ~Gamestate() {
         delete control_cache;
         delete pdir_cache;
-        delete wpieces;
-        delete bpieces;
-        delete w_kpinned_pieces;
-        delete w_kpin_dirs;
-        delete b_kpinned_pieces;
-        delete b_kpin_dirs;
+        delete[] wpieces;
+        delete[] bpieces;
+        delete[] w_kpinned_pieces;
+        delete[] w_kpin_dirs;
+        delete[] b_kpinned_pieces;
+        delete[] b_kpin_dirs;
     }
 
     Gamestate & operator=(const Gamestate &) = default;
@@ -447,20 +447,20 @@ private:
      * Allocates memory for all the fields in a gamestate which need it.
      */
     void alloc() {
-        wpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
-        bpieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
-        w_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
-        w_kpin_dirs = static_cast<Delta*> (operator new(sizeof(Delta) * 16));
-        b_kpinned_pieces = static_cast<Square*> (operator new(sizeof(Square) * 16));
-        b_kpin_dirs = static_cast<Delta*> (operator new(sizeof(Delta) * 16));
+        wpieces = new Square[16];
+        bpieces = new Square[16];
+        w_kpinned_pieces = new Square[16];
+        w_kpin_dirs = new Delta[16];
+        b_kpinned_pieces = new Square[16];
+        b_kpin_dirs = new Delta[16];
 
         // add sentinels to the pieces lists
-        *wpieces = SQUARE_SENTINEL;
-        *bpieces = SQUARE_SENTINEL;
-        *w_kpinned_pieces = SQUARE_SENTINEL;
-        *w_kpin_dirs = INVALID_DELTA;
-        *b_kpinned_pieces = SQUARE_SENTINEL;
-        *b_kpin_dirs = INVALID_DELTA;
+        wpieces[0] = SQUARE_SENTINEL;
+        bpieces[0] = SQUARE_SENTINEL;
+        w_kpinned_pieces[0] = SQUARE_SENTINEL;
+        w_kpin_dirs[0] = INVALID_DELTA;
+        b_kpinned_pieces[0] = SQUARE_SENTINEL;
+        b_kpin_dirs[0] = INVALID_DELTA;
 
         control_cache = new ControlCache; control_cache->gs = this;
         pdir_cache = new PieceEncounteredCache;
