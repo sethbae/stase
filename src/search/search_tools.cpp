@@ -16,7 +16,11 @@ void check_abort() {
  * Updates the terminal node of a given node according to whether the subtree rooted at the
  * given node has been fully explored (up to the threshold specified in search_tools.h)
  */
-void update_terminal(SearchNode * node) {
+void update_terminal(SearchNode * node, Observer & obs) {
+
+    if (!node) { return; }
+
+    obs.register_event(node, UPDATE_TERMINAL);
 
     if (node->gs->game_over) {
         node->terminal = true;
@@ -29,7 +33,7 @@ void update_terminal(SearchNode * node) {
     }
 
     // legal list has been added (and expanded). In check gamestates do not have had to reach the legal threshold.
-    if (node->visit_count < __engine_params::LEGAL_THRESHOLD && !node->gs->in_check) {
+    if (node->visit_count <= __engine_params::LEGAL_THRESHOLD && !node->gs->in_check) {
         return;
     }
 

@@ -63,7 +63,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     // exit conditions
     check_abort();
     if (node->gs->game_over) {
-        update_terminal(node);
+        update_terminal(node, obs);
         return false;
     }
 
@@ -106,7 +106,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
                         || changes;
         }
         update_score(node);
-        update_terminal(node);
+        update_terminal(node, obs);
         obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
         return changes;
     }
@@ -136,7 +136,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     update_score(node);
-    update_terminal(node);
+    update_terminal(node, obs);
     obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
     return changes;
 }
@@ -185,7 +185,7 @@ bool visit_node(SearchNode * node, Observer & obs) {
         default:
             ++node->visit_count;
             update_score(node);
-            update_terminal(node);
+            update_terminal(node, obs);
             obs.close_event(node, VISIT);
             return false;
     }
@@ -227,7 +227,7 @@ bool force_visit(SearchNode * node, Observer & obs) {
         // there may have been changes to other nodes in the line being force-visited,
         // and if there were no changes here then deepen won't have called the updates.
         update_score(node);
-        update_terminal(node);
+        update_terminal(node, obs);
     }
 
     obs.close_event(node, FORCE_VISIT);

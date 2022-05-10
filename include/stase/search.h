@@ -25,7 +25,8 @@ enum SearchEvent {
     FORCE_VISIT_LINE,
     DEEPEN,
     BURST_DEEPEN,
-    BEGIN_BURST
+    BEGIN_BURST,
+    UPDATE_TERMINAL
 };
 
 inline std::string name(SearchEvent ev) {
@@ -37,6 +38,7 @@ inline std::string name(SearchEvent ev) {
         case DEEPEN: return "deepen";
         case BURST_DEEPEN: return "burst_deepen";
         case BEGIN_BURST: return "begin_burst";
+        case UPDATE_TERMINAL: return "update_terminal";
         default: return "unknown event";
     }
 }

@@ -63,7 +63,7 @@ inline bool is_swing(const Eval a, const Eval b) {
     return millipawn_diff(a, b) > __engine_params::SWING_THRESHOLD;
 }
 
-void update_terminal(SearchNode *);
+void update_terminal(SearchNode *, Observer &);
 bool soft_exit_criteria(SearchNode * root);
 
 void check_abort();

@@ -36,7 +36,8 @@ public:
             node->best_trust_child,
             node->visit_count
         };
-        update_terminal(&copy);
+        Observer obs;
+        update_terminal(&copy, obs);
 
         if (node->terminal != copy.terminal) {
             if (!node->terminal) {
