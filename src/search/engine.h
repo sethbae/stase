@@ -70,9 +70,7 @@ public:
 
     ~Engine() {
         delete search_args;
-        if (root) { delete root->gs; }
-        if (root) { delete root->cand_set; }
-        delete root;
+        if (auto_cleanup) { cleanup(); }
     }
 
     Observer & get_obs() const { return obs; }
