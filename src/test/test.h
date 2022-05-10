@@ -116,6 +116,7 @@ inline bool evaluate_test_function(const std::string name, bool (*func)(void)) {
 bool test_board();
 bool test_game();
 bool test_search();
+bool integration_test_main();
 
 // board tests
 bool test_pieces();
