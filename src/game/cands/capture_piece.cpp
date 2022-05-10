@@ -231,51 +231,55 @@ int capture_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, i
     if (gs.board.get_ep_exists() && equal(s, gs.board.get_ep_pawn_square())) {
 
         // square on one side
-        temp = mksq(s.x - 1, s.y);
-        if (type(gs.board.get(temp)) == PAWN
+        if (s.x > 0) {
+            temp = mksq(s.x - 1, s.y);
+            if (type(gs.board.get(temp)) == PAWN
                 && colour(gs.board.get(temp)) == capturing_colour
                 && !gs.is_kpinned_piece(temp, get_delta_between(temp, s))) {
-            // IMPLICIT: pawns are always <= weakest defender
-            if (pawn_val < min_value_seen) {
-                // new lowest value; reset and add to the list
-                min_value_seen = pawn_val;
-                idx = local_reset_point;
-                Move m{temp, gs.board.get_ep_sq(), 0};
-                m.set_ep();
-                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
-                moves[idx++] = m;
-            } else if (pawn_val == min_value_seen) {
-                // equal lowest value; append
-                if (idx < end) {
+                // IMPLICIT: pawns are always <= weakest defender
+                if (pawn_val < min_value_seen) {
+                    // new lowest value; reset and add to the list
+                    min_value_seen = pawn_val;
+                    idx = local_reset_point;
                     Move m{temp, gs.board.get_ep_sq(), 0};
                     m.set_ep();
                     m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                     moves[idx++] = m;
+                } else if (pawn_val == min_value_seen) {
+                    // equal lowest value; append
+                    if (idx < end) {
+                        Move m{temp, gs.board.get_ep_sq(), 0};
+                        m.set_ep();
+                        m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                        moves[idx++] = m;
+                    }
                 }
             }
         }
 
         // and on the other
-        temp = mksq(s.x + 1, s.y);
-        if (type(gs.board.get(temp)) == PAWN
+        if (s.x < 7) {
+            temp = mksq(s.x + 1, s.y);
+            if (type(gs.board.get(temp)) == PAWN
                 && colour(gs.board.get(temp)) == capturing_colour
                 && !gs.is_kpinned_piece(temp, get_delta_between(temp, s))) {
-            // IMPLICIT: pawns are always <= weakest defender
-            if (pawn_val < min_value_seen) {
-                // new lowest value; reset and add to the list
-                min_value_seen = pawn_val;
-                idx = local_reset_point;
-                Move m{temp, gs.board.get_ep_sq(), 0};
-                m.set_ep();
-                m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
-                moves[idx++] = m;
-            } else if (pawn_val == min_value_seen) {
-                // equal lowest value; append
-                if (idx < end) {
+                // IMPLICIT: pawns are always <= weakest defender
+                if (pawn_val < min_value_seen) {
+                    // new lowest value; reset and add to the list
+                    min_value_seen = pawn_val;
+                    idx = local_reset_point;
                     Move m{temp, gs.board.get_ep_sq(), 0};
                     m.set_ep();
                     m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
                     moves[idx++] = m;
+                } else if (pawn_val == min_value_seen) {
+                    // equal lowest value; append
+                    if (idx < end) {
+                        Move m{temp, gs.board.get_ep_sq(), 0};
+                        m.set_ep();
+                        m.set_score(capture_piece_score(totally_undefended, b.get(temp), captured_piece));
+                        moves[idx++] = m;
+                    }
                 }
             }
         }
