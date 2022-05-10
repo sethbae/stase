@@ -51,10 +51,12 @@ bool evaluate_search_line_test_case(const SearchLineTestCase * tc) {
             .build();
     engine.blocking_run();
 
-    for (const SearchLineRequirement req : tc->reqs) {
+    for (const SearchLineRequirement & req : tc->reqs) {
         if (!evaluate_predicate(req.pred, engine.get_root(), req.move_str)) {
+            engine.cleanup();
             return false;
         }
     }
+    engine.cleanup();
     return true;
 }

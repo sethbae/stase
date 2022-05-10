@@ -29,7 +29,7 @@ private:
     int node_limit;
     int cycle_limit;
     double timeout_seconds;
-    bool cleanup;
+    bool auto_cleanup;
 
     Move best_move;
     int nodes;
@@ -45,7 +45,7 @@ public:
         node_limit(node_limit),
         cycle_limit(cycle_limit),
         timeout_seconds(timeout_seconds),
-        cleanup(cleanup),
+        auto_cleanup(cleanup),
 
         best_move(MOVE_SENTINEL),
         nodes(0)
@@ -70,6 +70,9 @@ public:
 
     ~Engine() {
         delete search_args;
+        if (root) { delete root->gs; }
+        if (root) { delete root->cand_set; }
+        delete root;
     }
 
     Observer & get_obs() const { return obs; }
@@ -86,7 +89,7 @@ public:
     Move get_best_move() { return best_move; }
     int get_nodes_explored() { return nodes; }
     Eval get_score() { return score; }
-    void delete_tree() { ::delete_tree(root); root = nullptr; }
+    void cleanup() { delete_tree(root); root = nullptr; }
 
 private:
     static void * start(void *);
