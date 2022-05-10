@@ -11,7 +11,7 @@ struct FeatureHandler {
     const std::vector<const Responder *> enemy_responses;
 };
 
-const std::vector<FeatureHandler> feature_handlers = {
+const static std::vector<FeatureHandler> feature_handlers = {
     FeatureHandler{
         king_pinned_pieces_hook,
         { &defend_centre_resp },
