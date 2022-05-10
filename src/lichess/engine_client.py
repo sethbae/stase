@@ -7,6 +7,7 @@ def setup_binding() -> None:
     global _ec_lib
     _ec_lib = ctypes.CDLL("../../libengine_client.so")
     _ec_lib.get_computer_move.restype = ctypes.c_char_p
+    _ec_lib.get_eval_str.restype = ctypes.c_char_p
 
 
 class EngineClient:
@@ -34,3 +35,15 @@ class EngineClient:
         Get the computer's move, with the given time to think.
         """
         return _ec_lib.get_computer_move(self._engine_client, ctypes.c_double(seconds)).decode("utf8")
+
+    def get_node_count(self):
+        """
+        Fetches the number of nodes explored in the most recent move.
+        """
+        return _ec_lib.get_node_count(self._engine_client)
+
+    def get_eval_str(self):
+        """
+        Fetches the computer evaluation for the most recent move.
+        """
+        return _ec_lib.get_eval_str(self._engine_client).decode("utf-8")
