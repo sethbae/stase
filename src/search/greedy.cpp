@@ -114,7 +114,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     int c = node->children.size();
     for (int i = 0; i < list.size(); ++i) {
         SearchNode * child = new_node(*node->gs, list[i]);
-        child->cand_set = cands(*child->gs, new CandSet);
+        child->cand_set = cands(*child->gs, child->cand_set);
         if (child->gs->has_been_mated) {
             child->score =
                 child->gs->board.get_white()
