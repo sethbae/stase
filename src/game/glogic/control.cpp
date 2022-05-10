@@ -110,6 +110,6 @@ bool pawn_is_en_passantable(const Gamestate & gs, const Square s) {
     Square r_sq = mksq(s.x - 1, s.y);
     Piece enemy_pawn = (c == WHITE ? B_PAWN : W_PAWN);
 
-    return (s.x > 0 && gs.board.get(l_sq) == enemy_pawn)
-        || (s.x < 7 && gs.board.get(r_sq) == enemy_pawn);
+    return (s.x < 7 && gs.board.get(l_sq) == enemy_pawn)
+        || (s.x > 0 && gs.board.get(r_sq) == enemy_pawn);
 }
