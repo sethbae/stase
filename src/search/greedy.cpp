@@ -149,7 +149,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  */
 bool visit_node(SearchNode * node, Observer & obs) {
 
-    if (node->gs->game_over || node->terminal) {
+    if (!node || node->gs->game_over || node->terminal) {
         return false;
     }
 
@@ -200,7 +200,7 @@ bool visit_node(SearchNode * node, Observer & obs) {
  */
 bool force_visit(SearchNode * node, Observer & obs) {
 
-    if (node->gs->game_over || node->terminal) {
+    if (!node || node->gs->game_over || node->terminal) {
         return false;
     }
 
