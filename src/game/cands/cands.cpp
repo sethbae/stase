@@ -48,7 +48,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
         cands_in_check(gs, cand_set);
         gs.in_check = true;
         if (cand_set->empty()) {
-            gs.has_been_mated = true;
+            gs.game_over = true;
         }
         return cand_set;
     }
@@ -153,7 +153,7 @@ CandSet * cands_report(Gamestate & gs) {
         cands_in_check(gs, cand_set);
 
         if (cand_set->empty()) {
-            gs.has_been_mated = true;
+            gs.game_over = true;
             cout << "The position is checkmate - no candidates\n";
         } else{
             cout << "In check. Returning legal moves:\n";

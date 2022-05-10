@@ -13,7 +13,7 @@ class Gamestate {
 
 public:
     Board board;
-    bool has_been_mated;
+    bool game_over;
     bool w_cas;
     bool b_cas;
     bool in_check;
@@ -34,7 +34,7 @@ public:
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
     Gamestate()
-            : has_been_mated(false),
+            : game_over(false),
               w_cas(false),
               b_cas(false),
               in_check(false),
@@ -47,7 +47,7 @@ public:
 
     Gamestate(const Board & b)
             : board(b),
-              has_been_mated(false),
+              game_over(false),
               w_cas(false),
               b_cas(false),
               in_check(false),
@@ -60,7 +60,7 @@ public:
 
     Gamestate(const Gamestate & o, const Move m)
             : board(o.board.successor_hard(m)),
-              has_been_mated(false),
+              game_over(false),
               in_check(false),
               phase(o.phase),
               last_move(m)
@@ -98,7 +98,7 @@ public:
 
     Gamestate(const std::string & fen)
             : board(fen_to_board(fen)),
-              has_been_mated(false),
+              game_over(false),
               w_cas(false),
               b_cas(false),
               in_check(false),
@@ -111,7 +111,7 @@ public:
 
     Gamestate(const std::string & fen, GamePhase phase)
             : board(fen_to_board(fen)),
-              has_been_mated(false),
+              game_over(false),
               w_cas(false),
               b_cas(false),
               in_check(false),
@@ -125,7 +125,7 @@ public:
     Gamestate(Gamestate && o)
     {
         board = o.board;
-        has_been_mated = o.has_been_mated;
+        game_over = o.game_over;
         w_cas = o.w_cas;
         b_cas = o.b_cas;
         in_check = o.in_check;
@@ -164,7 +164,7 @@ public:
     {
         alloc();
         board = o.board;
-        has_been_mated = o.has_been_mated;
+        game_over = o.game_over;
         w_cas = o.w_cas;
         b_cas = o.b_cas;
         in_check = o.in_check;

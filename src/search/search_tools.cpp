@@ -18,7 +18,7 @@ void check_abort() {
  */
 void update_terminal(SearchNode * node) {
 
-    if (node->gs->has_been_mated) {
+    if (node->gs->game_over) {
         node->terminal = true;
         return;
     }

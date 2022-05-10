@@ -16,13 +16,14 @@ void add_legal_moves(SearchNode * node) {
     std::vector<Move> legals = legal_moves(node->gs->board);
     if (legals.empty()) {
         if (node->gs->in_check) {
-            node->gs->has_been_mated = true;
+            node->gs->game_over = true;
             node->terminal = true;
             node->score =
                 node->gs->board.get_white()
                     ? white_has_been_mated()
                     : black_has_been_mated();
         } else {
+            node->gs->game_over = true;
             node->terminal = true;
             node->score = zero();
         }
@@ -61,7 +62,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     // exit conditions
     check_abort();
-    if (node->gs->has_been_mated) {
+    if (node->gs->game_over) {
         update_terminal(node);
         return false;
     }
@@ -115,7 +116,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     for (int i = 0; i < list.size(); ++i) {
         SearchNode * child = new_node(*node->gs, list[i]);
         child->cand_set = cands(*child->gs, child->cand_set);
-        if (child->gs->has_been_mated) {
+        if (child->gs->game_over) {
             child->score =
                 child->gs->board.get_white()
                     ? white_has_been_mated()
@@ -148,7 +149,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  */
 bool visit_node(SearchNode * node, Observer & obs) {
 
-    if (node->gs->has_been_mated || node->terminal) {
+    if (node->gs->game_over || node->terminal) {
         return false;
     }
 
@@ -199,7 +200,7 @@ bool visit_node(SearchNode * node, Observer & obs) {
  */
 bool force_visit(SearchNode * node, Observer & obs) {
 
-    if (node->gs->has_been_mated || node->terminal) {
+    if (node->gs->game_over || node->terminal) {
         return false;
     }
 
