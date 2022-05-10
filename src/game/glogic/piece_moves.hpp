@@ -24,10 +24,12 @@ namespace __bools {
     };
 }
 
-inline bool can_move_in_direction(Piece piece, MoveType dir) {
-    return __bools::PIECE_MOVE_TYPES[piece][dir];
+inline bool can_move_in_direction(Piece p, MoveType dir) {
+    if (p == EMPTY) { return false; }
+    return __bools::PIECE_MOVE_TYPES[p][dir];
 }
 inline bool can_move_in_direction(Piece p, Delta d) {
+    if (p == EMPTY) { return false; }
     return can_move_in_direction(p, direction_of_delta(d));
 }
 
