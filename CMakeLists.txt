@@ -93,6 +93,8 @@ set(TEST_SOURCE_FILES
         src/test/stress_test_main.cpp
         src/test/game/cands/stress_test_cands.cpp
 
+        src/test/integration_test_main.cpp
+
         src/test/game/test_game.cpp
         src/test/game/test_piece.cpp
         src/test/game/test_gs_piece_lists.cpp

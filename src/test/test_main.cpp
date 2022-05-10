@@ -35,6 +35,10 @@ int main(int argc, char** argv) {
             cout << "\nRunning stress tests\n";
             passed = stress_test_main() && passed;
             ++modules_tested;
+        } else if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "-integration") == 0) {
+            cout << "\nRunning integration tests\n";
+            passed = integration_test_main() && passed;
+            ++modules_tested;
         } else {
             cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
         }
