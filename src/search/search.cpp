@@ -276,14 +276,6 @@ std::vector<SearchNode *> retrieve_trust_line(SearchNode * root) {
 }
 
 /**
- * Extends the search tree indefinitely from the root. This function will only return if the root
- * becomes terminal (eg with forced mate).
- */
-void search_indefinite(SearchNode * root, Observer & o) {
-    greedy_search(root, -1, o);
-}
-
-/**
  * Deletes completely the tree or subtree of which the given node is the root.
  */
 void delete_tree(SearchNode * node) {
