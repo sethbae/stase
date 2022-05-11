@@ -19,6 +19,13 @@ namespace __engine_params {
     const int SWING_THRESHOLD = 2000;  // (millipawns)
 
     /**
+     * EVALS_EQUAL_THRESHOLD is the point at which two evaluations are considered so close that they are essentially equal.
+     * When so, at most MAX_EXTRA_SIBLINGS will be explored from the given node.
+     */
+    const int EVALS_EQUAL_THRESHOLD = 100;  // (millipawns)
+    const int MAX_EXTRA_SIBLINGS = 2;
+
+    /**
      * QUIESS_THRESHOLD determines when a position becomes viewed as non-quiescent.
      */
     const float QUIESS_THRESHOLD = 2.0f;

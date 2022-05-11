@@ -82,9 +82,13 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
         }
     }
 
-    if (burst && quiess(*node->gs) < __engine_params::QUIESS_THRESHOLD) {
-        obs.register_event(node, DEBURST);
-        return false;
+    if (burst) {
+        if (node->visit_count > __engine_params::CRITICAL_THRESHOLD
+            || quiess(*node->gs) < __engine_params::QUIESS_THRESHOLD
+            || node->cand_set->critical.empty()) {
+            obs.register_event(node, DEBURST);
+            return false;
+        }
     }
 
     obs.open_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
@@ -149,47 +153,45 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  * about the node except to update its score.
  * Returns true if new nodes were deepened and false otherwise.
  */
-bool visit_node(SearchNode * node, Observer & obs) {
+void visit_node(SearchNode * node, Observer & obs) {
 
     if (!node || node->gs->game_over || node->terminal) {
-        return false;
+        return;
     }
 
     obs.open_event(node, VISIT);
 
-    bool result;
-
     switch (node->visit_count) {
         case __engine_params::CRITICAL_THRESHOLD:
-            result = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
+            deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
             obs.close_event(node, VISIT, nullptr, 1);
-            return result;
+            return;
         case __engine_params::MEDIAL_THRESHOLD:
-            result = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
+            deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
             obs.close_event(node, VISIT, nullptr, 2);
-            return result;
+            return;
         case __engine_params::FINAL_THRESHOLD:
-            result = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
+            deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
             obs.close_event(node, VISIT, nullptr, 3);
-            return result;
+            return;
         case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
                 if (node->terminal) {
                     // stalemate could have been detected
                     obs.close_event(node, VISIT, nullptr, 4);
-                    return true;
+                    return;
                 }
             }
-            result = deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
+            deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
             obs.close_event(node, VISIT, nullptr, 5);
-            return result;
+            return;
         default:
             ++node->visit_count;
             update_score(node);
             update_terminal(node, obs);
             obs.close_event(node, VISIT, nullptr, 6);
-            return false;
+            return;
     }
 
 }
@@ -259,28 +261,43 @@ bool force_visit_best_line(SearchNode * node, Observer & obs) {
  * the leaf node, then back up to the root. If a swing is detected at any point,
  * then the path from the leaf back up to the current node is visited again, at
  * most once.
- * The in_swing flag should be set to false.
- * Returns true if any descendant of the given node was materially updated (ie new
- * moves + nodes), and false otherwise.
+ * Returns true if any descendant of the given node caused (and executed) a swing,
+ * and false otherwise.
  */
-bool visit_best_line(SearchNode * node, bool in_swing, Observer & obs) {
+bool visit_best_line(SearchNode * node, Observer & obs) {
 
     if (node == nullptr) { return false; }
 
     Eval prior = node->score;
     obs.open_event(node, VISIT_LINE);
 
-    // recurse first so that the line is visited bottom (deepest) first
-    bool changes = visit_best_line(node->best_child, in_swing, obs);
-    changes = visit_node(node, obs) || changes;
+    // recurse on the best child
+    bool has_swung = visit_best_line(node->best_child, obs);
 
-    if (!in_swing && is_swing(prior, node->score)) {
-        changes = force_visit_best_line(node, obs) || changes;
+    // recurse on very-nearly-equal siblings
+    int extra_siblings_visited = 0;
+    for (int i = 0; i < node->children.size(); ++i) {
+        if (node->children[i] == node->best_child) { continue; }
+        if (millipawn_diff(node->best_child->score, node->children[i]->score) <= __engine_params::EVALS_EQUAL_THRESHOLD) {
+            has_swung = visit_best_line(node->children[i], obs) || has_swung;
+            if (++extra_siblings_visited == __engine_params::MAX_EXTRA_SIBLINGS) {
+                break;
+            }
+        }
     }
 
-    obs.close_event(node, VISIT_LINE);
-    return changes;
+    // after the below recursion, visit the current node itself
+    visit_node(node, obs);
 
+    if (!has_swung && is_swing(prior, node->score)) {
+        obs.register_event(node, SWING);
+        force_visit_best_line(node, obs);
+        obs.close_event(node, VISIT_LINE, nullptr, 1);
+        return true;
+    }
+
+    obs.close_event(node, VISIT_LINE, nullptr, 2);
+    return has_swung;
 }
 
 std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
@@ -299,7 +316,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
 
     while (i++ < cycles || cycles < 0) {
 
-        visit_best_line(root, false, obs);
+        visit_best_line(root, obs);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
 //        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
