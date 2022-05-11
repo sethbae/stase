@@ -82,6 +82,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     }
 
     if (burst && quiess(*node->gs) < __engine_params::QUIESS_THRESHOLD) {
+        obs.register_event(node, DEBURST);
         return false;
     }
 
@@ -107,7 +108,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
         }
         update_score(node);
         update_terminal(node, obs);
-        obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
+        obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list, 1);
         return changes;
     }
 
@@ -137,7 +138,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
 
     update_score(node);
     update_terminal(node, obs);
-    obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list);
+    obs.close_event(node, burst ? BURST_DEEPEN : DEEPEN, &cand_list, 2);
     return changes;
 }
 
@@ -160,33 +161,33 @@ bool visit_node(SearchNode * node, Observer & obs) {
     switch (node->visit_count) {
         case __engine_params::CRITICAL_THRESHOLD:
             result = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
-            obs.close_event(node, VISIT);
+            obs.close_event(node, VISIT, nullptr, 1);
             return result;
         case __engine_params::MEDIAL_THRESHOLD:
             result = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
-            obs.close_event(node, VISIT);
+            obs.close_event(node, VISIT, nullptr, 2);
             return result;
         case __engine_params::FINAL_THRESHOLD:
             result = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
-            obs.close_event(node, VISIT);
+            obs.close_event(node, VISIT, nullptr, 3);
             return result;
         case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
                 if (node->terminal) {
                     // stalemate could have been detected
-                    obs.close_event(node, VISIT);
+                    obs.close_event(node, VISIT, nullptr, 4);
                     return true;
                 }
             }
             result = deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
-            obs.close_event(node, VISIT);
+            obs.close_event(node, VISIT, nullptr, 5);
             return result;
         default:
             ++node->visit_count;
             update_score(node);
             update_terminal(node, obs);
-            obs.close_event(node, VISIT);
+            obs.close_event(node, VISIT, nullptr, 6);
             return false;
     }
 

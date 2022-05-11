@@ -23,25 +23,32 @@ public:
      * Opens a new tag for the given event, and records some text on the same line. Causes a nested
      * layer in the output.
      */
-    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, const int branch) {
         const std::string move = to_string(node) + " " +
                 ((is_sentinel(node->move))
                     ? ""
                     : move2uci(node->move) + " ")
                 + (cand_list ? name(*cand_list) + " " : "")
                 + "(vc: " + std::to_string(node->visit_count) + ") "
+                + "(q: " + std::to_string((int)quiess(*node->gs)) + ") "
                 + board_to_fen(node->gs->board);
+        std::string event_name = name(ev);
+        if (branch) { event_name += "(" + std::to_string(branch) + ")"; }
+
         current_line.push_back(move2uci(node->move));
-        buffer.push_back(indent(indent_level) + "<" + name(ev) + ">" + move);
+        buffer.push_back(indent(indent_level) + "<" + event_name + ">" + move);
         ++indent_level;
     }
 
     /**
      * Closes a previously opened tag without any other text and reduces the indentation accordingly.
      */
-    inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *) {
+    inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *, const int branch) {
+        std::string event_name = name(ev);
+        if (branch) { event_name += "(" + std::to_string(branch) + ")"; }
+
         --indent_level;
-        buffer.push_back(indent(indent_level) + "</" + name(ev) + ">");
+        buffer.push_back(indent(indent_level) + "</" + event_name + ">");
         current_line.pop_back();
     }
 

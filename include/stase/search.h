@@ -26,7 +26,8 @@ enum SearchEvent {
     DEEPEN,
     BURST_DEEPEN,
     BEGIN_BURST,
-    UPDATE_TERMINAL
+    UPDATE_TERMINAL,
+    DEBURST
 };
 
 inline std::string name(SearchEvent ev) {
@@ -39,6 +40,7 @@ inline std::string name(SearchEvent ev) {
         case BURST_DEEPEN: return "burst_deepen";
         case BEGIN_BURST: return "begin_burst";
         case UPDATE_TERMINAL: return "update_terminal";
+        case DEBURST: return "deburst";
         default: return "unknown event";
     }
 }
@@ -51,8 +53,8 @@ inline std::string name(SearchEvent ev) {
 class Observer {
 
 public:
-    virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) {}
-    virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr) {}
+    virtual void open_event(const SearchNode *, const SearchEvent, const CandList * = nullptr, const int = 0) {}
+    virtual void close_event(const SearchNode *, const SearchEvent, const CandList * = nullptr, const int = 0) {}
     virtual void register_event(const SearchNode *, const SearchEvent) {}
 
 };
