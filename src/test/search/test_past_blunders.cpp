@@ -52,6 +52,17 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
             },
             75000  // nodes allowed
         },
+        SearchLineTestCase{
+            // failed to spot mate
+            "rn2k2r/pp1bnppp/3p4/3q4/3N4/2PB1N2/PP2QPPP/R3R1K1 b kq - 8 15",
+            {
+                SearchLineRequirement{
+                    MUST_APPEAR,
+                    "Kf8 Qxe7 Kg8 Qd8 Be8"
+                }
+            },
+            50000  // nodes allowed
+        }
     }
 };
 
