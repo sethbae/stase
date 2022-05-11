@@ -73,7 +73,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
             return false;
         }
 
-        if (quiess(*node->gs) >= __engine_params::QUIESS_THRESHOLD) {
+        if (node->visit_count <= __engine_params::CRITICAL_THRESHOLD
+              && quiess(*node->gs) >= __engine_params::QUIESS_THRESHOLD) {
             obs.register_event(node, BEGIN_BURST);
             return deepen(node, CRITICAL, __engine_params::BURST_DEPTH, obs, true);
         } else {
