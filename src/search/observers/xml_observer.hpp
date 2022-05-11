@@ -15,6 +15,22 @@ private:
     // we count indents from 1 so that the <main> tag can sit at the global level
     int indent_level = 1;
 
+    inline static bool activated(SearchEvent ev) {
+        switch (ev) {
+            case VISIT: return true;
+            case VISIT_LINE: return true;
+            case SWING: return true;
+            case FORCE_VISIT: return true;
+            case FORCE_VISIT_LINE: return true;
+            case DEEPEN: return false;
+            case BURST_DEEPEN: return false;
+            case BEGIN_BURST: return false;
+            case UPDATE_TERMINAL: return false;
+            case DEBURST: return false;
+            default: return true;
+        }
+    }
+
 public:
 
     XMLObserver(const std::string & filepath) : filepath(filepath) {}
@@ -24,6 +40,9 @@ public:
      * layer in the output.
      */
     inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, const int branch) {
+
+        if (!activated(ev)) { return; }
+
         const std::string move = to_string(node) + " " +
                 ((is_sentinel(node->move))
                     ? ""
@@ -44,11 +63,16 @@ public:
      * Closes a previously opened tag without any other text and reduces the indentation accordingly.
      */
     inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *, const int branch) {
-        std::string event_name = name(ev);
-        if (branch) { event_name += "(" + std::to_string(branch) + ")"; }
+
+        if (!activated(ev)) { return; }
+
+        std::string branch_string =
+            branch
+                ? "(" + std::to_string(branch) + ")"
+                : "";
 
         --indent_level;
-        buffer.push_back(indent(indent_level) + "</" + event_name + ">");
+        buffer.push_back(indent(indent_level) + branch_string + "</" + name(ev) + ">");
         current_line.pop_back();
     }
 
@@ -56,8 +80,9 @@ public:
      * Prints a single line for the event, eg <begin_burst>0x123456789</begin_burst>
      */
     inline void register_event(const SearchNode * node, const SearchEvent ev) {
+        if (!activated(ev)) { return; }
         buffer.push_back(
-            indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + "</" + name(ev) + ">"
+            indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + " " + position_string() + "</" + name(ev) + ">"
         );
     }
 

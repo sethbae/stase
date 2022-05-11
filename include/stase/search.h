@@ -21,6 +21,7 @@ struct SearchNode {
 enum SearchEvent {
     VISIT,
     VISIT_LINE,
+    SWING,
     FORCE_VISIT,
     FORCE_VISIT_LINE,
     DEEPEN,
@@ -34,6 +35,7 @@ inline std::string name(SearchEvent ev) {
     switch (ev) {
         case VISIT: return "visit";
         case VISIT_LINE: return "visit_l";
+        case SWING: return "swing";
         case FORCE_VISIT: return "f_visit";
         case FORCE_VISIT_LINE: return "f_visit_l";
         case DEEPEN: return "deepen";
