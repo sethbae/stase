@@ -6,7 +6,7 @@
 class CandListVisitCountObserver : public TestObserver {
 
 public:
-    void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+    void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, [[maybe_unused]] const int branch) {
         if (ev == DEEPEN) {
             TestObserver::register_applicable_event();
             switch (*cand_list) {

@@ -6,7 +6,7 @@
 class LegalMovesObserver : public TestObserver {
 
 public:
-    void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+    void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, [[maybe_unused]] const int branch) {
 
         if (!cand_list) { return; }
         if (ev == DEEPEN || ev == BURST_DEEPEN) {

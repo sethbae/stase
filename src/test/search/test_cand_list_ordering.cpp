@@ -8,7 +8,7 @@ private:
     unsigned null_count = 0;
 
 public:
-    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list) {
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, [[maybe_unused]] const int branch) {
 
         // update the counters
         TestObserver::register_applicable_event();

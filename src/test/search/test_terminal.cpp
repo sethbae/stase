@@ -6,7 +6,7 @@
 class TerminalNotDeepenedObserver : public TestObserver {
 
 public:
-    void open_event(const SearchNode * node, const SearchEvent ev, [[maybe_unused]] const CandList * cand_list) {
+    void open_event(const SearchNode * node, const SearchEvent ev, [[maybe_unused]] const CandList * cand_list, [[maybe_unused]] const int branch) {
         if (ev == DEEPEN) {
             TestObserver::register_applicable_event();
             if (node->terminal) {
@@ -20,7 +20,7 @@ public:
 class TerminalUpdatedCorrectlyObserver : public TestObserver {
 
 public:
-    void close_event(const SearchNode * node, [[maybe_unused]] const SearchEvent ev, [[maybe_unused]] const CandList * cand_list) {
+    void close_event(const SearchNode * node, [[maybe_unused]] const SearchEvent ev, [[maybe_unused]] const CandList * cand_list, [[maybe_unused]] const int branch) {
         TestObserver::register_applicable_event();
 
         // create a copy of the node, but with terminal false. Then update terminal,
