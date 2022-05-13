@@ -17,7 +17,7 @@ def post_update(token: str, game_id: str, engine: EngineClient, seconds_given: f
     Posts an update to the lichess chat with the engine's speed + evaluation.
     """
     post_to_chat(token, game_id,
-                 f"Evaluation: {engine.get_eval_str()} ({int(engine.get_node_count() / seconds_given)}n/s)")
+                 f" {engine.get_eval_str()} ({round(seconds_given, 1)}s @ {int(engine.get_node_count() / seconds_given)}n/s)")
 
 
 def play_game(token: str, game_id: str, chat_updates=True):
