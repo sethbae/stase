@@ -8,7 +8,7 @@ from src.lichess.client import (
     stream_incoming_events,
     make_move,
 )
-from src.lichess.info import read_access_token, ROOT_DIR, InvalidTokenException
+from src.lichess.info import read_access_token, InvalidTokenException
 from src.lichess.play import play_game
 
 STASE_SPLASH = \
@@ -42,12 +42,12 @@ def rebuild_stase(pr: bool = True) -> None:
     Pulls the latest version from master and builds the C++ executable.
     """
     if pr: print("Pulling changes...", end="")
-    subprocess.Popen("git pull".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+    subprocess.Popen("git pull".split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
     if pr: print("done")
 
     if pr: print("Building engine...", end="")
-    subprocess.Popen("cmake .".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
-    subprocess.Popen("make engine_client".split(), cwd=ROOT_DIR, stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen("cmake .".split(), stdout=subprocess.DEVNULL).wait()
+    subprocess.Popen("make engine_client".split(), stdout=subprocess.DEVNULL).wait()
     if pr: print("done")
 
 

@@ -1,7 +1,6 @@
 
 """Some file paths used for the engine and for talking to it"""
-ROOT_DIR = "../.."
-ENV_FILE = "../../env"
+ENV_FILE = "env"
 ENGINE_USERNAME = "queen_stase_approx"
 
 """Base URL for hitting the lichess api"""
@@ -20,7 +19,7 @@ def read_access_token() -> str:
         with open(ENV_FILE, "r") as file:
             token = file.read()
     except FileNotFoundError:
-        raise InvalidTokenException("Could not read .env file.")
+        raise InvalidTokenException("Could not read env file.")
 
     if not token.strip():
         raise InvalidTokenException("Auth token is not valid.")
