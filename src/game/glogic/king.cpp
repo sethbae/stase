@@ -48,53 +48,27 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
 
     // knights
     Piece enemy_knight = (king_colour == WHITE) ? B_KNIGHT : W_KNIGHT;
-    if (val(temp = mksq(x + 1, y + 2)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x + 1, y - 2)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x + 2, y + 1)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x + 2, y - 1)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x - 1, y + 2)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x - 1, y - 2)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x - 2, y + 1)) && gs.board.get(temp) == enemy_knight)
-        return false;
-    if (val(temp = mksq(x - 2, y - 1)) && gs.board.get(temp) == enemy_knight)
-        return false;
-
-    // kings
-    if (val(temp = mksq(x + 1, y + 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x + 1, y + 0)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x + 1, y - 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x + 0, y + 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x + 0, y - 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x - 1, y + 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x - 1, y + 0)) && (type(gs.board.get(temp)) == KING))
-        return false;
-    if (val(temp = mksq(x - 1, y - 1)) && (type(gs.board.get(temp)) == KING))
-        return false;
+    if (val(temp = mksq(x + 1, y + 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 1, y - 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 2, y + 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 2, y - 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 1, y + 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 1, y - 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 2, y + 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 2, y - 1)) && gs.board.get(temp) == enemy_knight) { return false; }
 
     // pawns
     if (king_colour == WHITE) {
-        if (val(temp = mksq(x + 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
-            return false;
-        if (val(temp = mksq(x - 1, y + 1)) && (gs.board.get(temp) == B_PAWN))
-            return false;
+        if (val(temp = mksq(x + 1, y + 1)) && (gs.board.get(temp) == B_PAWN)) { return false; }
+        if (val(temp = mksq(x - 1, y + 1)) && (gs.board.get(temp) == B_PAWN)) { return false; }
     } else {
-        if (val(temp = mksq(x + 1, y - 1)) && (gs.board.get(temp) == W_PAWN))
-            return false;
-        if (val(temp = mksq(x - 1, y - 1)) && (gs.board.get(temp) == W_PAWN))
-            return false;
+        if (val(temp = mksq(x + 1, y - 1)) && (gs.board.get(temp) == W_PAWN)) { return false; }
+        if (val(temp = mksq(x - 1, y - 1)) && (gs.board.get(temp) == W_PAWN)) { return false; }
     }
+
+    // kings
+    Square enemy_k_sq = (king_colour == WHITE ? gs.b_king : gs.w_king);
+    if (abs(enemy_k_sq.x - s.x) <= 1 && abs(enemy_k_sq.y - s.y) <= 1) { return false; }
 
     return true;
 
