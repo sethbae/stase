@@ -100,7 +100,7 @@ inline std::string etos(const Eval e) {
     // handle numerical evaluations
     stringstream ss;
     ss << std::fixed << std::setprecision(3) << human_eval(e);
-    if (e < zero()) {
+    if (e > zero()) {
         return "+" + ss.str();
     } else {
         return ss.str();
