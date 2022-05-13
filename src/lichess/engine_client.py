@@ -5,7 +5,7 @@ _ec_lib = None
 
 def setup_binding() -> None:
     global _ec_lib
-    _ec_lib = ctypes.CDLL("../../libengine_client.so")
+    _ec_lib = ctypes.CDLL("./libengine_client.so")
     _ec_lib.get_computer_move.restype = ctypes.c_char_p
     _ec_lib.get_eval_str.restype = ctypes.c_char_p
 
