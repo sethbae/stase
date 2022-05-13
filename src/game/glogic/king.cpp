@@ -1,5 +1,4 @@
 #include "../../../include/stase/game.h"
-#include "../../../include/stase/board.h"
 #include "glogic.h"
 #include "../gamestate.hpp"
 
@@ -8,6 +7,11 @@
  * the square [s] along the given [delta]. Returns true if an attacker is found, false otherwise.
  */
 bool seek_attackers(const Board & b, const Square s, const Colour king_colour, const Delta delta) {
+
+    /**
+     * NB this can be called from a sneaked context, so it is not safe to use
+     * Gamestate::first_piece_encountered.
+     */
 
     Square temp;
     MoveType dir = direction_of_delta(delta);
