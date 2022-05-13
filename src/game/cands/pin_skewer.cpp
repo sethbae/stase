@@ -3,19 +3,6 @@
 #include "responder.hpp"
 
 /**
- * Returns the final empty square on the trajectory and board given.
- */
-inline Square find_line_end(const Gamestate & gs, int x, int y, Delta d) {
-    int line_end_x = x, line_end_y = y;
-    while (val(line_end_x - d.dx, line_end_y - d.dy)
-           && gs.board.get(line_end_x - d.dx, line_end_y - d.dy) == EMPTY) {
-        line_end_x -= d.dx;
-        line_end_y -= d.dy;
-    }
-    return mksq(line_end_x, line_end_y);
-}
-
-/**
  * This method contains the logical checks of whether a second piece can be discovered
  * which can either be pinned or skewered from the second piece back to the first.
  * It checks, type, colour etc and notably that a pawn is not defended by any other pawn.
@@ -26,7 +13,7 @@ inline Square find_line_end(const Gamestate & gs, int x, int y, Delta d) {
  * - conf1: the value of the piece which is being pinned or skewered
  * - conf2: the value of the piece which it is being pinned or skewered to
  */
-inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
+bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
 
     Square other_p_sq = gs.first_piece_encountered(s, d);
 
@@ -59,75 +46,45 @@ inline bool detect_pin_skewer(Gamestate & gs, const Square s, const Delta d) {
      */
 
     MoveType dir = direction_of_delta(d);
-    Square line_end = find_line_end(gs, s.x, s.y, d);
 
-    // check for pieces which can move onto the line of empty squares
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
+    for (int x = s.x - d.dx, y = s.y - d.dy;  val(x, y); x -= d.dx, y -= d.dy) {
 
-            Piece p = gs.board.get(x, y);
+        Square dest = mksq(x, y);
+        if (gs.board.get(x, y) != EMPTY) { break; }
 
+        for (int i = 0; i < 8; ++i) {
+
+            Delta move_delta = D[i];
+            if (parallel(move_delta, d)) { continue; }
+
+            Square from = gs.first_piece_encountered(dest, move_delta);
+            if (is_sentinel(from)) { continue; }
+
+            Piece p = gs.board.get(from);
             if (colour(p) == colour(gs.board.get(s))
-                || !can_move_in_direction(p, dir)) {
+                || !can_move_in_direction(p, dir)
+                || !can_move_in_direction(p, move_delta)) {
                 continue;
             }
 
-            // if we are pinning with a queen, then there may be multiple squares to check
-            if (type(p) == QUEEN) {
-
-                std::vector<Square> squares_on_line =
-                        squares_piece_can_reach_on_line(gs.board, mksq(x, y), s, line_end);
-
-                for (int i = 0; i < squares_on_line.size(); ++i) {
-                    Move pin_move = Move{mksq(x, y), squares_on_line[i], 0};
-                    if (move_is_safe(gs, pin_move)
-                            && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
-
-                        bool result = gs.add_frame(
-                                pin_skewer_hook.id,
-                                FeatureFrame{
-                                    mksq(x,y),
-                                    squares_on_line[i],
-                                    piece_value(gs.board.get(s)),
-                                    piece_value(other_p)
-                                }
-                        );
-                        if (!result) { return false; }
-
-                    }
-                }
-
-            } else {
-
-                // bishop / rook has at most one square available to it
-
-                Square pin_from_square =
-                        square_piece_can_reach_on_line(gs.board, mksq(x, y), s, line_end);
-
-                if (is_sentinel(pin_from_square)) {
-                    continue;
-                }
-
-                Move pin_move = Move{mksq(x, y), pin_from_square, 0};
-                if (move_is_safe(gs, pin_move)
-                        && !gs.is_kpinned_piece(mksq(x, y), get_delta_between(pin_move.from, pin_move.to))) {
-
-                    bool result = gs.add_frame(
-                            pin_skewer_hook.id,
-                            FeatureFrame{
-                                mksq(x, y),
-                                pin_from_square,
-                                piece_value(gs.board.get(s)),
-                                piece_value(other_p)
-                            }
-                    );
-                    if (!result) { return false; }
-
-                }
+            Move pin_move{from, dest, 0};
+            if (gs.is_kpinned_piece(from, move_delta) || !move_is_safe(gs, pin_move)) {
+                continue;
             }
 
+            if (!gs.add_frame(
+                    pin_skewer_hook.id,
+                    FeatureFrame{
+                        from,
+                        dest,
+                        piece_value(gs.board.get(s)),
+                        piece_value(other_p)
+                    })) {
+                return false;
+            }
         }
     }
+
     return true;
 }
 
