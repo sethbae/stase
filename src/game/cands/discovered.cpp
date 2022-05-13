@@ -18,6 +18,7 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
 
     const Piece p = gs.board.get(s);
     const Colour c = colour(p);
+    if (p == EMPTY) { return true; }
 
     for (int i = 0; i < 8; ++i) {
         const Delta d = D[i];

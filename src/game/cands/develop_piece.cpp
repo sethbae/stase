@@ -361,6 +361,7 @@ bool is_undeveloped_piece(const Gamestate & gs, Square centre) {
  * pushes a new FeatureFrame onto the list.
  */
 bool is_undeveloped_piece_hook(Gamestate & gs, const Square centre) {
+    if (gs.board.get(centre) == EMPTY) { return true; }
     if (is_undeveloped_piece(gs, centre)) {
         return gs.add_frame(develop_hook.id, FeatureFrame{centre, SQUARE_SENTINEL, 0, 0});
     }
