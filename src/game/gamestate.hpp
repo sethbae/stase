@@ -33,7 +33,7 @@ public:
     PieceEncounteredCache * pdir_cache;
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
-    Gamestate()
+    explicit Gamestate()
             : game_over(false),
               w_cas(false),
               b_cas(false),
@@ -45,7 +45,7 @@ public:
         alloc();
     }
 
-    Gamestate(const Board & b)
+    explicit Gamestate(const Board & b)
             : board(b),
               game_over(false),
               w_cas(false),
@@ -58,7 +58,7 @@ public:
         compute_cache(board, pdir_cache);
     }
 
-    Gamestate(const Gamestate & o, const Move m)
+    explicit Gamestate(const Gamestate & o, const Move m)
             : board(o.board.successor_hard(m)),
               game_over(false),
               in_check(false),
@@ -96,7 +96,7 @@ public:
         this->control_cache->update(o.board, *o.control_cache, m);
     }
 
-    Gamestate(const std::string & fen)
+    explicit Gamestate(const std::string & fen)
             : board(fen_to_board(fen)),
               game_over(false),
               w_cas(false),
@@ -109,7 +109,7 @@ public:
         compute_cache(board, pdir_cache);
     }
 
-    Gamestate(const std::string & fen, GamePhase phase)
+    explicit Gamestate(const std::string & fen, GamePhase phase)
             : board(fen_to_board(fen)),
               game_over(false),
               w_cas(false),
@@ -122,7 +122,7 @@ public:
         compute_cache(board, pdir_cache);
     }
 
-    Gamestate(Gamestate && o)
+    explicit Gamestate(Gamestate && o)
     {
         board = o.board;
         game_over = o.game_over;
@@ -160,7 +160,7 @@ public:
      * Currently, it's one use case is when caching the puzzles read from file: they need
      * to be copied when a second or later benchmark asks for them.
      */
-    Gamestate(const Gamestate & o)
+    explicit Gamestate(const Gamestate & o)
     {
         alloc();
         board = o.board;
