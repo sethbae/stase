@@ -13,7 +13,7 @@ using std::cout;
  * Includes more complicated logic regarding x-rays including those of mixed colour.
  * @return a summary of the information found, a SquareControlStatus.
  */
-SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
+SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s, const bool use_caches) {
 
     /*
      *                  X-RAYS and POLY X-RAYS
@@ -225,22 +225,49 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, Square s) {
 
     // kings
     int k_val = piece_value(W_KING);
-    for (int i = 0; i < 8; ++i) {
-        if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(gs.board.get(temp)) == KING)) {
-            if (colour(gs.board.get(temp)) == WHITE) {
-                ++basic_balance;
-                ++poly_x_ray_balance;
-                if (min_value_w > k_val) {
-                    min_value_w = k_val;
-                }
-            } else {
-                --basic_balance;
-                --poly_x_ray_balance;
-                if (min_value_b > k_val) {
-                    min_value_b = k_val;
-                }
+    if (use_caches) {
+        /*
+         * Not in a sneaked context, so able to use w_king and b_king directly.
+         */
+//        if (type(gs.board.get(gs.w_king)) != KING) { std::cout << "w_king wrong\n"; }
+//        if (type(gs.board.get(gs.b_king)) != KING) { std::cout << "b_king wrong\n"; }
+        if (!equal(s, gs.w_king) && abs(x - gs.w_king.x) <= 1 && abs(y - gs.w_king.y) <= 1) {
+            ++basic_balance;
+            ++poly_x_ray_balance;
+            if (min_value_w > k_val) {
+                min_value_w = k_val;
             }
             ++directions_attacked_from;
+        }
+        if (!equal(s, gs.b_king) && abs(x - gs.b_king.x) <= 1 && abs(y - gs.b_king.y) <= 1) {
+            --basic_balance;
+            --poly_x_ray_balance;
+            if (min_value_b > k_val) {
+                min_value_b = k_val;
+            }
+            ++directions_attacked_from;
+        }
+    } else {
+        /*
+         * In a sneaked context, so cannot trust w_king an b_king: search manually.
+         */
+        for (int i = 0; i < 8; ++i) {
+            if (val(temp = mksq(x + XD[i], y + YD[i])) && (type(gs.board.get(temp)) == KING)) {
+                if (colour(gs.board.get(temp)) == WHITE) {
+                    ++basic_balance;
+                    ++poly_x_ray_balance;
+                    if (min_value_w > k_val) {
+                        min_value_w = k_val;
+                    }
+                } else {
+                    --basic_balance;
+                    --poly_x_ray_balance;
+                    if (min_value_b > k_val) {
+                        min_value_b = k_val;
+                    }
+                }
+                ++directions_attacked_from;
+            }
         }
     }
 
@@ -394,7 +421,7 @@ bool is_weak_status(const Gamestate & gs, const Square s, const Colour c, Square
  */
 bool is_weak_square(const Gamestate & gs, const Square s, const Colour c, const bool use_caches) {
     if (!use_caches) {
-        return is_weak_status(gs, s, c, evaluate_square_control(gs, s));
+        return is_weak_status(gs, s, c, evaluate_square_control(gs, s, use_caches));
     }
     return is_weak_status(gs, s, c, gs.control_cache->get_control_status(s));
 }
