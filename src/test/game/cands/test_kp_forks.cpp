@@ -113,7 +113,7 @@ const TestSet<ForkTestCase> king_fork_hook_test_cases{
     {
         // KING: basic undefended pieces #1
         ForkTestCase{
-            "8/8/8/4bn2/8/4K3/8/8 w - - 0 1",
+            "k7/8/8/4bn2/8/4K3/8/8 w - - 0 1",
             {
                 ForkFrame{"e5", "f5", "e4", "e3"}
             }

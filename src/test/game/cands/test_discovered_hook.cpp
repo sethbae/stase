@@ -30,7 +30,7 @@ const TestSet<HookTestCase> discovered_hook_test_set{
         },
         // BNp (no check required)
         HookTestCase{
-            "8/5p2/8/8/2N5/1B6/8/8 w - - 0 1",
+            "k7/5p2/8/8/2N5/1B6/8/K7 w - - 0 1",
             {
                 ExpectedFeatureFrame{"c4", "f7", sqtoi(stosq("b3")), 0}
             }

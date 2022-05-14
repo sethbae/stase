@@ -74,7 +74,7 @@ const TestSet<StringTestCase> hook_test_cases = {
         },
         // pawn threatens knight
         StringTestCase{
-            "8/8/8/3p4/4N3/8/8/8 w - - 0 1",
+            "k7/8/8/3p4/4N3/8/8/K7 w - - 0 1",
             {"e4"},
         },
         // does not take defended piece of same value

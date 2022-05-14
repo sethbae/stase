@@ -24,14 +24,14 @@ TestSet<ForkTestCase> knight_fork_hook_test_cases = {
         },
         // basic undefended pieces #2
         ForkTestCase{
-            "8/8/8/8/4R1n1/3R4/8/8 w - - 0 1",
+            "k7/8/8/8/4R1n1/3R4/8/K7 w - - 0 1",
             {
                 ForkFrame{"d3", "e4", "f2", "g4"}
             }
         },
         // basic undefended pieces #3
         ForkTestCase{
-            "8/b1p5/8/8/8/2N5/8/8 b - - 0 1",
+            "7k/b1p5/8/8/8/2N5/8/7K b - - 0 1",
             {
                 ForkFrame{"a7", "c7", "b5", "c3"}
             }
@@ -70,7 +70,7 @@ TestSet<ForkTestCase> knight_fork_hook_test_cases = {
         },
         // forks with capture #1
         ForkTestCase{
-            "8/3b4/6q1/4p3/8/3N4/8/8 w - - 0 1",
+            "k7/3b4/6q1/4p3/8/3N4/1K6/8 w - - 0 1",
             {
                 ForkFrame{"d7", "g6", "e5", "d3"}
             }

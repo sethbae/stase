@@ -18,7 +18,7 @@ TestSet<ForkTestCase> queen_fork_hook_test_cases = {
         },
         // basic undefended pieces #1
         ForkTestCase{
-            "8/3r4/7Q/8/8/8/6r1/8 w - - 0 1",
+            "1k6/3r4/7Q/8/8/8/6r1/K7 w - - 0 1",
             {
                 ForkFrame{"d7", "g2", "c6", "h6"},
                 ForkFrame{"d7", "g2", "h3", "h6"}
@@ -51,9 +51,10 @@ TestSet<ForkTestCase> queen_fork_hook_test_cases = {
         },
         //  basic undefended pieces #2
         ForkTestCase{
-            "8/1p3p2/3Q4/8/8/8/8/8 w - - 0 1",
+            "7K/1p3p2/3Q4/8/8/8/8/k7 w - - 0 1",
             {
                 ForkFrame{"b7", "f7", "d5", "d6"},
+                ForkFrame{"a1", "f7", "f6", "d6"}
             }
         },
         //  gives multiple choices #1
