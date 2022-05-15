@@ -265,8 +265,8 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
         other_forked_piece[i] = SQUARE_SENTINEL;
     }
 
-    FeatureFrame fork_frames_arr[32];
-    ptr_vec<FeatureFrame> fork_frames(fork_frames_arr, 32);
+    FeatureFrame fork_frames_arr[64];
+    ptr_vec<FeatureFrame> fork_frames(fork_frames_arr, 64);
 
     // first take all enemies not on a safe square
     for (int x = 0; x < 8; ++x) {
