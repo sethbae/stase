@@ -96,7 +96,7 @@ bool find_sliding_forks(Gamestate & gs, const Square s) {
 /**
  * Works out from the given square along either ORTHO or DIAG deltas (according to parameter),
  * and records each square from which a forking piece could attack it in the fork_bools array.
- * If a square reaches 2, then it is added to the fork_squares vector.
+ * If a square reaches 2, then it is added to fork_squares.
  * If the parameter avoid is filled, then this delta will not be considered: use this for when
  * a piece is pinned. Neither direction of the avoid delta will be considered!
  */
@@ -105,7 +105,7 @@ inline void update_fork_net(
         const Square s,
         uint8_t * fork_bools,
         Square * other_forked_piece,
-        std::vector<FeatureFrame> & frames,
+        ptr_vec<FeatureFrame> & frames,
         MoveType dir,
         const Delta avoid = INVALID_DELTA) {
 
@@ -135,26 +135,26 @@ inline void update_fork_net(
             if (p == EMPTY) {
                 // empty: can be hit here, can continue looking
                 if (fork_bools[8*x + y]++ == 1) {
-                    frames.push_back(
-                            FeatureFrame{
-                                s,
-                                other_forked_piece[8*x + y],
-                                sqtoi(mksq(x, y)),
-                                0  // these get filled in by the caller
-                            });
+                    frames.push(
+                        FeatureFrame{
+                            s,
+                            other_forked_piece[8*x + y],
+                            sqtoi(mksq(x, y)),
+                            0  // these get filled in by the caller
+                        });
                 } else {
                     other_forked_piece[8*x + y] = s;
                 }
             } else if (colour(p) == colour(gs.board.get(s))) {
                 // own team: a capture could occur here and hit it, but stop looking
                 if (fork_bools[8*x + y]++ == 1) {
-                    frames.push_back(
-                            FeatureFrame{
-                                s,
-                                other_forked_piece[8*x + y],
-                                sqtoi(mksq(x, y)),
-                                0  // these get filled in by the caller
-                            });
+                    frames.push(
+                        FeatureFrame{
+                            s,
+                            other_forked_piece[8*x + y],
+                            sqtoi(mksq(x, y)),
+                            0  // these get filled in by the caller
+                        });
                 } else {
                     other_forked_piece[8*x + y] = s;
                 }
@@ -174,7 +174,7 @@ inline void update_fork_net(
  * pawns and their pins correctly.
  */
 void update_pawn_fork_net(
-        const Gamestate & gs, const Square s, uint8_t * fork_bools, Square * other_forked_piece, std::vector<FeatureFrame> & frames) {
+        const Gamestate & gs, const Square s, uint8_t * fork_bools, Square * other_forked_piece, ptr_vec<FeatureFrame> & frames) {
 
     Delta avoid = gs.delta_of_kpinned_piece(s);
     int capturing_y_delta = (colour(gs.board.get(s)) == WHITE ? 1 : -1);
@@ -206,26 +206,26 @@ void update_pawn_fork_net(
             if (p == EMPTY) {
                 // empty: can be hit here, can continue looking
                 if (fork_bools[8*x + y]++ == 1) {
-                    frames.push_back(
-                            FeatureFrame{
-                                s,
-                                other_forked_piece[8*x + y],
-                                sqtoi(mksq(x, y)),
-                                0  // these get filled in by the caller
-                            });
+                    frames.push(
+                        FeatureFrame{
+                            s,
+                            other_forked_piece[8*x + y],
+                            sqtoi(mksq(x, y)),
+                            0  // these get filled in by the caller
+                        });
                 } else {
                     other_forked_piece[8*x + y] = s;
                 }
             } else if (colour(p) == colour(gs.board.get(s))) {
                 // own team: a capture could occur here and hit it, but stop looking
                 if (fork_bools[8*x + y]++ == 1) {
-                    frames.push_back(
-                            FeatureFrame{
-                                s,
-                                other_forked_piece[8*x + y],
-                                sqtoi(mksq(x, y)),
-                                0  // these get filled in by the caller
-                            });
+                    frames.push(
+                        FeatureFrame{
+                            s,
+                            other_forked_piece[8*x + y],
+                            sqtoi(mksq(x, y)),
+                            0  // these get filled in by the caller
+                        });
                 } else {
                     other_forked_piece[8*x + y] = s;
                 }
@@ -265,7 +265,8 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
         other_forked_piece[i] = SQUARE_SENTINEL;
     }
 
-    std::vector<FeatureFrame> fork_frames;
+    FeatureFrame fork_frames_arr[32];
+    ptr_vec<FeatureFrame> fork_frames(fork_frames_arr, 32);
 
     // first take all enemies not on a safe square
     for (int x = 0; x < 8; ++x) {
@@ -307,7 +308,9 @@ bool find_queen_forks(Gamestate & gs, const Square s) {
         }
     }
 
-    for (const FeatureFrame & ff : fork_frames) {
+    for (int i = 0; i < fork_frames.size(); ++i) {
+
+        FeatureFrame & ff = fork_frames[i];
 
         // don't record traditional forks: only those which go in different directions
         Square fork_sq = itosq(ff.conf_1);
@@ -453,7 +456,8 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
 
     if (type(pawn) != PAWN || gs.is_kpinned_piece(s, delta(0, FORWARD))) { return true; }
 
-    std::vector<Square> squares;
+    Square squares_arr[4];
+    ptr_vec<Square> squares(squares_arr, 4);
 
     Square lcap = mksq(s.x - 1, s.y + FORWARD);
     Square rcap = mksq(s.x + 1, s.y + FORWARD);
@@ -462,25 +466,25 @@ bool find_pawn_forks(Gamestate & gs, const Square s) {
 
     // regular captures
     if (val(lcap) && gs.board.get(lcap) != EMPTY && colour(gs.board.get(lcap)) != colour(pawn)) {
-        squares.push_back(lcap);
+        squares.push(lcap);
     }
     if (val(rcap) && gs.board.get(rcap) != EMPTY && colour(gs.board.get(rcap)) != colour(pawn)) {
-        squares.push_back(rcap);
+        squares.push(rcap);
     }
     // forward moves
     if (val(fw1) && gs.board.get(fw1) == EMPTY) {
-        squares.push_back(fw1);
+        squares.push(fw1);
         if (FIRST_MOVE && gs.board.get(fw2) == EMPTY) {
-            squares.push_back(fw2);
+            squares.push(fw2);
         }
     }
     // en-passant
     if (gs.board.get_ep_exists()) {
         // note that we do not risk duplicating, because ep squares are always empty
         if (equal(lcap, gs.board.get_ep_sq())) {
-            squares.push_back(lcap);
+            squares.push(lcap);
         } else if (equal(rcap, gs.board.get_ep_sq())) {
-            squares.push_back(rcap);
+            squares.push(rcap);
         }
     }
 
