@@ -70,7 +70,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
             FeatureFrame ff = gs.frames[fh.hook.id][j];
             bool centre_piece_is_white = (colour(gs.board.get(ff.centre)) == WHITE);
 
-            std::vector<const Responder *> responders =
+            const std::vector<const Responder *> & responders =
                 (gs.board.get_white() == centre_piece_is_white)
                     ? fh.friendly_responses
                     : fh.enemy_responses;
@@ -202,7 +202,7 @@ CandSet * cands_report(Gamestate & gs) {
 
             cout << "Looking at frame " << j << " (" << sqtos(ff.centre) << ", " << sqtos(ff.secondary) << "):\n";
 
-            std::vector<const Responder *> responders =
+            const std::vector<const Responder *> & responders =
                     (gs.board.get_white() == centre_piece_is_white)
                     ? fh.friendly_responses
                     : fh.enemy_responses;
