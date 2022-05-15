@@ -57,7 +57,7 @@ struct Move {
 const Move MOVE_SENTINEL = Move{SQUARE_SENTINEL, SQUARE_SENTINEL, 0};
 
 constexpr Move empty_move() {
-    return Move{0, 0, 0, 0, 0};
+    return Move{{0, 0}, {0, 0}, 0};
 }
 
 inline bool is_sentinel(const Move m) {
