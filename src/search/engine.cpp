@@ -19,7 +19,7 @@ void * Engine::start(void * args) {
     reset_abort_flag();
     greedy_search(search_args->root, search_args->cycles, *search_args->o);
 
-    *search_args->nodes_out = node_count();
+    *search_args->nodes_out = subtree_size(search_args->root);
     *search_args->move_out = current_best_move(search_args->root);
     *search_args->score_out = search_args->root->score;
 
@@ -53,7 +53,7 @@ void * Engine::start_with_timeout(void * args) {
     pthread_join(t_id, nullptr);
     reset_abort_flag();
 
-    *search_args->nodes_out = node_count();
+    *search_args->nodes_out = subtree_size(search_args->root);
     *search_args->move_out = current_best_move(search_args->root);
     *search_args->score_out = search_args->root->score;
 
