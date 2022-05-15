@@ -20,16 +20,25 @@ namespace __bools {
             { false, false, true, false, false, false },    // KNIGHT
             { false, true, false, false, false, false },    // BISHOP
             { false, false, false, true, false, false },    // PAWN
-            { false, false, false, false, false, false }    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // ---------invalid-----------
+            { false, false, false, false, false, false },    // EMPTY
+            { false, false, false, false, false, false }     // INVALID
     };
 }
 
 inline bool can_move_in_direction(Piece p, MoveType dir) {
-    if (p == EMPTY) { return false; }
     return __bools::PIECE_MOVE_TYPES[p][dir];
 }
 inline bool can_move_in_direction(Piece p, Delta d) {
-    if (p == EMPTY) { return false; }
     return can_move_in_direction(p, direction_of_delta(d));
 }
 
