@@ -67,6 +67,7 @@ set(SOURCE_FILES
         src/game/glogic/piece_encounter_lookups.cpp
         src/game/glogic/pawn.cpp
         src/game/glogic/control.cpp
+        src/game/glogic/square_control.cpp
 
         src/utils/utils.h
         src/utils/print.cpp
