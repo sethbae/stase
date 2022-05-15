@@ -1,9 +1,9 @@
 #include "metrics.h"
 
-int COUNT = 0;
+volatile int COUNT = 0;
 
 void register_new_node() {
-    ++COUNT;
+    COUNT = COUNT + 1;
 }
 int node_count() {
     return COUNT;
