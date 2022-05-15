@@ -93,10 +93,7 @@ void find_queen_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Squ
 
         // try to get on the line c_sq (exclusive) -> segment_end (inclusive)
         // parameter ordering in following call is crucial (to get inc/exc right)
-        std::vector<Square> reachable = squares_piece_can_reach_on_line(gs.board, q_sq, segment_end, c_sq);
-        for (const Square & s : reachable) {
-            squares.push(s);
-        }
+        squares_piece_can_reach_on_line(gs.board, squares, q_sq, segment_end, c_sq);
     }
 }
 

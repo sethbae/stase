@@ -625,34 +625,34 @@ int find_piece_to_fork(const Gamestate & gs, const FeatureFrame * ff, Move * m, 
 
             // find any squares that the piece can move to on the required line
             Square endpoint = mksq(ff->secondary.x - d.dx, ff->secondary.y - d.dy);
-            std::vector<Square> squares_reachable;
+            Square reachable_arr[3];
+            ptr_vec<Square> reachable(reachable_arr, 3);
             if (type(p) == QUEEN) {
                 // queens might be able to reach more than one square
-                squares_reachable =
-                    squares_piece_can_reach_on_line(
-                        gs.board,
-                        temp,
-                        ff->centre,
-                        endpoint
-                    );
+                squares_piece_can_reach_on_line(
+                    gs.board,
+                    reachable,
+                    temp,
+                    ff->centre,
+                    endpoint
+                );
             } else {
                 // other pieces can only reach a single square on a line
-                Square reachable =
+                Square reachable_sq =
                     square_piece_can_reach_on_line(
                         gs.board,
                         temp,
                         ff->centre,
                         endpoint
                     );
-                if (is_sentinel(reachable)) {
-                    squares_reachable = {};
-                } else {
-                    squares_reachable = { reachable };
+                if (!is_sentinel(reachable_sq)) {
+                    reachable.push(reachable_sq);
                 }
             }
 
             // and check for each one that the piece is not pinned, and that it would end up safe.
-            for (const Square fork_sq : squares_reachable) {
+            for (int i = 0; i < reachable.size(); ++i) {
+                Square fork_sq = reachable[i];
                 if (gs.is_kpinned_piece(temp, get_delta_between(temp, fork_sq))
                     || !move_is_safe(gs, Move{temp, fork_sq, 0})) {
                     continue;

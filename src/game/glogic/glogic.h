@@ -44,7 +44,7 @@ inline bool collinear_points(Square a, Square b, Square c) {
 bool can_move_to_square(const Board &, Square from, Square to);
 Delta open_path_between(const Board & b, const Square, const Square);
 Square square_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
-std::vector<Square> squares_piece_can_reach_on_line(const Board & b, const Square, const Square, const Square);
+void squares_piece_can_reach_on_line(const Board & b, ptr_vec<Square> &, const Square, const Square, const Square);
 
 float piece_activity_alpha(const Board &);
 float piece_activity_beta(const Board &);
