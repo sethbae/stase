@@ -91,7 +91,7 @@ bool pawn_is_en_passantable(const Gamestate &, const Square);
 /**
  * More efficient versions of the board API (eg, for legal moves etc)
  */
-void find_pawn_moves_to(const Gamestate &, std::vector<Move> &, const Colour, const Square);
+void find_pawn_moves_to(const Gamestate &, ptr_vec<Move> &, const Colour, const Square);
 bool can_see_immediately(const Gamestate &, const Piece, const Square, const Square);
 bool can_see_x_ray(const Gamestate &, const Piece, const Square, const Square);
 

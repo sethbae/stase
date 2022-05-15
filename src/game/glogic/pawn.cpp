@@ -1,7 +1,7 @@
 #include "glogic.h"
 #include "../gamestate.hpp"
 
-void find_pawn_moves_to(const Gamestate & gs, std::vector<Move> & moves, const Colour c, const Square target) {
+void find_pawn_moves_to(const Gamestate & gs, ptr_vec<Move> & moves, const Colour c, const Square target) {
 
     Square l_sq;
     Square r_sq;
@@ -19,13 +19,13 @@ void find_pawn_moves_to(const Gamestate & gs, std::vector<Move> & moves, const C
         if (val(l_sq)) {
             Piece p = gs.board.get(l_sq);
             if (type(p) == PAWN && colour(p) == c) {
-                moves.push_back(Move{l_sq, target, 0});
+                moves.push(Move{l_sq, target, 0});
             }
         }
         if (val(r_sq)) {
             Piece p = gs.board.get(r_sq);
             if (type(p) == PAWN && colour(p) == c) {
-                moves.push_back(Move{r_sq, target, 0});
+                moves.push(Move{r_sq, target, 0});
             }
         }
     }
@@ -40,7 +40,7 @@ void find_pawn_moves_to(const Gamestate & gs, std::vector<Move> & moves, const C
         if (val(behind_sq)) {
             Piece p = gs.board.get(behind_sq);
             if (type(p) == PAWN && colour(p) == c) {
-                moves.push_back(Move{behind_sq, target, 0});
+                moves.push(Move{behind_sq, target, 0});
             }
 
             // double move forward
@@ -50,7 +50,7 @@ void find_pawn_moves_to(const Gamestate & gs, std::vector<Move> & moves, const C
                     if (val(behind2_sq)) {
                         Piece p2 = gs.board.get(behind2_sq);
                         if (type(p2) == PAWN && colour(p2) == c) {
-                            moves.push_back(Move{behind2_sq, target, 0});
+                            moves.push(Move{behind2_sq, target, 0});
                         }
                     }
                 } else if (c != WHITE && target.y == 4) {
@@ -58,7 +58,7 @@ void find_pawn_moves_to(const Gamestate & gs, std::vector<Move> & moves, const C
                     if (val(behind2_sq)) {
                         Piece p2 = gs.board.get(behind2_sq);
                         if (type(p2) == PAWN && colour(p2) == c) {
-                            moves.push_back(Move{behind2_sq, target, 0});
+                            moves.push(Move{behind2_sq, target, 0});
                         }
                     }
                 }

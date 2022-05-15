@@ -8,7 +8,7 @@
  * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
  */
 void find_rook_cover(
-        const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
+        const Gamestate & gs, ptr_vec<Square> & squares, const Square p_sq, const Square c_sq) {
 
     if (p_sq.x == c_sq.x || p_sq.y == c_sq.y) {
         // piece already defends
@@ -20,11 +20,11 @@ void find_rook_cover(
 
     if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_left)
             && can_see_x_ray(gs, gs.board.get(p_sq), top_left, c_sq)) {
-        squares.push_back(top_left);
+        squares.push(top_left);
     }
     if (can_see_immediately(gs, gs.board.get(p_sq), p_sq, top_right)
             && can_see_x_ray(gs, gs.board.get(p_sq), top_right, c_sq)) {
-        squares.push_back(top_right);
+        squares.push(top_right);
     }
     return;
 }
@@ -33,7 +33,7 @@ void find_rook_cover(
  * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
  * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
  */
-void find_bishop_cover(const Gamestate & gs, std::vector<Square> & squares, const Square p_sq, const Square c_sq) {
+void find_bishop_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Square p_sq, const Square c_sq) {
 
     if (abs(c_sq.x - p_sq.x) == abs(c_sq.y - p_sq.y)) {
         // piece already defends
@@ -59,12 +59,12 @@ void find_bishop_cover(const Gamestate & gs, std::vector<Square> & squares, cons
     if (val(corner1)
             && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner1)
             && can_see_x_ray(gs, gs.board.get(p_sq), corner1, c_sq)) {
-        squares.push_back(corner1);
+        squares.push(corner1);
     }
     if (val(corner2)
             && can_see_immediately(gs, gs.board.get(p_sq), p_sq, corner2)
             && can_see_x_ray(gs, gs.board.get(p_sq), corner2, c_sq)) {
-        squares.push_back(corner2);
+        squares.push(corner2);
     }
 }
 
@@ -72,7 +72,7 @@ void find_bishop_cover(const Gamestate & gs, std::vector<Square> & squares, cons
  * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
  * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
  */
-void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const Square q_sq, const Square c_sq) {
+void find_queen_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Square q_sq, const Square c_sq) {
 
     if (beta_covers(gs.board, q_sq, c_sq)) {
         // queen already defends
@@ -95,12 +95,12 @@ void find_queen_cover(const Gamestate & gs, std::vector<Square> & squares, const
         // parameter ordering in following call is crucial (to get inc/exc right)
         std::vector<Square> reachable = squares_piece_can_reach_on_line(gs.board, q_sq, segment_end, c_sq);
         for (const Square & s : reachable) {
-            squares.push_back(s);
+            squares.push(s);
         }
     }
 }
 
-void find_knight_cover(const Gamestate & gs, std::vector<Move> & moves, const Colour c, const Square c_sq) {
+void find_knight_cover(const Gamestate & gs, ptr_vec<Move> & moves, const Colour c, const Square c_sq) {
 
     Square temp;
 
@@ -117,14 +117,14 @@ void find_knight_cover(const Gamestate & gs, std::vector<Move> & moves, const Co
                         && (type(gs.board.get(temp)) == KNIGHT)
                         && (colour(gs.board.get(temp)) == c)
                         && !equal(temp, c_sq)) {
-                    moves.push_back(Move{temp, defend_from_square, 0});
+                    moves.push(Move{temp, defend_from_square, 0});
                 }
             }
         }
     }
 }
 
-void find_king_cover(const Gamestate & gs, std::vector<Move> & moves, const Colour c, const Square c_sq) {
+void find_king_cover(const Gamestate & gs, ptr_vec<Move> & moves, const Colour c, const Square c_sq) {
 
     Square temp;
 
@@ -141,14 +141,14 @@ void find_king_cover(const Gamestate & gs, std::vector<Move> & moves, const Colo
                         && (colour(gs.board.get(temp)) == c)
                         && !equal(temp, c_sq)
                         && would_be_safe_king_square(gs, defend_from_square, c)) {
-                    moves.push_back(Move{temp, defend_from_square, 0});
+                    moves.push(Move{temp, defend_from_square, 0});
                 }
             }
         }
     }
 }
 
-void find_pawn_cover(const Gamestate & gs, std::vector<Move> & moves, const Colour c, const Square c_sq) {
+void find_pawn_cover(const Gamestate & gs, ptr_vec<Move> & moves, const Colour c, const Square c_sq) {
 
     Square left_pawn_defence_square;
     Square right_pawn_defence_square;
@@ -172,7 +172,7 @@ void find_pawn_cover(const Gamestate & gs, std::vector<Move> & moves, const Colo
  * This does nothing if given a non sliding piece (king, pawn or knight).
  */
 void find_sliding_cover_squares(
-        const Gamestate & gs, std::vector<Square> & squares, const Square piece_square, const Square cover_square) {
+        const Gamestate & gs, ptr_vec<Square> & squares, const Square piece_square, const Square cover_square) {
     switch (type(gs.board.get(piece_square))) {
         case BISHOP: find_bishop_cover(gs, squares, piece_square, cover_square); return;
         case ROOK: find_rook_cover(gs, squares, piece_square, cover_square); return;
@@ -209,15 +209,16 @@ int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, i
             default: ;
         }
 
-        std::vector<Square> cover_squares;
+        Square cover_squares_arr[8];
+        ptr_vec<Square> cover_squares(cover_squares_arr, 8);
         find_sliding_cover_squares(gs, cover_squares, p_sq, s);
 
-        for (const Square & c_sq : cover_squares) {
+        for (int j = 0; j < cover_squares.size(); ++j) {
 
-            if (move_is_safe(gs, Move{p_sq, c_sq, 0})
-                    && !gs.is_kpinned_piece(p_sq, get_delta_between(p_sq, c_sq))) {
+            if (move_is_safe(gs, Move{p_sq, cover_squares[j], 0})
+                    && !gs.is_kpinned_piece(p_sq, get_delta_between(p_sq, cover_squares[j]))) {
                 if (idx < end) {
-                    Move m{p_sq, c_sq, 0};
+                    Move m{p_sq, cover_squares[j], 0};
                     m.set_score(defend_score(gs.board.get(s)));
                     moves[idx++] = m;
                 } else {
@@ -228,12 +229,14 @@ int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, i
     }
 
     // find non-sliding moves
-    std::vector<Move> covering_moves;
+    Move cover_squares_arr[8];
+    ptr_vec<Move> covering_moves(cover_squares_arr, 8);
     find_knight_cover(gs, covering_moves, defending_colour, s);
     find_king_cover(gs, covering_moves, defending_colour, s);
     find_pawn_cover(gs, covering_moves, defending_colour, s);
 
-    for (Move & m : covering_moves) {
+    for (int i = 0; i < covering_moves.size(); ++i) {
+        Move & m = covering_moves[i];
         Delta d = get_delta_between(m.from, m.to);
         if (!gs.is_kpinned_piece(m.from, d) && move_is_safe(gs, m)) {
             if (idx < end) {
