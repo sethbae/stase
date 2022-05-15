@@ -364,22 +364,18 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, const Square s
         int prior_balance = basic_balance;
 
         int x_inc = XD[i], y_inc = YD[i];
+        Delta d = delta(x_inc, y_inc);
         bool cont = true;
         bool x_ray = false;
         Colour x_ray_colour = INVALID_COLOUR;
         bool poly_x_ray = false;
 
-        x = get_x(s) + x_inc, y = get_y(s) + y_inc;
+        temp = gs.first_piece_encountered(s, d);
 
         // work outwards in that direction
-        while (val(temp = mksq(x, y)) && cont) {
+        while (!is_sentinel(temp) && cont) {
 
             Piece p = gs.board.get(temp);
-            if (p == EMPTY) {
-                x += x_inc;
-                y += y_inc;
-                continue;
-            }
 
             bool moves_in_right_dir = can_move_in_direction(p, dir);
 
@@ -389,14 +385,14 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, const Square s
 
                 // they can only contribute from the very first square along the diagonal, because that's
                 // the only square they can capture the target from
-                if (x == get_x(s) + x_inc && y == get_y(s) + y_inc) {
+                if (temp.x == s.x + x_inc && temp.y == s.y + y_inc) {
 
                     // otherwise, the diagonal has to be going in the right direction for their colour
                     if (colour(p) == WHITE && y_inc == -1) {
                         // white pawns can capture up the board, so if we are working out from
                         // the target and moving down the board, a white pawn is able to take
                         // it may however be pinned of course, in which case the diagonal is done.
-                        if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                        if (gs.is_kpinned_piece(temp, d)) {
                             cont = false;
                             attacked_by_pinned_w_piece = true;
                             continue;
@@ -405,7 +401,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, const Square s
                         }
                     } else if (colour(p) == BLACK && y_inc == 1) {
                         // vice versa
-                        if (gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                        if (gs.is_kpinned_piece(temp, d)) {
                             cont = false;
                             attacked_by_pinned_b_piece = true;
                             continue;
@@ -418,7 +414,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, const Square s
 
             if (moves_in_right_dir) {
 
-                if (!x_ray && gs.is_kpinned_piece(temp, delta(x_inc, y_inc))) {
+                if (!x_ray && gs.is_kpinned_piece(temp, d)) {
                     cont = false;
                     if (colour(p) == WHITE) {
                         attacked_by_pinned_w_piece = true;
@@ -472,8 +468,7 @@ SquareControlStatus evaluate_square_control(const Gamestate & gs, const Square s
                 cont = false;
             }
 
-            x += x_inc;
-            y += y_inc;
+            temp = gs.first_piece_encountered(temp, d);
 
         }
 
