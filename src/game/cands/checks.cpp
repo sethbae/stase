@@ -24,12 +24,14 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
 
     // find the squares this piece can move to
     bool moving_king = type(gs.board.get(s)) == KING;
-    std::vector<Move> piece_moves;
-    piece_moves.reserve(32);
+    Move piece_moves_arr[32];
+    ptr_vec<Move> piece_moves(piece_moves_arr, 32);
     piecemoves_ignore_check(gs.board, s, piece_moves);
 
     // add a frame for each one which engenders an unsafe enemy king
-    for (const Move & m : piece_moves) {
+    for (int i = 0; i < piece_moves.size(); ++i) {
+
+        Move & m = piece_moves[i];
 
         if (moving_king && !would_be_safe_king_square(gs, m.to, colour(gs.board.get(m.from)))) {
             continue;

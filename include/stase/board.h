@@ -7,6 +7,7 @@
 #include "../../src/board/base_types.h"
 #include "../../src/board/square.h"
 #include "../../src/board/move.h"
+#include "../../src/utils/ptr_vec.h"
 
 /**
  * The board struct represents a fully-specified board position: pieces and their
@@ -29,7 +30,7 @@ constexpr std::string_view starting_fen() {
  * as well as checking whether you're in check or not.
  */
 
-void piecemoves_ignore_check(const Board &, const Square, std::vector<Move> &);
+void piecemoves_ignore_check(const Board &, const Square, ptr_vec<Move> &);
 bool in_check_hard(const Board &);
 bool in_check_hard(const Board &, Colour);
 void legal_moves(const Board &, std::vector<Move> &);

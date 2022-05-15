@@ -368,11 +368,11 @@ int control_count(const Gamestate & gs, const Square s) {
  * disregarding check and other considerations.
  */
 bool can_move_to_square(const Board & b, Square from_sq, Square to_sq) {
-    std::vector<Move> p_moves;
-    p_moves.reserve(64);
-    piecemoves_ignore_check(b, from_sq, p_moves);
-    for (const Move m : p_moves) {
-        if (equal(m.to, to_sq)) {
+    Move piece_moves_arr[64];
+    ptr_vec<Move> piece_moves(piece_moves_arr, 64);
+    piecemoves_ignore_check(b, from_sq, piece_moves);
+    for (int i = 0; i < piece_moves.size(); ++i) {
+        if (equal(piece_moves[i].to, to_sq)) {
             return true;
         }
     }

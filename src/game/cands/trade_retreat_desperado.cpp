@@ -8,8 +8,8 @@
  */
 int trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
-    std::vector<Move> piece_moves;
-    piece_moves.reserve(32);
+    Move piece_moves_arr[32];
+    ptr_vec<Move> piece_moves(piece_moves_arr, 32);
 
     piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
@@ -50,8 +50,8 @@ int trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int
  */
 int retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
-    std::vector<Move> piece_moves;
-    piece_moves.reserve(32);
+    Move piece_moves_arr[32];
+    ptr_vec<Move> piece_moves(piece_moves_arr, 32);
 
     piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
@@ -86,8 +86,8 @@ int retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, i
 int desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
     Piece desperado = gs.board.get(ff->centre);
-    std::vector<Move> piece_moves;
-    piece_moves.reserve(32);
+    Move piece_moves_arr[32];
+    ptr_vec<Move> piece_moves(piece_moves_arr, 32);
 
     piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 

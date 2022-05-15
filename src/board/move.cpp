@@ -7,6 +7,7 @@ using std::cout;
 
 #include "board.h"
 #include "board.hpp"
+#include "../utils/ptr_vec.h"
 
 /*
  * Defines a move data type and defines functions to make moves
@@ -147,7 +148,7 @@ void Move::inc_score(int inc) {
 
 void line_search(const Board & b, const Square s,
                     Delta d,
-                    vector<Move> & moves) {
+                    ptr_vec<Move> & moves) {
         
     Piece p = b.get(s);
     Square temp = s;
@@ -164,7 +165,7 @@ void line_search(const Board & b, const Square s,
         if (otherp == EMPTY) {
             //cout << "e ";
             m.to = temp;
-            moves.push_back(m);
+            moves.push(m);
         } else {
             cont = false;
             if (colour(otherp) != colour(p)) {
@@ -172,7 +173,7 @@ void line_search(const Board & b, const Square s,
                 m.to = temp;
                 m.set_cap();
                 m.set_cap_piece(otherp);
-                moves.push_back(m);
+                moves.push(m);
             }
         }
         temp.x += d.dx;
@@ -181,7 +182,7 @@ void line_search(const Board & b, const Square s,
 
 }
 
-void ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
+void ortho(const Board & b, const Square start_sq, ptr_vec<Move> & moves) {
 
     line_search(b, start_sq, Delta{1, 0}, moves);
     line_search(b, start_sq, Delta{-1, 0},moves);
@@ -190,7 +191,7 @@ void ortho(const Board & b, const Square start_sq, vector<Move> & moves) {
 
 }
 
-void diag(const Board & b, const Square start_sq, vector<Move> & moves) {
+void diag(const Board & b, const Square start_sq, ptr_vec<Move> & moves) {
 
     line_search(b, start_sq, Delta{1, 1}, moves);
     line_search(b, start_sq, Delta{-1, -1}, moves);
@@ -199,7 +200,7 @@ void diag(const Board & b, const Square start_sq, vector<Move> & moves) {
 
 }
 
-void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
+void knight_moves(const Board & b, const Square s, ptr_vec<Move> & moves) {
 
     int x = get_x(s), y = get_y(s);
     Colour knightcol = colour(b.get(s));
@@ -212,7 +213,7 @@ void knight_moves(const Board & b, const Square s, vector<Move> & moves) {
                  m.set_cap();
                  m.set_cap_piece(b.get(temp));
              }
-             moves.push_back(m);
+             moves.push(m);
          }
      }
 
@@ -310,7 +311,7 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
     return false;
 }
 
-void king_moves(const Board & b, const Square s, vector<Move> & moves) {
+void king_moves(const Board & b, const Square s, ptr_vec<Move> & moves) {
 
     Colour kingcol = colour(b.get(s));
     Square temp;
@@ -322,14 +323,14 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
             Move m{s, stosq("g1"), 0};
             m.set_cas();
             m.set_cas_short();
-            moves.push_back(m);
+            moves.push(m);
         }
         
         if (b.get_cas_wl() && castle_checks(b, WHITE, false)) {
             Move m{s, stosq("c1"), 0};
             m.set_cas();
             m.unset_cas_short();
-            moves.push_back(m);
+            moves.push(m);
         }
     
     // and for black
@@ -339,14 +340,14 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
             Move m{s, stosq("g8"), 0};
             m.set_cas();
             m.set_cas_short();
-            moves.push_back(m);
+            moves.push(m);
         }
 
         if (b.get_cas_bl() && castle_checks(b, BLACK, false)) {
             Move m{s, stosq("c8"), 0};
             m.set_cas();
             m.unset_cas_short();
-            moves.push_back(m);
+            moves.push(m);
         }
 
     }
@@ -360,13 +361,13 @@ void king_moves(const Board & b, const Square s, vector<Move> & moves) {
                 m.set_cap();
                 m.set_cap_piece(b.get(temp));
             }
-            moves.push_back(m);
+            moves.push(m);
         }
     }
 
 }
 
-void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
+void pawn_moves(const Board & b, const Square s, ptr_vec<Move> & moves) {
        
     int x = get_x(s), y = get_y(s);
     Colour pawn_colour = colour(b.get(s));
@@ -400,19 +401,19 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
             m.set_prom_piece(QUEEN);
             Move m2 = m;
             m2.set_prom_piece(ROOK);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(BISHOP);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(KNIGHT);
-            moves.push_back(m2);
+            moves.push(m2);
         }
         
-        moves.push_back(m);
+        moves.push(m);
         
         // starting rank: double move
         if (y == START_RANK && b.get(sq = mksq(x, y + FORWARD + FORWARD)) == EMPTY) {
             m.to = sq;
-            moves.push_back(m);
+            moves.push(m);
         } 
         
     }
@@ -428,13 +429,13 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
             m.set_prom_piece(QUEEN);
             Move m2 = m;
             m2.set_prom_piece(ROOK);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(BISHOP);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(KNIGHT);
-            moves.push_back(m2);
+            moves.push(m2);
         }
-        moves.push_back(m);
+        moves.push(m);
     }
     if (val(sq = mksq(x + 1, y + FORWARD)) && colour(b.get(sq)) == capture_colour) {
         m.to = sq;
@@ -446,13 +447,13 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
             m.set_prom_piece(QUEEN);
             Move m2 = m;
             m2.set_prom_piece(ROOK);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(BISHOP);
-            moves.push_back(m2);
+            moves.push(m2);
             m2.set_prom_piece(KNIGHT);
-            moves.push_back(m2);
+            moves.push(m2);
         }
-        moves.push_back(m);   
+        moves.push(m);
     }
     
     // en-passant capture
@@ -463,13 +464,13 @@ void pawn_moves(const Board & b, const Square s, vector<Move> & moves) {
             m.set_cap();
             m.set_cap_piece((pawn_colour == WHITE) ? B_PAWN : W_PAWN);
             m.set_ep();
-            moves.push_back(m);
+            moves.push(m);
         }
     }
 
 }
 
-void piecemoves_ignore_check(const Board & b, const Square s, vector<Move> & moves) {
+void piecemoves_ignore_check(const Board & b, const Square s, ptr_vec<Move> & moves) {
 
     Piece p = b.get(s);
 
@@ -624,10 +625,15 @@ void legal_moves(const Board & b, vector<Move> & moves) {
     // get moves for every piece on the board
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
+            Move piece_moves_arr[32];
+            ptr_vec<Move> piece_moves(piece_moves_arr, 32);
             Square sq = mksq(x, y);
             if (colour(b.get(sq)) == col) {
-                piecemoves_ignore_check(b, sq, moves);
-            }   
+                piecemoves_ignore_check(b, sq, piece_moves);
+            }
+            for (int j = 0; j < piece_moves.size(); ++j) {
+                moves.push_back(piece_moves[j]);
+            }
         }
     }
     

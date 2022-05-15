@@ -209,8 +209,8 @@ int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, i
             default: ;
         }
 
-        Square cover_squares_arr[8];
-        ptr_vec<Square> cover_squares(cover_squares_arr, 8);
+        Square cover_squares_arr[16];
+        ptr_vec<Square> cover_squares(cover_squares_arr, 16);
         find_sliding_cover_squares(gs, cover_squares, p_sq, s);
 
         for (int j = 0; j < cover_squares.size(); ++j) {
@@ -229,8 +229,8 @@ int defend_square(const Gamestate & gs, const Square s, Move * moves, int idx, i
     }
 
     // find non-sliding moves
-    Move cover_squares_arr[8];
-    ptr_vec<Move> covering_moves(cover_squares_arr, 8);
+    Move cover_squares_arr[16];
+    ptr_vec<Move> covering_moves(cover_squares_arr, 16);
     find_knight_cover(gs, covering_moves, defending_colour, s);
     find_king_cover(gs, covering_moves, defending_colour, s);
     find_pawn_cover(gs, covering_moves, defending_colour, s);

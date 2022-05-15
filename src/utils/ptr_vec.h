@@ -1,7 +1,7 @@
 #ifndef STASE_PTR_VEC_H
 #define STASE_PTR_VEC_H
 
-#include "utils.h"
+#include <iostream>
 
 template <typename T>
 class ptr_vec {
@@ -57,7 +57,7 @@ public:
 private:
     inline void exit_with_failure(const std::string message) const {
         std::cout << "*****Illegal ptr_vec usage: " + message + "*****\n";
-        print_stack_trace_and_abort(0);
+        abort();
     }
 };
 
