@@ -8,6 +8,7 @@ private:
     Gamestate gs;
     int nodes;
     std::string eval_str;
+    double time_elapsed;
 
 public:
     EngineClient() : gs(starting_pos()) {}
@@ -29,6 +30,7 @@ public:
         gs = Gamestate(gs, uci2move(*uci));
         nodes = engine.get_nodes_explored();
         eval_str = etos(engine.get_score());
+        time_elapsed = engine.get_actual_seconds();
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] exiting get_computer_move\n";
 #endif
@@ -51,6 +53,10 @@ public:
 
     int get_node_count() {
         return nodes;
+    }
+
+    double get_time_elapsed() {
+        return time_elapsed;
     }
 
     const char * get_eval_str() {
@@ -76,5 +82,8 @@ extern "C" {
     }
     const char * get_eval_str(EngineClient * client) {
         return client->get_eval_str();
+    }
+    double get_time_elapsed(EngineClient * client) {
+        return client->get_time_elapsed();
     }
 }
