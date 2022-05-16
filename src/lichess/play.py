@@ -24,7 +24,7 @@ def post_update(token: str, game_id: str, engine: EngineClient, requested_think_
                  f" {engine.get_eval_str()} ({round(engine.get_time_elapsed(), 1)}s @ {speed}n/s)")
 
 
-def play_game(token: str, game_id: str, chat_updates=False):
+def play_game(token: str, game_id: str, chat_updates=True):
     def play_a_move(think_time) -> bool:
         move: str = engine.get_computer_move(think_time)
         if move == "ERROR":
