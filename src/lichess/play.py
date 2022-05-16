@@ -12,12 +12,13 @@ from src.lichess.info import (
 THINK_TIME_PROPORTION: float = 0.025
 
 
-def post_update(token: str, game_id: str, engine: EngineClient, seconds_given: float) -> None:
+def post_update(token: str, game_id: str, engine: EngineClient) -> None:
     """
     Posts an update to the lichess chat with the engine's speed + evaluation.
     """
+    speed = int(engine.get_node_count() / engine.get_time_elapsed())
     post_to_chat(token, game_id,
-                 f" {engine.get_eval_str()} ({round(seconds_given, 1)}s @ {int(engine.get_node_count() / seconds_given)}n/s)")
+                 f" {engine.get_eval_str()} ({round(engine.get_time_elapsed(), 1)}s @ {speed}n/s)")
 
 
 def play_game(token: str, game_id: str, chat_updates=True):
@@ -31,7 +32,7 @@ def play_game(token: str, game_id: str, chat_updates=True):
             return True
         else:
             if chat_updates:
-                post_update(token, game_id, engine, think_time)
+                post_update(token, game_id, engine)
             return make_move(token, game_id, move)
 
     post_to_chat(token, game_id, "Hello there! I'll post regular updates. If you want me to stop, say \"mute\"!")
@@ -72,7 +73,7 @@ def play_game(token: str, game_id: str, chat_updates=True):
             half_move_count = event["moves"].count(' ') + 1
             millis_remaining = event["wtime"] if as_white else event["btime"]
 
-            if (as_white and half_move_count % 2 == 0)\
+            if (as_white and half_move_count % 2 == 0) \
                     or (not as_white and half_move_count % 2 == 1):
                 # update the engine with the opponent's move
                 engine.register_opponent_move(move_played)
