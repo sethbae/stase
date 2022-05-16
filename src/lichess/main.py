@@ -120,7 +120,7 @@ class ChallengePool:
         for i in range(len(self.procs)):
             proc = self.procs[i]
             if proc is not None and not proc.is_alive():
-                print(f"Game {self.proc_names[proc]} has finished")
+                print(f"Game {self.proc_names[proc]} has ended")
                 self.proc_names[proc] = ""
                 self.procs[i] = None
 
