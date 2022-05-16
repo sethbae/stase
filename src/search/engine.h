@@ -18,6 +18,7 @@ private:
         int * nodes_out;
         Move * move_out;
         Eval * score_out;
+        double *secs_out;
     };
 
     const std::string fen;
@@ -34,6 +35,7 @@ private:
     Move best_move;
     int nodes;
     Eval score;
+    double actual_seconds;
 
 public:
     Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds, bool cleanup):
@@ -48,7 +50,9 @@ public:
         auto_cleanup(cleanup),
 
         best_move(MOVE_SENTINEL),
-        nodes(0)
+        nodes(0),
+        score(zero()),
+        actual_seconds(timeout_seconds)
     {
         root = new SearchNode{
             new Gamestate(fen),
@@ -76,6 +80,10 @@ public:
     Observer & get_obs() const { return obs; }
     std::string get_fen() const { return fen; }
     SearchNode * get_root() const { return root; }
+    Move get_best_move() { return best_move; }
+    int get_nodes_explored() { return nodes; }
+    Eval get_score() { return score; }
+    double get_actual_seconds() { return actual_seconds; }
 
     void run();
     Move blocking_run();
@@ -84,9 +92,6 @@ public:
 
     bool has_finished();
 
-    Move get_best_move() { return best_move; }
-    int get_nodes_explored() { return nodes; }
-    Eval get_score() { return score; }
     void cleanup() { delete_tree(root); root = nullptr; }
 
 private:

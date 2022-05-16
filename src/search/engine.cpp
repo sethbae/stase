@@ -17,12 +17,17 @@ void * Engine::start(void * args) {
 
     reset_node_count();
     reset_abort_flag();
+
+
+    auto start = std::chrono::high_resolution_clock::now();
     greedy_search(search_args->root, search_args->cycles, *search_args->o);
+    auto stop = std::chrono::high_resolution_clock::now();
+    double secs = duration_cast<std::chrono::milliseconds>(stop - start).count() / 1000;
 
     *search_args->nodes_out = subtree_size(search_args->root);
     *search_args->move_out = current_best_move(search_args->root);
     *search_args->score_out = search_args->root->score;
-
+    *search_args->secs_out = secs;
     return nullptr;
 }
 
@@ -72,7 +77,8 @@ void Engine::run() {
             timeout_seconds,
             &nodes,
             &best_move,
-            &score
+            &score,
+            &actual_seconds
         };
 
     set_node_limit(node_limit);
