@@ -580,7 +580,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGTERM, print_stack_trace_and_abort);
 
-    const std::string fen = "2r2rk1/1p1bbppp/pP2pn2/3p4/1n6/1PN1PN2/P1PBBPPP/3R1RK1 w - - 1 15";
+    const std::string fen = "r1bqkb1r/pp3ppp/2n1pn2/2p1Q3/8/3P1N2/PPP2PPP/RNB1KB1R w KQkq - 2 7";
 
     Gamestate gs(fen, OPENING);
     pr_board(gs.board);
@@ -606,13 +606,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     XMLObserver observer("debug_pos");
     Engine engine =
         EngineBuilder::for_position(fen)
-            .with_timeout(5)
-            .with_obs(observer)
+            .with_node_limit(25000)
+            .with_cleanup(false)
+//            .with_obs(observer)
             .build();
 
     engine.blocking_run();
 //    observer.write();
 
+//    std::cout << engine.get_nodes_explored() << "\n";
+//    std::cout << subtree_size(engine.get_root()) << "\n";
 //    std::cout << move2uci(engine.get_best_move()) << "\n";
 
 //    XMLObserver o("stase_stack");
