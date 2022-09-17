@@ -25,18 +25,18 @@ public:
 
         // create a copy of the node, but with terminal false. Then update terminal,
         // and see if the expected value matches the actual.
-        SearchNode copy{
+        SearchNode copy(
             node->gs,
             node->cand_set,
-            node->score,
-            node->move,
-            false,
-            node->board_hash,
-            node->children,
-            node->best_child,
-            node->best_trust_child,
-            node->visit_count
-        };
+            node->score);
+        copy.move = node->move;
+        copy.terminal = false;
+        copy.board_hash = node->board_hash;
+        copy.children = node->children;
+        copy.best_child = node->best_child;
+        copy.best_trust_child = node->best_trust_child;
+        copy.visit_count = node->visit_count;
+
         Observer obs;
         update_terminal(&copy, obs);
 

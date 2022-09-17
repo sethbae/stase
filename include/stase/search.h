@@ -17,6 +17,46 @@ struct SearchNode {
     SearchNode * best_trust_child;
     unsigned short visit_count;
 
+    SearchNode(Gamestate * gs, CandSet * cand_set) :
+        gs(gs),
+        cand_set(cand_set),
+        score(zero()),
+        move(MOVE_SENTINEL),
+        terminal(false),
+        board_hash(hash()),
+        children(),
+        best_child(nullptr),
+        best_trust_child(nullptr),
+        visit_count(0)
+    {}
+
+    SearchNode(Gamestate * gs, CandSet * cand_set, Move m) :
+        gs(gs),
+        cand_set(cand_set),
+        score(zero()),
+        move(m),
+        terminal(false),
+        board_hash(hash()),
+        children(),
+        best_child(nullptr),
+        best_trust_child(nullptr),
+        visit_count(0)
+    {}
+
+    SearchNode(Gamestate * gs, CandSet * cand_set, Eval e) :
+        gs(gs),
+        cand_set(cand_set),
+        score(e),
+        move(MOVE_SENTINEL),
+        terminal(false),
+        board_hash(hash()),
+        children(),
+        best_child(nullptr),
+        best_trust_child(nullptr),
+        visit_count(0)
+    {}
+
+private: long hash();
 };
 
 enum SearchEvent {

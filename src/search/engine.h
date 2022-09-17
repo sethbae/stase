@@ -55,19 +55,7 @@ public:
         score(zero()),
         actual_seconds(timeout_seconds)
     {
-        Gamestate * new_gs = new Gamestate(fen);
-        root = new SearchNode{
-            new_gs,
-            new CandSet,
-            zero(),
-            MOVE_SENTINEL,
-            false,
-            board_hash(new_gs),
-            {},
-            nullptr,
-            nullptr,
-            0
-        };
+        root = new SearchNode(new Gamestate(fen), new CandSet);
 #ifdef ENGINE_STACK_TRACE
         signal(SIGSEGV, print_stack_trace_and_abort);
         signal(SIGABRT, print_stack_trace_and_abort);
