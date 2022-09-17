@@ -43,13 +43,6 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
     int y = get_y(s);
     Colour king_colour = colour(gs.board.get(s));
 
-    // sliding directions
-    for (int i = 0; i < 8; ++i) {
-        if (seek_attackers(gs.board, s, king_colour, Delta{(SignedByte) XD[i], (SignedByte) YD[i]})) {
-            return false;
-        }
-    }
-
     // knights
     Piece enemy_knight = (king_colour == WHITE) ? B_KNIGHT : W_KNIGHT;
     if (val(temp = mksq(x + 1, y + 2)) && gs.board.get(temp) == enemy_knight) { return false; }
@@ -73,6 +66,13 @@ int is_safe_for_king(const Gamestate & gs, const Square s) {
     // kings
     Square enemy_k_sq = (king_colour == WHITE ? gs.b_king : gs.w_king);
     if (abs(enemy_k_sq.x - s.x) <= 1 && abs(enemy_k_sq.y - s.y) <= 1) { return false; }
+
+    // sliding directions
+    for (int i = 0; i < 8; ++i) {
+        if (seek_attackers(gs.board, s, king_colour, Delta{(SignedByte) XD[i], (SignedByte) YD[i]})) {
+            return false;
+        }
+    }
 
     return true;
 
