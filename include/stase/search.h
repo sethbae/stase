@@ -12,6 +12,7 @@ struct SearchNode {
     Move move;
     bool terminal;
     long board_hash;
+    const SearchNode * parent;
     std::vector<SearchNode*> children;
     SearchNode * best_child;
     SearchNode * best_trust_child;
@@ -24,6 +25,7 @@ struct SearchNode {
         move(MOVE_SENTINEL),
         terminal(false),
         board_hash(hash()),
+        parent(nullptr),
         children(),
         best_child(nullptr),
         best_trust_child(nullptr),
@@ -37,6 +39,7 @@ struct SearchNode {
         move(m),
         terminal(false),
         board_hash(hash()),
+        parent(nullptr),
         children(),
         best_child(nullptr),
         best_trust_child(nullptr),
@@ -50,6 +53,7 @@ struct SearchNode {
         move(MOVE_SENTINEL),
         terminal(false),
         board_hash(hash()),
+        parent(nullptr),
         children(),
         best_child(nullptr),
         best_trust_child(nullptr),

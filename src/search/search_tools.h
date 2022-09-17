@@ -59,7 +59,7 @@ namespace __engine_params {
     const int SOFT_EXIT_EXPLORED_VC = MEDIAL_THRESHOLD;
 }
 
-SearchNode *new_node(const Gamestate & gs, Move m);
+SearchNode *new_node(const SearchNode *, Move);
 long board_hash(const Gamestate &);
 long board_hash(const Gamestate *);
 

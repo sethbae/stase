@@ -12,6 +12,7 @@ bool test_search() {
     passed = test_best_child_updated() && passed;
     passed = test_past_blunders() && passed;
     passed = test_past_crashes() && passed;
+    passed = test_parent_pointer() && passed;
 
     return passed;
 

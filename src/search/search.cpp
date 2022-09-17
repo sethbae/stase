@@ -177,9 +177,11 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
  * Allocates a new gamestate according to the previous state and the move given. The new
  * gamestate will represent the position after the given move has been played.
  */
-SearchNode *new_node(const Gamestate & gs, Move m) {
+SearchNode *new_node(const SearchNode * node, Move m) {
     register_new_node();
-    return new SearchNode(new Gamestate(gs, m), new CandSet, m);
+    SearchNode * new_node = new SearchNode(new Gamestate(*node->gs, m), new CandSet, m);
+    new_node->parent = node;
+    return new_node;
 }
 
 /**

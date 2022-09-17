@@ -120,7 +120,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     // create child for each move in the list (appending)
     int c = node->children.size();
     for (int i = 0; i < list.size(); ++i) {
-        SearchNode * child = new_node(*node->gs, list[i]);
+        SearchNode * child = new_node(node, list[i]);
         child->cand_set = cands(*child->gs, child->cand_set);
         if (child->gs->game_over) {
             child->score =
