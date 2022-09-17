@@ -73,21 +73,35 @@ enum SearchEvent {
     BURST_DEEPEN,
     BEGIN_BURST,
     UPDATE_TERMINAL,
-    DEBURST
+    DEBURST,
+    THREEFOLD_REP,
 };
-
+const std::vector<SearchEvent> ALL_SEARCH_EVENTS{
+    VISIT,
+    VISIT_LINE,
+    SWING,
+    FORCE_VISIT,
+    FORCE_VISIT_LINE,
+    DEEPEN,
+    BURST_DEEPEN,
+    BEGIN_BURST,
+    UPDATE_TERMINAL,
+    DEBURST,
+    THREEFOLD_REP,
+};
 inline std::string name(SearchEvent ev) {
     switch (ev) {
         case VISIT: return "visit";
-        case VISIT_LINE: return "visit_l";
+        case VISIT_LINE: return "visit-l";
         case SWING: return "swing";
-        case FORCE_VISIT: return "f_visit";
-        case FORCE_VISIT_LINE: return "f_visit_l";
+        case FORCE_VISIT: return "f-visit";
+        case FORCE_VISIT_LINE: return "f-visit-l";
         case DEEPEN: return "deepen";
-        case BURST_DEEPEN: return "burst_deepen";
-        case BEGIN_BURST: return "begin_burst";
-        case UPDATE_TERMINAL: return "update_terminal";
+        case BURST_DEEPEN: return "burst-deepen";
+        case BEGIN_BURST: return "begin-burst";
+        case UPDATE_TERMINAL: return "update-terminal";
         case DEBURST: return "deburst";
+        case THREEFOLD_REP: return "threefold-rep";
         default: return "unknown event";
     }
 }

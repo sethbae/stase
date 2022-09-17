@@ -74,7 +74,8 @@ set(SOURCE_FILES
         src/utils/uci.cpp
         src/utils/signal.cpp
         src/utils/ptr_vec.h
-        src/search/board_hash.cpp)
+        src/search/board_hash.cpp
+        src/search/observers/stats_observer.hpp)
 
 set(STASE_SOURCE_FILES)
 

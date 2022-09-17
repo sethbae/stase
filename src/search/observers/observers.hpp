@@ -11,6 +11,7 @@
  */
 
 #include "xml_observer.hpp"
+#include "stats_observer.hpp"
 
 
 #endif //STASE_OBSERVERS_HPP
