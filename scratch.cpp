@@ -430,6 +430,7 @@ SearchNode * repl_cycles(const std::string & fen) {
             heur(*root_gs),
             MOVE_SENTINEL,
             false,
+            board_hash(root_gs),
             {},
             nullptr,
             nullptr,

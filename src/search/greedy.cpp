@@ -357,6 +357,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer & 
         heur(root_gs),
         MOVE_SENTINEL,
         false,
+        board_hash(root_gs),
         {},
         nullptr,
         nullptr,

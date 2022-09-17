@@ -31,6 +31,7 @@ public:
             node->score,
             node->move,
             false,
+            node->board_hash,
             node->children,
             node->best_child,
             node->best_trust_child,

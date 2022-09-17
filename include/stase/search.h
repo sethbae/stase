@@ -11,6 +11,7 @@ struct SearchNode {
     Eval score;
     Move move;
     bool terminal;
+    long board_hash;
     std::vector<SearchNode*> children;
     SearchNode * best_child;
     SearchNode * best_trust_child;

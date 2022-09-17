@@ -73,7 +73,8 @@ set(SOURCE_FILES
         src/utils/print.cpp
         src/utils/uci.cpp
         src/utils/signal.cpp
-        src/utils/ptr_vec.h)
+        src/utils/ptr_vec.h
+        src/search/board_hash.cpp)
 
 set(STASE_SOURCE_FILES)
 

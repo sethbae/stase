@@ -4,6 +4,7 @@
 #include "../../include/stase/search.h"
 #include "../../include/stase/game.h"
 #include "../game/gamestate.hpp"
+#include "search_tools.h"
 #include <csignal>
 
 class Engine {
@@ -54,12 +55,14 @@ public:
         score(zero()),
         actual_seconds(timeout_seconds)
     {
+        Gamestate * new_gs = new Gamestate(fen);
         root = new SearchNode{
-            new Gamestate(fen),
+            new_gs,
             new CandSet,
             zero(),
             MOVE_SENTINEL,
             false,
+            board_hash(new_gs),
             {},
             nullptr,
             nullptr,

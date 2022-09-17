@@ -179,12 +179,14 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
  */
 SearchNode *new_node(const Gamestate & gs, Move m) {
     register_new_node();
+    Gamestate * new_gs = new Gamestate(gs, m);
     return new SearchNode{
-        new Gamestate(gs, m),
+        new_gs,
         new CandSet,
         zero(),
         m,
         false,
+        board_hash(new_gs),
         {},
         nullptr,
         nullptr,
