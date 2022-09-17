@@ -60,6 +60,8 @@ namespace __engine_params {
 }
 
 SearchNode *new_node(const Gamestate & gs, Move m);
+long board_hash(const Gamestate &);
+long board_hash(const Gamestate *);
 
 void update_score(SearchNode *);
 Eval trust_score(SearchNode *, bool is_white);
