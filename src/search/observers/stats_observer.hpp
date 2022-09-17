@@ -9,7 +9,7 @@ private:
 public:
     StatsObserver() {
         counts = new int[ALL_SEARCH_EVENTS.size()];
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < ALL_SEARCH_EVENTS.size(); ++i) {
             counts[i] = 0;
         }
     }
@@ -25,7 +25,7 @@ public:
     void print_summary(std::ostream & o) const {
         o << "StatsObserver saw these events:\n";
         for (const SearchEvent ev : ALL_SEARCH_EVENTS) {
-            o << std::setw(20) << name(ev) << ": " << counts[ev] << "\n";
+            o << std::left << std::setw(20) << name(ev) << ": " << counts[ev] << "\n";
         }
     }
 };
