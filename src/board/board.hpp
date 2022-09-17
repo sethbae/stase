@@ -356,6 +356,20 @@ struct Board {
         return b;
     }
 
+    bool eq(const Board & o) {
+        if (conf != o.conf) {
+            return false;
+        }
+        for (int x = 0; x < 8; ++x) {
+            for (int y = 0; y < 8; ++y) {
+                if (squares[x][y] != o.squares[x][y]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 private:
 
     /**
