@@ -7,6 +7,35 @@
 #include "../game/gamestate.hpp"
 
 /**
+ * @return true if there are three identical positions on the path from the given node to the root.
+ * Note that this is not sufficient to avoid threefold repetition: you also need to know about moves
+ * from the whole game.
+ */
+bool threefold_rep(const SearchNode * node) {
+
+    int count = 0;
+    const SearchNode * current = node->parent;
+
+    while (current) {
+        if (current->board_hash == node->board_hash && node->gs->board.eq(current->gs->board)) {
+            if (++count == 3) {
+                return true;
+            }
+        }
+        if (current->parent) {
+            // check for pawn moves!
+            Piece moved = current->parent->gs->board.get(current->move.from);
+            if (type(moved) == PAWN) {
+                return false;
+            }
+        }
+        current = current->parent;
+    }
+
+    return false;
+}
+
+/**
  * Extends the CandSet of the given node to include legal moves. It removes from this list
  * all legal moves which (i) are already present in another list (ii) belong to an existing
  * child of this node.
@@ -127,6 +156,10 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
                 child->gs->board.get_white()
                     ? white_has_been_mated()
                     : black_has_been_mated();
+        } else if (threefold_rep(child)) {
+            child->score = zero();
+            child->gs->game_over = true;
+            obs.register_event(child, THREEFOLD_REP);
         } else {
             child->score = heur(*child->gs);
         }
