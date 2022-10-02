@@ -2,13 +2,16 @@
 #include "../game/gamestate.hpp"
 
 long SearchNode::hash() {
+    return ::board_hash(gs->board);
+}
 
+long board_hash(const Board & b) {
     long hash = 0l;
     long mask = 1l;
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
-            if (gs->board.get(x, y) != EMPTY) {
+            if (b.get(x, y) != EMPTY) {
                 hash |= mask;
             }
             mask <<= 1;
@@ -16,5 +19,4 @@ long SearchNode::hash() {
     }
 
     return hash;
-
 }
