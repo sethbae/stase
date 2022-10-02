@@ -17,7 +17,7 @@ bool threefold_rep(const SearchNode * node) {
     const SearchNode * current = node->parent;
 
     while (current) {
-        if (current->board_hash == node->board_hash && node->gs->board.eq(current->gs->board)) {
+        if (current->board_hash == node->board_hash && node->gs->board.equivalent(current->gs->board)) {
             if (++count == 3) {
                 return true;
             }

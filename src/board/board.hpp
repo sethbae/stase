@@ -356,8 +356,12 @@ struct Board {
         return b;
     }
 
-    bool eq(const Board & o) {
-        if (conf != o.conf) {
+    /**
+     * Returns true if the current position is equivalent to the other position for the purpose of
+     * threefold repetition.
+     */
+    bool equivalent(const Board & o) {
+        if (non_move_conf() != o.non_move_conf()) {
             return false;
         }
         for (int x = 0; x < 8; ++x) {
@@ -448,6 +452,13 @@ private:
         b.flip_white();
     }
 
+    /**
+     * Returns a version of the conf word which does not include the whole or half move count (ie, the bits
+     * are set to zero).
+     */
+    uint32_t non_move_conf() const {
+        return (conf & ~__bit_masks::WHOLE_M_MASK) & ~__bit_masks::HALF_M_MASK;
+    }
 };
 
 #endif //STASE_BOARD_HPP
