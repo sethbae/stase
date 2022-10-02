@@ -38,6 +38,8 @@ private:
     Eval score;
     double actual_seconds;
 
+    const std::vector<Board> * board_history;
+
 public:
     Engine(
             const std::string fen,
@@ -46,7 +48,8 @@ public:
             int cycle_limit,
             double timeout_seconds,
             bool cleanup,
-            GamePhase game_phase):
+            GamePhase game_phase,
+            const std::vector<Board> * board_history):
         fen(fen),
         obs(o),
         search_args(nullptr),
@@ -60,7 +63,9 @@ public:
         best_move(MOVE_SENTINEL),
         nodes(0),
         score(zero()),
-        actual_seconds(timeout_seconds)
+        actual_seconds(timeout_seconds),
+
+        board_history(board_history)
     {
         root = new SearchNode(new Gamestate(fen, game_phase), new CandSet);
 #ifdef ENGINE_STACK_TRACE
@@ -82,6 +87,7 @@ public:
     int get_nodes_explored() { return nodes; }
     Eval get_score() { return score; }
     double get_actual_seconds() { return actual_seconds; }
+    const std::vector<Board> * get_board_history() { return board_history; }
 
     void run();
     Move blocking_run();
@@ -108,6 +114,7 @@ private:
     double seconds;
     bool cleanup;
     GamePhase game_phase;
+    const std::vector<Board> * board_history;
 
     EngineBuilder(
             std::string fen,
@@ -116,20 +123,22 @@ private:
             int cycle_limit,
             double timeout_seconds,
             bool cleanup,
-            GamePhase game_phase) :
+            GamePhase game_phase,
+            const std::vector<Board> * board_history) :
         fen(fen),
         obs(obs),
         nodes(node_limit),
         cycles(cycle_limit),
         seconds(timeout_seconds),
         cleanup(cleanup),
-        game_phase(game_phase)
+        game_phase(game_phase),
+        board_history(board_history)
     {}
 
 public:
 
     static EngineBuilder for_position(std::string fen_string) {
-        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true, OPENING);
+        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true, OPENING, nullptr);
     }
 
     static EngineBuilder for_starting_position() {
@@ -137,31 +146,31 @@ public:
     }
 
     EngineBuilder with_game_phase(GamePhase phase) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase, board_history);
     }
 
     EngineBuilder with_obs(Observer & observer) {
-        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase);
+        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase, board_history);
     }
 
     EngineBuilder with_node_limit(int node_limit) {
-        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase);
+        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase, board_history);
     }
 
     EngineBuilder with_cycle_limit(int cycle_limit) {
-        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase);
+        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase, board_history);
     }
 
     EngineBuilder with_timeout(double secs) {
-        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase);
+        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase, board_history);
     }
 
     EngineBuilder with_cleanup(bool auto_cleanup) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, board_history);
     }
 
     Engine build() {
-        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase);
+        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, board_history);
     }
 };
 
