@@ -188,6 +188,6 @@ float __metrics::__far_advanced_pawns_metric(const Gamestate & gs) {
         }
     }
 
-    return ((float) score) / 10.0f;
+    return ((float) score) / 4.0f;
 
 }
