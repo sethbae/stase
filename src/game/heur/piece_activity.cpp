@@ -24,13 +24,11 @@ float __metrics::__piece_activity_alpha_metric(const Gamestate & gs) {
         }
     }
 
-    float w_proportion = 0.0;
-
-    if (w_control + b_control > 0)
-        w_proportion = ((float)w_control / (float)(b_control + w_control));
-
-    return -1.0f + 2*w_proportion;
-
+    if (w_control + b_control > 0) {
+        float w_proportion = ((float) w_control / (float) (b_control + w_control));
+        return -1.0f + 2*w_proportion;
+    }
+    return 0.0f;
 }
 
 float __metrics::__piece_activity_beta_metric(const Gamestate & gs) {
@@ -53,13 +51,11 @@ float __metrics::__piece_activity_beta_metric(const Gamestate & gs) {
         }
     }
 
-    float w_proportion = 0.0;
-
-    if (w_control + b_control > 0)
-        w_proportion = ((float)w_control / (float)(b_control + w_control));
-
-    return -1.0f + 2*w_proportion;
-
+    if (w_control + b_control > 0) {
+        float w_proportion = ((float) w_control / (float) (b_control + w_control));
+        return -1.0f + 2*w_proportion;
+    }
+    return 0.0f;
 }
 
 float __metrics::__piece_activity_gamma_metric(const Gamestate & gs) {
@@ -82,11 +78,9 @@ float __metrics::__piece_activity_gamma_metric(const Gamestate & gs) {
         }
     }
 
-    float w_proportion = 0.0;
-
-    if (w_control + b_control > 0)
-        w_proportion = ((float)w_control / (float)(b_control + w_control));
-
-    return -1.0f + 2*w_proportion;
-
+    if (w_control + b_control > 0) {
+        float w_proportion = ((float) w_control / (float) (b_control + w_control));
+        return -1.0f + 2*w_proportion;
+    }
+    return 0.0f;
 }
