@@ -11,7 +11,7 @@
  * Note that this is not sufficient to avoid threefold repetition: you also need to know about moves
  * from the whole game.
  */
-bool threefold_rep(const SearchNode * node) {
+bool threefold_rep(const SearchNode * node, const std::vector<Board> * board_history) {
 
     int count = 0;
     const SearchNode * current = node->parent;
@@ -87,7 +87,7 @@ void add_legal_moves(SearchNode * node) {
  * If given a depth of 0, nothing will happen.
  * Returns true if new nodes are created, false otherwise.
  */
-bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bool burst=false) {
+bool deepen(SearchNode * node, CandList cand_list, int depth, const std::vector<Board> * board_history, Observer & obs, bool burst=false) {
 
     // exit conditions
     check_abort();
@@ -105,7 +105,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
         if (node->visit_count <= __engine_params::CRITICAL_THRESHOLD
               && quiess(*node->gs) >= __engine_params::QUIESS_THRESHOLD) {
             obs.register_event(node, BEGIN_BURST);
-            return deepen(node, CRITICAL, __engine_params::BURST_DEPTH, obs, true);
+            return deepen(node, CRITICAL, __engine_params::BURST_DEPTH, board_history, obs, true);
         } else {
             return false;
         }
@@ -137,7 +137,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
         // even if the list is empty, we still need to recurse up to the given depth
         bool changes = false;
         for (int i = 0; i < node->children.size(); ++i) {
-            changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
+            changes = deepen(node->children[i], cand_list, depth - 1, board_history, obs, burst)
                         || changes;
         }
         update_score(node);
@@ -156,7 +156,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
                 child->gs->board.get_white()
                     ? white_has_been_mated()
                     : black_has_been_mated();
-        } else if (threefold_rep(child)) {
+        } else if (threefold_rep(child, board_history)) {
             child->score = zero();
             child->gs->game_over = true;
             obs.register_event(child, THREEFOLD_REP);
@@ -170,7 +170,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
     // recurse as appropriate
     bool changes = (node->children.size() != c);
     for (int i = 0; i < node->children.size(); ++i) {
-        changes = deepen(node->children[i], cand_list, depth - 1, obs, burst)
+        changes = deepen(node->children[i], cand_list, depth - 1, board_history, obs, burst)
                     || changes;
     }
 
@@ -186,7 +186,7 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, Observer & obs, bo
  * about the node except to update its score.
  * Returns true if new nodes were deepened and false otherwise.
  */
-void visit_node(SearchNode * node, Observer & obs) {
+void visit_node(SearchNode * node, const std::vector<Board> * board_history, Observer & obs) {
 
     if (!node || node->gs->game_over || node->terminal) {
         return;
@@ -196,15 +196,15 @@ void visit_node(SearchNode * node, Observer & obs) {
 
     switch (node->visit_count) {
         case __engine_params::CRITICAL_THRESHOLD:
-            deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
+            deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, board_history, obs);
             obs.close_event(node, VISIT, nullptr, 1);
             return;
         case __engine_params::MEDIAL_THRESHOLD:
-            deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
+            deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, board_history, obs);
             obs.close_event(node, VISIT, nullptr, 2);
             return;
         case __engine_params::FINAL_THRESHOLD:
-            deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
+            deepen(node, FINAL, __engine_params::FINAL_DEPTH, board_history, obs);
             obs.close_event(node, VISIT, nullptr, 3);
             return;
         case __engine_params::LEGAL_THRESHOLD:
@@ -216,7 +216,7 @@ void visit_node(SearchNode * node, Observer & obs) {
                     return;
                 }
             }
-            deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, obs);
+            deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, board_history, obs);
             obs.close_event(node, VISIT, nullptr, 5);
             return;
         default:
@@ -235,7 +235,7 @@ void visit_node(SearchNode * node, Observer & obs) {
  * excluding legal moves.
  * Returns true if any new nodes were in fact extended.
  */
-bool force_visit(SearchNode * node, Observer & obs) {
+bool force_visit(SearchNode * node, const std::vector<Board> * board_history, Observer & obs) {
 
     if (!node || node->gs->game_over || node->terminal) {
         return false;
@@ -247,17 +247,17 @@ bool force_visit(SearchNode * node, Observer & obs) {
 
     if (node->visit_count <= __engine_params::CRITICAL_THRESHOLD) {
         node->visit_count = __engine_params::CRITICAL_THRESHOLD;
-        changes = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, obs);
+        changes = deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, board_history, obs);
     }
 
     if (!changes && node->visit_count < __engine_params::MEDIAL_THRESHOLD) {
         node->visit_count = __engine_params::MEDIAL_THRESHOLD;
-        changes = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, obs);
+        changes = deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, board_history, obs);
     }
 
     if (!changes && node->visit_count < __engine_params::FINAL_THRESHOLD) {
         node->visit_count = __engine_params::FINAL_THRESHOLD;
-        changes = deepen(node, FINAL, __engine_params::FINAL_DEPTH, obs);
+        changes = deepen(node, FINAL, __engine_params::FINAL_DEPTH, board_history, obs);
     }
 
     if (!changes) {
@@ -277,13 +277,13 @@ bool force_visit(SearchNode * node, Observer & obs) {
  * so the line visited is that which is the best line in the initial position.
  * Returns true if any changes were made, false otherwise.
  */
-bool force_visit_best_line(SearchNode * node, Observer & obs) {
+bool force_visit_best_line(SearchNode * node, const std::vector<Board> * board_history, Observer & obs) {
 
     if (node == nullptr) { return false; }
 
     obs.open_event(node, FORCE_VISIT_LINE);
-    bool changes = force_visit(node->best_child, obs);
-    changes = force_visit(node, obs) || changes;
+    bool changes = force_visit(node->best_child, board_history, obs);
+    changes = force_visit(node, board_history, obs) || changes;
 
     obs.close_event(node, FORCE_VISIT_LINE);
     return changes;
@@ -297,7 +297,7 @@ bool force_visit_best_line(SearchNode * node, Observer & obs) {
  * Returns true if any descendant of the given node caused (and executed) a swing,
  * and false otherwise.
  */
-bool visit_best_line(SearchNode * node, Observer & obs) {
+bool visit_best_line(SearchNode * node, const std::vector<Board> * board_history, Observer & obs) {
 
     if (node == nullptr) { return false; }
 
@@ -305,14 +305,14 @@ bool visit_best_line(SearchNode * node, Observer & obs) {
     obs.open_event(node, VISIT_LINE);
 
     // recurse on the best child
-    bool has_swung = visit_best_line(node->best_child, obs);
+    bool has_swung = visit_best_line(node->best_child, board_history, obs);
 
     // recurse on very-nearly-equal siblings
     int extra_siblings_visited = 0;
     for (int i = 0; i < node->children.size(); ++i) {
         if (node->children[i] == node->best_child) { continue; }
         if (millipawn_diff(node->best_child->score, node->children[i]->score) <= __engine_params::EVALS_EQUAL_THRESHOLD) {
-            has_swung = visit_best_line(node->children[i], obs) || has_swung;
+            has_swung = visit_best_line(node->children[i], board_history, obs) || has_swung;
             if (++extra_siblings_visited == __engine_params::MAX_EXTRA_SIBLINGS) {
                 break;
             }
@@ -320,11 +320,11 @@ bool visit_best_line(SearchNode * node, Observer & obs) {
     }
 
     // after the below recursion, visit the current node itself
-    visit_node(node, obs);
+    visit_node(node, board_history, obs);
 
     if (!has_swung && is_swing(prior, node->score)) {
         obs.register_event(node, SWING);
-        force_visit_best_line(node, obs);
+        force_visit_best_line(node, board_history, obs);
         obs.close_event(node, VISIT_LINE, nullptr, 1);
         return true;
     }
@@ -349,7 +349,7 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector
 
     while (i++ < cycles || cycles < 0) {
 
-        visit_best_line(root, obs);
+        visit_best_line(root, board_history, obs);
 
 //        auto stop = std::chrono::high_resolution_clock::now();
 //        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
