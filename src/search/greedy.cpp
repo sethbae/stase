@@ -333,7 +333,7 @@ bool visit_best_line(SearchNode * node, Observer & obs) {
     return has_swung;
 }
 
-std::vector<Move> greedy_search(SearchNode * root, int cycles, Observer & obs) {
+std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector<Board> * board_history, Observer & obs) {
 
     if (root->score == zero()) {
         root->score = heur(*root->gs);
@@ -386,7 +386,7 @@ std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer & 
     Gamestate root_gs(fen);
     SearchNode root(&root_gs, cands(root_gs, new CandSet), heur(root_gs));
 
-    return greedy_search(&root, cycles, obs);
+    return greedy_search(&root, cycles, nullptr, obs);
 
 }
 

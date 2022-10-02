@@ -20,6 +20,7 @@ private:
         Move * move_out;
         Eval * score_out;
         double * secs_out;
+        const std::vector<Board> * board_history;
     };
 
     const std::string fen;

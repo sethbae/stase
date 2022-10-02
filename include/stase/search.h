@@ -127,7 +127,7 @@ public:
 extern Observer DEFAULT_OBSERVER;
 
 std::vector<Move> greedy_search(const std::string &, int, Observer & = DEFAULT_OBSERVER);
-std::vector<Move> greedy_search(SearchNode *, int, Observer & = DEFAULT_OBSERVER);
+std::vector<Move> greedy_search(SearchNode *, int, const std::vector<Board> *, Observer & = DEFAULT_OBSERVER);
 
 void delete_tree(SearchNode *);
 
