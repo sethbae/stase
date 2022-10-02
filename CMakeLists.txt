@@ -22,6 +22,7 @@ set(SOURCE_FILES
         src/game/heur/pawns.cpp
         src/game/heur/development.cpp
         src/game/heur/king.cpp
+        src/game/heur/endgame.cpp
 
         src/puzzle/puzzle.cpp
         src/puzzle/read_formats.cpp
@@ -37,6 +38,8 @@ set(SOURCE_FILES
         src/search/search_tools.cpp
         src/search/observers/xml_observer.hpp
         src/search/observers/observers.hpp
+        src/search/board_hash.cpp
+        src/search/observers/stats_observer.hpp
 
         src/game/cands/cands.h
         src/game/cands/score.h
@@ -73,9 +76,7 @@ set(SOURCE_FILES
         src/utils/print.cpp
         src/utils/uci.cpp
         src/utils/signal.cpp
-        src/utils/ptr_vec.h
-        src/search/board_hash.cpp
-        src/search/observers/stats_observer.hpp)
+        src/utils/ptr_vec.h)
 
 set(STASE_SOURCE_FILES)
 

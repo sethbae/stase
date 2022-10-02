@@ -125,6 +125,7 @@ namespace __metrics {
     float __control_near_king_metric(const Gamestate &);
     float __king_exposure_metric(const Gamestate &);
     float __unconventional_king_metric(const Gamestate &);
+    float __promotion_squares(const Gamestate &);
 
     const Metric piece_activity_alpha_metric{
         "piece-activity-alpha",
@@ -206,6 +207,11 @@ namespace __metrics {
         {1000, 500, 0},
         &__unconventional_king_metric
     };
+    const Metric promotion_squares_metric{
+        "promotion-squares",
+        {0, 1000, 2000},
+        &__promotion_squares
+    };
 }
 
 const std::vector<const Metric *> ALL_METRICS{
@@ -225,7 +231,8 @@ const std::vector<const Metric *> ALL_METRICS{
     &__metrics::pawns_defend_king_metric,
     &__metrics::control_near_king_metric,
     &__metrics::king_exposure_metric,
-    &__metrics::unconventional_king_metric
+    &__metrics::unconventional_king_metric,
+    &__metrics::promotion_squares_metric
 
 };
 
