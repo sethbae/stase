@@ -360,7 +360,7 @@ struct Board {
      * Returns true if the current position is equivalent to the other position for the purpose of
      * threefold repetition.
      */
-    bool equivalent(const Board & o) {
+    bool equivalent(const Board & o) const {
         if (non_move_conf() != o.non_move_conf()) {
             return false;
         }

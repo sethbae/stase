@@ -32,6 +32,18 @@ bool threefold_rep(const SearchNode * node, const std::vector<Board> * board_his
         current = current->parent;
     }
 
+    if (!board_history) { return false; }
+
+    // we now search the board history
+    for (int i = board_history->size() - 1; i >= 0; --i) {
+        const Board & b = (*board_history)[i];
+        if (board_hash(b) == node->board_hash && b.equivalent(node->gs->board)) {
+            if (++count == 3) {
+                return true;
+            }
+        }
+        // TODO: somehow check for pawn moves or captures and abort here.
+    }
     return false;
 }
 
