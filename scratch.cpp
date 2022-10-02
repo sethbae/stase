@@ -412,7 +412,7 @@ void show_hook_frames(const std::string & fen, const Hook & h) {
     show_hook_frames(gs, h);
 }
 
-SearchNode * repl_cycles(const std::string & fen) {
+SearchNode * repl_cycles(const std::string & fen, const GamePhase game_phase) {
 
     std::string input;
 
@@ -423,7 +423,7 @@ SearchNode * repl_cycles(const std::string & fen) {
     cout << "\nAnalysing...";
     cout.flush();
 
-    Gamestate * root_gs = new Gamestate(fen);
+    Gamestate * root_gs = new Gamestate(fen, game_phase);
     SearchNode * root =
         new SearchNode(root_gs, cands(*root_gs, new CandSet), heur(*root_gs));
 
@@ -434,7 +434,7 @@ SearchNode * repl_cycles(const std::string & fen) {
 
 }
 
-SearchNode * repl_seconds(const std::string & fen) {
+SearchNode * repl_seconds(const std::string & fen, const GamePhase game_phase) {
 
     std::string input;
 
@@ -449,6 +449,7 @@ SearchNode * repl_seconds(const std::string & fen) {
         EngineBuilder::for_position(fen)
             .with_timeout(secs)
             .with_cleanup(false)
+            .with_game_phase(game_phase)
             .build();
     engine.blocking_run();
 
@@ -457,7 +458,7 @@ SearchNode * repl_seconds(const std::string & fen) {
     return engine.get_root();
 }
 
-SearchNode * repl_nodes(const std::string & fen) {
+SearchNode * repl_nodes(const std::string & fen, const GamePhase game_phase) {
     std::string input;
 
     cout << "Enter number of nodes to analyse for: ";
@@ -471,6 +472,7 @@ SearchNode * repl_nodes(const std::string & fen) {
         EngineBuilder::for_position(fen)
             .with_node_limit(n)
             .with_cleanup(false)
+            .with_game_phase(game_phase)
             .build();
     engine.blocking_run();
     cout << "done\n";
@@ -478,7 +480,7 @@ SearchNode * repl_nodes(const std::string & fen) {
     return engine.get_root();
 }
 
-void repl(const std::string & fen) {
+void repl(const std::string & fen, const GamePhase game_phase) {
 
     std::string input;
 
@@ -488,11 +490,11 @@ void repl(const std::string & fen) {
     SearchNode * root = nullptr;
     while (!root) {
         if (input == "s") {
-            root = repl_seconds(fen);
+            root = repl_seconds(fen, game_phase);
         } else if (input == "c") {
-            root = repl_cycles(fen);
+            root = repl_cycles(fen, game_phase);
         } else if (input == "n") {
-            root = repl_nodes(fen);
+            root = repl_nodes(fen, game_phase);
         } else {
             cout << "unknown unit\n";
         }
@@ -573,7 +575,9 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
     const std::string fen = "r1bqkb1r/pp3ppp/2n1pn2/2p1Q3/8/3P1N2/PPP2PPP/RNB1KB1R w KQkq - 2 7";
 
-    Gamestate gs(fen, OPENING);
+    const GamePhase game_phase = ENDGAME;
+
+    Gamestate gs(fen, game_phase);
     pr_board(gs.board);
 //
 //    heur_with_description(gs);
@@ -592,11 +596,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    q_scores();
 
-//    repl(fen);
+    repl(fen, game_phase);
 
     XMLObserver observer("debug_pos");
     Engine engine =
         EngineBuilder::for_position(fen)
+            .with_game_phase(game_phase)
             .with_node_limit(25000)
             .with_cleanup(false)
 //            .with_obs(observer)
