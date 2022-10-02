@@ -19,7 +19,7 @@ private:
         int * nodes_out;
         Move * move_out;
         Eval * score_out;
-        double *secs_out;
+        double * secs_out;
     };
 
     const std::string fen;
@@ -39,7 +39,14 @@ private:
     double actual_seconds;
 
 public:
-    Engine(const std::string fen, Observer & o, int node_limit, int cycle_limit, double timeout_seconds, bool cleanup):
+    Engine(
+            const std::string fen,
+            Observer & o,
+            int node_limit,
+            int cycle_limit,
+            double timeout_seconds,
+            bool cleanup,
+            GamePhase game_phase):
         fen(fen),
         obs(o),
         search_args(nullptr),
@@ -55,7 +62,7 @@ public:
         score(zero()),
         actual_seconds(timeout_seconds)
     {
-        root = new SearchNode(new Gamestate(fen), new CandSet);
+        root = new SearchNode(new Gamestate(fen, game_phase), new CandSet);
 #ifdef ENGINE_STACK_TRACE
         signal(SIGSEGV, print_stack_trace_and_abort);
         signal(SIGABRT, print_stack_trace_and_abort);
@@ -100,48 +107,61 @@ private:
     int cycles;
     double seconds;
     bool cleanup;
+    GamePhase game_phase;
 
-    EngineBuilder(std::string fen, Observer & obs, int node_limit, int cycle_limit, double timeout_seconds, bool cleanup) :
+    EngineBuilder(
+            std::string fen,
+            Observer & obs,
+            int node_limit,
+            int cycle_limit,
+            double timeout_seconds,
+            bool cleanup,
+            GamePhase game_phase) :
         fen(fen),
         obs(obs),
         nodes(node_limit),
         cycles(cycle_limit),
         seconds(timeout_seconds),
-        cleanup(cleanup)
+        cleanup(cleanup),
+        game_phase(game_phase)
     {}
 
 public:
 
     static EngineBuilder for_position(std::string fen_string) {
-        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true);
+        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true, OPENING);
     }
 
     static EngineBuilder for_starting_position() {
         return for_position(std::string(starting_fen()));
     }
 
+    EngineBuilder with_game_phase(GamePhase phase) {
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase);
+    }
+
     EngineBuilder with_obs(Observer & observer) {
-        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup);
+        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase);
     }
 
     EngineBuilder with_node_limit(int node_limit) {
-        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup);
+        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase);
     }
 
     EngineBuilder with_cycle_limit(int cycle_limit) {
-        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup);
+        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase);
     }
 
     EngineBuilder with_timeout(double secs) {
-        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup);
+        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase);
     }
 
     EngineBuilder with_cleanup(bool auto_cleanup) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase);
     }
 
     Engine build() {
-        return Engine(fen, obs, nodes, cycles, seconds, cleanup);
+        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase);
     }
 };
 
