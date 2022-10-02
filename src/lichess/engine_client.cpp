@@ -30,7 +30,7 @@ public:
         Engine engine =
             EngineBuilder::for_position(board_to_fen(gs.board))
                 .with_timeout(think_time)
-                .with_board_history(board_history)
+                .with_board_history(&board_history)
                 .build();
         std::string * uci = new string(move2uci(engine.blocking_run()));
         gs = Gamestate(gs, uci2move(*uci));
