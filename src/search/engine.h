@@ -170,6 +170,10 @@ public:
         return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, board_history);
     }
 
+    EngineBuilder with_board_history(const std::vector<Board> * _board_history) {
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, _board_history);
+    }
+
     Engine build() {
         return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, board_history);
     }
