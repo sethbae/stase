@@ -20,7 +20,7 @@ private:
         Move * move_out;
         Eval * score_out;
         double * secs_out;
-        const std::vector<Board> * board_history;
+        const std::vector<Gamestate> * game_history;
     };
 
     const std::string fen;
@@ -39,7 +39,7 @@ private:
     Eval score;
     double actual_seconds;
 
-    const std::vector<Board> * board_history;
+    const std::vector<Gamestate> * game_history;
 
 public:
     Engine(
@@ -50,7 +50,7 @@ public:
             double timeout_seconds,
             bool cleanup,
             GamePhase game_phase,
-            const std::vector<Board> * board_history):
+            const std::vector<Gamestate> * game_history):
         fen(fen),
         obs(o),
         search_args(nullptr),
@@ -66,7 +66,7 @@ public:
         score(zero()),
         actual_seconds(timeout_seconds),
 
-        board_history(board_history)
+        game_history(game_history)
     {
         root = new SearchNode(new Gamestate(fen, game_phase), new CandSet);
 #ifdef ENGINE_STACK_TRACE
@@ -88,7 +88,7 @@ public:
     int get_nodes_explored() { return nodes; }
     Eval get_score() { return score; }
     double get_actual_seconds() { return actual_seconds; }
-    const std::vector<Board> * get_board_history() { return board_history; }
+    const std::vector<Gamestate> * get_game_history() { return game_history; }
 
     void run();
     Move blocking_run();
@@ -115,7 +115,7 @@ private:
     double seconds;
     bool cleanup;
     GamePhase game_phase;
-    const std::vector<Board> * board_history;
+    const std::vector<Gamestate> * game_history;
 
     EngineBuilder(
             std::string fen,
@@ -125,7 +125,7 @@ private:
             double timeout_seconds,
             bool cleanup,
             GamePhase game_phase,
-            const std::vector<Board> * board_history) :
+            const std::vector<Gamestate> * game_history) :
         fen(fen),
         obs(obs),
         nodes(node_limit),
@@ -133,7 +133,7 @@ private:
         seconds(timeout_seconds),
         cleanup(cleanup),
         game_phase(game_phase),
-        board_history(board_history)
+        game_history(game_history)
     {}
 
 public:
@@ -147,35 +147,35 @@ public:
     }
 
     EngineBuilder with_game_phase(GamePhase phase) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase, board_history);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase, game_history);
     }
 
     EngineBuilder with_obs(Observer & observer) {
-        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase, board_history);
+        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase, game_history);
     }
 
     EngineBuilder with_node_limit(int node_limit) {
-        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase, board_history);
+        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase, game_history);
     }
 
     EngineBuilder with_cycle_limit(int cycle_limit) {
-        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase, board_history);
+        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase, game_history);
     }
 
     EngineBuilder with_timeout(double secs) {
-        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase, board_history);
+        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase, game_history);
     }
 
     EngineBuilder with_cleanup(bool auto_cleanup) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, board_history);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, game_history);
     }
 
-    EngineBuilder with_board_history(const std::vector<Board> * _board_history) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, _board_history);
+    EngineBuilder with_game_history(const std::vector<Gamestate> * _game_history) {
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, _game_history);
     }
 
     Engine build() {
-        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, board_history);
+        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, game_history);
     }
 };
 

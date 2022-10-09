@@ -19,7 +19,7 @@ void * Engine::start(void * args) {
     reset_abort_flag();
 
     auto start = std::chrono::high_resolution_clock::now();
-    greedy_search(search_args->root, search_args->cycles, search_args->board_history, *search_args->o);
+    greedy_search(search_args->root, search_args->cycles, search_args->game_history, *search_args->o);
     auto stop = std::chrono::high_resolution_clock::now();
     double secs = duration_cast<std::chrono::microseconds>(stop - start).count() / 1000000;
 
@@ -78,7 +78,7 @@ void Engine::run() {
             &best_move,
             &score,
             &actual_seconds,
-            board_history
+            game_history
         };
 
     set_node_limit(node_limit);
