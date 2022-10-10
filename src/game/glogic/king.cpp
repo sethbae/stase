@@ -2,6 +2,97 @@
 #include "glogic.h"
 #include "../gamestate.hpp"
 
+inline Square __sneaked_fpe(const Gamestate & gs, const Square s, const Delta d, const Piece ignore) {
+    Square fpe = gs.first_piece_encountered(s, d);
+    if (!is_sentinel(fpe) && gs.board.get(fpe) == ignore) {
+        return gs.first_piece_encountered(fpe, d);
+    }
+    return fpe;
+}
+
+/**
+ * Looks for attackers of the opposite colour to the given king_colour by working outwards from
+ * the square [s] along the given [delta]. Returns true if an attacker is found, false otherwise.
+ */
+bool __sneaked_seek_attackers(const Gamestate & gs, const Square s, const Colour king_colour, const Delta delta) {
+
+    /**
+     * NB this can be called from a sneaked context, so it is not safe to use
+     * Gamestate::first_piece_encountered.
+     */
+
+    Square temp;
+    const Piece ignored_king = (king_colour == WHITE) ? W_KING : B_KING;
+    MoveType dir = direction_of_delta(delta);
+    int x = get_x(s) + delta.dx, y = get_y(s) + delta.dy;
+
+    while (val(temp = mksq(x, y))) {
+
+        Piece p = gs.board.get(temp);
+
+        if (p != EMPTY && p != ignored_king) {
+            return colour(p) != king_colour && can_move_in_direction(p, dir);
+        }
+
+        x += delta.dx;
+        y += delta.dy;
+    }
+
+    return false;
+}
+
+/**
+ * Checks if a king of the given colour is safe on the given square. Does not assume that the king is currently
+ * on the given square.
+ */
+int __sneaked_is_safe_for_king(const Gamestate & gs, const Square s, const Colour c) {
+
+    Square temp;
+    int x = get_x(s);
+    int y = get_y(s);
+    Piece ignored_king = (c == WHITE) ? W_KING : B_KING;
+
+    // knights
+    Piece enemy_knight = (c == WHITE) ? B_KNIGHT : W_KNIGHT;
+    if (val(temp = mksq(x + 1, y + 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 1, y - 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 2, y + 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x + 2, y - 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 1, y + 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 1, y - 2)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 2, y + 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+    if (val(temp = mksq(x - 2, y - 1)) && gs.board.get(temp) == enemy_knight) { return false; }
+
+    // pawns
+    if (c == WHITE) {
+        if (val(temp = mksq(x + 1, y + 1)) && (gs.board.get(temp) == B_PAWN)) { return false; }
+        if (val(temp = mksq(x - 1, y + 1)) && (gs.board.get(temp) == B_PAWN)) { return false; }
+    } else {
+        if (val(temp = mksq(x + 1, y - 1)) && (gs.board.get(temp) == W_PAWN)) { return false; }
+        if (val(temp = mksq(x - 1, y - 1)) && (gs.board.get(temp) == W_PAWN)) { return false; }
+    }
+
+    // kings
+    Piece enemy_king = (c == WHITE) ? B_KING : W_KING;
+    if (val(temp = mksq(x + 1, y + 1)) && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x + 1, y))     && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x + 1, y - 1)) && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x, y + 1))     && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x, y - 1))     && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x - 1, y + 1)) && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x - 1, y))     && gs.board.get(temp) == enemy_king) { return false; }
+    if (val(temp = mksq(x - 1, y - 1)) && gs.board.get(temp) == enemy_king) { return false; }
+
+    // sliding directions
+    for (int i = 0; i < 8; ++i) {
+        if (__sneaked_seek_attackers(gs, s, c, Delta{(SignedByte) XD[i], (SignedByte) YD[i]})) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 /**
  * Looks for attackers of the opposite colour to the given king_colour by working outwards from
  * the square [s] along the given [delta]. Returns true if an attacker is found, false otherwise.
@@ -108,21 +199,11 @@ bool has_safe_king(const Gamestate & gs, const Colour king_colour) {
  */
 bool would_be_safe_for_king_after(const Gamestate & gs, const Square s, const Move m, Colour colour) {
 
-    // sneak the first move: a move taking place before this calculation
+    // sneak the move before this calculation
     Piece sneaked = gs.sneak(m);
-    Square k_sq;
-    if (colour == WHITE) {
-        k_sq = gs.w_king;
-    } else {
-        k_sq = gs.b_king;
-    }
 
-    // perform an inner sneak: moving the king onto the square we want to know about
-    Piece sneaked2 = gs.sneak(Move{k_sq, s, 0});
-    bool result = is_safe_for_king(gs, s); // fetch the result on the double-sneaked board
+    bool result = __sneaked_is_safe_for_king(gs, s, colour);
 
-    // unsneak
-    gs.unsneak(Move{k_sq, s, 0}, sneaked2);
     gs.unsneak(m, sneaked);
 
     return result;
