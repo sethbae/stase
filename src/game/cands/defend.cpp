@@ -5,7 +5,7 @@
 
 /**
  * Finds squares on which a rook on p_sq would be able to defend c_sq. Does not account for whether
- * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ * the piece is pinned or not. Does not return squares if the piece already covers the c_sq.
  */
 void find_rook_cover(
         const Gamestate & gs, ptr_vec<Square> & squares, const Square p_sq, const Square c_sq) {
@@ -31,7 +31,7 @@ void find_rook_cover(
 
 /**
  * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
- * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ * the piece is pinned or not. Does not return squares if the piece already covers the c_sq.
  */
 void find_bishop_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Square p_sq, const Square c_sq) {
 
@@ -69,8 +69,8 @@ void find_bishop_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Sq
 }
 
 /**
- * Finds squares on which a bishop on p_sq would be able to defend c_sq. Does not account for whether
- * the rook is pinned or not. Does not return squares if the rook already covers the c_sq.
+ * Finds squares on which a queen on q_sq would be able to defend c_sq. Does not account for whether
+ * the piece is pinned or not. Does not return squares if the piece already covers the c_sq.
  */
 void find_queen_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Square q_sq, const Square c_sq) {
 
@@ -85,6 +85,7 @@ void find_queen_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Squ
         Delta d = D[i];
 
         // TODO make this account for x-rays (use a while loop)
+        //  -be warned that it is used by the check_hook
         Square segment_end = gs.first_piece_encountered(c_sq, d);
         if (is_sentinel(segment_end)) {
             segment_end = edge_of_board(c_sq, i);
@@ -93,7 +94,7 @@ void find_queen_cover(const Gamestate & gs, ptr_vec<Square> & squares, const Squ
 
         // try to get on the line c_sq (exclusive) -> segment_end (inclusive)
         // parameter ordering in following call is crucial (to get inc/exc right)
-        squares_piece_can_reach_on_line(gs.board, squares, q_sq, segment_end, c_sq);
+        squares_piece_can_reach_on_line(gs.board, squares, q_sq, c_sq, segment_end);
     }
 }
 
