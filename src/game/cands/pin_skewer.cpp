@@ -166,8 +166,7 @@ int pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * mo
 }
 
 /**
- * Detects pieces which in the current position are already pinned. Writes a feature frame for each such
- * piece it finds. This will only operate on a square containing a king.
+ * These are detected on startup by the gamestate class, which writes the FeatureFrames in the following format.
  * The format of the feature frames is:
  * centre: the pinned piece
  * secondary: the piece which pins it
@@ -175,37 +174,7 @@ int pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * mo
  * conf_2: dy of the pin direction
  */
 bool identify_king_pinned_pieces_hook(Gamestate & gs, const Square s) {
-
-    Piece king = gs.board.get(s);
-
-    if (type(king) != KING) {
-        return true;
-    }
-
-    for (int i = ALL_DIRS_START; i < ALL_DIRS_STOP; ++i) {
-
-        Delta d{XD[i], YD[i]};
-        Square pinned_sq = gs.first_piece_encountered(s, d);
-
-        if (is_sentinel(pinned_sq) || colour(gs.board.get(pinned_sq)) != colour(king)) {
-            continue;
-        }
-
-        Square pinner_sq = gs.first_piece_encountered(pinned_sq, d);
-
-        if (is_sentinel(pinner_sq)) {
-            continue;
-        }
-
-        if  (colour(gs.board.get(pinner_sq)) == colour(king)
-                || !can_move_in_direction(gs.board.get(pinner_sq), d)) {
-            continue;
-        }
-
-        gs.add_kpinned_piece(pinned_sq, d);
-        bool result = gs.add_frame(king_pinned_pieces_hook.id, FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
-        if (!result) { return false; }
-    }
+    // intentional stub
     return true;
 }
 

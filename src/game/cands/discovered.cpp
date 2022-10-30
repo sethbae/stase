@@ -80,6 +80,18 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
 }
 
 /**
+ * Discovered checks are found by the gamestate on startup, and FeatureFrames are written in the following format:
+ * centre: the piece blocking the discovery
+ * secondary: the piece which would give the discovery
+ * conf1: the x coord of the delta to the enemy king
+ * conf2: the y coord of the delta to the enemy king
+ */
+bool discovered_check(Gamestate & gs, const Square s) {
+    // intentional stub
+    return true;
+}
+
+/**
  * Responds to a discovered FeatureFrame by attempting to maximise the damage done. If check
  * is required, this will recommend every appropriate check. Otherwise, it will currently
  * desperado the piece.
@@ -115,6 +127,12 @@ const Hook discovered_hook{
     "discovered",
     8,
     &discovered_attack_hook
+};
+
+const Hook discovered_check_hook{
+    "discovered-check",
+    10,
+    &discovered_check
 };
 
 const Responder play_discovered_resp{

@@ -57,6 +57,8 @@ public:
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
+        find_kpins_and_discoveries(w_king);
+        find_kpins_and_discoveries(b_king);
     }
 
     explicit Gamestate(const Gamestate & o, const Move m)
@@ -95,6 +97,10 @@ public:
         update_cache(board, pdir_cache, m);
         update_phase(m);
         this->control_cache->update(o.board, *o.control_cache, m);
+
+        // re-find pins and discoveries
+        find_kpins_and_discoveries(w_king);
+        find_kpins_and_discoveries(b_king);
     }
 
     explicit Gamestate(const std::string & fen)
@@ -108,6 +114,8 @@ public:
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
+        find_kpins_and_discoveries(w_king);
+        find_kpins_and_discoveries(b_king);
     }
 
     explicit Gamestate(const std::string & fen, GamePhase phase)
@@ -121,6 +129,8 @@ public:
         alloc();
         find_kings();
         compute_cache(board, pdir_cache);
+        find_kpins_and_discoveries(w_king);
+        find_kpins_and_discoveries(b_king);
     }
 
     explicit Gamestate(Gamestate && o)
@@ -299,7 +309,7 @@ public:
      * Records that the piece on the given square is pinned to its king and is therefore
      * not able to move.
      */
-    void add_kpinned_piece(const Square s, const Delta delta) {
+    inline void add_kpinned_piece(const Square s, const Delta delta) {
         Piece p = board.get(s);
         if (colour(p) == WHITE) {
             wpin_cache.add_pin(s, p, delta);
@@ -317,7 +327,7 @@ public:
      * If the piece on the square cannot move in the direction passed, true will be
      * returned regardless of the pin direction.
      */
-    bool is_kpinned_piece(const Square s, const Delta delta) const {
+    inline bool is_kpinned_piece(const Square s, const Delta delta) const {
         if (colour(board.get(s)) == WHITE) {
             return wpin_cache.is_pinned(s, delta);
         } else {
@@ -329,7 +339,7 @@ public:
      * If the piece on the given square is pinned to its king, this returns the delta along which it is pinned.
      * Otherwise, it returns INVALID_DELTA.
      */
-    Delta delta_of_kpinned_piece(const Square s) const {
+    inline Delta delta_of_kpinned_piece(const Square s) const {
         if (colour(board.get(s)) == WHITE) {
             return wpin_cache.delta_of_pin(s);
         } else {
@@ -351,7 +361,7 @@ public:
     /**
      * Mark a piece as no longer pinned to its king, so that it is able to move once more.
      */
-    void remove_kpinned_piece(const Square s) {
+    inline void remove_kpinned_piece(const Square s) {
         if (colour(board.get(s)) == WHITE) {
             wpin_cache.remove_pin(s);
         } else {
@@ -359,12 +369,20 @@ public:
         }
     }
 
+    inline ptr_vec<Square> all_wpinned_pieces() {
+        return wpin_cache.all();
+    }
+
+    inline ptr_vec<Square> all_bpinned_pieces() {
+        return bpin_cache.all();
+    }
+
     /**
      * Records that the piece on the given square can move while giving a discovered check.
      * Add the square of the piece that moves, not the piece that gives check. Add the delta
      * along which the check would be given.
      */
-    void add_discovery(const Square s, const Delta delta) {
+    inline void add_discovery(const Square s, const Delta delta) {
         Piece p = board.get(s);
         if (colour(p) == WHITE) {
             wdiscoveries.add_pin(s, p, delta);
@@ -376,7 +394,7 @@ public:
     /**
      * Checks whether the given square contains a piece which can discover check.
      */
-    bool can_discover_check(const Square s) const {
+    inline bool can_discover_check(const Square s) const {
         // TODO (ST-118): un-hack this by generifying pin_cache.
         bool white = colour(board.get(s)) == WHITE;
         Delta d = get_delta_between(s, white ? w_king : b_king);
@@ -390,12 +408,20 @@ public:
     /**
      * Mark a piece as no longer pinned to its king, so that it is able to move once more.
      */
-    void remove_discovery(const Square s) {
+    inline void remove_discovery(const Square s) {
         if (colour(board.get(s)) == WHITE) {
             wdiscoveries.remove_pin(s);
         } else {
             bdiscoveries.remove_pin(s);
         }
+    }
+
+    inline ptr_vec<Square> all_white_discoveries() {
+        return wdiscoveries.all();
+    }
+
+    inline ptr_vec<Square> all_black_discoveries() {
+        return bdiscoveries.all();
     }
 
 private:
@@ -458,6 +484,41 @@ private:
         }
     }
 
+    /**
+     * Detects pieces which in the current position are either pinned to their own king (kpins),
+     * or which are threatening a discovery against the opponent king. These are recorded in the
+     * caches on the gamestate (and are later converted to FeatureFrames by the relevant hooks).
+     */
+    inline void find_kpins_and_discoveries(const Square s) {
+
+        Piece king = board.get(s);
+        if (type(king) != KING) { return; }
+
+        for (int i = ALL_DIRS_START; i < ALL_DIRS_STOP; ++i) {
+
+            Delta d{XD[i], YD[i]};
+            Square pinned_sq = first_piece_encountered(s, d);
+            if (is_sentinel(pinned_sq)) { continue; }
+            Square pinner_sq = first_piece_encountered(pinned_sq, d);
+            if (is_sentinel(pinner_sq)) { continue; }
+
+            // check the covered piece threatens the king
+            if (colour(board.get(pinner_sq)) != colour(king)
+                    && can_move_in_direction(board.get(pinner_sq), d)) {
+                if (colour(board.get(pinned_sq)) == colour(king)) {
+                    // if the interstitial piece is the king's colour, it's a pin
+                    add_kpinned_piece(pinned_sq, d);
+                    add_frame(king_pinned_pieces_hook.id, FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
+                } else {
+                    // otherwise it's a discovery
+                    add_discovery(pinned_sq, d);
+                    add_frame(discovered_check_hook.id, FeatureFrame{pinned_sq, pinner_sq, d.dx, d.dy});
+                }
+            }
+        }
+
+        return;
+    }
 };
 
 #endif  // STASE_GAMESTATE_HPP

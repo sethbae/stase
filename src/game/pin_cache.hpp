@@ -94,6 +94,10 @@ public:
             }
         }
     }
+
+    ptr_vec<Square> all() {
+        return ptr_vec(p_squares, size);
+    }
 };
 
 #endif // STASE_PIN_CACHE_HPP

@@ -1,8 +1,8 @@
 #include "../test.h"
 #include "../../game/gamestate.hpp"
 
-const TestSet<StringTestCase> kpinned_piece_test_set{
-    "game-gs-kpinned-piece-list",
+const TestSet<StringTestCase> pin_cache_test_set{
+    "game-gs-pin-cache",
     {
         StringTestCase{
             "3rr1k1/p1p2ppp/1qP1pn2/1P2N3/3PP3/3Q1P2/6PP/RR4K1 w - - 3 23",
@@ -51,7 +51,7 @@ const TestSet<StringTestCase> kpinned_piece_test_set{
     }
 };
 
-bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
+bool evaluate_pin_cache_test_case(const StringTestCase *tc) {
 
     std::vector<Square> squares;
     Gamestate gs(tc->fen);
@@ -68,9 +68,17 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
         }
     }
 
+    PinCache wpin_cache;
+    PinCache bpin_cache;
+
     // try adding them
     for (Square s : squares) {
-        gs.add_kpinned_piece(s, DIR_USED);
+
+        PinCache & pin_cache =
+            colour(gs.board.get(s)) == WHITE
+                ? wpin_cache
+                : bpin_cache;
+        pin_cache.add_pin(s, gs.board.get(s), DIR_USED);
 
         // NOTE: using can_move_in_direction here does not account for pawns in the same way as inside
         // Gamestate::is_kpinned_piece. This might cause problems if more test cases are introduced,
@@ -79,12 +87,12 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
         if (can_move_in_direction(gs.board.get(s), DIR_USED)) {
             // piece can move in this direction, so it shouldn't be pinned in the direction we used,
             // but should be pinned in any other direction
-            if (gs.is_kpinned_piece(s, DIR_USED)) {
+            if (pin_cache.is_pinned(s, DIR_USED)) {
                 return false;
-            } else if (!gs.is_kpinned_piece(s, DIR_NOT_USED)) {
+            } else if (!pin_cache.is_pinned(s, DIR_NOT_USED)) {
                 return false;
             }
-        } else if (!gs.is_kpinned_piece(s, INVALID_DELTA)) {
+        } else if (!pin_cache.is_pinned(s, INVALID_DELTA)) {
             // piece can't move in that direction, so pinned should definitely return true
             return false;
         }
@@ -94,8 +102,12 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
 
     // and removing them
     for (Square s : squares) {
-        gs.remove_kpinned_piece(s);
-        if (gs.is_kpinned_piece(s, DIR_USED) || gs.is_kpinned_piece(s, DIR_NOT_USED)) {
+        PinCache & pin_cache =
+            colour(gs.board.get(s)) == WHITE
+                ? wpin_cache
+                : bpin_cache;
+        pin_cache.remove_pin(s);
+        if (pin_cache.is_pinned(s, DIR_USED) || pin_cache.is_pinned(s, DIR_NOT_USED)) {
             return false;
         }
     }
@@ -103,6 +115,6 @@ bool evaluate_test_case_kpinned_list(const StringTestCase *tc) {
     return true;
 }
 
-bool test_kpinned_piece_list() {
-    return evaluate_test_set(&kpinned_piece_test_set, &evaluate_test_case_kpinned_list);
+bool test_pin_cache() {
+    return evaluate_test_set(&pin_cache_test_set, &evaluate_pin_cache_test_case);
 }

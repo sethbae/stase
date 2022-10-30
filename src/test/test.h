@@ -132,7 +132,7 @@ bool test_move_scores();
 bool test_alpha_covers();
 bool test_beta_covers();
 bool test_gamma_covers();
-bool test_kpinned_piece_list();
+bool test_pin_cache();
 bool test_cands_sorting();
 
 // hooks and responders

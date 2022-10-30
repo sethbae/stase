@@ -10,7 +10,7 @@ bool test_game() {
     passed = test_gamma_covers() && passed;
     passed = test_weak_square() && passed;
     passed = test_unsafe_piece() && passed;
-    passed = test_kpinned_piece_list() && passed;
+    passed = test_pin_cache() && passed;
     passed = test_cands_sorting() && passed;
 
     // cands
