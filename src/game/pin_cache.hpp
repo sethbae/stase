@@ -26,10 +26,12 @@ public:
         deltas[size] = delta;
 
         ++size;
-
-        if (size <= CAPACITY - 1) {
-            p_squares[size] = SQUARE_SENTINEL;
+#ifdef SAFE_STACK_VEC
+        if (size >= CAPACITY) {
+            exit_with_failure("adding more pins to the pin_cache than there is space for");
         }
+#endif
+        p_squares[size] = SQUARE_SENTINEL;
     }
 
     inline bool is_pinned(const Square s, const Delta d) const {
@@ -80,6 +82,13 @@ public:
                     deltas[j - 1] = deltas[j];
                 }
                 --size;
+
+#ifdef SAFE_STACK_VEC
+                if (size <= 0) {
+                    exit_with_failure("removing pin from empty pin_cache");
+                }
+#endif
+
                 p_squares[size] = SQUARE_SENTINEL;
                 return;
             }
