@@ -63,9 +63,4 @@ inline void split(std::vector<std::string> & output, const std::string & s, cons
     }
 }
 
-inline void exit_with_failure(const std::string message) {
-    std::cout << "*****Illegal ptr_vec usage: " + message + "*****\n";
-    abort();
-}
-
 #endif //STASE_UTILS_H

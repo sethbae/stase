@@ -2,7 +2,6 @@
 #define STASE_PTR_VEC_H
 
 #include <iostream>
-#include "utils.h"
 
 template <typename T>
 class ptr_vec {
@@ -53,6 +52,12 @@ public:
         }
 #endif
         return ptr[j];
+    }
+
+private:
+    inline void exit_with_failure(const std::string message) {
+        std::cout << "*****Illegal ptr_vec usage: " + message + "*****\n";
+        abort();
     }
 };
 

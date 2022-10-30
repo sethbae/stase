@@ -2,7 +2,6 @@
 #define STASE_PIN_CACHE_HPP
 
 #include "../board/board.hpp"
-#include "../utils/utils.h"
 
 class PinCache {
 
@@ -92,6 +91,12 @@ public:
 
     ptr_vec<Square> all() {
         return ptr_vec(p_squares, size);
+    }
+
+private:
+    inline void exit_with_failure(const std::string message) {
+        std::cout << "*****Illegal pin_cache usage: " + message + "*****\n";
+        abort();
     }
 };
 
