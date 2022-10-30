@@ -2,6 +2,7 @@
 #define STASE_PIN_CACHE_HPP
 
 #include "../board/board.hpp"
+#include "../utils/utils.h"
 
 class PinCache {
 
