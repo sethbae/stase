@@ -27,6 +27,8 @@ public:
     Square * bpieces;
     PinCache wpin_cache;
     PinCache bpin_cache;
+    PinCache wdiscoveries;
+    PinCache bdiscoveries;
 
     ControlCache * control_cache;
     PieceEncounteredCache * pdir_cache;
@@ -137,6 +139,8 @@ public:
         bpieces = o.bpieces; o.bpieces = nullptr;
         wpin_cache = o.wpin_cache;
         bpin_cache = o.bpin_cache;
+        wdiscoveries = o.wdiscoveries;
+        bdiscoveries = o.bdiscoveries;
 
         control_cache = o.control_cache;
         control_cache->gs = this;
@@ -172,6 +176,8 @@ public:
         b_king = o.b_king;
         wpin_cache = o.wpin_cache;
         bpin_cache = o.bpin_cache;
+        wdiscoveries = o.wdiscoveries;
+        bdiscoveries = o.bdiscoveries;
 
         for (int i = 0; i < 16; ++i) {
             wpieces[i] = o.wpieces[i];
@@ -350,6 +356,45 @@ public:
             wpin_cache.remove_pin(s);
         } else {
             bpin_cache.remove_pin(s);
+        }
+    }
+
+    /**
+     * Records that the piece on the given square can move while giving a discovered check.
+     * Add the square of the piece that moves, not the piece that gives check. Add the delta
+     * along which the check would be given.
+     */
+    void add_discovery(const Square s, const Delta delta) {
+        Piece p = board.get(s);
+        if (colour(p) == WHITE) {
+            wdiscoveries.add_pin(s, p, delta);
+        } else {
+            bdiscoveries.add_pin(s, p, delta);
+        }
+    }
+
+    /**
+     * Checks whether the given square contains a piece which can discover check.
+     */
+    bool can_discover_check(const Square s) const {
+        // TODO (ST-118): un-hack this by generifying pin_cache.
+        bool white = colour(board.get(s)) == WHITE;
+        Delta d = get_delta_between(s, white ? w_king : b_king);
+        if (white) {
+            return wdiscoveries.is_pinned(s, d);
+        } else {
+            return bdiscoveries.is_pinned(s, d);
+        }
+    }
+
+    /**
+     * Mark a piece as no longer pinned to its king, so that it is able to move once more.
+     */
+    void remove_discovery(const Square s) {
+        if (colour(board.get(s)) == WHITE) {
+            wdiscoveries.remove_pin(s);
+        } else {
+            bdiscoveries.remove_pin(s);
         }
     }
 
