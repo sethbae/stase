@@ -14,24 +14,20 @@ private:
     Delta deltas[CAPACITY];
 
 public:
-    PinCache() : size(0) {
-        p_squares[0] = SQUARE_SENTINEL;
-    }
+    PinCache() : size(0) {}
 
     inline void add_pin(const Square s, const Piece p, const Delta delta) {
 
-        // add a piece and delta
         p_squares[size] = s;
         pieces[size] = p;
         deltas[size] = delta;
 
         ++size;
 #ifdef SAFE_STACK_VEC
-        if (size >= CAPACITY) {
+        if (size > CAPACITY) {
             exit_with_failure("adding more pins to the pin_cache than there is space for");
         }
 #endif
-        p_squares[size] = SQUARE_SENTINEL;
     }
 
     inline bool is_pinned(const Square s, const Delta d) const {
@@ -88,8 +84,6 @@ public:
                     exit_with_failure("removing pin from empty pin_cache");
                 }
 #endif
-
-                p_squares[size] = SQUARE_SENTINEL;
                 return;
             }
         }
