@@ -12,6 +12,7 @@ set(SOURCE_FILES
 
         src/game/eval.hpp
         src/game/control_cache.hpp
+        src/game/pin_cache.hpp
         src/game/quiet.cpp
 
         src/game/heur/heur.cpp

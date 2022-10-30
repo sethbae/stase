@@ -6,6 +6,7 @@
 #include "cands/cands.h"
 #include "cands/hook.hpp"
 #include "control_cache.hpp"
+#include "pin_cache.hpp"
 
 const int MAX_FRAMES = 20;
 
@@ -24,10 +25,8 @@ public:
     mutable Square b_king;
     Square * wpieces;
     Square * bpieces;
-    Square * w_kpinned_pieces;
-    Delta * w_kpin_dirs;
-    Square * b_kpinned_pieces;
-    Delta * b_kpin_dirs;
+    PinCache wpin_cache;
+    PinCache bpin_cache;
 
     ControlCache * control_cache;
     PieceEncounteredCache * pdir_cache;
@@ -136,10 +135,8 @@ public:
         b_king = o.b_king;
         wpieces = o.wpieces; o.wpieces = nullptr;
         bpieces = o.bpieces; o.bpieces = nullptr;
-        w_kpinned_pieces = o.w_kpinned_pieces; o.w_kpinned_pieces = nullptr;
-        w_kpin_dirs = o.w_kpin_dirs; o.w_kpin_dirs = nullptr;
-        b_kpinned_pieces = o.b_kpinned_pieces;  o.b_kpinned_pieces = nullptr;
-        b_kpin_dirs = o.b_kpin_dirs; o.b_kpin_dirs = nullptr;
+        wpin_cache = o.wpin_cache;
+        bpin_cache = o.bpin_cache;
 
         control_cache = o.control_cache;
         control_cache->gs = this;
@@ -173,6 +170,9 @@ public:
         last_move = o.last_move;
         w_king = o.w_king;
         b_king = o.b_king;
+        wpin_cache = o.wpin_cache;
+        bpin_cache = o.bpin_cache;
+
         for (int i = 0; i < 16; ++i) {
             wpieces[i] = o.wpieces[i];
             if (is_sentinel(wpieces[i])) { break; }
@@ -180,22 +180,6 @@ public:
         for (int i = 0; i < 16; ++i) {
             bpieces[i] = o.bpieces[i];
             if (is_sentinel(bpieces[i])) { break; }
-        }
-        for (int i = 0; i < 16; ++i) {
-            w_kpinned_pieces[i] = o.w_kpinned_pieces[i];
-            if (is_sentinel(w_kpinned_pieces[i])) { break; }
-        }
-        for (int i = 0; i < 16; ++i) {
-            w_kpin_dirs[i] = o.w_kpin_dirs[i];
-            if (!is_valid_delta(w_kpin_dirs[i])) { break; }
-        }
-        for (int i = 0; i < 16; ++i) {
-            b_kpinned_pieces[i] = o.b_kpinned_pieces[i];
-            if (is_sentinel(b_kpinned_pieces[i])) { break; }
-        }
-        for (int i = 0; i < 16; ++i) {
-            b_kpin_dirs[i] = o.b_kpin_dirs[i];
-            if (!is_valid_delta(b_kpin_dirs[i])) { break; }
         }
 
         // copy the caches
@@ -216,10 +200,6 @@ public:
         delete pdir_cache;
         delete[] wpieces;
         delete[] bpieces;
-        delete[] w_kpinned_pieces;
-        delete[] w_kpin_dirs;
-        delete[] b_kpinned_pieces;
-        delete[] b_kpin_dirs;
     }
 
     Gamestate & operator=(const Gamestate &) = default;
@@ -313,27 +293,13 @@ public:
      * Records that the piece on the given square is pinned to its king and is therefore
      * not able to move.
      */
-    void add_kpinned_piece(const Square s, const Delta dir) {
-
-        Square * pieces;
-        Delta * dirs;
-        if (colour(board.get(s)) == WHITE) {
-            pieces = w_kpinned_pieces;
-            dirs = w_kpin_dirs;
+    void add_kpinned_piece(const Square s, const Delta delta) {
+        Piece p = board.get(s);
+        if (colour(p) == WHITE) {
+            wpin_cache.add_pin(s, p, delta);
         } else {
-            pieces = b_kpinned_pieces;
-            dirs = b_kpin_dirs;
+            bpin_cache.add_pin(s, p, delta);
         }
-
-        // find the sentinel
-        for (; !is_sentinel(*pieces); ++pieces, ++dirs)
-            ;
-
-        // add a piece and delta
-        *pieces++ = s;
-        *dirs = dir;
-        *pieces = SQUARE_SENTINEL;
-
     }
 
     /**
@@ -345,35 +311,12 @@ public:
      * If the piece on the square cannot move in the direction passed, true will be
      * returned regardless of the pin direction.
      */
-    bool is_kpinned_piece(const Square s, const Delta d) const {
-
-        Square * pieces;
-        Delta * dirs;
+    bool is_kpinned_piece(const Square s, const Delta delta) const {
         if (colour(board.get(s)) == WHITE) {
-            pieces = w_kpinned_pieces;
-            dirs = w_kpin_dirs;
+            return wpin_cache.is_pinned(s, delta);
         } else {
-            pieces = b_kpinned_pieces;
-            dirs = b_kpin_dirs;
+            return bpin_cache.is_pinned(s, delta);
         }
-
-        for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
-            // check that the square matches
-            if (equal(s, *pieces)) {
-                // check it can move in the direction requested
-                Piece p = board.get(s);
-                MoveType move_type = direction_of_delta(d);
-                if (can_move_in_direction(p, move_type) || (type(p) == PAWN && move_type == DIAG)) {
-                    Delta dir1 = *dirs;
-                    Delta dir2 = {(SignedByte) -dir1.dx, (SignedByte) -dir1.dy };
-                    // and check that it is pinned in that direction or its diametric opposite
-                    return !equal(d, dir1) && !equal(d, dir2);
-                }
-                return true;
-            }
-        }
-        return false;
-
     }
 
     /**
@@ -381,64 +324,32 @@ public:
      * Otherwise, it returns INVALID_DELTA.
      */
     Delta delta_of_kpinned_piece(const Square s) const {
-
-        Square * pieces;
-        Delta * dirs;
         if (colour(board.get(s)) == WHITE) {
-            pieces = w_kpinned_pieces;
-            dirs = w_kpin_dirs;
+            return wpin_cache.delta_of_pin(s);
         } else {
-            pieces = b_kpinned_pieces;
-            dirs = b_kpin_dirs;
+            return bpin_cache.delta_of_pin(s);
         }
-
-        for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
-            // check that the square matches
-            if (equal(s, *pieces)) {
-                return *dirs;
-            }
-        }
-        return INVALID_DELTA;
     }
 
     /**
      * Checks if the piece has been pinned in any direction at all.
      */
     inline bool is_kpinned_piece(const Square s) {
-        return is_valid_delta(delta_of_kpinned_piece(s));
+        if (colour(board.get(s)) == WHITE) {
+            return wpin_cache.is_pinned(s);
+        } else {
+            return bpin_cache.is_pinned(s);
+        }
     }
 
     /**
      * Mark a piece as no longer pinned to its king, so that it is able to move once more.
      */
     void remove_kpinned_piece(const Square s) {
-
-        Square * pieces;
-        Delta * dirs;
         if (colour(board.get(s)) == WHITE) {
-            pieces = w_kpinned_pieces;
-            dirs = w_kpin_dirs;
+            wpin_cache.remove_pin(s);
         } else {
-            pieces = b_kpinned_pieces;
-            dirs = b_kpin_dirs;
-        }
-
-        // iterate up to the piece
-        for ( ; !is_sentinel(*pieces) && !equal(*pieces, s); ++pieces, ++dirs)
-            ;
-
-        if (is_sentinel(*pieces)) {
-            // piece was not found: return
-            return;
-        } else {
-            // piece was found: move the remainder of the list left one
-            pieces++;
-            dirs++;
-            for (; !is_sentinel(*pieces); ++pieces, ++dirs) {
-                *(pieces - 1) = *pieces;
-                *(dirs - 1) = *dirs;
-            }
-            *(pieces - 1) = SQUARE_SENTINEL;
+            bpin_cache.remove_pin(s);
         }
     }
 
@@ -447,22 +358,14 @@ private:
      * Allocates memory for all the fields in a gamestate which need it.
      */
     void alloc() {
+        // initialise the piece lists with sentinels
         wpieces = new Square[16];
         bpieces = new Square[16];
-        w_kpinned_pieces = new Square[16];
-        w_kpin_dirs = new Delta[16];
-        b_kpinned_pieces = new Square[16];
-        b_kpin_dirs = new Delta[16];
-
-        // add sentinels to the pieces lists
         wpieces[0] = SQUARE_SENTINEL;
         bpieces[0] = SQUARE_SENTINEL;
-        w_kpinned_pieces[0] = SQUARE_SENTINEL;
-        w_kpin_dirs[0] = INVALID_DELTA;
-        b_kpinned_pieces[0] = SQUARE_SENTINEL;
-        b_kpin_dirs[0] = INVALID_DELTA;
 
-        control_cache = new ControlCache; control_cache->gs = this;
+        control_cache = new ControlCache;
+        control_cache->gs = this;
         pdir_cache = new PieceEncounteredCache;
 
         // add sentinel to start of every list
