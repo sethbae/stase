@@ -86,7 +86,7 @@ bool discovered_attack_hook(Gamestate & gs, const Square s) {
  * conf1: the x coord of the delta to the enemy king
  * conf2: the y coord of the delta to the enemy king
  */
-bool discovered_check(Gamestate & gs, const Square s) {
+bool discovered_check([[maybe_unused]] Gamestate & gs, [[maybe_unused]] const Square s) {
     // intentional stub
     return true;
 }

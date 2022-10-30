@@ -173,7 +173,7 @@ int pin_or_skewer_piece(const Gamestate & gs, const FeatureFrame * ff, Move * mo
  * conf_1: dx of the pin direction
  * conf_2: dy of the pin direction
  */
-bool identify_king_pinned_pieces_hook(Gamestate & gs, const Square s) {
+bool identify_king_pinned_pieces_hook([[maybe_unused]] Gamestate & gs, [[maybe_unused]] const Square s) {
     // intentional stub
     return true;
 }
