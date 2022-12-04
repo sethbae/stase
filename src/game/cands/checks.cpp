@@ -57,8 +57,8 @@ bool find_knight_checks(Gamestate & gs, const Square s, const Square k_sq) {
 bool find_sliding_checks(Gamestate & gs, const Square s, const Square k_sq) {
 
     // find the squares we can attack the king from
-    Square cover_squares_arr[16];
-    ptr_vec<Square> cover_squares(cover_squares_arr, 16);
+    Square cover_squares_arr[32];
+    ptr_vec<Square> cover_squares(cover_squares_arr, 32);
     find_sliding_cover_squares(gs, cover_squares, s, k_sq);
 
     // add a frame for each
