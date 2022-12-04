@@ -350,7 +350,7 @@ public:
     /**
      * Checks if the piece has been pinned in any direction at all.
      */
-    inline bool is_kpinned_piece(const Square s) {
+    inline bool is_kpinned_piece(const Square s) const {
         if (colour(board.get(s)) == WHITE) {
             return wpin_cache.is_pinned(s);
         } else {
@@ -516,8 +516,6 @@ private:
                 }
             }
         }
-
-        return;
     }
 };
 

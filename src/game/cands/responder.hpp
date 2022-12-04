@@ -22,18 +22,18 @@ extern const Responder promotion_resp;
 extern const Responder play_discovered_resp;
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
-        &defend_centre_resp,
-        &defend_secondary_resp,
-        &capture_resp,
-        &develop_resp,
-        &play_fork_resp,
-        &trade_resp,
-        &retreat_resp,
-        &desperado_resp,
-        &play_check_resp,
-        &pin_skewer_resp,
-        &promotion_resp,
-        &play_discovered_resp
+    &defend_centre_resp,
+    &defend_secondary_resp,
+    &capture_resp,
+    &develop_resp,
+    &play_fork_resp,
+    &trade_resp,
+    &retreat_resp,
+    &desperado_resp,
+    &play_check_resp,
+    &pin_skewer_resp,
+    &promotion_resp,
+    &play_discovered_resp
 };
 
 #endif //STASE_RESPONDER_HPP
