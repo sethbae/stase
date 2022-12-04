@@ -106,13 +106,15 @@ void squares_piece_can_reach_on_line(
 
     if (equal(line_start_point, line_end_point)) { return; }
 
+    Colour p_colour = colour(b.get(piece_sq));
     Delta delta = get_delta_between(line_start_point, line_end_point);
     int x = get_x(line_start_point) + delta.dx, y = get_y(line_start_point) + delta.dy;
 
     Square temp;
 
     while (val(temp = mksq(x, y))) {
-        if (alpha_covers(b, piece_sq, temp)) {
+        // check beta covers so that captures are included, but don't consider captures of your own colour
+        if (beta_covers(b, piece_sq, temp) && colour(b.get(temp)) != p_colour) {
             squares.push(mksq(x, y));
         }
         if (equal(temp, line_end_point)) {
@@ -121,8 +123,6 @@ void squares_piece_can_reach_on_line(
         x += delta.dx;
         y += delta.dy;
     }
-
-    return;
 }
 
 /**

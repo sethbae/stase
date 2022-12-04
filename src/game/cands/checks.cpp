@@ -115,8 +115,8 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
         case BISHOP:
         case ROOK:
         case QUEEN: return find_sliding_checks(gs, s, k_sq);
+        default: return true;
     }
-    return true;
 }
 
 int play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
