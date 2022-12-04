@@ -47,7 +47,7 @@ public:
 
     inline T & operator[] (short unsigned j) {
 #ifdef SAFE_STACK_VEC
-        if (j < 0 || j >= n) {
+        if (j >= n) {
             exit_with_failure("assigning " + std::to_string(j) + " at " + std::to_string(i) + "/" + std::to_string(n));
         }
 #endif
