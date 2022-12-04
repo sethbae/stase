@@ -62,28 +62,6 @@ TestSet<StringTestCase> check_hook_test_cases = {
     }
 };
 
-const TestSet<HookTestCase> discovered_check_tests{
-    "game-cands-discovered-check-hook",
-    {
-        HookTestCase{
-            "r1bq1rk1/ppp1n1bp/3p1np1/4p3/2P5/1BN2N2/PP3PP1/R1BQ1RK1 w - - 1 9",
-            {
-                ExpectedFeatureFrame{"c4", "sentinel", 0, 1},
-                ExpectedFeatureFrame{"d1", "d5", 0, 0}
-            }
-        },
-        HookTestCase{
-            "3r4/pppk2pp/8/8/8/8/PPP3PP/3K4 w - - 0 1",
-            {
-                ExpectedFeatureFrame{"d7", "sentinel", 0, 1}
-            }
-        }
-    }
-};
-
-bool evaluate_discovered_test_case(const HookTestCase * tc) {
-    return evaluate_hook_test_case(check_hook, tc);
-}
 
 bool evaluate_test_case_check_hook(const StringTestCase *tc) {
 
@@ -102,8 +80,4 @@ bool evaluate_test_case_check_hook(const StringTestCase *tc) {
 
 bool test_check_hook() {
     return evaluate_test_set(&check_hook_test_cases, &evaluate_test_case_check_hook);
-}
-
-bool test_discovered_check_hook() {
-    return evaluate_test_set(&discovered_check_tests, &evaluate_discovered_test_case);
 }

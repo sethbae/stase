@@ -8,8 +8,8 @@ bool find_pawn_checks(Gamestate & gs, const Square s, const Square k_sq) {
     Square left_of_king = mksq(k_sq.x - 1, k_sq.y - FORWARDS);
     Square right_of_king = mksq(k_sq.x + 1, k_sq.y - FORWARDS);
 
-    Move moves_arr[8];
-    ptr_vec<Move> moves(moves_arr, 8);
+    Move moves_arr[16];
+    ptr_vec<Move> moves(moves_arr, 16);
     piecemoves_ignore_check(gs.board, s, moves);
 
     for (int i = 0; i < moves.size(); ++i) {
@@ -57,8 +57,8 @@ bool find_knight_checks(Gamestate & gs, const Square s, const Square k_sq) {
 bool find_sliding_checks(Gamestate & gs, const Square s, const Square k_sq) {
 
     // find the squares we can attack the king from
-    Square cover_squares_arr[8];
-    ptr_vec<Square> cover_squares(cover_squares_arr, 8);
+    Square cover_squares_arr[16];
+    ptr_vec<Square> cover_squares(cover_squares_arr, 16);
     find_sliding_cover_squares(gs, cover_squares, s, k_sq);
 
     // add a frame for each
@@ -79,22 +79,14 @@ bool find_sliding_checks(Gamestate & gs, const Square s, const Square k_sq) {
     return true;
 }
 
-bool find_discovered_checks(Gamestate & gs, const Square s) {
-    if (gs.can_discover_check(s)) {
-        return gs.add_frame(check_hook.id, FeatureFrame{s, SQUARE_SENTINEL, 0, 1});
-    }
-    return true;
-}
-
 /**
  * Finds checks in the given gamestate. Adds feature frames to the given vector to record the ones it does find.
- * Finds checks playable by either colour, regardless of whose turn it is. For discovered checks, no destination
- * is chosen: the secondary square is a sentinel and conf2 is used as a boolean to further indicate this.
+ * Finds checks playable by either colour, regardless of whose turn it is.
  * The format of the FeatureFrames is this:
  * -centre: the current square of a piece which can play a check
- * -secondary: the square on which it can play a check, or SQUARE_SENTINEL if it's a discovery
+ * -secondary: the square on which it can play a check
  * -conf1: unused
- * -conf2: 1 if the check is discovered, 0 otherwise
+ * -conf2: unused
  */
 bool find_checks_hook(Gamestate & gs, const Square s) {
 
@@ -104,10 +96,8 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
             ? gs.b_king
             : gs.w_king;
 
-    bool result = find_discovered_checks(gs, s);
-    if (!result) {
-        return false;
-    }
+    // TODO (ST-119): use Gamestate::can_discover_check to write frames for discovered checks. Currently
+    //  this is handled in the discovered hook, but it would be better to do it here.
 
     switch (type(p)) {
         case PAWN: return find_pawn_checks(gs, s, k_sq);
@@ -121,9 +111,9 @@ bool find_checks_hook(Gamestate & gs, const Square s) {
 
 int play_check(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
 
-    if (ff->conf_2) {
-        // discovered check: delegate to different responder
-        return play_discovered_resp.resp(gs, ff, moves, idx, end);
+    if (ff->conf_1) {
+        // TODO (ST-119): this condition ignores frames corresponding to discovered checks. Refactor this.
+        return true;
     }
 
     if (idx < end && !gs.is_kpinned_piece(ff->centre, get_delta_between(ff->centre, ff->secondary))) {
