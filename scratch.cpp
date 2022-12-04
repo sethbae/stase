@@ -573,9 +573,10 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGTERM, print_stack_trace_and_abort);
 
-    const std::string fen = "r1bqkb1r/pp3ppp/2n1pn2/2p1Q3/8/3P1N2/PPP2PPP/RNB1KB1R w KQkq - 2 7";
+//    const std::string fen = "r1b1k1nr/ppp2ppp/2nb4/8/4q3/2P2N2/PP2BPPP/RNBQR1K1 b kq - 1 9";
+    const std::string fen = "r1bq1rk1/ppp1n1bp/3p1np1/4p3/2P5/1BN2N2/PP3PP1/R1BQ1RK1 w - - 1 9";
 
-    const GamePhase game_phase = ENDGAME;
+    const GamePhase game_phase = OPENING;
 
     Gamestate gs(fen, game_phase);
     pr_board(gs.board);
@@ -607,7 +608,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 //            .with_obs(observer)
             .build();
 
-    engine.blocking_run();
+//    engine.blocking_run();
 //    observer.write();
 
 //    std::cout << engine.get_nodes_explored() << "\n";
@@ -620,8 +621,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 //    o.write();
 
 
-//    discover_feature_frames(gs, king_pinned_pieces_hook);
-//    show_hook_frames(gs, fork_hook);
+    discover_feature_frames(gs, king_pinned_pieces_hook);
+    show_hook_frames(gs, check_hook);
+//
+//    Square cover_squares_arr[8];
+//    ptr_vec<Square> cover_squares(cover_squares_arr, 8);
+//    find_sliding_cover_squares(gs, cover_squares, stosq("e6"), stosq("e1"));
+//
+//    for (int i = 0; i < cover_squares.size(); ++i) {
+//        cout << "found: " << sqtos(cover_squares[i]) << "\n";
+//    }
 
 //    evaluate_square_control(gs, stosq("d5")).print();
 
