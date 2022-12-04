@@ -1,3 +1,4 @@
+import time
 from src.lichess.engine_client import EngineClient
 from src.lichess.client import (
     stream_game_events,
@@ -12,21 +13,23 @@ from src.lichess.info import (
 THINK_TIME_PROPORTION: float = 0.05
 
 
-def post_update(token: str, game_id: str, engine: EngineClient) -> None:
+def post_update(token: str, game_id: str, evaluation: str, time_elapsed: float, nodes_visited: int) -> None:
     """
     Posts an update to the lichess chat with the engine's speed + evaluation.
     """
-    if engine.get_time_elapsed() != 0:
-        speed = str(int(engine.get_node_count() / engine.get_time_elapsed()))
+    if time_elapsed != 0:
+        speed = str(int(nodes_visited / time_elapsed))
     else:
         speed = "???"
     post_to_chat(token, game_id,
-                 f" {engine.get_eval_str()} ({round(engine.get_time_elapsed(), 1)}s @ {speed}n/s)")
+                 f" {evaluation} ({round(time_elapsed, 2)}s @ {speed}n/s)")
 
 
 def play_game(token: str, game_id: str, chat_updates=True):
     def play_a_move(think_time) -> bool:
+        start = time.time()
         move: str = engine.get_computer_move(think_time)
+        elapsed = time.time() - start
         if move == "ERROR":
             print("Encountered engine error")
             return False
@@ -35,7 +38,7 @@ def play_game(token: str, game_id: str, chat_updates=True):
             return True
         else:
             if chat_updates:
-                post_update(token, game_id, engine)
+                post_update(token, game_id, engine.get_eval_str(), elapsed, engine.get_node_count())
             return make_move(token, game_id, move)
 
     post_to_chat(token, game_id, "Hello there! I'll post regular updates. If you want me to stop, say \"mute\"!")

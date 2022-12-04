@@ -43,7 +43,7 @@ private:
 
 public:
     Engine(
-            const std::string fen,
+            const std::string & fen,
             Observer & o,
             int node_limit,
             int cycle_limit,
@@ -118,7 +118,7 @@ private:
     const std::vector<Gamestate> * game_history;
 
     EngineBuilder(
-            std::string fen,
+            std::string & fen,
             Observer & obs,
             int node_limit,
             int cycle_limit,

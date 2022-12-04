@@ -8,14 +8,13 @@ private:
     Gamestate gs;
     int nodes;
     std::string eval_str;
-    double time_elapsed;
     std::vector<Gamestate> game_history;
 
 public:
-    EngineClient() : gs(starting_pos()) {
+    EngineClient() : gs(starting_pos()), nodes(0) {
         game_history.push_back(gs);
     }
-    EngineClient(const char * fen) : gs(std::string(fen)) {
+    explicit EngineClient(const char * fen) : gs(std::string(fen)), nodes(0) {
         game_history.push_back(gs);
     }
 
@@ -36,7 +35,6 @@ public:
         gs = Gamestate(gs, uci2move(*uci));
         nodes = engine.get_nodes_explored();
         eval_str = etos(engine.get_score());
-        time_elapsed = engine.get_actual_seconds();
         game_history.push_back(gs);
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] exiting get_computer_move\n";
@@ -63,10 +61,6 @@ public:
         return nodes;
     }
 
-    double get_time_elapsed() const {
-        return time_elapsed;
-    }
-
     const char * get_eval_str() {
         return eval_str.c_str();
     }
@@ -90,8 +84,5 @@ extern "C" {
     }
     const char * get_eval_str(EngineClient * client) {
         return client->get_eval_str();
-    }
-    double get_time_elapsed(EngineClient * client) {
-        return client->get_time_elapsed();
     }
 }

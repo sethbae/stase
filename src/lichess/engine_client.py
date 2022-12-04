@@ -1,14 +1,9 @@
 import ctypes
 
-_ec_lib = None
-
-
-def setup_binding() -> None:
-    global _ec_lib
-    _ec_lib = ctypes.CDLL("./libengine_client.so")
-    _ec_lib.get_computer_move.restype = ctypes.c_char_p
-    _ec_lib.get_eval_str.restype = ctypes.c_char_p
-    _ec_lib.get_time_elapsed.restype = ctypes.c_double
+# load the shared library (once, on import)
+_ec_lib = ctypes.CDLL("../../libengine_client.so")
+_ec_lib.get_computer_move.restype = ctypes.c_char_p
+_ec_lib.get_eval_str.restype = ctypes.c_char_p
 
 
 class EngineClient:
@@ -18,8 +13,6 @@ class EngineClient:
     to a move made by an opponent.
     """
     def __init__(self, fen: str = ""):
-        if not _ec_lib:
-            setup_binding()
         if fen:
             self._engine_client = _ec_lib.get_client(ctypes.c_char_p(bytes(fen)))
         else:
@@ -48,9 +41,3 @@ class EngineClient:
         Fetches the computer evaluation for the most recent move.
         """
         return _ec_lib.get_eval_str(self._engine_client).decode("utf-8")
-
-    def get_time_elapsed(self) -> float:
-        """
-        Fetches the actual seconds elapsed, since the engine could have exited early.
-        """
-        return _ec_lib.get_time_elapsed(self._engine_client)
