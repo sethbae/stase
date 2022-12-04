@@ -29,6 +29,7 @@ bool test_game() {
     passed = test_retreat_piece() && passed;
     passed = test_desperado_piece() && passed;
     passed = test_check_hook() && passed;
+    passed = test_discovered_check_hook() && passed;
     passed = test_pin_skewer_hook() && passed;
     passed = test_king_pinned_pieces_hook() && passed;
     passed = test_promotion_hook() && passed;

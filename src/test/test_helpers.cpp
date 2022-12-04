@@ -83,8 +83,10 @@ bool assert_string_lists_equal(const std::vector<std::string> & a, const std::ve
  * Compares an ExpectedFeatureFrame to an actual one, unpacking strings and checking the squares match.
  */
 bool expected_frame_matches_actual(const ExpectedFeatureFrame & expected, const FeatureFrame & actual) {
-    return equal(stosq(expected.centre), actual.centre)
-           && equal(stosq(expected.secondary), actual.secondary)
+    Square expected_centre = expected.centre == "sentinel" ? SQUARE_SENTINEL : stosq(expected.centre);
+    Square expected_secondary = expected.secondary == "sentinel" ? SQUARE_SENTINEL : stosq(expected.secondary);
+    return equal(expected_centre, actual.centre)
+           && equal(expected_secondary, actual.secondary)
            && expected.conf_1 == actual.conf_1
            && expected.conf_2 == actual.conf_2;
 }
