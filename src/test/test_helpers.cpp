@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cstdlib>
 #include "test.h"
 #include "../game/gamestate.hpp"
 
@@ -62,9 +63,9 @@ bool assert_string_lists_equal(const std::vector<std::string> & a, const std::ve
 
     if (a.size() != b.size()) { return false; }
 
-    for (const std::string stra : a) {
+    for (const std::string & stra : a) {
         bool present = false;
-        for (const std::string strb : b) {
+        for (const std::string & strb : b) {
             if (std::strcmp(stra.c_str(), strb.c_str()) == 0) {
                 present = true;
                 break;
@@ -89,26 +90,6 @@ bool expected_frame_matches_actual(const ExpectedFeatureFrame & expected, const 
            && equal(expected_secondary, actual.secondary)
            && expected.conf_1 == actual.conf_1
            && expected.conf_2 == actual.conf_2;
-}
-
-/**
- * Returns a random but valid piece of either colour, not EMPTY or INVALID.
- */
-Piece random_piece() {
-    if (rand() % 2) {
-        return (Piece) (B_KING + (rand() % 7));
-    }
-    return (Piece) (W_KING + (rand() % 7));
-}
-
-/**
- * Returns a random piece of the given colour, not EMPTY or INVALID.
- */
-Piece random_piece(Colour c) {
-    if (c == BLACK) {
-        return (Piece) (B_KING + (rand() % 7));
-    }
-    return (Piece) (W_KING + (rand() % 7));
 }
 
 /**
