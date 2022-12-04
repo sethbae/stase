@@ -11,7 +11,19 @@ void find_rook_cover(
         const Gamestate & gs, ptr_vec<Square> & squares, const Square p_sq, const Square c_sq) {
 
     if (p_sq.x == c_sq.x || p_sq.y == c_sq.y) {
-        // piece already defends
+
+        Piece rook = gs.board.get(p_sq);
+
+        // rook is already on the right line: check if a capture is required
+        Square covered = gs.first_piece_encountered(p_sq, get_delta_between(p_sq, c_sq));
+        if (!is_sentinel(covered) && !equal(covered, c_sq) && can_see_immediately(gs, rook, covered, c_sq)) {
+
+            // check that the piece is of the opposite colour
+            Piece captured = gs.board.get(covered);
+            if (colour(captured) != colour(rook)) {
+                squares.push(covered);
+            }
+        }
         return;
     }
 
@@ -26,7 +38,6 @@ void find_rook_cover(
             && can_see_x_ray(gs, gs.board.get(p_sq), top_right, c_sq)) {
         squares.push(top_right);
     }
-    return;
 }
 
 /**
