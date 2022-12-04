@@ -41,11 +41,11 @@ def rebuild_stase(pr: bool = True) -> None:
     """
     Pulls the latest version from master and builds the C++ executable.
     """
-    if pr: print("Pulling changes...", end="")
+    if pr: print("Pulling changes...", end="", flush=True)
     subprocess.Popen("git pull".split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
     if pr: print("done")
 
-    if pr: print("Building engine...", end="")
+    if pr: print("Building engine...", end="", flush=True)
     subprocess.Popen("cmake .".split(), stdout=subprocess.DEVNULL).wait()
     subprocess.Popen("make engine_client".split(), stdout=subprocess.DEVNULL).wait()
     if pr: print("done")
