@@ -59,11 +59,11 @@ public:
 #endif
     }
 
-    int get_node_count() {
+    int get_node_count() const {
         return nodes;
     }
 
-    double get_time_elapsed() {
+    double get_time_elapsed() const {
         return time_elapsed;
     }
 

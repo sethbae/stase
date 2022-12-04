@@ -85,9 +85,9 @@ public:
     std::string get_fen() const { return fen; }
     SearchNode * get_root() const { return root; }
     Move get_best_move() { return best_move; }
-    int get_nodes_explored() { return nodes; }
-    Eval get_score() { return score; }
-    double get_actual_seconds() { return actual_seconds; }
+    int get_nodes_explored() const { return nodes; }
+    Eval get_score() const { return score; }
+    double get_actual_seconds() const { return actual_seconds; }
     const std::vector<Gamestate> * get_game_history() { return game_history; }
 
     void run();
