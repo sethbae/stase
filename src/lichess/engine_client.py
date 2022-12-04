@@ -1,7 +1,7 @@
 import ctypes
 
 # load the shared library (once, on import)
-_ec_lib = ctypes.CDLL("../../libengine_client.so")
+_ec_lib = ctypes.CDLL("./libengine_client.so")
 _ec_lib.get_computer_move.restype = ctypes.c_char_p
 _ec_lib.get_eval_str.restype = ctypes.c_char_p
 
