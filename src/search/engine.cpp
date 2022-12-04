@@ -21,7 +21,7 @@ void * Engine::start(void * args) {
     auto start = std::chrono::high_resolution_clock::now();
     greedy_search(search_args->root, search_args->cycles, search_args->game_history, *search_args->o);
     auto stop = std::chrono::high_resolution_clock::now();
-    double secs = duration_cast<std::chrono::microseconds>(stop - start).count() / 1000000;
+    double secs = duration_cast<std::chrono::microseconds>(stop - start).count() / 1000000.0;
 
     *search_args->nodes_out = subtree_size(search_args->root);
     *search_args->move_out = current_best_move(search_args->root);
