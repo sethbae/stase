@@ -428,7 +428,7 @@ private:
     /**
      * Allocates memory for all the fields in a gamestate which need it.
      */
-    void alloc() {
+    inline void alloc() {
         // initialise the piece lists with sentinels
         wpieces = new Square[16];
         bpieces = new Square[16];

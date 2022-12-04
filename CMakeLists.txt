@@ -10,6 +10,7 @@ set(SOURCE_FILES
         src/board/helper.cpp
         src/board/move.cpp
 
+        src/game/gamestate.hpp
         src/game/eval.hpp
         src/game/control_cache.hpp
         src/game/pin_cache.hpp
