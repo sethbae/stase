@@ -53,6 +53,10 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
         return cand_set;
     }
 
+    cand_set->critical.reserve(16);
+    cand_set->medial.reserve(8);
+    cand_set->final.reserve(8);
+
     Move all_moves[MAX_TOTAL_CANDS];
     int m = 0;
 

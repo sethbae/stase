@@ -659,6 +659,7 @@ void legal_moves(const Board & b, vector<Move> & moves) {
 
 vector<Move> legal_moves(const Board & b) {
     vector<Move> moves;
+    moves.reserve(32);
     legal_moves(b, moves);
     return moves;
 }
