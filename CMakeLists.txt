@@ -176,7 +176,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 SET(CMAKE_CXX_FLAGS "-pthread -rdynamic ${CMAKE_CXX_FLAGS}")
 
 if(DEBUG)
-    SET(CMAKE_CXX_FLAGS "-Ofast -DSAFE_STACK_VEC -DPYBIND_DEBUG_LOG -DENGINE_STACK_TRACE -g -Wall -Wextra -Wno-sign-compare -fsanitize=address -fsanitize=undefined ${CMAKE_CXX_FLAGS}")
+    SET(CMAKE_CXX_FLAGS "-Ofast -DSAFE_STACK_VEC -DPYBIND_DEBUG_LOG -DENGINE_STACK_TRACE -g -Wall -Wextra -Wno-sign-compare -Werror -fsanitize=address -fsanitize=undefined ${CMAKE_CXX_FLAGS}")
 else()
     SET(CMAKE_CXX_FLAGS "-Ofast -fno-exceptions -DENGINE_STACK_TRACE ${CMAKE_CXX_FLAGS}")
 endif()
