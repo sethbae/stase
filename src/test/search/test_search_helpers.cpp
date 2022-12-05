@@ -5,7 +5,7 @@ bool entire_line_present(SearchNode * root, std::vector<std::string> & move_strs
 
     SearchNode * current = root;
 
-    for (const std::string move_str : move_strs) {
+    for (const std::string & move_str : move_strs) {
 
         bool present = false;
         SearchNode * next;
