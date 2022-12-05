@@ -76,7 +76,7 @@ struct ControlCache {
     }
 
 private:
-    constexpr unsigned index(const Square s) {
+    static constexpr unsigned index(const Square s) {
         return s.x + (8 * s.y);
     }
 
