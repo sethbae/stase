@@ -221,12 +221,6 @@ public:
     Gamestate & operator=(const Gamestate &) = default;
     Gamestate & operator=(Gamestate &&) = default;
 
-    inline Square * friendly_pieces() const {
-        return board.get_white() ? wpieces : bpieces;
-    }
-    inline Square * enemy_pieces() const {
-        return board.get_white() ? bpieces : wpieces;
-    }
     inline Piece sneak(const Move m) const {
         Piece sneaked = board.sneak(m);
         Piece p = board.get(m.to);
