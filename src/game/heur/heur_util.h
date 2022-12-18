@@ -6,6 +6,8 @@
 /**
  * Useful collections of squares
  */
+extern const Square CENTRAL_SQUARES[];
+extern const unsigned NUM_CENTRAL_SQUARES;
 extern const Square INNER_CENTRAL_SQUARES[];
 extern const unsigned NUM_INNER_CENTRAL_SQUARES;
 extern const Square OUTER_CENTRAL_SQUARES[];
