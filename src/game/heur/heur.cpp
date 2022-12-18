@@ -41,12 +41,13 @@ int material_balance(const Gamestate & gs) {
         for (int y = 0; y < 8; ++y) {
             Piece p = gs.board.get(mksq(x, y));
             
-            if (colour(p) == WHITE)
+            if (colour(p) == WHITE) {
                 count += piece_value_millis(p);
-            else if (colour(p) == BLACK)
+            } else if (colour(p) == BLACK) {
                 count -= piece_value_millis(p);
-            // colour can be INVALID
-        
+            } else {
+                // colour can be INVALID
+            }
         }
     }
     
@@ -58,11 +59,13 @@ Eval heur(const Gamestate & gs) {
     
     Eval ev = zero();
     
-    for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
-        int score = (int)(ALL_METRICS[i]->metric(gs) * (float)ALL_METRICS[i]->weights[gs.phase]);
-        ev += score;
+    for (const Metric * metric : ALL_METRICS) {
+        float weight = (float) metric->weights[gs.phase];
+        if (weight != 0) {
+            ev += (int) (metric->metric(gs) * weight);
+        }
     }
-    
+
     return ev + material_balance(gs);
 }
 
@@ -81,17 +84,17 @@ Eval heur_with_description(const Gamestate & gs) {
     cout << setw(20) << "Material balance" << ": " << std::right << setw(26) << mat_bal << "\n";
 
     Eval ev = zero();
-    for (unsigned i = 0; i < ALL_METRICS.size(); ++i) {
-        float score = ALL_METRICS[i]->metric(gs);
-        int weighted_score = (int)(score * (float)ALL_METRICS[i]->weights[gs.phase]);
+    for (const Metric * metric : ALL_METRICS) {
+        float score = metric->metric(gs);
+        int weighted_score = (int)(score * (float)metric->weights[gs.phase]);
         ev += weighted_score;
         
-        cout << std::left << setw(20) << ALL_METRICS[i]->name << ": "
-                << std::right << setw(8) << score 
-                << " * " 
-                << setw(6) << ALL_METRICS[i]->weights[gs.phase]
-                << " = " 
-                << setw(6) << weighted_score
+        cout << std::left << setw(20) << metric->name << ": "
+             << std::right << setw(8) << score
+             << " * "
+             << setw(6) << metric->weights[gs.phase]
+             << " = "
+             << setw(6) << weighted_score
                 << "\n";
     }
     
