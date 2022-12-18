@@ -573,8 +573,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGTERM, print_stack_trace_and_abort);
 
-//    const std::string fen = "r1b1k1nr/ppp2ppp/2nb4/8/4q3/2P2N2/PP2BPPP/RNBQR1K1 b kq - 1 9";
-    const std::string fen = "r1bq1rk1/ppp1n1bp/3p1np1/4p3/2P5/1BN2N2/PP3PP1/R1BQ1RK1 w - - 1 9";
+    const std::string fen = "r1b1k1nr/ppp2ppp/2nb4/8/4q3/2P2N2/PP2BPPP/RNBQR1K1 b kq - 1 9";
 
     const GamePhase game_phase = OPENING;
 
@@ -597,18 +596,19 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    q_scores();
 
-    repl(fen, game_phase);
+//    repl(fen, game_phase);
 
     XMLObserver observer("debug_pos");
     Engine engine =
         EngineBuilder::for_position(fen)
             .with_game_phase(game_phase)
+//            .with_timeout(5)
             .with_node_limit(25000)
             .with_cleanup(false)
 //            .with_obs(observer)
             .build();
 
-//    engine.blocking_run();
+    engine.blocking_run();
 //    observer.write();
 
 //    std::cout << engine.get_nodes_explored() << "\n";
@@ -621,8 +621,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 //    o.write();
 
 
-    discover_feature_frames(gs, king_pinned_pieces_hook);
-    show_hook_frames(gs, check_hook);
+//    discover_feature_frames(gs, king_pinned_pieces_hook);
+//    show_hook_frames(gs, check_hook);
 //
 //    Square cover_squares_arr[8];
 //    ptr_vec<Square> cover_squares(cover_squares_arr, 8);
