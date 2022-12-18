@@ -66,9 +66,9 @@ void manual_gameplay() {
 
 }
 
-void play_game(bool engine_is_white, int seconds_per_move) {
+void play_game(const std::string & starting_fen, bool engine_is_white, int seconds_per_move) {
 
-    Board b = starting_pos();
+    Board b = fen_to_board(starting_fen);
     bool players_turn = !engine_is_white;
     bool keep_playing = true;
 
@@ -158,18 +158,22 @@ int main(int argc, char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
 
     int t = 10;
+    std::string fen = starting_fen();
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-t") == 0) {
             const std::string time(argv[++i]);
             t = stoi(time);
+        } else if (strcmp(argv[i], "-f") == 0) {
+            const std::string quoted_fen = std::string(argv[++i]);
+            fen = quoted_fen.substr(1, quoted_fen.size() - 1);
         } else {
             cout << "Unrecognised argument: " + std::string(argv[i]) + "\n";
         }
     }
 
     cout << welcome_message;
-    play_game(false, t);
+    play_game(fen, false, t);
 
     pthread_exit(nullptr);
 
