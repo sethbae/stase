@@ -7,6 +7,7 @@
 #include "cands/hook.hpp"
 #include "control_cache.hpp"
 #include "pin_cache.hpp"
+#include "king_net.hpp"
 
 const int MAX_FRAMES = 20;
 
@@ -22,7 +23,9 @@ public:
 
     Move last_move;
     mutable Square w_king;
+    KingNet * w_king_net;
     mutable Square b_king;
+    KingNet * b_king_net;
     Square * wpieces;
     Square * bpieces;
     PinCache wpin_cache;
@@ -41,7 +44,9 @@ public:
               in_check(false),
               phase(OPENING),
               w_king(SQUARE_SENTINEL),
-              b_king(SQUARE_SENTINEL)
+              w_king_net(nullptr),
+              b_king(SQUARE_SENTINEL),
+              b_king_net(nullptr)
     {
         alloc();
     }
@@ -59,6 +64,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const Gamestate & o, const Move m)
@@ -101,6 +108,9 @@ public:
         // re-find pins and discoveries
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const std::string & fen)
@@ -116,6 +126,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const std::string & fen, GamePhase phase)
@@ -131,6 +143,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(Gamestate && o)
@@ -144,7 +158,9 @@ public:
 
         last_move = o.last_move;
         w_king = o.w_king;
+        w_king_net = o.w_king_net;
         b_king = o.b_king;
+        b_king_net = o.b_king_net;
         wpieces = o.wpieces; o.wpieces = nullptr;
         bpieces = o.bpieces; o.bpieces = nullptr;
         wpin_cache = o.wpin_cache;
@@ -183,7 +199,9 @@ public:
 
         last_move = o.last_move;
         w_king = o.w_king;
+        w_king_net = o.w_king_net;
         b_king = o.b_king;
+        b_king_net = o.b_king_net;
         wpin_cache = o.wpin_cache;
         bpin_cache = o.bpin_cache;
         wdiscoveries = o.wdiscoveries;
@@ -214,6 +232,8 @@ public:
     ~Gamestate() {
         delete control_cache;
         delete pdir_cache;
+        delete w_king_net;
+        delete b_king_net;
         delete[] wpieces;
         delete[] bpieces;
     }

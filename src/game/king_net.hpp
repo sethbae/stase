@@ -2,7 +2,8 @@
 #define STASE_KING_NET_HPP
 
 #include "../board/board.hpp"
-#include "gamestate.hpp"
+#include "../../include/stase/game.h"
+#include "glogic/glogic.h"
 
 class KingNet {
 
@@ -13,16 +14,16 @@ private:
     Byte n;
 
 public:
-    explicit KingNet(const Gamestate & gs, const Square k_sq) :
+    explicit KingNet(const Gamestate & gs, const Board & b, const Square k_sq) :
             k_sq(k_sq), n(0) {
 
-        Colour c = colour(gs.board.get(k_sq));
+        Colour c = colour(b.get(k_sq));
 
         for (int i = 0; i < 8; ++i) {
             int x = k_sq.x + XD[i], y = k_sq.y + YD[i];
             if (val(x, y)) {
                 neighbours[i] = mksq(x, y);
-                if (is_safe(gs, mksq(x, y), c)) {
+                if (is_safe(gs, b, mksq(x, y), c)) {
                     safe[i] = true;
                     ++n;
                 } else {
@@ -39,9 +40,9 @@ private:
     /**
      * @return true if a king of the given colour could use the given square to avoid check.
      */
-    static inline bool is_safe(const Gamestate &gs, const Square s, const Colour c) {
+    static inline bool is_safe(const Gamestate & gs, const Board & b, const Square s, const Colour c) {
 
-        Piece p = gs.board.get(s);
+        Piece p = b.get(s);
 
         if (colour(p) == c) {
             return false;
