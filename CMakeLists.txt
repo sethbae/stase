@@ -73,6 +73,7 @@ set(SOURCE_FILES
         src/game/glogic/pawn.cpp
         src/game/glogic/control.cpp
         src/game/glogic/square_control.cpp
+        src/game/king_net.hpp
 
         src/utils/utils.h
         src/utils/print.cpp
