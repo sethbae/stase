@@ -25,6 +25,7 @@ set(SOURCE_FILES
         src/game/heur/development.cpp
         src/game/heur/king.cpp
         src/game/heur/endgame.cpp
+        src/game/heur/mating_net.cpp
 
         src/puzzle/puzzle.cpp
         src/puzzle/read_formats.cpp
