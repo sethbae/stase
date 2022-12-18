@@ -12,15 +12,6 @@ using std::string;
 #include "heur.h"
 #include "heur_util.h"
 
-// the central 16 squares
-const Square CENTRAL_SQUARES[] = {
-    stosq("c6"), stosq("d6"), stosq("e6"), stosq("f6"),
-    stosq("c5"), stosq("d5"), stosq("e5"), stosq("f5"),
-    stosq("c4"), stosq("d4"), stosq("e4"), stosq("f4"),
-    stosq("c3"), stosq("d3"), stosq("e3"), stosq("f3")
-};
-const unsigned NUM_CENTRAL_SQUARES = 16;
-
 // the central four squares
 const Square INNER_CENTRAL_SQUARES[] = {
 
