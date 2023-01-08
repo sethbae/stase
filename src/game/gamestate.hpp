@@ -37,20 +37,6 @@ public:
     PieceEncounteredCache * pdir_cache;
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
 
-    explicit Gamestate()
-            : game_over(false),
-              w_cas(false),
-              b_cas(false),
-              in_check(false),
-              phase(OPENING),
-              w_king(SQUARE_SENTINEL),
-              w_king_net(nullptr),
-              b_king(SQUARE_SENTINEL),
-              b_king_net(nullptr)
-    {
-        alloc();
-    }
-
     explicit Gamestate(const Board & b)
             : board(b),
               game_over(false),
@@ -159,8 +145,10 @@ public:
         last_move = o.last_move;
         w_king = o.w_king;
         w_king_net = o.w_king_net;
+        o.w_king_net = nullptr;
         b_king = o.b_king;
         b_king_net = o.b_king_net;
+        o.b_king_net = nullptr;
         wpieces = o.wpieces; o.wpieces = nullptr;
         bpieces = o.bpieces; o.bpieces = nullptr;
         wpin_cache = o.wpin_cache;
@@ -199,9 +187,7 @@ public:
 
         last_move = o.last_move;
         w_king = o.w_king;
-        w_king_net = o.w_king_net;
         b_king = o.b_king;
-        b_king_net = o.b_king_net;
         wpin_cache = o.wpin_cache;
         bpin_cache = o.bpin_cache;
         wdiscoveries = o.wdiscoveries;
@@ -219,6 +205,9 @@ public:
         // copy the caches
         control_cache->copy(*o.control_cache);
         copy_cache(o.pdir_cache, pdir_cache);
+
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
 
         // copy contents of feature frames across
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
