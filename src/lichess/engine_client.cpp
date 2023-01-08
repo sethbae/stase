@@ -5,17 +5,17 @@
 class EngineClient {
 
 private:
-    Gamestate gs;
+    Gamestate * gs;
     int nodes;
     std::string eval_str;
     std::vector<Gamestate> game_history;
 
 public:
-    EngineClient() : gs(starting_pos()), nodes(0) {
-        game_history.push_back(gs);
+    EngineClient() : gs(new Gamestate(starting_pos())), nodes(0) {
+        game_history.push_back(*gs);
     }
-    explicit EngineClient(const char * fen) : gs(std::string(fen)), nodes(0) {
-        game_history.push_back(gs);
+    explicit EngineClient(const char * fen) : gs(new Gamestate(std::string(fen))), nodes(0) {
+        game_history.push_back(*gs);
     }
 
     /**
@@ -27,15 +27,15 @@ public:
         std::cout << "[C++] entering get_computer_move\n";
 #endif
         Engine engine =
-            EngineBuilder::for_position(board_to_fen(gs.board))
+            EngineBuilder::for_position(board_to_fen(gs->board))
                 .with_timeout(think_time)
                 .with_game_history(&game_history)
                 .build();
         std::string * uci = new string(move2uci(engine.blocking_run()));
-        gs = Gamestate(gs, uci2move(*uci));
+        gs = new Gamestate(*gs, uci2move(*uci));
         nodes = engine.get_nodes_explored();
         eval_str = etos(engine.get_score());
-        game_history.push_back(gs);
+        game_history.push_back(*gs);
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] exiting get_computer_move\n";
 #endif
@@ -50,8 +50,8 @@ public:
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] entering register_opponent_move\n";
 #endif
-        gs = Gamestate(gs, uci2move(string(uci)));
-        game_history.push_back(gs);
+        gs = new Gamestate(*gs, uci2move(string(uci)));
+        game_history.push_back(*gs);
 #ifdef PYBIND_DEBUG_LOG
         std::cout << "[C++] exiting register_opponent_move\n";
 #endif

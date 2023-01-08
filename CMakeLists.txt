@@ -25,6 +25,7 @@ set(SOURCE_FILES
         src/game/heur/development.cpp
         src/game/heur/king.cpp
         src/game/heur/endgame.cpp
+        src/game/heur/mating_net.cpp
 
         src/puzzle/puzzle.cpp
         src/puzzle/read_formats.cpp
@@ -73,6 +74,7 @@ set(SOURCE_FILES
         src/game/glogic/pawn.cpp
         src/game/glogic/control.cpp
         src/game/glogic/square_control.cpp
+        src/game/king_net.hpp
 
         src/utils/utils.h
         src/utils/print.cpp

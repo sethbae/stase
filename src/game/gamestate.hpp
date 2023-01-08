@@ -7,6 +7,7 @@
 #include "cands/hook.hpp"
 #include "control_cache.hpp"
 #include "pin_cache.hpp"
+#include "king_net.hpp"
 
 const int MAX_FRAMES = 20;
 
@@ -22,7 +23,9 @@ public:
 
     Move last_move;
     mutable Square w_king;
+    KingNet * w_king_net;
     mutable Square b_king;
+    KingNet * b_king_net;
     Square * wpieces;
     Square * bpieces;
     PinCache wpin_cache;
@@ -33,18 +36,6 @@ public:
     ControlCache * control_cache;
     PieceEncounteredCache * pdir_cache;
     FeatureFrame frames[NUM_HOOKS][MAX_FRAMES];
-
-    explicit Gamestate()
-            : game_over(false),
-              w_cas(false),
-              b_cas(false),
-              in_check(false),
-              phase(OPENING),
-              w_king(SQUARE_SENTINEL),
-              b_king(SQUARE_SENTINEL)
-    {
-        alloc();
-    }
 
     explicit Gamestate(const Board & b)
             : board(b),
@@ -59,6 +50,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const Gamestate & o, const Move m)
@@ -101,6 +94,9 @@ public:
         // re-find pins and discoveries
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const std::string & fen)
@@ -116,6 +112,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(const std::string & fen, GamePhase phase)
@@ -131,6 +129,8 @@ public:
         compute_cache(board, pdir_cache);
         find_kpins_and_discoveries(w_king);
         find_kpins_and_discoveries(b_king);
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
     }
 
     explicit Gamestate(Gamestate && o)
@@ -144,7 +144,11 @@ public:
 
         last_move = o.last_move;
         w_king = o.w_king;
+        w_king_net = o.w_king_net;
+        o.w_king_net = nullptr;
         b_king = o.b_king;
+        b_king_net = o.b_king_net;
+        o.b_king_net = nullptr;
         wpieces = o.wpieces; o.wpieces = nullptr;
         bpieces = o.bpieces; o.bpieces = nullptr;
         wpin_cache = o.wpin_cache;
@@ -202,6 +206,9 @@ public:
         control_cache->copy(*o.control_cache);
         copy_cache(o.pdir_cache, pdir_cache);
 
+        w_king_net = new KingNet(*this, board, w_king);
+        b_king_net = new KingNet(*this, board, b_king);
+
         // copy contents of feature frames across
         for (int i = 0; i < ALL_HOOKS.size(); ++i) {
             for (int j = 0; j < MAX_FRAMES; ++j) {
@@ -214,6 +221,8 @@ public:
     ~Gamestate() {
         delete control_cache;
         delete pdir_cache;
+        delete w_king_net;
+        delete b_king_net;
         delete[] wpieces;
         delete[] bpieces;
     }

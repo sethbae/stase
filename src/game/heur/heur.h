@@ -40,20 +40,6 @@ namespace __piece_constants{
 }
 
 /**
- * Returns a positive integer representing the value of the given piece type in millipawns.
- */
-constexpr int piece_value_millis(const Ptype p) {
-    switch (p) {
-        case PAWN: return __piece_constants::PAWN_VAL;
-        case KNIGHT: return __piece_constants::KNIGHT_VAL;
-        case BISHOP: return __piece_constants::BISHOP_VAL;
-        case ROOK: return __piece_constants::ROOK_VAL;
-        case QUEEN: return __piece_constants::QUEEN_VAL;
-        default: return __piece_constants::KING_VAL;
-    }
-}
-
-/**
  * Returns a positive integer representing the value of the given piece in millipawns.
  */
 constexpr int piece_value_millis(const Piece p) {
@@ -126,6 +112,7 @@ namespace __metrics {
     float __king_exposure_metric(const Gamestate &);
     float __unconventional_king_metric(const Gamestate &);
     float __promotion_squares(const Gamestate &);
+    float __mating_net(const Gamestate &);
 
     const Metric piece_activity_alpha_metric{
         "piece-activity-alpha",
@@ -212,6 +199,11 @@ namespace __metrics {
         {0, 1000, 2000},
         &__promotion_squares
     };
+    const Metric mating_net_metric{
+        "mating-net",
+        {0, 2000, 5000},
+        &__mating_net
+    };
 }
 
 const std::vector<const Metric *> ALL_METRICS{
@@ -232,7 +224,8 @@ const std::vector<const Metric *> ALL_METRICS{
     &__metrics::control_near_king_metric,
     &__metrics::king_exposure_metric,
     &__metrics::unconventional_king_metric,
-    &__metrics::promotion_squares_metric
+    &__metrics::promotion_squares_metric,
+    &__metrics::mating_net_metric
 
 };
 
