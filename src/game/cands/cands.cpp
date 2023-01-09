@@ -155,6 +155,7 @@ CandSet * cands_report(Gamestate & gs) {
     if (!has_safe_king(gs, gs.board.get_white() ? WHITE : BLACK)) {
 
         cands_in_check(gs, cand_set);
+        gs.in_check = true;
 
         if (cand_set->empty()) {
             gs.game_over = true;
@@ -179,10 +180,10 @@ CandSet * cands_report(Gamestate & gs) {
         Move moves[MAX_MOVES_PER_HOOK];
         int n = 0;
 
-        std::string friends = "";
-        std::string enems = "";
-        for (const Responder * r : fh.friendly_responses) { friends = friends + " " + r->name; }
-        for (const Responder * r : fh.enemy_responses) { enems = enems + " " + r->name; }
+        std::string friends;
+        std::string enems;
+        for (const Responder * r : fh.friendly_responses) { friends += " " + r->name; }
+        for (const Responder * r : fh.enemy_responses) { enems += " " + r->name; }
         cout << "\n***** Feature handler " << i << "\n";
         cout << "* Hook: " << fh.hook.name << "\n";
         cout << "* Friendly:" << friends << "\n";
