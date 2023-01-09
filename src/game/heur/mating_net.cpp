@@ -43,12 +43,12 @@ float rank_file_score(const Square s) {
 float __metrics::__mating_net(const Gamestate & gs) {
 
     bool white_attacks = gs.board.get_white();
-    bool checks_exist =
+    bool checks_available =
         white_attacks
             ? colour_can_play_check(gs, WHITE)
             : colour_can_play_check(gs, BLACK);
 
-    if (!checks_exist) {
+    if (!checks_available && !gs.in_check) {
         return 0.0f;
     }
 
