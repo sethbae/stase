@@ -13,6 +13,7 @@ bool test_search() {
     passed = test_past_blunders() && passed;
     passed = test_past_crashes() && passed;
     passed = test_parent_pointer() && passed;
+    passed = test_checkmate() && passed;
 
     return passed;
 

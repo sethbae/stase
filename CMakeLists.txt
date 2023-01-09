@@ -148,7 +148,8 @@ set(TEST_SOURCE_FILES
         src/test/search/test_search_helpers.cpp
         src/test/search/test_past_blunders.cpp
         src/test/search/test_past_crashes.cpp
-        src/test/search/test_parent_pointer.cpp)
+        src/test/search/test_parent_pointer.cpp
+        src/test/search/test_checkmates.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

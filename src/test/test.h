@@ -168,6 +168,7 @@ bool test_best_child_updated();
 bool test_past_blunders();
 bool test_past_crashes();
 bool test_parent_pointer();
+bool test_checkmate();
 
 bool stress_test_main();
 
