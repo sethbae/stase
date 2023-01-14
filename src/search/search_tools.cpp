@@ -13,6 +13,35 @@ void check_abort() {
 }
 
 /**
+ * Check whether the distribution of visit counts between the given node's children is very uneven. This is defined
+ * as the most-visited node having been visited more than the rest combined, if there are more than two nodes, and
+ * having been visited more
+ */
+bool uneven_visit_distribution(const SearchNode * node) {
+
+    int sum = 0, max = 0;
+
+    for (const SearchNode * child : node->children) {
+        int visits = child->visit_count;
+        if (visits > max) {
+            max = visits;
+        }
+        sum += visits;
+    }
+
+    if (node->children.size() > 2) {
+        // considered uneven if the max is greater than all the rest combined
+        return max > (sum - max);
+    } else if (node->children.size() == 2) {
+        // or twice that, if there are two nodes
+        return max > 2*(sum - max);
+    } else {
+        // and never if there's one
+        return false;
+    }
+}
+
+/**
  * Updates the terminal node of a given node according to whether the subtree rooted at the
  * given node has been fully explored (up to the threshold specified in search_tools.h)
  */

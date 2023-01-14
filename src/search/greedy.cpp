@@ -326,12 +326,15 @@ bool visit_best_line(SearchNode * node, const std::vector<Gamestate> * game_hist
     bool has_swung = visit_best_line(node->best_child, game_history, obs);
 
     // recurse on very-nearly-equal siblings
+    bool uneven_visits = uneven_visit_distribution(node);
     int extra_siblings_visited = 0;
     for (int i = 0; i < node->children.size(); ++i) {
         if (node->children[i] == node->best_child) { continue; }
-        if (millipawn_diff(node->best_child->score, node->children[i]->score) <= __engine_params::EVALS_EQUAL_THRESHOLD) {
+        if (uneven_visits ||
+                millipawn_diff(node->best_child->score, node->children[i]->score) <= __engine_params::EVALS_EQUAL_THRESHOLD) {
             has_swung = visit_best_line(node->children[i], game_history, obs) || has_swung;
-            if (++extra_siblings_visited == __engine_params::MAX_EXTRA_SIBLINGS) {
+            if (!uneven_visits &&
+                    ++extra_siblings_visited == __engine_params::MAX_EXTRA_SIBLINGS) {
                 break;
             }
         }

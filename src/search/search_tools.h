@@ -61,6 +61,7 @@ namespace __engine_params {
 
 SearchNode *new_node(const SearchNode *, Move);
 long board_hash(const Board &);
+bool uneven_visit_distribution(const SearchNode *);
 
 void update_score(SearchNode *);
 Eval trust_score(SearchNode *, bool is_white);
