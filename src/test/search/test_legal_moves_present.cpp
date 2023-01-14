@@ -6,7 +6,9 @@
 class LegalMovesObserver : public TestObserver {
 
 public:
-    void close_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, [[maybe_unused]] const int branch) {
+    void close_event(
+            const SearchNode *node, const SearchEvent ev, const CandList *cand_list, [[maybe_unused]] const int branch)
+    override {
 
         if (!cand_list) { return; }
         if (ev == DEEPEN || ev == BURST_DEEPEN) {
@@ -15,16 +17,16 @@ public:
                 TestObserver::register_applicable_event();
                 std::vector<Move> expected_legals = legal_moves(node->gs->board);
 
-                for (int i = 0; i < expected_legals.size(); ++i) {
+                for (const Move expected_legal: expected_legals) {
                     bool present = false;
-                    for (int j = 0; j < node->children.size(); ++j) {
-                        if (equal_exactly(expected_legals[i], node->children[j]->move)) {
+                    for (const SearchNode *j: node->children) {
+                        if (equal_exactly(expected_legal, j->move)) {
                             present = true;
                             break;
                         }
                     }
                     if (!present) {
-                        fail_test(node, expected_legals[i]);
+                        fail_test(node, expected_legal);
                     }
                 }
 
