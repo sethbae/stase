@@ -58,6 +58,22 @@ public:
     inline int flight_squares() const {
         return n;
     }
+
+    inline bool is_flight_square(const Square s) const {
+        int dx = s.x - k_sq.x;
+        int dy = s.y - k_sq.y;
+        for (int i = 0; i < 8; ++i) {
+            if (XD[i] == dx && YD[i] == dy) {
+                return safe[i];
+            }
+        }
+        // flight square is not adjacent to king
+        return false;
+    }
+
+    inline Square king_square() const {
+        return k_sq;
+    }
 };
 
 #endif //STASE_KING_NET_HPP

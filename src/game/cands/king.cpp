@@ -33,7 +33,7 @@ int approach_kings(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
             && would_be_safe_king_square(gs, dest, king_colour)) {
         if (idx < end) {
             Move m{k_sq, dest, 0};
-            m.set_score(approach_kings_score());
+            m.set_score(approach_kings_score(gs.phase));
             moves[idx++] = m;
         }
     }

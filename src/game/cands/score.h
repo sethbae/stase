@@ -66,8 +66,8 @@ constexpr int discovered_score(Piece attacked) {
     }
 }
 
-constexpr int approach_kings_score() {
-    return 0;
+constexpr int approach_kings_score(GamePhase phase) {
+    return (phase == ENDGAME) ? 2 : 0;
 }
 
 #endif //STASE_SCORE_H
