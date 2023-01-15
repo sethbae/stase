@@ -26,6 +26,8 @@ using std::ofstream;
 #include "src/search/observers/observers.hpp"
 #include "src/search/engine.h"
 
+#include "src/lichess/engine_client.cpp"
+
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"
 
@@ -573,14 +575,25 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGTERM, print_stack_trace_and_abort);
 
-    const std::string fen = "r1b1k1nr/ppp2ppp/2nb4/8/4q3/2P2N2/PP2BPPP/RNBQR1K1 b kq - 1 9";
+    const std::string fen = "8/6k1/8/5QK1/8/8/8/8 w - - 0 1";
+    const std::string fen2 = "5k2/3Q4/5K2/8/8/8/8/8 b - - 3 2";
 
-    const GamePhase game_phase = OPENING;
+    const GamePhase game_phase = ENDGAME;
 
-    Gamestate gs(fen, game_phase);
+    Gamestate gs(fen2, game_phase);
     pr_board(gs.board);
+
 //
-//    heur_with_description(gs);
+//    EngineClient * client = new EngineClient();
+//
+//    client->register_opponent_move("e2e4");
+//
+//    client->get_computer_move(10.0);
+
+//    cands_report(gs);
+    discover_feature_frames(gs, king_pinned_pieces_hook);
+    discover_feature_frames(gs, check_hook);
+    heur_with_description(gs);
 
 //    Gamestate next(gs, Move{stosq("c5"), stosq("e4")});
 //    std::cout << "back in main\n";
@@ -596,7 +609,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    q_scores();
 
-//    repl(fen, game_phase);
+    repl(fen, game_phase);
 
     XMLObserver observer("debug_pos");
     Engine engine =
@@ -608,7 +621,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 //            .with_obs(observer)
             .build();
 
-    engine.blocking_run();
+//    engine.blocking_run();
 //    observer.write();
 
 //    std::cout << engine.get_nodes_explored() << "\n";
@@ -634,7 +647,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    evaluate_square_control(gs, stosq("d5")).print();
 
-//    show_responder_moves(fen, defend_centre_resp, FeatureFrame{stosq("d7"), {0, 0}, r, r});
+    show_responder_moves(fen2, approach_kings_resp, FeatureFrame{stosq("e1"), {0, 0}, r, r});
 
 //    CandSet c;
 //    cands_report(gs);

@@ -13,6 +13,17 @@ const TestSet<SearchLineTestCase> checkmate_test_set{
                     "Rf6 Ke7 Qd6 Ke8 Rf8"
                 }
             },
+            30000  // nodes allowed
+        },
+        SearchLineTestCase{
+            // Queen mate
+            "8/6k1/8/5QK1/8/8/8/8 w - - 0 1",
+            {
+                SearchLineRequirement{
+                    MUST_APPEAR,
+                    ""
+                }
+            },
             500  // nodes allowed
         }
     }
