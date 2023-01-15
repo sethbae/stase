@@ -129,6 +129,7 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_promotion.cpp
         src/test/game/cands/test_fork_responder.cpp
         src/test/game/cands/test_discovered_hook.cpp
+        src/test/game/cands/test_approach_kings.cpp
 
         src/test/board/test_board.cpp
         src/test/board/test_pieces.cpp

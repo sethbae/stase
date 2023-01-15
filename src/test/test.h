@@ -157,6 +157,7 @@ bool test_pin_skewer_hook();
 bool test_king_pinned_pieces_hook();
 bool test_promotion_hook();
 bool test_discovered_hook();
+bool test_approach_kings();
 
 // search tests
 bool test_cand_list_ordering();

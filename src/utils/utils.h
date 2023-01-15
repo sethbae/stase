@@ -35,6 +35,16 @@ constexpr T min(const T a, const T b, const T c) {
     return b < c ? b : c;
 }
 
+template <typename T>
+constexpr int signum(const T a, const T b) {
+    if (a > b) {
+        return 1;
+    } else if (a < b) {
+        return -1;
+    }
+    return 0;
+}
+
 
 Move uci2move(const std::string &);
 std::string move2uci(const Move);
