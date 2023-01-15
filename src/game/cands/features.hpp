@@ -61,11 +61,6 @@ const static std::vector<FeatureHandler> feature_handlers = {
         develop_hook,
         { &develop_resp },
         { }
-    },
-    FeatureHandler{
-        king_position_hook,
-        { &approach_kings_resp },
-        { }
     }
 };
 

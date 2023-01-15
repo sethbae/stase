@@ -201,7 +201,7 @@ namespace __metrics {
     };
     const Metric mating_net_metric{
         "mating-net",
-        {2000, 2000, 10000},
+        {2000, 2000, 5000},
         &__mating_net
     };
 }
