@@ -131,12 +131,12 @@ namespace __metrics {
     };
     const Metric open_line_control_metric{
         "open-line-control",
-        {800, 1000, 1200},
+        {800, 1000, 800},
         &__open_line_control_metric
     };
     const Metric centre_control_metric{
         "centre-control",
-        {2000, 1500, 1250},
+        {2000, 1500, 750},
         &__centre_control_metric
     };
     const Metric defended_pawns_metric{
