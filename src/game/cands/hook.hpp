@@ -22,6 +22,7 @@ extern const Hook promotion_hook;
 extern const Hook discovered_hook;
 extern const Hook positional_hook;
 extern const Hook discovered_check_hook;
+extern const Hook king_position_hook;
 
 const std::vector<Hook> ALL_HOOKS {
     king_pinned_pieces_hook,
@@ -34,17 +35,18 @@ const std::vector<Hook> ALL_HOOKS {
     promotion_hook,
     discovered_hook,
     positional_hook,
-    discovered_check_hook
+    discovered_check_hook,
+    king_position_hook
 };
 
 // in order to allocate the feature frames array statically, we cannot take the value
 // from the vector dynamically. Instead we have to do this :(
-const int NUM_HOOKS = 11;
+const int NUM_HOOKS = 12;
 inline bool assert_failed() {
     std::cout << "Assertion failed: update NUM_HOOKS to correctly match the number of hooks\n";
     abort();
     return true;
 }
-const bool assertion_failed = (NUM_HOOKS == ALL_HOOKS.size() ? false : assert_failed());
+const bool assertion_failed = NUM_HOOKS != ALL_HOOKS.size() && assert_failed();
 
 #endif //STASE_HOOK_HPP
