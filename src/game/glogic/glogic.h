@@ -81,5 +81,6 @@ bool can_see_immediately(const Gamestate &, Piece, Square, Square);
 bool can_see_x_ray(const Gamestate &, Piece, Square, Square);
 
 bool has_luft(const Gamestate &, Colour);
+bool colour_can_play_check(const Gamestate &, Colour);
 
 #endif //STASE_GLOGIC_H

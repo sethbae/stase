@@ -72,3 +72,19 @@ bool has_luft(const Gamestate & gs, const Colour c) {
 
     return false;
 }
+
+/**
+ * @return true if the given colour can play a check in the current position, false otherwise.
+ */
+bool colour_can_play_check(const Gamestate & gs, const Colour c) {
+    for (int i = 0; i < MAX_FRAMES; ++i) {
+        const FeatureFrame & frame = gs.frames[check_hook.id][i];
+        if (is_sentinel(frame.centre)) {
+            return false;
+        }
+        if (colour(gs.board.get(frame.centre)) == c) {
+            return true;
+        }
+    }
+    return false;
+}
