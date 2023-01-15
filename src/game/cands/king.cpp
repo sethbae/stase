@@ -40,7 +40,55 @@ int approach_kings(const Gamestate & gs, const FeatureFrame * ff, Move * moves, 
     return idx;
 }
 
+int avoid_mate(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int idx, int end) {
+
+    const Square k_sq = ff->centre;
+    const Piece king = gs.board.get(k_sq);
+    const Colour king_colour = colour(king);
+
+    if (!has_luft(gs, king_colour) && colour_can_play_check(gs, opposite_colour(king))) {
+
+        Square neighbours[4]{
+            SQUARE_SENTINEL,
+            SQUARE_SENTINEL,
+            SQUARE_SENTINEL,
+            SQUARE_SENTINEL
+        };
+
+        if (k_sq.y == 7 || k_sq.y == 0) {
+            neighbours[0] = mksq(k_sq.x + 1, k_sq.y);
+            neighbours[1] = mksq(k_sq.x - 1, k_sq.y);
+        }
+        if (k_sq.x == 7 || k_sq.x == 0) {
+            neighbours[2] = mksq(k_sq.x, k_sq.y + 1);
+            neighbours[3] = mksq(k_sq.x, k_sq.y - 1);
+        }
+
+        for (const Square dest : neighbours) {
+            if (val(dest)
+                && colour(gs.board.get(dest)) != king_colour
+                && would_be_safe_king_square(gs, dest, king_colour)) {
+
+                if (idx < end) {
+                    Move m{k_sq, dest, 0};
+                    m.set_score(avoid_mate_score());
+                    moves[idx++] = m;
+                } else {
+                    return idx;
+                }
+            }
+        }
+    }
+
+    return idx;
+}
+
 const Responder approach_kings_resp{
     "approach-kings",
     &approach_kings
+};
+
+const Responder avoid_mate_resp{
+    "avoid-mate",
+    &avoid_mate
 };

@@ -70,4 +70,8 @@ constexpr int approach_kings_score(GamePhase phase) {
     return (phase == ENDGAME) ? 2 : 0;
 }
 
+constexpr int avoid_mate_score() {
+    return 9;
+}
+
 #endif //STASE_SCORE_H
