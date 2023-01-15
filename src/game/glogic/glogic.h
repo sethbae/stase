@@ -80,9 +80,4 @@ void find_pawn_moves_to(const Gamestate &, ptr_vec<Move> &, Colour, Square);
 bool can_see_immediately(const Gamestate &, Piece, Square, Square);
 bool can_see_x_ray(const Gamestate &, Piece, Square, Square);
 
-bool is_knight_move(Square, Square);
-bool is_king_move(Square, Square);
-bool is_pawn_capture(Colour, Square, Square);
-bool piece_covers_from_square(const Gamestate &, Piece, Square, Square);
-
 #endif //STASE_GLOGIC_H

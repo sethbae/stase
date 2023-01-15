@@ -140,38 +140,3 @@ void find_invalidated_squares(const Board & b, const Move m, ptr_vec<Square> & s
         }
     }
 }
-
-bool is_knight_move(const Square a, const Square b) {
-    return (abs(b.x - a.x) == 1 && abs(b.y - a.y) == 2)
-        || (abs(b.x - a.x) == 2 && abs(b.y - a.y) == 1);
-}
-
-bool is_king_move(const Square a, const Square b) {
-    return abs(b.x - a.x) <= 1 && abs(b.y - a.y) <= 1;
-}
-
-bool is_pawn_capture(const Colour c, const Square a, const Square b) {
-    if (c == WHITE) {
-        return (b.y == a.y + 1) && (abs(b.x - a.x) == 1);
-    } else {
-        return (b.y == a.y - 1) && (abs(b.x - a.x) == 1);
-    }
-}
-
-bool piece_covers_from_square(const Gamestate & gs, const Piece p, const Square from, const Square to) {
-    Delta d = get_delta_between(from, to);
-    switch (type(p)) {
-        case QUEEN:
-        case BISHOP:
-        case ROOK:
-            return orth_diag(d) && can_move_in_direction(p, d) && can_see_immediately(gs, p, from, to);
-        case KING:
-            return is_king_move(from, to);
-        case KNIGHT:
-            return is_knight_move(from, to);
-        case PAWN:
-            return is_pawn_capture(colour(p), from, to);
-        default:
-            return false;
-    }
-}
