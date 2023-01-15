@@ -112,8 +112,7 @@ inline void gamma_explore(const Board & b, const Square s, ptr_vec<Square> & squ
  */
 void find_invalidated_squares(const Board & b, const Move m, ptr_vec<Square> & squares) {
 
-    for (int j = 0; j < 8; ++j) {
-        Delta d = D[j];
+    for (const Delta d : D) {
         gamma_explore(b, m.from, squares, d, direction_of_delta(d));
         gamma_explore(b, m.to, squares, d, direction_of_delta(d));
     }

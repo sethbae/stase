@@ -80,4 +80,6 @@ void find_pawn_moves_to(const Gamestate &, ptr_vec<Move> &, Colour, Square);
 bool can_see_immediately(const Gamestate &, Piece, Square, Square);
 bool can_see_x_ray(const Gamestate &, Piece, Square, Square);
 
+bool has_luft(const Gamestate &, Colour);
+
 #endif //STASE_GLOGIC_H
