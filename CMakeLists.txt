@@ -61,6 +61,7 @@ set(SOURCE_FILES
         src/game/cands/promote.cpp
         src/game/cands/discovered.cpp
         src/game/cands/position.cpp
+        src/game/cands/king.cpp
 
         src/game/glogic/geometry.cpp
         src/game/glogic/piece.cpp

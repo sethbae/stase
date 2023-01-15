@@ -20,6 +20,7 @@ extern const Responder play_check_resp;
 extern const Responder pin_skewer_resp;
 extern const Responder promotion_resp;
 extern const Responder play_discovered_resp;
+extern const Responder approach_kings_resp;
 
 const std::vector<const Responder *> ALL_RESPONDERS = {
     &defend_centre_resp,
@@ -33,7 +34,8 @@ const std::vector<const Responder *> ALL_RESPONDERS = {
     &play_check_resp,
     &pin_skewer_resp,
     &promotion_resp,
-    &play_discovered_resp
+    &play_discovered_resp,
+    &approach_kings_resp
 };
 
 #endif //STASE_RESPONDER_HPP
