@@ -363,22 +363,6 @@ int control_count(const Gamestate & gs, const Square s) {
     
 }
 
-/*
- * Returns true if the piece currently on the from-square could move to the to-square,
- * disregarding check and other considerations.
- */
-bool can_move_to_square(const Board & b, Square from_sq, Square to_sq) {
-    Move piece_moves_arr[64];
-    ptr_vec<Move> piece_moves(piece_moves_arr, 64);
-    piecemoves_ignore_check(b, from_sq, piece_moves);
-    for (int i = 0; i < piece_moves.size(); ++i) {
-        if (equal(piece_moves[i].to, to_sq)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool alpha_cover_slide(const Board & b, Square piece_sq, Square target_sq) {
 
     const Piece p = b.get(piece_sq);
@@ -575,56 +559,3 @@ int b_pawn_defence_count(const Gamestate & gs, const Square s) {
 
     return count;
 }
-
-/**
- * Returns the pawn-only control balance of the given square.
- */
-int pawn_defence_count(const Gamestate & gs, const Square s) {
-    return w_pawn_defence_count(gs, s) - b_pawn_defence_count(gs, s);
-}
-
-/*
- * Below code was a start on defining these for non-sliding squares, which turns
- * out to be kinda complicated and not immediately useful?
- */
-
-//bool knight_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
-//    int x = get_x(piece_sq), y = get_y(piece_sq);
-//    Square temp;
-//    for (int i = 0; i < 8; ++i) {
-//        if (val(temp = mksq(x + XKN[i], y + YKN[i])) && temp == target_sq) {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-//
-//bool king_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
-//    int x = get_x(piece_sq), y = get_y(piece_sq);
-//    Square temp;
-//    for (int i = 0; i < 8; ++i) {
-//        if (val(temp = mksq(x + XD[i], y + YD[i])) && temp == target_sq) {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-//
-//bool pawn_can_move_to(const Board & b, Square piece_sq, Square target_sq) {
-//    int x = get_x(piece_sq), y = get_y(piece_sq);
-//    Square temp;
-//    if (colour(b.get(piece_sq)) == WHITE) {
-//        if (b.get(temp = mksq(x, y + 1)) != EMPTY) { return false; }
-//        if (temp == target_sq) { return true; }
-//        if (get_y(piece_sq) == 1) {
-//            return b.get(temp = mksq(x, y + 2)) == EMPTY && temp == target_sq;
-//        }
-//    } else {
-//        if (b.get(temp = mksq(x, y - 1)) != EMPTY) { return false; }
-//        if (temp == target_sq) { return true; }
-//        if (get_y(piece_sq) == 6) {
-//            return b.get(temp = mksq(x, y - 2)) == EMPTY && temp == target_sq;
-//        }
-//    }
-//    return false;
-//}
