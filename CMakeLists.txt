@@ -105,9 +105,7 @@ set(TEST_SOURCE_FILES
         src/test/integration_test_main.cpp
 
         src/test/game/test_game.cpp
-        src/test/game/test_piece.cpp
         src/test/game/test_gs_piece_lists.cpp
-        src/test/game/test_weak.cpp
         src/test/game/test_cands_sorting.cpp
 
         src/test/game/cands/test_capture_piece.cpp
@@ -130,6 +128,10 @@ set(TEST_SOURCE_FILES
         src/test/game/cands/test_fork_responder.cpp
         src/test/game/cands/test_discovered_hook.cpp
         src/test/game/cands/test_approach_kings.cpp
+
+        src/test/game/glogic/test_weak.cpp
+        src/test/game/glogic/test_piece.cpp
+        src/test/game/glogic/test_luft.cpp
 
         src/test/board/test_board.cpp
         src/test/board/test_pieces.cpp
@@ -155,7 +157,7 @@ set(TEST_SOURCE_FILES
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)
-set(SCRATCH_MAIN scratch.cpp)
+set(SCRATCH_MAIN scratch.cpp src/test/game/glogic/test_luft.cpp)
 set(STASE_MAIN src/main.cpp)
 
 include_directories(include/stase)

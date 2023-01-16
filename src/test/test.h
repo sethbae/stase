@@ -129,13 +129,10 @@ bool test_mutate();
 bool test_move_scores();
 
 // top level game tests
-bool test_alpha_covers();
-bool test_beta_covers();
-bool test_gamma_covers();
 bool test_pin_cache();
 bool test_cands_sorting();
 
-// hooks and responders
+// cands
 bool test_unsafe_piece_hook();
 bool test_development_hook();
 bool test_capture_piece();
@@ -147,8 +144,6 @@ bool test_queen_fork_hook();
 bool test_pawn_fork_hook();
 bool test_king_fork_hook();
 bool test_fork_responder();
-bool test_weak_square();
-bool test_unsafe_piece();
 bool test_trade_piece();
 bool test_retreat_piece();
 bool test_desperado_piece();
@@ -158,6 +153,14 @@ bool test_king_pinned_pieces_hook();
 bool test_promotion_hook();
 bool test_discovered_hook();
 bool test_approach_kings();
+
+// glogic
+bool test_alpha_covers();
+bool test_beta_covers();
+bool test_gamma_covers();
+bool test_weak_square();
+bool test_unsafe_piece();
+bool test_luft();
 
 // search tests
 bool test_cand_list_ordering();

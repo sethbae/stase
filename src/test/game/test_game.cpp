@@ -5,11 +5,6 @@ bool test_game() {
     bool passed = true;
 
     // top level
-    passed = test_alpha_covers() && passed;
-    passed = test_beta_covers() && passed;
-    passed = test_gamma_covers() && passed;
-    passed = test_weak_square() && passed;
-    passed = test_unsafe_piece() && passed;
     passed = test_pin_cache() && passed;
     passed = test_cands_sorting() && passed;
 
@@ -34,6 +29,14 @@ bool test_game() {
     passed = test_promotion_hook() && passed;
     passed = test_discovered_hook() && passed;
     passed = test_approach_kings() && passed;
+
+    // glogic
+    passed = test_alpha_covers() && passed;
+    passed = test_beta_covers() && passed;
+    passed = test_gamma_covers() && passed;
+    passed = test_weak_square() && passed;
+    passed = test_unsafe_piece() && passed;
+    passed = test_luft() && passed;
 
     return passed;
 }
