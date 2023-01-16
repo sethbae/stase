@@ -1,7 +1,7 @@
-#include "../test.h"
-#include "../../game/gamestate.hpp"
+#include "../../test.h"
+#include "../../../game/gamestate.hpp"
 #include "game.h"
-#include <string.h>
+#include <cstring>
 
 struct WeakTestCase {
 
@@ -23,7 +23,7 @@ struct UnsafeTestCase {
 };
 
 const TestSet<WeakTestCase> weak_test_cases = {
-    "game-piece-weak-square",
+    "game-glogic-weak-square",
     {
         WeakTestCase{
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -149,7 +149,7 @@ const TestSet<WeakTestCase> weak_test_cases = {
 };
 
 const TestSet<UnsafeTestCase> unsafe_test_cases = {
-    "game-piece-unsafe-piece",
+    "game-glogic-unsafe-piece",
     {
         UnsafeTestCase{
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",

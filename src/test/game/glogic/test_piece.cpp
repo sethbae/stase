@@ -1,7 +1,7 @@
 #include "board.h"
-#include "../test.h"
-#include "../../game/glogic/glogic.h"
-#include "../../board/board.hpp"
+#include "../../test.h"
+#include "../../../game/glogic/glogic.h"
+#include "../../../board/board.hpp"
 
 #include <vector>
 #include <iostream>
@@ -15,7 +15,7 @@ struct CoversTestCase {
 };
 
 const TestSet<CoversTestCase> alpha_tests = {
-        "game-piece-alpha-covers",
+        "game-glogic-alpha-covers",
         std::vector<CoversTestCase>{
                 // queen correct
                 CoversTestCase{
@@ -77,7 +77,7 @@ const TestSet<CoversTestCase> alpha_tests = {
 };
 
 const TestSet<CoversTestCase> beta_tests = {
-        "game-piece-beta-covers",
+        "game-glogic-beta-covers",
         std::vector<CoversTestCase>{
                 // queen correct
                 CoversTestCase{
@@ -146,7 +146,7 @@ const TestSet<CoversTestCase> beta_tests = {
 };
 
 const TestSet<CoversTestCase> gamma_tests = {
-        "game-piece-gamma-covers",
+        "game-glogic-gamma-covers",
         std::vector<CoversTestCase>{
                 // queen correct
                 CoversTestCase{
