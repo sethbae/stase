@@ -38,9 +38,22 @@ float white_score(const Gamestate & gs) {
 
 float __metrics::__mating_net(const Gamestate & gs) {
 
-    if (!colour_can_play_check(gs, WHITE) && !colour_can_play_check(gs, BLACK) && !gs.in_check) {
+    Colour side_to_move = gs.board.get_white() ? WHITE : BLACK;
+    bool white_can_play_check = colour_can_play_check(gs, WHITE);
+    bool black_can_play_check = colour_can_play_check(gs, BLACK);
+
+    if (!white_can_play_check && !black_can_play_check && !gs.in_check) {
         return 0.0f;
     }
 
-    return 0.5f * (black_score(gs) - white_score(gs));
+    float tempo_offset = 0.0f;
+    if (!gs.in_check) {
+        if (side_to_move == WHITE && white_can_play_check) {
+            tempo_offset = 0.25f;
+        } else if (side_to_move == BLACK && black_can_play_check) {
+            tempo_offset = -0.25f;
+        }
+    }
+
+    return tempo_offset + (0.33f * (black_score(gs) - white_score(gs)));
 }
