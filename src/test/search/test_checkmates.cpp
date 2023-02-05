@@ -21,10 +21,11 @@ const TestSet<SearchLineTestCase> checkmate_test_set{
             {
                 SearchLineRequirement{
                     MUST_APPEAR,
-                    ""
+                    "Qd7 Kf8 Kf6 Kg8 Qg7"
                 }
             },
-            500  // nodes allowed
+            50000,  // nodes allowed
+            ENDGAME
         }
     }
 };

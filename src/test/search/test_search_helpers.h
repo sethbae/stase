@@ -19,6 +19,7 @@ struct SearchLineTestCase {
     const std::string fen;
     std::vector<SearchLineRequirement> reqs;
     const int nodes_allowed = 0;
+    const GamePhase phase = OPENING;
 };
 
 bool evaluate_search_line_test_case(const SearchLineTestCase *);
@@ -34,7 +35,7 @@ public:
 
     inline virtual bool passed_test() {
         if (visit_count == 0) {
-            diagnostics.push_back("Test failed because the observer was not visited.\n");
+            diagnostics.emplace_back("Test failed because the observer was not visited.\n");
             return false;
         }
         diagnostics.push_back(
