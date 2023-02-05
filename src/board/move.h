@@ -152,6 +152,6 @@ const unsigned ALL_DIRS_STOP = 8;
  */
 struct Board;
 Move stom(const Board &, const std::string &);
-std::string mtos(const Board &, const Move);
+std::string mtos(const Board &, Move);
 
 #endif //STASE_MOVE_H
