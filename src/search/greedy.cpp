@@ -154,8 +154,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, const std::vector<
     if (list.empty()) {
         // even if the list is empty, we still need to recurse up to the given depth
         bool changes = false;
-        for (int i = 0; i < node->children.size(); ++i) {
-            changes = deepen(node->children[i], cand_list, depth - 1, game_history, obs, burst)
+        for (SearchNode * i : node->children) {
+            changes = deepen(i, cand_list, depth - 1, game_history, obs, burst)
                         || changes;
         }
         update_score(node);
@@ -166,8 +166,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, const std::vector<
 
     // create child for each move in the list (appending)
     int c = node->children.size();
-    for (int i = 0; i < list.size(); ++i) {
-        SearchNode * child = new_node(node, list[i]);
+    for (const Move m : list) {
+        SearchNode * child = new_node(node, m);
         child->cand_set = cands(*child->gs, child->cand_set);
         if (child->gs->game_over) {
             child->score =
@@ -187,8 +187,8 @@ bool deepen(SearchNode * node, CandList cand_list, int depth, const std::vector<
 
     // recurse as appropriate
     bool changes = (node->children.size() != c);
-    for (int i = 0; i < node->children.size(); ++i) {
-        changes = deepen(node->children[i], cand_list, depth - 1, game_history, obs, burst)
+    for (SearchNode * child : node->children) {
+        changes = deepen(child, cand_list, depth - 1, game_history, obs, burst)
                     || changes;
     }
 

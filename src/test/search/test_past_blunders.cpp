@@ -32,7 +32,6 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
             }
         },
         SearchLineTestCase{
-            // ends line too early (misses capture)
             "1k4r1/pppnR1bp/8/Q7/2br2p1/2N3B1/1P3PPP/6K1 w - - 2 26",
             {
                 SearchLineRequirement{
