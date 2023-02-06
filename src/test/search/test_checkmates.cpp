@@ -26,6 +26,18 @@ const TestSet<SearchLineTestCase> checkmate_test_set{
             },
             50000,  // nodes allowed
             ENDGAME
+        },
+        SearchLineTestCase{
+            // Rook mate
+            "8/1k6/8/1K6/3R4/8/8/8 w - - 0 1",
+            {
+                SearchLineRequirement{
+                    MUST_APPEAR,
+                    "Rd7 Ka8 Kc6 Kb8 Kb6 Kc8 Rd6 Kb8 Rd8"
+                }
+            },
+            30000,
+            ENDGAME
         }
     }
 };

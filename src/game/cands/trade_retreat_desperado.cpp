@@ -44,6 +44,28 @@ int trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int
     return idx;
 }
 
+/** convert a delta into a numeral, 0-7 inclusive. This does not correspond to its index in the array D */
+int ordinal_of_delta(const Delta & d) {
+    return 2*(d.dx + 1) + (d.dy + 1);
+}
+
+/**
+ * @return true if the given list contains at least two moves which move along different trajectories, counting a
+ *    delta and its reverse as separate directions.
+ */
+bool multiple_directions_exist(const ptr_vec<Move> & moves) {
+    if (moves.size() == 0) {
+        return false;
+    }
+    Delta d = get_delta_between(moves[0].from, moves[0].to);
+    for (int i = 1; i < moves.size(); ++i) {
+        if (!equal(get_delta_between(moves[i].from, moves[i].to), d)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * Tries to move the piece to a safe square. This square may be backwards or forwards, as long as
  * it is safe.
@@ -52,12 +74,26 @@ int retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, i
 
     Move piece_moves_arr[32];
     ptr_vec<Move> piece_moves(piece_moves_arr, 32);
-
     piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
     bool is_king = type(gs.board.get(ff->centre)) == KING;
+    bool track_directions = is_major_piece(gs.board.get(ff->centre)) && multiple_directions_exist(piece_moves);
+    char direction_counts[8]{
+        0, 0, 0, 0, 0, 0, 0, 0
+    };
 
     for (int i = 0; i < piece_moves.size(); ++i) {
+
+        if (track_directions) {
+            // count how many moves go in this direction, or directly opposite it
+            int forward_dir = ordinal_of_delta(get_delta_between(piece_moves[i].from, piece_moves[i].to));
+            int reverse_dir = ordinal_of_delta(get_delta_between(piece_moves[i].to, piece_moves[i].from));
+            direction_counts[forward_dir] += 1;
+            direction_counts[reverse_dir] += 1;
+            if (direction_counts[forward_dir] > 3) {
+                continue;
+            }
+        }
 
         bool would_be_unsafe;
 

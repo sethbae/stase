@@ -19,15 +19,15 @@ const TestSet<SearchLineTestCase> past_blunders_test_set{
         },
         SearchLineTestCase{
             // hung queen against Timo
-            "r1b1kb1r/pp1p1ppp/4pn2/2q5/1n2P3/3Q1N2/PPPB1PPP/RN2KB1R w KQkq - 2 8",
+            "r1b1kb1r/pp1p1ppp/4pn2/2q5/1n2P3/4QN2/PPPB1PPP/RN2KB1R b KQkq - 2 8",
             {
                 SearchLineRequirement{
                     MUST_APPEAR,
-                    "Qe3 Nxc2 Kd1 Nxe3"
+                    "Nxc2 Kd1 Nxe3"
                 },
                 SearchLineRequirement{
                     MUST_APPEAR,
-                    "Qe3 Nxc2 Ke2 Nxe3"
+                    "Nxc2 Ke2 Nxe3"
                 }
             }
         },

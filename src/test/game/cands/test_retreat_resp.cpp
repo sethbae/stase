@@ -32,6 +32,12 @@ const TestSet<ResponderTestCase> retreat_test_cases = {
             "8/8/8/8/8/b1N5/1qPB4/1R1Q4 b - - 0 1",
             {FeatureFrame{stosq("b2"), SQUARE_SENTINEL, 0, 0}},
             {}
+        },
+        // retreats in multiple directions
+        ResponderTestCase{
+            "2k5/3R4/1K6/8/8/8/8/8 w - - 0 1",
+            {FeatureFrame{stosq("d7"), SQUARE_SENTINEL, 0, 0}},
+            {"d7e7", "d7f7", "d7g7", "d7d6", "d7d5"}
         }
     }
 };
