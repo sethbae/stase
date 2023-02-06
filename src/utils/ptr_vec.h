@@ -25,7 +25,7 @@ public:
 
     inline T pop() {
 #ifdef SAFE_STACK_VEC
-        if (i <= 0) {
+        if (i == 0) {
             exit_with_failure("popping from empty stack");
         }
 #endif
@@ -38,7 +38,7 @@ public:
 
     inline T operator[] (short unsigned j) const {
 #ifdef SAFE_STACK_VEC
-        if (j < 0 || j >= n) {
+        if (j >= n) {
             exit_with_failure("accessing " + std::to_string(j) + " at " + std::to_string(i) + "/" + std::to_string(n));
         }
 #endif
@@ -55,7 +55,7 @@ public:
     }
 
 private:
-    inline void exit_with_failure(const std::string message) {
+    inline void exit_with_failure(const std::string message) const {
         std::cout << "*****Illegal ptr_vec usage: " + message + "*****\n";
         abort();
     }
