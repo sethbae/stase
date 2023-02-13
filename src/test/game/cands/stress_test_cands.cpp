@@ -29,7 +29,7 @@ bool stress_test_individual_hook(std::vector<Gamestate> & states, const Hook & h
             if (!val(ff.centre)) {
                 cout << "\n[" << i << "] FAILED: Received " << sqtos(ff.centre) << "\n";
                 cout << board_utils::board_to_fen(gs.board) << "\n";
-                board_utils::pr_board(gs.board);
+                board_utils::print(gs.board);
                 return false;
             }
         }
@@ -61,7 +61,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         if (moves.size() > MAX_TOTAL_CANDS) {
             cout << "\n[" << i << "] FAILED: Received too many candidates (" << moves.size() << ")\n";
             cout << board_utils::board_to_fen(gs.board) << "\n";
-            board_utils::pr_board(gs.board);
+            board_utils::print(gs.board);
             return false;
         }
 
@@ -70,7 +70,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
             if (!val(moves[j].from) || !val(moves[j].to)) {
                 cout << "\n[" << i << "] FAILED(invalid): Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
                 cout << board_utils::board_to_fen(gs.board) << "\n";
-                board_utils::pr_board(gs.board);
+                board_utils::print(gs.board);
                 return false;
             }
 
@@ -85,7 +85,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
             if (!is_legal) {
                 cout << "\n[" << i << "] FAILED(illegal): Received " << sqtos(moves[j].from) << " to " << sqtos(moves[j].to) << "\n";
                 cout << board_utils::board_to_fen(gs.board) << "\n";
-                board_utils::pr_board(gs.board);
+                board_utils::print(gs.board);
                 return false;
             }
         }

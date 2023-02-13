@@ -408,7 +408,7 @@ void board_utils::wr_board_conf(const Board & b, ostream & output) {
  PRINTING FUNCTIONS         for board
  ************************************************************************************/
 
-void board_utils::pr_board(const Board & b) {
+void board_utils::print(const Board & b) {
     wr_board(b, "", cout);
 }
 

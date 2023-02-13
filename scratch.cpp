@@ -378,7 +378,7 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
 
     Gamestate gs(fen);
 
-    board_utils::pr_board(gs.board);
+    board_utils::print(gs.board);
 
     Move moves[100];
     int idx = 0;
@@ -399,7 +399,7 @@ void show_hook_frames(Gamestate & gs, const Hook & h) {
 
     discover_feature_frames(gs, h);
 
-    board_utils::pr_board(gs.board);
+    board_utils::print(gs.board);
     cout << "\nFeatureFrames found for " << h.name << ":\n";
     for (int i = 0; !is_sentinel(gs.frames[h.id][i].centre) && i < MAX_FRAMES; ++i) {
         FeatureFrame ff = gs.frames[h.id][i];
@@ -580,7 +580,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     const GamePhase game_phase = ENDGAME;
 
     Gamestate gs(fen, game_phase);
-    board_utils::pr_board(gs.board);
+    board_utils::print(gs.board);
 
 //
 //    EngineClient * client = new EngineClient();
@@ -596,7 +596,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    Gamestate next(gs, Move{stosq("c5"), stosq("e4")});
 //    std::cout << "back in main\n";
-//    board_utils::pr_board(next.board);
+//    board_utils::print(next.board);
 
 //    for (const Move m : legal_moves(gs.board)) {
 //        cout << mtos(gs.board, m) << " ";

@@ -279,7 +279,7 @@ CandSet * cands_report(Gamestate & gs) {
         cand_set->legal = legal_moves(gs.board);
     }
 
-    board_utils::pr_board(gs.board);
+    board_utils::print(gs.board);
     print_cand_set(gs, *cand_set, cout);
 
     return cand_set;

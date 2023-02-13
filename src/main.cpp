@@ -74,7 +74,7 @@ void play_game(const std::string & starting_fen, bool engine_is_white, int secon
 
     while (keep_playing) {
 
-        board_utils::pr_board(b);
+        board_utils::print(b);
         std::vector<Move> legals = legal_moves(b);
 
         if (players_turn) {

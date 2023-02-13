@@ -74,7 +74,7 @@ Eval heur_with_description(const Gamestate & gs) {
     cout << std::left << std::setprecision(3);
 
     cout << "Evaluating position:\n";
-    board_utils::pr_board(gs.board);
+    board_utils::print(gs.board);
 
     cout << "In phase: " << name(gs.phase) << "\n";
     
