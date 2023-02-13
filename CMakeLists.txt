@@ -92,13 +92,6 @@ set(STASE_SOURCE_FILES)
 
 set(SCRATCH_SOURCE_FILES)
 
-set(BENCH_SOURCE_FILES
-        src/bench/bench.h
-        src/bench/game/bench_game.cpp
-        src/bench/board/bench_board.cpp
-        src/bench/game/cands/bench_cands.cpp
-        src/bench/game/heur/bench_heur.cpp)
-
 set(TEST_SOURCE_FILES
 
         src/test/test.h
@@ -162,7 +155,6 @@ set(TEST_SOURCE_FILES
         src/test/integration/integration_test_main.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
-set(BENCH_MAIN src/bench/bench_main.cpp)
 set(SCRATCH_MAIN scratch.cpp src/test/game/glogic/test_luft.cpp)
 set(STASE_MAIN src/main.cpp)
 
@@ -170,9 +162,7 @@ include_directories(include/stase)
 
 add_executable(stase ${STASE_MAIN} ${SOURCE_FILES} ${STASE_SOURCE_FILES} ${SOURCES})
 
-add_executable(scratch ${SCRATCH_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${STASE_SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
-
-add_executable(bench ${BENCH_MAIN} ${SOURCE_FILES} ${BENCH_SOURCE_FILES} ${SOURCES})
+add_executable(scratch ${SCRATCH_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${STASE_SOURCE_FILES} ${SCRATCH_SOURCE_FILES} ${SOURCES})
 
 add_executable(test ${TEST_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES})
 

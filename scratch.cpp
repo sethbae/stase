@@ -18,7 +18,6 @@ using std::ofstream;
 #include "include/stase/puzzle.h"
 #include "src/game/cands/cands.h"
 #include "src/game/gamestate.hpp"
-#include "src/bench/bench.h"
 #include "src/game/cands/responder.hpp"
 #include "src/test/test.h"
 #include "src/search/search_tools.h"
