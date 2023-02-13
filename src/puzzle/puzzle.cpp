@@ -105,29 +105,3 @@ bool read_all_fens(vector<string> & vec) {
     return true;
 
 }
-
-std::string random_fen() {
-    ifstream file;
-
-    file.open("src/puzzle/lichess_db_puzzle.csv", ios::in);
-    if (!file) {
-        cout << "WARNING: could not read puzzle csv\n";
-        return "";
-    }
-
-    string s;
-
-    // initialise the seed with current time
-    srand(time(nullptr));
-
-    // and skip a random number of puzzles (different every time)
-    unsigned x = rand() % 1000000;
-    while (x--)
-        getline(file, s);
-
-    // FEN is second field of CSV
-    s = s.substr(s.find_first_of(',') + 1);
-    s = s.substr(0, s.find_first_of(','));
-    return s;
-
-}

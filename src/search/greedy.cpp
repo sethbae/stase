@@ -401,16 +401,6 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector
     return moves;
 }
 
-std::vector<Move> greedy_search(const std::string & fen, int cycles, Observer & obs) {
-
-    // set up the root node
-    Gamestate root_gs(fen);
-    SearchNode root(&root_gs, cands(root_gs, new CandSet), heur(root_gs));
-
-    return greedy_search(&root, cycles, nullptr, obs);
-
-}
-
 Eval trust_score(SearchNode * node, bool is_white) {
 
     if (is_mate(node->score)) {

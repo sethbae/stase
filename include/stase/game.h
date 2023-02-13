@@ -50,12 +50,12 @@ struct CandSet {
             legal(std::vector<Move>())
     {}
 
-    inline bool empty() { return critical.empty() && medial.empty() && final.empty() && legal.empty(); }
-    inline int size() {
-        if (legal.size()) {
-            return legal.size();
+    inline bool empty() const { return critical.empty() && medial.empty() && final.empty() && legal.empty(); }
+    inline int size() const {
+        if (!legal.empty()) {
+            return (int) legal.size();
         }
-        return critical.size() + medial.size() + final.size();
+        return (int) (critical.size() + medial.size() + final.size());
     }
 
     inline std::vector<Move> & get_list(CandList cand_list) {
@@ -85,8 +85,7 @@ struct CandSet {
         for (int i = 0; i < list.size(); ++i) {
             for (int j = 0; j < i; ++j) {
                 if (list[i].get_score() > list[j].get_score()) {
-                    Move temp;
-                    temp = list[j];
+                    Move temp = list[j];
                     list[j] = list[i];
                     list[i] = temp;
                 }

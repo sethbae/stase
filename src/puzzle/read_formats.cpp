@@ -9,22 +9,6 @@
 #include "../game/gamestate.hpp"
 
 /**
- * Reads and returns every FEN from the lichess puzzle database. This uses caching - it's cheap!
- * @param vec the vector to fill.
- */
-void retrieve_all_puzzle_fens(std::vector<std::string> & vec) {
-
-    static std::vector<std::string> cache;
-
-    if (cache.empty()) {
-        read_all_fens(cache);
-    }
-
-    vec = cache;
-
-}
-
-/**
  * Reads and returns every FEN from the lichess puzzle database, initialised as a gamestate.
  * This uses caching - it's cheap!
  * @param vec the vector to fill.
@@ -36,8 +20,8 @@ void puzzle_gamestates(std::vector<Gamestate> & vec) {
     if (cache.empty()) {
         std::vector<std::string> fens;
         read_all_fens(fens);
-        for (int i = 0; i < fens.size(); ++i) {
-            cache.push_back(Gamestate(fens[i]));
+        for (const auto & fen : fens) {
+            cache.emplace_back(fen);
         }
     }
 
@@ -81,9 +65,9 @@ void retrieve_all_puzzles(std::vector<Puzzle> & vec) {
             // skip first field of csv
             csv_line = csv_line.substr(csv_line.find_first_of(',') + 1);
 
-            int first_comma = csv_line.find(',', 0);
-            int second_comma = csv_line.find(',', first_comma + 1);
-            int third_comma = csv_line.find(',', second_comma + 1);
+            unsigned long first_comma = csv_line.find(',', 0);
+            unsigned long second_comma = csv_line.find(',', first_comma + 1);
+            unsigned long third_comma = csv_line.find(',', second_comma + 1);
 
             const std::string fen = csv_line.substr(0, first_comma);
             const std::string move_str = csv_line.substr(first_comma + 1, second_comma - first_comma - 1);
