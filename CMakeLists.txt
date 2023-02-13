@@ -151,7 +151,6 @@ set(TEST_SOURCE_FILES
         src/test/search/test_parent_pointer.cpp
         src/test/search/test_checkmates.cpp
 
-        src/test/integration/integration_test.h
         src/test/integration/integration_test_main.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
