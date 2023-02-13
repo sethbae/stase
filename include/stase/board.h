@@ -37,24 +37,12 @@ void legal_moves(const Board &, std::vector<Move> &);
 std::vector<Move> legal_moves(const Board &);
 
 /**
- * Reading and writing helpers: into and out of FEN and displaying usefully
- * either to stdout or to a given ostream.
+ * Reading and writing helpers: into and out of FEN and displaying usefully.
  */
-
 Board fen_to_board(const std::string_view & fen);
 std::string board_to_fen(const Board &);
-std::vector<std::string> read_pgn(const std::string &s);
-// write functions (write to ostream)
-void wr_board(const Board &, std::ostream &);
-void wr_board(const Board &, const std::string & indent, std::ostream &);
 void wr_board_conf(const Board &, std::ostream &);
-void wr_board_conf(const Board &, const std::string & indent, std::ostream &);
-void wr_bin_64(uint64_t, std::ostream &);
-// print functions (write to stdout using cout)
 void pr_board(const Board &);
-void pr_board(const Board &, const std::string & indent);
 void pr_board_conf(const Board &);
-void pr_board_conf(const Board &, const std::string & indent);
-void pr_bin_64(uint64_t);
 
 #endif //STASE_BOARD_H

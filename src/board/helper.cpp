@@ -1,19 +1,15 @@
+#include <iostream>
+#include <ostream>
+#include <string>
+#include <vector>
+using std::vector;
+using std::string;
+using std::ostream;
+using std::cout;
+
 #include "board.h"
 #include "board.hpp"
 
-#include <iostream>
-using std::cout;
-#include <ostream>
-using std::ostream;
-
-#include <string>
-using std::string;
-
-#include <vector>
-using std::vector;
-
-#include <sstream>
-using std::stringstream;
 
 /**
  * Converts the given SAN string (eg "Be4") into a Move, operating on the given board.
@@ -23,7 +19,7 @@ using std::stringstream;
 Move stom(const Board & b, const string & san) {
 
     for (const Move m : legal_moves(b)) {
-        if (mtos(b, m).compare(san) == 0) {
+        if (mtos(b, m) == san) {
             return m;
         }
     }
@@ -63,9 +59,7 @@ DisambigType compute_disambig(const Board & b, const Move m) {
     bool rank_not_usable = false;
     bool file_not_usable = false;
 
-    for (int i = 0; i < legals.size(); ++i) {
-
-        const Move other_m = legals[i];
+    for (const Move & other_m : legals) {
 
         if (equal(other_m.from, m.from)) { continue; }
 
@@ -93,15 +87,12 @@ DisambigType compute_disambig(const Board & b, const Move m) {
 
     if (rank_not_usable && file_not_usable) {
         return TOTAL;
-    } else if (rank_not_usable) {
-        return BY_FILE;
     } else if (file_not_usable) {
         return BY_RANK;
     } else {
         // using files is somewhat more natural, so it's the default
         return BY_FILE;
     }
-
 }
 
 /**
@@ -120,7 +111,7 @@ string mtos(const Board & b, const Move m) {
         return "invalid move";
     }
 
-    string s = "";
+    string s;
     Colour piece_colour = colour(b.get(m.from));
 
     bool castle = (type(b.get(m.from)) == KING && abs(get_x(m.to) - get_x(m.from)) == 2);
@@ -135,8 +126,8 @@ string mtos(const Board & b, const Move m) {
 
         switch (disambig) {
             case NONE: break;
-            case BY_RANK: s += ('1' + get_y(m.from)); break;
-            case BY_FILE: s += (get_x(m.from) + 'a'); break;
+            case BY_RANK: s += (char) ('1' + get_y(m.from)); break;
+            case BY_FILE: s += (char) (get_x(m.from) + 'a'); break;
             case TOTAL: s += sqtos(m.from); break;
         }
         
@@ -308,25 +299,15 @@ string board_to_fen(const Board & b) {
     return ss.str();
 }
 
-// read PGN into a vector of the moves (still just as strings)
-vector<string> read_pgn(const string & s) {
-    vector<string> v;
-    v.push_back(s);
-    return v;
-    
-}
-
 /***** useful functions for getting the start or empty boards without knowing the FENs *****/
 
 Board starting_pos() {
     return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-
-
 Board empty_board() {
-    
-    Board b;
+
+    Board b{};
 
     for (int x = 0; x < 8; ++x) {
         for (int y = 0; y < 8; ++y) {
@@ -335,7 +316,6 @@ Board empty_board() {
     }
 
     b.conf = 0;
-    
     return b;
 }
 
@@ -344,7 +324,6 @@ Board empty_board() {
  ************************************************************************************/
 
 void wr_board(const Board & b, const string & indent, ostream & output) {
-
     for (int y = 7; y >= 0; --y) {
         output << indent;
         for (int x = 0; x < 8; ++x) {
@@ -353,14 +332,7 @@ void wr_board(const Board & b, const string & indent, ostream & output) {
         }
         output << "\n";
     }
-    
     output << "\n";
-    return;
-
-}
-
-void wr_board(const Board & b, ostream & output) {
-    wr_board(b, "", output);
 }
 
 void wr_board_conf(const Board & b, const string & indent, ostream & output) {
@@ -442,8 +414,9 @@ void wr_board_conf(const Board & b, const string & indent, ostream & output) {
                 output << "\tFull moves: " << b.get_wholemoves();
                 break;
             }
-        }
 
+            default: break;
+        }
         output << "\n";
     }
 }
@@ -452,40 +425,14 @@ void wr_board_conf(const Board & b, ostream & output) {
     wr_board_conf(b, "", output);
 }
 
-/* prints out 64 bits of binary lichess_db_puzzle.csv from MSB (left) to LSB (right) */
-void wr_bin_64(uint64_t data, ostream & output) {
-    
-    uint64_t mask = ( ((uint64_t) 1) << 63);
-    
-    do {
-        output << ((data & mask) ? '1' : '0');
-    } while (mask >>= 1);
-    
-}
-
 /*************************************************************************************
  PRINTING FUNCTIONS         for board
  ************************************************************************************/
-
-/* print out a human readable chess representation of the board */
-void pr_board(const Board & b, const string & indent) {
-    wr_board(b, indent, cout);
-}
 
 void pr_board(const Board & b) {
     wr_board(b, "", cout);
 }
 
-
-void pr_board_conf(const Board & b, const string & indent) {
-    wr_board_conf(b, indent, cout);
-}
-
 void pr_board_conf(const Board & b) {
     wr_board_conf(b, "", cout);
-}
-
-/* prints out 64 bits of binary lichess_db_puzzle.csv from MSB (left) to LSB (right) */
-void pr_bin_64(uint64_t data) {
-    wr_bin_64(data, cout);
 }

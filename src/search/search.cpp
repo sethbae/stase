@@ -2,9 +2,7 @@
 #include "search.h"
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
-#include "../game/eval.hpp"
 #include "metrics.h"
-#include "observers/observers.hpp"
 
 #include <vector>
 using std::vector;
@@ -25,8 +23,8 @@ int subtree_size(SearchNode * node) {
     if (node == nullptr) { return 0; }
 
     int size = 1;
-    for (int i = 0; i < node->children.size(); ++i) {
-        size += subtree_size(node->children[i]);
+    for (SearchNode * i : node->children) {
+        size += subtree_size(i);
     }
     return size;
 }
@@ -36,11 +34,11 @@ int subtree_size(SearchNode * node) {
  */
 int subtree_depth(SearchNode *node) {
 
-    if (node == nullptr || node->children.size() == 0) { return 0; }
+    if (node == nullptr || node->children.empty()) { return 0; }
 
     int max = 0;
-    for (int i = 0; i < node->children.size(); ++i) {
-        int depth = subtree_depth(node->children[i]);
+    for (SearchNode * i : node->children) {
+        int depth = subtree_depth(i);
         if (depth > max) {
             max = depth;
         }
@@ -101,7 +99,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "Is in check? " << (node->gs->in_check ? "true\n" : "false\n");
     output << "Visit count: " << node->visit_count << "\n\n";
 
-    if (node->children.size() == 0) {
+    if (node->children.empty()) {
         output << "Has no children.\n";
     } else {
         output << "Children:\n";
@@ -154,8 +152,8 @@ void write_to_file(SearchNode *node, ostream & output) {
  */
 void write_to_file_recursively(SearchNode *node, ostream & output) {
     write_to_file(node, output);
-    for (int i = 0; i < node->children.size(); ++i) {
-        write_to_file_recursively(node->children[i], output);
+    for (SearchNode * i : node->children) {
+        write_to_file_recursively(i, output);
     }
 }
 
@@ -191,7 +189,7 @@ SearchNode *new_node(const SearchNode * node, Move m) {
 void update_score(SearchNode * node) {
 
     check_abort();
-    if (node->children.size() == 0) { return; }
+    if (node->children.empty()) { return; }
 
     // find the best score among children
     node->score = node->children[0]->score;
@@ -223,10 +221,8 @@ void update_score(SearchNode * node) {
 
     for (int i = 1; i < node->children.size(); ++i) {
         Eval score = trust_score(node->children[i], node->gs->board.get_white());
-        if (node->gs->board.get_white() && score > best_trust_score) {
-            best_trust_score = score;
-            node->best_trust_child = node->children[i];
-        } else if (!node->gs->board.get_white() && score < best_trust_score) {
+        if ((node->gs->board.get_white() && score > best_trust_score)
+            || (!node->gs->board.get_white() && score < best_trust_score)) {
             best_trust_score = score;
             node->best_trust_child = node->children[i];
         }
@@ -274,8 +270,8 @@ void delete_tree(SearchNode * node) {
 
     if (!node) { return; }
 
-    for (int i = 0; i < node->children.size(); ++i) {
-        delete_tree(node->children[i]);
+    for (SearchNode * i : node->children) {
+        delete_tree(i);
     }
     delete node->gs;
     delete node->cand_set;
