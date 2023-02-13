@@ -148,7 +148,7 @@ CandSet * cands_report(Gamestate & gs) {
             "* Generating candidate moves\n"
             "********************************\n\n";
 
-    board_utils::pr_board_conf(gs.board);
+    board_utils::print_conf(gs.board);
     CandSet * cand_set = new CandSet;
 
     // if we're in check, handle the candidates differently

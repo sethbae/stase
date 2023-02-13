@@ -412,6 +412,6 @@ void board_utils::print(const Board & b) {
     wr_board(b, "", cout);
 }
 
-void board_utils::pr_board_conf(const Board & b) {
+void board_utils::print_conf(const Board & b) {
     wr_board_conf(b, "", cout);
 }

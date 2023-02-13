@@ -85,7 +85,7 @@ bool score_engine_against_puzzle(const Puzzle & puzzle, int positions_allowed) {
     // get the UCI moves it played
     std::vector<SearchNode *> line_played = retrieve_trust_line(engine.get_root());
 
-    board_utils::pr_board_conf(board_utils::fen_to_board(puzzle.fen));
+    board_utils::print_conf(board_utils::fen_to_board(puzzle.fen));
     std::cout << "Rating: " << puzzle.rating << "\n";
     for (int i = 0; i < puzzle.solution_moves.size(); ++i) {
         std::cout << move2uci(puzzle.solution_moves[i]) << " ";

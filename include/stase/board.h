@@ -42,7 +42,7 @@ namespace board_utils {
     std::string board_to_fen(const Board &);
     void wr_board_conf(const Board &, std::ostream &);
     void print(const Board &);
-    void pr_board_conf(const Board &);
+    void print_conf(const Board &);
 }
 
 #endif //STASE_BOARD_H

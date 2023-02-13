@@ -27,7 +27,7 @@ void manual_gameplay() {
 
     while (true) {
 
-        board_utils::pr_board_conf(b); cout << "\n";
+        board_utils::print_conf(b); cout << "\n";
 
         moves.clear();
         legal_moves(b, moves);
