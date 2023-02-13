@@ -102,8 +102,6 @@ set(TEST_SOURCE_FILES
         src/test/stress_test_main.cpp
         src/test/game/cands/stress_test_cands.cpp
 
-        src/test/integration_test_main.cpp
-
         src/test/game/test_game.cpp
         src/test/game/test_gs_piece_lists.cpp
         src/test/game/test_cands_sorting.cpp
@@ -153,7 +151,9 @@ set(TEST_SOURCE_FILES
         src/test/search/test_past_blunders.cpp
         src/test/search/test_past_crashes.cpp
         src/test/search/test_parent_pointer.cpp
-        src/test/search/test_checkmates.cpp)
+        src/test/search/test_checkmates.cpp
+
+        src/test/integration/integration_test_main.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
 set(BENCH_MAIN src/bench/bench_main.cpp)

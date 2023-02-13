@@ -1,5 +1,5 @@
-#include "test.h"
-#include "../search/engine.h"
+#include "../test.h"
+#include "../../search/engine.h"
 #include <vector>
 #include <iomanip>
 
@@ -17,13 +17,13 @@ const static std::vector<std::string> fens = {
 };
 
 bool integration_test_main() {
-    for (int i = 0; i < fens.size(); ++i) {
+    for (const std::string & fen : fens) {
         Engine engine =
-            EngineBuilder::for_position(fens[i])
+            EngineBuilder::for_position(fen)
                 .with_timeout(10)
                 .build();
         engine.blocking_run();
-        std::cout << std::left << std::setw(75) << fens[i] << ": ok\n";
+        std::cout << std::left << std::setw(75) << fen << ": ok\n";
     }
     std::cout << "All tests passed.\n";
     return true;

@@ -96,7 +96,7 @@ inline bool evaluate_test_set(const TestSet<T> * test_set, bool (*func)(const T*
 
 }
 
-inline bool evaluate_test_function(const std::string name, bool (*func)(void)) {
+inline bool evaluate_test_function(const std::string name, bool (*func)()) {
 
     bool passed = false;
     if (func) {
