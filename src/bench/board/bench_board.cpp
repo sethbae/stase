@@ -49,7 +49,7 @@ void bench_board_write() {
 
     std::vector<BoardPairParam> params;
     for (int i = 0; i < boards.size(); ++i) {
-        Board b = empty_board();
+        Board b = Board::empty();
         params.push_back(BoardPairParam{boards[i], b});
     }
 
@@ -103,7 +103,7 @@ void bench_board_write_config() {
 
     std::vector<BoardPairParam> params;
     for (int i = 0; i < boards.size(); ++i) {
-        Board b = empty_board();
+        Board b = Board::empty();
         params.push_back(BoardPairParam{boards[i], b});
     }
 

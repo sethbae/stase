@@ -183,7 +183,7 @@ Board fen_to_board(const std::string_view & fen) {
 
     std::string s(fen);
     stringstream stream(s);
-    Board b = empty_board();
+    Board b = Board::empty();
     
     /* take the first token: the pieces on the board */
     string piece_layout = get_word(stream);
@@ -206,7 +206,7 @@ Board fen_to_board(const std::string_view & fen) {
                 b.set(mksq(x, y), p);
                 ++x;
             } else {
-                return empty_board();
+                return Board::empty();
             }
             
         } else if ('1' <= c && c <= '8') {
@@ -216,9 +216,8 @@ Board fen_to_board(const std::string_view & fen) {
 
         } else {
             // illegal character
-            return empty_board();
+            return Board::empty();
         }
-        
     }
     
     /* now use the remaining words to get the config info */
@@ -297,26 +296,6 @@ string board_to_fen(const Board & b) {
     ss << " " << b.get_halfmoves() << " " << b.get_wholemoves();
 
     return ss.str();
-}
-
-/***** useful functions for getting the start or empty boards without knowing the FENs *****/
-
-Board starting_pos() {
-    return fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-}
-
-Board empty_board() {
-
-    Board b{};
-
-    for (int x = 0; x < 8; ++x) {
-        for (int y = 0; y < 8; ++y) {
-            b.set(x, y, EMPTY);
-        }
-    }
-
-    b.conf = 0;
-    return b;
 }
 
 /*************************************************************************************

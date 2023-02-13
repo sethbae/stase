@@ -257,11 +257,9 @@ struct Board {
 
         // promotion
         if (m.is_prom()) {
-            Piece p = m.get_prom_piece(col);
+            p = m.get_prom_piece(col);
             set(m.to, p);
         }
-
-        return;
     }
 
     void mutate_hard(const Move m) {
@@ -323,8 +321,6 @@ struct Board {
             Piece prom_piece = m.get_prom_piece(colour(get(m.to)));
             set(m.to, prom_piece);
         }
-
-        return;
     }
 
     /**
@@ -372,6 +368,23 @@ struct Board {
             }
         }
         return true;
+    }
+
+    static Board empty() {
+        Board b{};
+
+        for (int x = 0; x < 8; ++x) {
+            for (int y = 0; y < 8; ++y) {
+                b.set(x, y, EMPTY);
+            }
+        }
+
+        b.conf = 0;
+        return b;
+    }
+
+    static Board starting_pos() {
+        return fen_to_board(starting_fen());
     }
 
 private:

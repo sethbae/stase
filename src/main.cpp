@@ -22,7 +22,7 @@ const std::string welcome_message =
 
 void manual_gameplay() {
 
-    Board b = starting_pos();
+    Board b = Board::starting_pos();
     vector<Move> moves;
 
     while (true) {

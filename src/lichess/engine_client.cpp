@@ -11,7 +11,7 @@ private:
     std::vector<Gamestate> game_history;
 
 public:
-    EngineClient() : gs(new Gamestate(starting_pos())), nodes(0) {
+    EngineClient() : gs(new Gamestate(Board::starting_pos())), nodes(0) {
         game_history.push_back(*gs);
     }
     explicit EngineClient(const char * fen) : gs(new Gamestate(std::string(fen))), nodes(0) {

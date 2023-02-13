@@ -18,9 +18,6 @@
  */
 struct Board;
 
-/** special values: empty, starting */
-Board empty_board();
-Board starting_pos();
 inline std::string starting_fen() {
     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 }
@@ -30,7 +27,7 @@ inline std::string starting_fen() {
  * as well as checking whether you're in check or not.
  */
 
-void piecemoves_ignore_check(const Board &, const Square, ptr_vec<Move> &);
+void piecemoves_ignore_check(const Board &, Square, ptr_vec<Move> &);
 bool in_check_hard(const Board &);
 bool in_check_hard(const Board &, Colour);
 void legal_moves(const Board &, std::vector<Move> &);
