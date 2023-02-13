@@ -77,7 +77,7 @@ bool score_engine_against_puzzle(const Puzzle & puzzle, int positions_allowed) {
 
     // then run the engine
     Engine engine =
-        EngineBuilder::for_position(board_to_fen(gs.board))
+        EngineBuilder::for_position(board_utils::board_to_fen(gs.board))
             .with_node_limit(positions_allowed)
             .build();
     engine.blocking_run();
@@ -85,7 +85,7 @@ bool score_engine_against_puzzle(const Puzzle & puzzle, int positions_allowed) {
     // get the UCI moves it played
     std::vector<SearchNode *> line_played = retrieve_trust_line(engine.get_root());
 
-    pr_board_conf(fen_to_board(puzzle.fen));
+    board_utils::pr_board_conf(board_utils::fen_to_board(puzzle.fen));
     std::cout << "Rating: " << puzzle.rating << "\n";
     for (int i = 0; i < puzzle.solution_moves.size(); ++i) {
         std::cout << move2uci(puzzle.solution_moves[i]) << " ";

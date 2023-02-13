@@ -215,17 +215,17 @@ const TestSet<CoversTestCase> gamma_tests = {
 };
 
 bool evaluate_alpha_covers_test_case(const CoversTestCase * tc) {
-    const Board board = fen_to_board(tc->fen);
+    const Board board = board_utils::fen_to_board(tc->fen);
     return tc->expected == alpha_covers(board, tc->piece_sq, tc->to_sq);
 }
 
 bool evaluate_beta_covers_test_case(const CoversTestCase * tc) {
-    const Board board = fen_to_board(tc->fen);
+    const Board board = board_utils::fen_to_board(tc->fen);
     return tc->expected == beta_covers(board, tc->piece_sq, tc->to_sq);
 }
 
 bool evaluate_gamma_covers_test_case(const CoversTestCase * tc) {
-    const Board board = fen_to_board(tc->fen);
+    const Board board = board_utils::fen_to_board(tc->fen);
     return tc->expected == gamma_covers(board, tc->piece_sq, tc->to_sq);
 }
 

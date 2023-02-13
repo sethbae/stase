@@ -9,7 +9,7 @@ struct SetGetTestCase {
 };
 
 bool evaluate_set_get_test_case(const SetGetTestCase * tc) {
-    Board b(fen_to_board(tc->fen));
+    Board b(board_utils::fen_to_board(tc->fen));
     b.set(tc->sq, tc->p);
     return b.get(tc->sq) == tc->p;
 }

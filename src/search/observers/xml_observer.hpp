@@ -17,29 +17,29 @@ private:
 
     inline static bool activated(SearchEvent ev) {
         switch (ev) {
-            case VISIT: return true;
-            case VISIT_LINE: return true;
-            case SWING: return true;
-            case FORCE_VISIT: return true;
-            case FORCE_VISIT_LINE: return true;
-            case DEEPEN: return false;
-            case BURST_DEEPEN: return false;
-            case BEGIN_BURST: return false;
-            case UPDATE_TERMINAL: return false;
+            case DEEPEN:
+            case BURST_DEEPEN:
+            case BEGIN_BURST:
+            case UPDATE_TERMINAL:
             case DEBURST: return false;
+            case VISIT:
+            case VISIT_LINE:
+            case SWING:
+            case FORCE_VISIT:
+            case FORCE_VISIT_LINE:
             default: return true;
         }
     }
 
 public:
 
-    XMLObserver(const std::string & filepath) : filepath(filepath) {}
+    explicit XMLObserver(const std::string & filepath) : filepath(filepath) {}
 
     /**
      * Opens a new tag for the given event, and records some text on the same line. Causes a nested
      * layer in the output.
      */
-    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, const int branch) {
+    inline void open_event(const SearchNode * node, const SearchEvent ev, const CandList * cand_list, const int branch)  override {
 
         if (!activated(ev)) { return; }
 
@@ -50,7 +50,7 @@ public:
                 + (cand_list ? name(*cand_list) + " " : "")
                 + "(vc: " + std::to_string(node->visit_count) + ") "
                 + "(q: " + std::to_string((int)quiess(*node->gs)) + ") "
-                + board_to_fen(node->gs->board);
+                + board_utils::board_to_fen(node->gs->board);
         std::string event_name = name(ev);
         if (branch) { event_name += "(" + std::to_string(branch) + ")"; }
 
@@ -62,7 +62,7 @@ public:
     /**
      * Closes a previously opened tag without any other text and reduces the indentation accordingly.
      */
-    inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *, const int branch) {
+    inline void close_event([[maybe_unused]] const SearchNode * node, const SearchEvent ev, const CandList *, const int branch) override {
 
         if (!activated(ev)) { return; }
 
@@ -79,7 +79,7 @@ public:
     /**
      * Prints a single line for the event, eg <begin_burst>0x123456789</begin_burst>
      */
-    inline void register_event(const SearchNode * node, const SearchEvent ev) {
+    inline void register_event(const SearchNode * node, const SearchEvent ev) override {
         if (!activated(ev)) { return; }
         buffer.push_back(
             indent(indent_level) + "<" + name(ev) + ">" + to_string(node) + " " + position_string() + "</" + name(ev) + ">"
@@ -100,7 +100,7 @@ public:
 private:
 
     inline std::string position_string() {
-        std::string s = "";
+        std::string s;
         for (int i = 0; i < current_line.size() - 1; ++i) {
             s += current_line[i];
             s += " ";
@@ -109,8 +109,8 @@ private:
         return s;
     }
 
-    inline std::string indent(const int n) {
-        std::string s = "";
+    static inline std::string indent(const int n) {
+        std::string s;
         for (int i = 0; i < n; ++i) {
             s += " ";
         }

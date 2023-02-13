@@ -100,7 +100,7 @@ public:
     }
 
     explicit Gamestate(const std::string & fen)
-            : board(fen_to_board(fen)),
+            : board(board_utils::fen_to_board(fen)),
               game_over(false),
               w_cas(false),
               b_cas(false),
@@ -117,7 +117,7 @@ public:
     }
 
     explicit Gamestate(const std::string & fen, GamePhase phase)
-            : board(fen_to_board(fen)),
+            : board(board_utils::fen_to_board(fen)),
               game_over(false),
               w_cas(false),
               b_cas(false),

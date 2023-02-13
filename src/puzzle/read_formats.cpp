@@ -58,7 +58,7 @@ void puzzle_boards(std::vector<Board> & vec) {
         std::vector<std::string> fens;
         read_all_fens(fens);
         for (std::string fen : fens) {
-            cache.push_back(fen_to_board(fen));
+            cache.push_back(board_utils::fen_to_board(fen));
         }
     }
 

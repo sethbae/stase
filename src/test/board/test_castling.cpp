@@ -60,7 +60,7 @@ const TestSet<CastleTestCase> castle_test_set{
 
 bool evaluate_castle_test_case(const CastleTestCase * tc) {
 
-    Board b = fen_to_board(tc->fen);
+    Board b = board_utils::fen_to_board(tc->fen);
 
     // these are the moves representing each of four castles
     Move ws = Move{stosq("e1"), stosq("g1"), 0};

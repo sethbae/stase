@@ -27,7 +27,7 @@ public:
         std::cout << "[C++] entering get_computer_move\n";
 #endif
         Engine engine =
-            EngineBuilder::for_position(board_to_fen(gs->board))
+            EngineBuilder::for_position(board_utils::board_to_fen(gs->board))
                 .with_timeout(think_time)
                 .with_game_history(&game_history)
                 .build();

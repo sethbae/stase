@@ -148,7 +148,7 @@ CandSet * cands_report(Gamestate & gs) {
             "* Generating candidate moves\n"
             "********************************\n\n";
 
-    pr_board_conf(gs.board);
+    board_utils::pr_board_conf(gs.board);
     CandSet * cand_set = new CandSet;
 
     // if we're in check, handle the candidates differently
@@ -279,7 +279,7 @@ CandSet * cands_report(Gamestate & gs) {
         cand_set->legal = legal_moves(gs.board);
     }
 
-    pr_board(gs.board);
+    board_utils::pr_board(gs.board);
     print_cand_set(gs, *cand_set, cout);
 
     return cand_set;

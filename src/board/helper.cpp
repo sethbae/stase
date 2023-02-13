@@ -179,7 +179,7 @@ int get_number(stringstream & ss) {
 
 /***** FEN to board and board to FEN *****/
 
-Board fen_to_board(const std::string_view & fen) {
+Board board_utils::fen_to_board(const std::string_view & fen) {
 
     std::string s(fen);
     stringstream stream(s);
@@ -248,7 +248,7 @@ Board fen_to_board(const std::string_view & fen) {
     return b;
 }
 
-string board_to_fen(const Board & b) {
+string board_utils::board_to_fen(const Board & b) {
     
     stringstream ss;
 
@@ -330,7 +330,7 @@ void wr_board_conf(const Board & b, const string & indent, ostream & output) {
             
             // print the FEN
             case 7: {
-                output << "\tFEN: " << board_to_fen(b);
+                output << "\tFEN: " << board_utils::board_to_fen(b);
                 break;
             }
             
@@ -400,7 +400,7 @@ void wr_board_conf(const Board & b, const string & indent, ostream & output) {
     }
 }
 
-void wr_board_conf(const Board & b, ostream & output) {
+void board_utils::wr_board_conf(const Board & b, ostream & output) {
     wr_board_conf(b, "", output);
 }
 
@@ -408,10 +408,10 @@ void wr_board_conf(const Board & b, ostream & output) {
  PRINTING FUNCTIONS         for board
  ************************************************************************************/
 
-void pr_board(const Board & b) {
+void board_utils::pr_board(const Board & b) {
     wr_board(b, "", cout);
 }
 
-void pr_board_conf(const Board & b) {
+void board_utils::pr_board_conf(const Board & b) {
     wr_board_conf(b, "", cout);
 }

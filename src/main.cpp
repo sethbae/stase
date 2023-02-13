@@ -27,7 +27,7 @@ void manual_gameplay() {
 
     while (true) {
 
-        pr_board_conf(b); cout << "\n";
+        board_utils::pr_board_conf(b); cout << "\n";
 
         moves.clear();
         legal_moves(b, moves);
@@ -68,13 +68,13 @@ void manual_gameplay() {
 
 void play_game(const std::string & starting_fen, bool engine_is_white, int seconds_per_move) {
 
-    Board b = fen_to_board(starting_fen);
+    Board b = board_utils::fen_to_board(starting_fen);
     bool players_turn = !engine_is_white;
     bool keep_playing = true;
 
     while (keep_playing) {
 
-        pr_board(b);
+        board_utils::pr_board(b);
         std::vector<Move> legals = legal_moves(b);
 
         if (players_turn) {
@@ -101,7 +101,7 @@ void play_game(const std::string & starting_fen, bool engine_is_white, int secon
 
         } else {
 
-            const std::string fen = board_to_fen(b);
+            const std::string fen = board_utils::board_to_fen(b);
 
             cout << "Stase has " << seconds_per_move << " seconds to think\n";
 

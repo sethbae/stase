@@ -36,10 +36,13 @@ std::vector<Move> legal_moves(const Board &);
 /**
  * Reading and writing helpers: into and out of FEN and displaying usefully.
  */
-Board fen_to_board(const std::string_view & fen);
-std::string board_to_fen(const Board &);
-void wr_board_conf(const Board &, std::ostream &);
-void pr_board(const Board &);
-void pr_board_conf(const Board &);
+
+namespace board_utils {
+    Board fen_to_board(const std::string_view & fen);
+    std::string board_to_fen(const Board &);
+    void wr_board_conf(const Board &, std::ostream &);
+    void pr_board(const Board &);
+    void pr_board_conf(const Board &);
+}
 
 #endif //STASE_BOARD_H

@@ -364,7 +364,7 @@ void find_cands_outliers(CandList cand_list) {
 
     for (int i = 0; i < N; ++i) {
         if (num_cands[i] >= max_size - 1) {
-            cout << "(" << num_cands[i] << ") " << board_to_fen(states[i].board) << "\n";
+            cout << "(" << num_cands[i] << ") " << board_utils::board_to_fen(states[i].board) << "\n";
         }
     }
 
@@ -378,7 +378,7 @@ void show_responder_moves(const std::string & fen, const Responder & resp, const
 
     Gamestate gs(fen);
 
-    pr_board(gs.board);
+    board_utils::pr_board(gs.board);
 
     Move moves[100];
     int idx = 0;
@@ -399,7 +399,7 @@ void show_hook_frames(Gamestate & gs, const Hook & h) {
 
     discover_feature_frames(gs, h);
 
-    pr_board(gs.board);
+    board_utils::pr_board(gs.board);
     cout << "\nFeatureFrames found for " << h.name << ":\n";
     for (int i = 0; !is_sentinel(gs.frames[h.id][i].centre) && i < MAX_FRAMES; ++i) {
         FeatureFrame ff = gs.frames[h.id][i];
@@ -575,13 +575,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
     signal(SIGABRT, print_stack_trace_and_abort);
     signal(SIGTERM, print_stack_trace_and_abort);
 
-    const std::string fen = "8/6k1/8/5QK1/8/8/8/8 w - - 0 1";
-    const std::string fen2 = "5k2/3Q4/5K2/8/8/8/8/8 b - - 3 2";
+    const std::string fen = "2k5/3R4/1K6/8/8/8/8/8 w - - 0 1";
 
     const GamePhase game_phase = ENDGAME;
 
-    Gamestate gs(fen2, game_phase);
-    pr_board(gs.board);
+    Gamestate gs(fen, game_phase);
+    board_utils::pr_board(gs.board);
 
 //
 //    EngineClient * client = new EngineClient();
@@ -591,13 +590,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 //    client->get_computer_move(10.0);
 
 //    cands_report(gs);
-    discover_feature_frames(gs, king_pinned_pieces_hook);
-    discover_feature_frames(gs, check_hook);
-    heur_with_description(gs);
+//    discover_feature_frames(gs, king_pinned_pieces_hook);
+//    discover_feature_frames(gs, check_hook);
+//    heur_with_description(gs);
 
 //    Gamestate next(gs, Move{stosq("c5"), stosq("e4")});
 //    std::cout << "back in main\n";
-//    pr_board(next.board);
+//    board_utils::pr_board(next.board);
 
 //    for (const Move m : legal_moves(gs.board)) {
 //        cout << mtos(gs.board, m) << " ";
@@ -609,7 +608,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    q_scores();
 
-    repl(fen, game_phase);
+//    repl(fen, game_phase);
 
     XMLObserver observer("debug_pos");
     Engine engine =
@@ -647,7 +646,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv) {
 
 //    evaluate_square_control(gs, stosq("d5")).print();
 
-    show_responder_moves(fen2, approach_kings_resp, FeatureFrame{stosq("e1"), {0, 0}, r, r});
+    show_responder_moves(fen, retreat_resp, {FeatureFrame{stosq("d7"), SQUARE_SENTINEL, 0, 0}});
 
 //    CandSet c;
 //    cands_report(gs);

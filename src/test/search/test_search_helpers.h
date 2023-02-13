@@ -54,7 +54,7 @@ protected:
 
     inline void fail_test(const SearchNode * node, const std::string error) {
         diagnostics.push_back(
-            board_to_fen(node->gs->board)
+            board_utils::board_to_fen(node->gs->board)
             + ": "
             + error
         );

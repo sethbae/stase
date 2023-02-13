@@ -384,7 +384,7 @@ struct Board {
     }
 
     static Board starting_pos() {
-        return fen_to_board(starting_fen());
+        return board_utils::fen_to_board(starting_fen());
     }
 
 private:
@@ -395,7 +395,7 @@ private:
    * This must be called after the board has been updated to the new position. If it is called
    * beforehand, it will not work correctly.
    */
-    void update_config_after_move(Board & b, const Move m) const {
+    static void update_config_after_move(Board & b, const Move m) {
 
         // if white and there are castling rights to lose
         if (b.get_white() && (b.get_cas_ws() || b.get_cas_wl())) {

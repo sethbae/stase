@@ -8,7 +8,7 @@ struct FenTestCase {
 };
 
 bool evaluate_fen_test_case(const FenTestCase * tc) {
-    const std::string new_fen = board_to_fen(fen_to_board(tc->fen));
+    const std::string new_fen = board_utils::board_to_fen(board_utils::fen_to_board(tc->fen));
     return new_fen.compare(tc->fen) == 0;
 }
 

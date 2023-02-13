@@ -184,7 +184,7 @@ TestSet<MutationTestCase> mutation_test_set{
 
 bool evaluate_mutation_test_case(const MutationTestCase * tc, bool hard) {
 
-    Board start = fen_to_board(tc->start);
+    Board start = board_utils::fen_to_board(tc->start);
     Move m = uci2move(tc->move);
 
     if (is_sentinel(m)) {
@@ -213,7 +213,7 @@ bool evaluate_mutation_test_case(const MutationTestCase * tc, bool hard) {
         start.mutate(m);
     }
 
-    return board_to_fen(start).compare(tc->end) == 0;
+    return board_utils::board_to_fen(start).compare(tc->end) == 0;
 }
 
 bool evaluate_mutate_hard_test_case(const MutationTestCase * tc) {
