@@ -90,7 +90,7 @@ void write_to_file(SearchNode *node, ostream & output) {
     output << "SearchNode at " << node
            << " (created by " << mtos(node->gs->board, node->move) << ")\n";
 
-    board_utils::wr_board_conf(node->gs->board, output);
+    board_utils::write_conf(node->gs->board, output);
 
     output << "\nScore: " << etos(node->score) << "\n";
     output << "Trust score: " << etos(trust_line[trust_line.size() - 1]->score) << "\n";
@@ -163,7 +163,7 @@ void record_tree_in_file(const std::string & filename, SearchNode * root) {
 
     file << "This file contains engine analysis of the following position\n";
 
-    board_utils::wr_board_conf(root->gs->board, file);
+    board_utils::write_conf(root->gs->board, file);
 
     file << "\nHere are the nodes:\n";
 

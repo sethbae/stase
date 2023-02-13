@@ -400,8 +400,8 @@ void wr_board_conf(const Board & b, const string & indent, ostream & output) {
     }
 }
 
-void board_utils::wr_board_conf(const Board & b, ostream & output) {
-    wr_board_conf(b, "", output);
+void board_utils::write_conf(const Board & b, ostream & o) {
+    wr_board_conf(b, "", o);
 }
 
 /*************************************************************************************
