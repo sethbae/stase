@@ -24,8 +24,7 @@ using std::ofstream;
 #include "src/search/metrics.h"
 #include "src/search/observers/observers.hpp"
 #include "src/search/engine.h"
-
-#include "src/lichess/engine_client.cpp"
+#include "src/search/engine_client.h"
 
 //#include "src/test/test.h"
 //#include "src/test/game/cands/fork_helpers.h"

@@ -39,6 +39,8 @@ set(SOURCE_FILES
         src/search/search.cpp
         src/search/engine.h
         src/search/engine.cpp
+        src/search/engine_client.h
+        src/search/engine_client.cpp
         src/search/greedy.cpp
         src/search/metrics.h
         src/search/metrics.cpp
@@ -86,7 +88,7 @@ set(SOURCE_FILES
         src/utils/print.cpp
         src/utils/uci.cpp
         src/utils/signal.cpp
-        src/utils/ptr_vec.h)
+        src/utils/ptr_vec.h src/search/engine_client.h)
 
 set(STASE_SOURCE_FILES)
 
@@ -151,6 +153,7 @@ set(TEST_SOURCE_FILES
         src/test/search/test_parent_pointer.cpp
         src/test/search/test_checkmates.cpp
 
+        src/test/integration/integration_test.h
         src/test/integration/integration_test_main.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
@@ -167,7 +170,7 @@ add_executable(test ${TEST_MAIN} ${SOURCE_FILES} ${TEST_SOURCE_FILES} ${SOURCES}
 
 add_library(engine_client
             SHARED
-            ${SOURCE_FILES} src/lichess/engine_client.cpp)
+            ${SOURCE_FILES} src/search/engine_client.cpp)
 
 # these two lines are apparently a workaround which force the library to be rebuilt whenever
 # the sources change.
