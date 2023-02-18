@@ -17,6 +17,7 @@ public:
     EngineClient();
     explicit EngineClient(const char * fen);
     explicit EngineClient(const std::string & fen);
+    explicit EngineClient(const std::string & fen, GamePhase phase);
 
     /**
      * Fetches a move in the current position and updates the engine to the resulting position.

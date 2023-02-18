@@ -14,6 +14,10 @@ EngineClient::EngineClient(const std::string & fen) : gs(new Gamestate(fen)), no
     game_history.push_back(*gs);
 }
 
+EngineClient::EngineClient(const std::string & fen, GamePhase phase) : gs(new Gamestate(fen, phase)), nodes(0) {
+    game_history.push_back(*gs);
+}
+
 const char * EngineClient::get_computer_move(double think_time) {
 #ifdef PYBIND_DEBUG_LOG
     std::cout << "[C++] entering get_computer_move\n";
