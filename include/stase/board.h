@@ -26,6 +26,16 @@ enum GameStatus {
     DRAW_BY_THREEFOLD,
     DRAW_BY_FIFTY_MOVES
 };
+inline std::string name(GameStatus game_status) {
+    switch (game_status) {
+        case ONGOING: return "ongoing";
+        case WHITE_WON: return "white won";
+        case BLACK_WON: return "black won";
+        case DRAW_BY_STALEMATE: return "stalemate";
+        case DRAW_BY_THREEFOLD: return "threefold rep";
+        case DRAW_BY_FIFTY_MOVES: return "fifty move rule";
+    }
+}
 
 inline std::string starting_fen() {
     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";

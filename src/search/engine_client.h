@@ -12,6 +12,7 @@ class EngineClient {
     int nodes;
     std::string eval_str;
     std::vector<Gamestate> game_history;
+    GameStatus game_status;
 
 public:
     EngineClient();
@@ -38,6 +39,13 @@ public:
     const char * get_eval_cstr();
 
     std::string get_eval_str();
+
+    bool game_has_ended() const;
+
+    GameStatus current_status() const;
+
+private:
+    void update_status();
 };
 
 #endif //STASE_ENGINE_CLIENT_H
