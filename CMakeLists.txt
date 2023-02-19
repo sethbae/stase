@@ -14,6 +14,7 @@ set(SOURCE_FILES
         src/board/board.hpp
         src/board/helper.cpp
         src/board/move.cpp
+        src/board/game_status.cpp
 
         src/game/gamestate.hpp
         src/game/eval.hpp
@@ -151,13 +152,10 @@ set(TEST_SOURCE_FILES
         src/test/search/test_past_blunders.cpp
         src/test/search/test_past_crashes.cpp
         src/test/search/test_parent_pointer.cpp
-        src/test/search/test_checkmates.cpp
-
-        src/test/integration/integration_test.h
-        src/test/integration/integration_test_main.cpp)
+        src/test/search/test_checkmates.cpp)
 
 set(TEST_MAIN src/test/test_main.cpp)
-set(SCRATCH_MAIN scratch.cpp src/test/game/glogic/test_luft.cpp)
+set(SCRATCH_MAIN scratch.cpp)
 set(STASE_MAIN src/main.cpp)
 
 include_directories(include/stase)
