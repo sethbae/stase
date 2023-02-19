@@ -10,16 +10,16 @@ class IntegrationTest {
 public:
     const std::string fen;
     const GamePhase phase;
-    const int primary_think_time;
-    const int secondary_think_time;
+    const double primary_think_time;
+    const double secondary_think_time;
     const int max_moves;
     const GameStatus expected_result;
 
     IntegrationTest(
             const std::string & fen,
             const GamePhase phase,
-            const int primary_think_time,
-            const int secondary_think_time,
+            const double primary_think_time,
+            const double secondary_think_time,
             const int max_moves,
             const GameStatus expected_result)
         :  fen(fen),
