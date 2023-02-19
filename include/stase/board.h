@@ -34,6 +34,7 @@ inline std::string name(GameStatus game_status) {
         case DRAW_BY_STALEMATE: return "stalemate";
         case DRAW_BY_THREEFOLD: return "threefold rep";
         case DRAW_BY_FIFTY_MOVES: return "fifty move rule";
+        default: return "unknown game status";
     }
 }
 inline GameStatus value_of(const std::string & s) {

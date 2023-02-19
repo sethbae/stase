@@ -144,6 +144,7 @@ set(TEST_SOURCE_FILES
 
         src/test/integration/integration_test.h
         src/test/integration/integration_test_main.cpp
+        src/test/integration/test_piece_mates.cpp
 
         src/test/search/test_search.cpp
         src/test/search/test_search_helpers.h

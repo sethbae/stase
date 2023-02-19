@@ -30,19 +30,19 @@ public:
            expected_result(expected_result) {}
 };
 
-inline bool evaluate_integration_test(const IntegrationTest & test) {
+inline bool evaluate_integration_test(const IntegrationTest * test) {
 
     bool is_primary = false;
-    EngineClient engine(test.fen, test.phase);
+    EngineClient engine(test->fen, test->phase);
 
-    for (int unused = 0; unused < test.max_moves; ++unused) {
+    for (int unused = 0; unused < test->max_moves; ++unused) {
         const std::string move =
             engine.get_computer_move(
                 (is_primary = !is_primary)
-                    ? test.primary_think_time
-                    : test.secondary_think_time);
+                    ? test->primary_think_time
+                    : test->secondary_think_time);
         GameStatus status = value_of(move);
-        if (status == test.expected_result) {
+        if (status == test->expected_result) {
             return true;
         } else if (status != ONGOING) {
             std::cout << "unexpected termination: " << move << "\n";
@@ -53,5 +53,7 @@ inline bool evaluate_integration_test(const IntegrationTest & test) {
     std::cout << "game did not end\n";
     return false;
 }
+
+bool test_piece_mates();
 
 #endif //STASE_INTEGRATION_TEST_H
