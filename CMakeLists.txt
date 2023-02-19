@@ -140,6 +140,7 @@ set(TEST_SOURCE_FILES
         src/test/board/test_castling.cpp
         src/test/board/test_mutate.cpp
         src/test/board/test_move.cpp
+        src/test/board/test_game_status.cpp
 
         src/test/search/test_search.cpp
         src/test/search/test_search_helpers.h

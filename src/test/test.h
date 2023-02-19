@@ -127,6 +127,7 @@ bool test_castling();
 bool test_mutate_hard();
 bool test_mutate();
 bool test_move_scores();
+bool test_game_status();
 
 // top level game tests
 bool test_pin_cache();
