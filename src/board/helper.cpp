@@ -157,7 +157,7 @@ string mtos(const Board & b, const Move m) {
     
     // add + for check
     Colour opposite_colour = (piece_colour == WHITE) ? BLACK : WHITE;
-    if (game_rules::in_check_hard(b, opposite_colour)) {
+    if (game_rules::in_check(b, opposite_colour)) {
         s += "+";
     }
     

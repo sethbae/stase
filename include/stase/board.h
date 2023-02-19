@@ -27,8 +27,8 @@ inline std::string starting_fen() {
  * as well as checking whether you're in check or not.
  */
 namespace game_rules {
-    bool in_check_hard(const Board &);
-    bool in_check_hard(const Board &, Colour);
+    bool in_check(const Board &);
+    bool in_check(const Board &, Colour);
     void piecemoves_ignore_check(const Board &, Square, ptr_vec<Move> &);
     void legal_moves(const Board &, std::vector<Move> &);
     std::vector<Move> legal_moves(const Board &);

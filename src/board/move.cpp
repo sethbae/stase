@@ -7,7 +7,6 @@ using std::cout;
 
 #include "board.h"
 #include "board.hpp"
-#include "../utils/ptr_vec.h"
 
 /*
  * Defines a move data type and defines functions to make moves
@@ -236,11 +235,11 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
             b.set(k_sq, EMPTY);
             b.set(s1, W_KING);
             
-            if (!game_rules::in_check_hard(b, WHITE)) {
+            if (!game_rules::in_check(b, WHITE)) {
                 b.set(s1, EMPTY);
                 b.set(s2, W_KING);
                 
-                return !game_rules::in_check_hard(b, WHITE);
+                return !game_rules::in_check(b, WHITE);
             }
             
         }           
@@ -257,11 +256,11 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
             b.set(k_sq, EMPTY);
             b.set(s1, W_KING);
             
-            if (!game_rules::in_check_hard(b, WHITE)) {
+            if (!game_rules::in_check(b, WHITE)) {
                 b.set(s1, EMPTY);
                 b.set(s2, W_KING);
                 
-                return !game_rules::in_check_hard(b, WHITE);
+                return !game_rules::in_check(b, WHITE);
             }
             
         }   
@@ -277,11 +276,11 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
             b.set(k_sq, EMPTY);
             b.set(s1, B_KING);
             
-            if (!game_rules::in_check_hard(b, BLACK)) {
+            if (!game_rules::in_check(b, BLACK)) {
                 b.set(s1, EMPTY);
                 b.set(s2, B_KING);
                 
-                return !game_rules::in_check_hard(b, BLACK);
+                return !game_rules::in_check(b, BLACK);
             }
             
         }
@@ -298,11 +297,11 @@ bool castle_checks(Board b, const Colour col, const bool kingside) {
             b.set(k_sq, EMPTY);
             b.set(s1, B_KING);
 
-            if (!game_rules::in_check_hard(b, BLACK)) {
+            if (!game_rules::in_check(b, BLACK)) {
                 b.set(s1, EMPTY);
                 b.set(s2, B_KING);
 
-                return !game_rules::in_check_hard(b, BLACK);
+                return !game_rules::in_check(b, BLACK);
             }
             
         }
@@ -317,7 +316,7 @@ void king_moves(const Board & b, const Square s, ptr_vec<Move> & moves) {
     Square temp{};
 
     // check castle for white
-    if (kingcol == WHITE && !game_rules::in_check_hard(b, WHITE)) {
+    if (kingcol == WHITE && !game_rules::in_check(b, WHITE)) {
         
         if (b.get_cas_ws() && castle_checks(b, WHITE, true)) {
             Move m{s, stosq("g1"), 0};
@@ -334,7 +333,7 @@ void king_moves(const Board & b, const Square s, ptr_vec<Move> & moves) {
         }
     
     // and for black
-    } else if (kingcol == BLACK && !game_rules::in_check_hard(b, BLACK)) {
+    } else if (kingcol == BLACK && !game_rules::in_check(b, BLACK)) {
 
         if (b.get_cas_bs() && castle_checks(b, BLACK, true)) {
             Move m{s, stosq("g8"), 0};
@@ -531,10 +530,10 @@ bool line_search_check(const Board & b, Square sq, const Piece p1, const Piece p
  * Returns true iff the player of the given colour is in check. If no king of the given
  * colour is found, then false is returned.
  */
-bool game_rules::in_check_hard(const Board & b, Colour col) {
+bool game_rules::in_check(const Board & b, Colour c) {
 
     Square temp{};
-    bool white = (col == WHITE);
+    bool white = (c == WHITE);
     Piece king = (white) ? W_KING : B_KING;
     Square ksq{0, 0};
     int king_x = 0, king_y = 0;
@@ -610,8 +609,8 @@ bool game_rules::in_check_hard(const Board & b, Colour col) {
     return false;
 }
 
-bool game_rules::in_check_hard(const Board & b) {
-    return game_rules::in_check_hard(b, b.colour_to_move());
+bool game_rules::in_check(const Board & b) {
+    return game_rules::in_check(b, b.colour_to_move());
 }
 
 /*************************************************************************
@@ -647,7 +646,7 @@ void game_rules::legal_moves(const Board & b, vector<Move> & moves) {
         //cout << movetosan(b, m) << " ";
         Board local = b;
         local.mutate_hard(m);
-        if (game_rules::in_check_hard(local)) {
+        if (game_rules::in_check(local)) {
             itr = moves.erase(itr);
         } else {
             itr++;

@@ -136,7 +136,7 @@ void play_game(const std::string & starting_fen, bool engine_is_white, int secon
 
         }
 
-        if (game_rules::in_check_hard(b) && game_rules::legal_moves(b).empty()) {
+        if (game_rules::in_check(b) && game_rules::legal_moves(b).empty()) {
             cout << "Checkmate!\n";
             cout << (players_turn
                         ? "You win!\n"
