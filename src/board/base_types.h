@@ -28,9 +28,8 @@ enum Piece : Byte {
     W_PAWN = 13,
 
     // as explained below, the EMPTY value needs to have the 5th bit (16) set.
-    EMPTY = 24,
+    EMPTY = 24
 
-    INVALID_PIECE = 25
 };
 
 /**
@@ -45,9 +44,7 @@ enum Ptype : Byte {
     ROOK = 2,
     KNIGHT = 3,
     BISHOP = 4,
-    PAWN = 5,
-
-    INVALID_TYPE = 16
+    PAWN = 5
 
 };
 
@@ -88,18 +85,6 @@ constexpr Colour opposite_colour(const Piece p) {
     return (p & COLOUR_MASK) ? BLACK : WHITE;
 }
 
-/**
- * Other helpers: minor/major pieces
- */
-constexpr bool is_minor_piece(Piece p) {
-    switch (type(p)) {
-        case KNIGHT:
-        case BISHOP:
-            return true;
-        default:
-            return false;
-    }
-}
 constexpr bool is_major_piece(Piece p) {
     switch (type(p)) {
         case QUEEN:
@@ -168,7 +153,7 @@ constexpr std::string_view ptos_alg(Piece p) {
         case ROOK: return "R";
         case BISHOP: return "B";
         case KNIGHT: return "N";
-        case PAWN: return "";
+        case PAWN:
         default: return "";
     }
 }
