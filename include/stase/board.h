@@ -22,7 +22,7 @@ enum GameStatus {
     ONGOING,
     WHITE_WON,
     BLACK_WON,
-    STALEMATE,
+    DRAW_BY_STALEMATE,
     DRAW_BY_THREEFOLD,
     DRAW_BY_FIFTY_MOVES
 };

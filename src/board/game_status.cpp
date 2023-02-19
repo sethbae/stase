@@ -8,7 +8,7 @@ GameStatus game_rules::check_status(const Board & b) {
 
     if (legal_moves.empty()) {
         if (!in_check) {
-            return STALEMATE;
+            return DRAW_BY_STALEMATE;
         }
         return b.get_white() ? BLACK_WON : WHITE_WON;
     }
