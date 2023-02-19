@@ -99,8 +99,8 @@ set(TEST_SOURCE_FILES
 
         src/test/test.h
         src/test/test_helpers.cpp
-
         src/test/stress_test_main.cpp
+
         src/test/game/cands/stress_test_cands.cpp
 
         src/test/game/test_game.cpp
@@ -141,6 +141,9 @@ set(TEST_SOURCE_FILES
         src/test/board/test_mutate.cpp
         src/test/board/test_move.cpp
         src/test/board/test_game_status.cpp
+
+        src/test/integration/integration_test.h
+        src/test/integration/integration_test_main.cpp
 
         src/test/search/test_search.cpp
         src/test/search/test_search_helpers.h

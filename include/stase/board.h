@@ -36,6 +36,16 @@ inline std::string name(GameStatus game_status) {
         case DRAW_BY_FIFTY_MOVES: return "fifty move rule";
     }
 }
+inline GameStatus value_of(const std::string & s) {
+    if (s == name(ONGOING)) { return ONGOING; }
+    if (s == name(WHITE_WON)) { return WHITE_WON; }
+    if (s == name(BLACK_WON)) { return BLACK_WON; }
+    if (s == name(DRAW_BY_STALEMATE)) { return DRAW_BY_STALEMATE; }
+    if (s == name(DRAW_BY_THREEFOLD)) { return DRAW_BY_THREEFOLD; }
+    if (s == name(DRAW_BY_FIFTY_MOVES)) { return DRAW_BY_FIFTY_MOVES; }
+
+    return ONGOING;
+}
 
 inline std::string starting_fen() {
     return "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
