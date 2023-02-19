@@ -32,7 +32,7 @@ void discover_feature_frames(Gamestate & gs, const Hook & hook) {
  */
 CandSet * cands_in_check(const Gamestate & gs, CandSet * cand_set) {
     // currently, there is no special logic.
-    cand_set->critical = legal_moves(gs.board);
+    cand_set->critical = game_rules::legal_moves(gs.board);
     return cand_set;
 }
 
@@ -131,7 +131,7 @@ CandSet * cands(Gamestate & gs, CandSet * cand_set) {
     }
 
     if (m == 0) {
-        cand_set->legal = legal_moves(gs.board);
+        cand_set->legal = game_rules::legal_moves(gs.board);
     }
 
     return cand_set;
@@ -276,7 +276,7 @@ CandSet * cands_report(Gamestate & gs) {
     }
 
     if (m == 0) {
-        cand_set->legal = legal_moves(gs.board);
+        cand_set->legal = game_rules::legal_moves(gs.board);
     }
 
     board_utils::print(gs.board);

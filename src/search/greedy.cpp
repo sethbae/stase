@@ -60,7 +60,7 @@ bool threefold_rep(const SearchNode * node, const std::vector<Gamestate> * game_
  */
 void add_legal_moves(SearchNode * node) {
 
-    std::vector<Move> legals = legal_moves(node->gs->board);
+    std::vector<Move> legals = game_rules::legal_moves(node->gs->board);
     if (legals.empty()) {
         if (node->gs->in_check) {
             node->gs->game_over = true;

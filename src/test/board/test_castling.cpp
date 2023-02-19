@@ -69,9 +69,9 @@ bool evaluate_castle_test_case(const CastleTestCase * tc) {
     Move bl = Move{stosq("e8"), stosq("c8"), 0};
 
     // create a list which is all the legal moves for either player
-    std::vector<Move> legals = legal_moves(b);
+    std::vector<Move> legals = game_rules::legal_moves(b);
     b.flip_white();
-    std::vector<Move> legals2 = legal_moves(b);
+    std::vector<Move> legals2 = game_rules::legal_moves(b);
     legals.insert(legals.end(), legals2.begin(), legals2.end());
 
     // and now check four booleans, that each one is/isn't legal

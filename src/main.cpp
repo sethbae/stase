@@ -30,7 +30,7 @@ void manual_gameplay() {
         board_utils::print_conf(b); cout << "\n";
 
         moves.clear();
-        legal_moves(b, moves);
+        game_rules::legal_moves(b, moves);
 
         for (Move m : moves) {
             cout << mtos(b, m) << " ";
@@ -75,7 +75,7 @@ void play_game(const std::string & starting_fen, bool engine_is_white, int secon
     while (keep_playing) {
 
         board_utils::print(b);
-        std::vector<Move> legals = legal_moves(b);
+        std::vector<Move> legals = game_rules::legal_moves(b);
 
         if (players_turn) {
 
@@ -136,7 +136,7 @@ void play_game(const std::string & starting_fen, bool engine_is_white, int secon
 
         }
 
-        if (in_check_hard(b) && legal_moves(b).empty()) {
+        if (game_rules::in_check_hard(b) && game_rules::legal_moves(b).empty()) {
             cout << "Checkmate!\n";
             cout << (players_turn
                         ? "You win!\n"

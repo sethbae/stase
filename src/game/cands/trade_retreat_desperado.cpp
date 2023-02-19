@@ -11,7 +11,7 @@ int trade_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, int
     Move piece_moves_arr[32];
     ptr_vec<Move> piece_moves(piece_moves_arr, 32);
 
-    piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
+    game_rules::piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
     // find the maximum value available
     int max_val = 0;
@@ -74,7 +74,7 @@ int retreat_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves, i
 
     Move piece_moves_arr[32];
     ptr_vec<Move> piece_moves(piece_moves_arr, 32);
-    piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
+    game_rules::piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
     bool is_king = type(gs.board.get(ff->centre)) == KING;
     bool track_directions = is_major_piece(gs.board.get(ff->centre)) && multiple_directions_exist(piece_moves);
@@ -125,7 +125,7 @@ int desperado_piece(const Gamestate & gs, const FeatureFrame * ff, Move * moves,
     Move piece_moves_arr[32];
     ptr_vec<Move> piece_moves(piece_moves_arr, 32);
 
-    piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
+    game_rules::piecemoves_ignore_check(gs.board, ff->centre, piece_moves);
 
     // find the maximum value available
     int max_val = 0;

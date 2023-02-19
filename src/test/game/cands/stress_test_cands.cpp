@@ -56,7 +56,7 @@ bool stress_test_cands(std::vector<Gamestate> & states) {
         gs.clear_all_frames();
 
         std::vector<Move> moves = cands(gs, new CandSet)->critical;
-        std::vector<Move> legals = legal_moves(gs.board);
+        std::vector<Move> legals = game_rules::legal_moves(gs.board);
 
         if (moves.size() > MAX_TOTAL_CANDS) {
             cout << "\n[" << i << "] FAILED: Received too many candidates (" << moves.size() << ")\n";

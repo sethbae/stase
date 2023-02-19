@@ -10,7 +10,7 @@ bool find_pawn_checks(Gamestate & gs, const Square s, const Square k_sq) {
 
     Move moves_arr[16];
     ptr_vec<Move> moves(moves_arr, 16);
-    piecemoves_ignore_check(gs.board, s, moves);
+    game_rules::piecemoves_ignore_check(gs.board, s, moves);
 
     for (int i = 0; i < moves.size(); ++i) {
         if (equal(left_of_king, moves[i].to) || equal(right_of_king, moves[i].to)) {

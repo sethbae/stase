@@ -38,7 +38,7 @@ const TestSet<CheckTestCase> in_check_test_set{
 
 bool evaluate_check_test_case(const CheckTestCase * tc) {
     Board b = board_utils::fen_to_board(tc->fen);
-    return in_check_hard(b) == b.get_cas_ws();
+    return game_rules::in_check_hard(b) == b.get_cas_ws();
 }
 
 bool test_in_check() {

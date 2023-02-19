@@ -15,7 +15,7 @@ public:
             if (*cand_list == LEGAL) {
 
                 TestObserver::register_applicable_event();
-                std::vector<Move> expected_legals = legal_moves(node->gs->board);
+                std::vector<Move> expected_legals = game_rules::legal_moves(node->gs->board);
 
                 for (const Move expected_legal: expected_legals) {
                     bool present = false;

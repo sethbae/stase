@@ -18,7 +18,7 @@ using std::cout;
  */
 Move stom(const Board & b, const string & san) {
 
-    for (const Move m : legal_moves(b)) {
+    for (const Move m : game_rules::legal_moves(b)) {
         if (mtos(b, m) == san) {
             return m;
         }
@@ -54,7 +54,7 @@ enum DisambigType {
  */
 DisambigType compute_disambig(const Board & b, const Move m) {
 
-    std::vector<Move> legals = legal_moves(b);
+    std::vector<Move> legals = game_rules::legal_moves(b);
     bool required = false;
     bool rank_not_usable = false;
     bool file_not_usable = false;
@@ -157,7 +157,7 @@ string mtos(const Board & b, const Move m) {
     
     // add + for check
     Colour opposite_colour = (piece_colour == WHITE) ? BLACK : WHITE;
-    if (in_check_hard(b, opposite_colour)) {
+    if (game_rules::in_check_hard(b, opposite_colour)) {
         s += "+";
     }
     

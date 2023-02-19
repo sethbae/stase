@@ -26,12 +26,13 @@ inline std::string starting_fen() {
  * Legal moves. These functions provide all legal moves, those only for a certain piece
  * as well as checking whether you're in check or not.
  */
-
-void piecemoves_ignore_check(const Board &, Square, ptr_vec<Move> &);
-bool in_check_hard(const Board &);
-bool in_check_hard(const Board &, Colour);
-void legal_moves(const Board &, std::vector<Move> &);
-std::vector<Move> legal_moves(const Board &);
+namespace game_rules {
+    bool in_check_hard(const Board &);
+    bool in_check_hard(const Board &, Colour);
+    void piecemoves_ignore_check(const Board &, Square, ptr_vec<Move> &);
+    void legal_moves(const Board &, std::vector<Move> &);
+    std::vector<Move> legal_moves(const Board &);
+}
 
 /**
  * Reading and writing helpers: into and out of FEN and displaying usefully.
