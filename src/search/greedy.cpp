@@ -35,8 +35,8 @@ bool threefold_rep(const SearchNode * node, const std::vector<Gamestate> * game_
     if (!game_history) { return false; }
 
     // we now search the board history
-    for (int i = game_history->size() - 1; i >= 0; --i) {
-        const Gamestate & gs = (*game_history)[i];
+    for (int i = (int)game_history->size() - 1; i >= 0; --i) {
+        const Gamestate & gs = game_history->operator[](i);
         if (board_hash(gs.board) == node->board_hash && gs.board.equivalent(node->gs->board)) {
             if (++count == 3) {
                 return true;
@@ -44,7 +44,7 @@ bool threefold_rep(const SearchNode * node, const std::vector<Gamestate> * game_
         }
         if (i > 0) {
             // check for pawn moves!
-            Piece moved = (*game_history)[i - 1].board.get(gs.last_move.from);
+            Piece moved = game_history->operator[](i - 1).board.get(gs.last_move.from);
             if (type(moved) == PAWN) {
                 return false;
             }
@@ -79,19 +79,19 @@ void add_legal_moves(SearchNode * node) {
     std::vector<Move> approved;
     approved.reserve(legals.size());
 
-    for (int i = 0; i < legals.size(); ++i) {
+    for (const Move & legal : legals) {
 
         // check in children
         bool already_created = false;
-        for (int j = 0; j < node->children.size(); ++j) {
-            if (equal_exactly(node->children[j]->move, legals[i])) {
+        for (const SearchNode * j : node->children) {
+            if (equal_exactly(j->move, legal)) {
                 already_created = true;
                 break;
             }
         }
 
         if (!already_created) {
-            approved.push_back(legals[i]);
+            approved.push_back(legal);
         }
     }
 
@@ -366,19 +366,9 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector
 
     int i = 0;
 
-//    auto start = std::chrono::high_resolution_clock::now();
-
     while (i++ < cycles || cycles < 0) {
 
         visit_best_line(root, game_history, obs);
-
-//        auto stop = std::chrono::high_resolution_clock::now();
-//        long duration = duration_cast<std::chrono::microseconds>(stop - start).count();
-//        double seconds = ((double)duration) / 1000000.0;
-//
-//        std::cout << i << ": (" << ((double) node_count()) / seconds << ") ";
-//        std::vector<SearchNode *> best_line = retrieve_best_line(root);
-//        print_line(best_line);
 
         if (root->terminal || soft_exit_criteria(root)) {
             break;
@@ -386,7 +376,6 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector
     }
 
     std::vector<SearchNode *> best_line = retrieve_trust_line(root);
-//    print_line(best_line);
 
     std::vector<Move> moves;
     for (SearchNode * s : best_line) {
@@ -394,9 +383,6 @@ std::vector<Move> greedy_search(SearchNode * root, int cycles, const std::vector
             moves.push_back(s->move);
         }
     }
-
-    std::string name = "stase_tree";
-    // record_tree_in_file(name, root);
 
     return moves;
 }
