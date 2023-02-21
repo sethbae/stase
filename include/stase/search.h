@@ -64,7 +64,7 @@ private: long hash();
 };
 
 enum SearchEvent {
-    VISIT,
+    VISIT_NODE,
     VISIT_LINE,
     SWING,
     FORCE_VISIT,
@@ -77,7 +77,7 @@ enum SearchEvent {
     THREEFOLD_REP,
 };
 const std::vector<SearchEvent> ALL_SEARCH_EVENTS{
-    VISIT,
+    VISIT_NODE,
     VISIT_LINE,
     SWING,
     FORCE_VISIT,
@@ -91,7 +91,7 @@ const std::vector<SearchEvent> ALL_SEARCH_EVENTS{
 };
 inline std::string name(SearchEvent ev) {
     switch (ev) {
-        case VISIT: return "visit";
+        case VISIT_NODE: return "visit";
         case VISIT_LINE: return "visit-l";
         case SWING: return "swing";
         case FORCE_VISIT: return "f-visit";

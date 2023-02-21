@@ -210,38 +210,38 @@ void visit_node(SearchNode * node, const std::vector<Gamestate> * game_history, 
         return;
     }
 
-    obs.open_event(node, VISIT);
+    obs.open_event(node, VISIT_NODE);
 
     switch (node->visit_count) {
         case __engine_params::CRITICAL_THRESHOLD:
             deepen(node, CRITICAL, __engine_params::CRITICAL_DEPTH, game_history, obs);
-            obs.close_event(node, VISIT, nullptr, 1);
+            obs.close_event(node, VISIT_NODE, nullptr, 1);
             return;
         case __engine_params::MEDIAL_THRESHOLD:
             deepen(node, MEDIAL, __engine_params::MEDIAL_DEPTH, game_history, obs);
-            obs.close_event(node, VISIT, nullptr, 2);
+            obs.close_event(node, VISIT_NODE, nullptr, 2);
             return;
         case __engine_params::FINAL_THRESHOLD:
             deepen(node, FINAL, __engine_params::FINAL_DEPTH, game_history, obs);
-            obs.close_event(node, VISIT, nullptr, 3);
+            obs.close_event(node, VISIT_NODE, nullptr, 3);
             return;
         case __engine_params::LEGAL_THRESHOLD:
             if (node->cand_set->legal.empty()) {
                 add_legal_moves(node);
                 if (node->terminal) {
                     // stalemate could have been detected
-                    obs.close_event(node, VISIT, nullptr, 4);
+                    obs.close_event(node, VISIT_NODE, nullptr, 4);
                     return;
                 }
             }
             deepen(node, LEGAL, __engine_params::LEGAL_DEPTH, game_history, obs);
-            obs.close_event(node, VISIT, nullptr, 5);
+            obs.close_event(node, VISIT_NODE, nullptr, 5);
             return;
         default:
             ++node->visit_count;
             update_score(node);
             update_terminal(node, obs);
-            obs.close_event(node, VISIT, nullptr, 6);
+            obs.close_event(node, VISIT_NODE, nullptr, 6);
             return;
     }
 

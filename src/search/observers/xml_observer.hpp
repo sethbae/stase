@@ -22,7 +22,7 @@ private:
             case BEGIN_BURST:
             case UPDATE_TERMINAL:
             case DEBURST: return false;
-            case VISIT:
+            case VISIT_NODE:
             case VISIT_LINE:
             case SWING:
             case FORCE_VISIT:

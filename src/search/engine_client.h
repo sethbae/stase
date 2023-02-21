@@ -1,7 +1,7 @@
 #ifndef STASE_ENGINE_CLIENT_H
 #define STASE_ENGINE_CLIENT_H
 
-#include "game.h"
+#include "../../include/stase/game.h"
 
 /**
  * THe EngineClient provides an easy interface to play a game involving an engine. Moves can be fetched and opponent
