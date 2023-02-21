@@ -2,33 +2,29 @@
 using std::cout;
 #include <vector>
 using std::vector;
-#include <fstream>
-#include <csignal>
-#include <unistd.h>
-#include <cstring>
-#include <string>
 #include <chrono>
+#include <csignal>
+#include <cstring>
+#include <fstream>
+#include <string>
 #include <thread>
-#include "src/utils/ptr_vec.h"
+#include <unistd.h>
 
 using std::ofstream;
 
 #include "include/stase/board.h"
 #include "include/stase/game.h"
-#include "include/stase/search.h"
 #include "include/stase/puzzle.h"
+#include "include/stase/search.h"
 #include "src/game/cands/cands.h"
-#include "src/game/gamestate.hpp"
 #include "src/game/cands/responder.hpp"
-#include "src/test/test.h"
-#include "src/search/search_tools.h"
-#include "src/search/observers/observers.hpp"
+#include "src/game/gamestate.hpp"
 #include "src/search/engine.h"
 #include "src/search/engine_client.h"
-
-//#include "src/test/test.h"
-//#include "src/test/game/cands/fork_helpers.h"
-
+#include "src/search/observers/observers.hpp"
+#include "src/search/search_tools.h"
+#include "src/test/test.h"
+#include "src/utils/ptr_vec.h"
 
 /**
  * Runs cands on the first hundred thousand puzzles. Prints out a histogram showing for each decile,
@@ -47,7 +43,7 @@ void number_of_cands_hist(CandList cand_list) {
 
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
-        int size;
+        int size = 0;
         switch (cand_list) {
             case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
@@ -59,7 +55,7 @@ void number_of_cands_hist(CandList cand_list) {
                 abort();
         }
         max_size = std::max(size, max_size);
-        num_cands[i] = (double)size;
+        num_cands[i] = static_cast<double>(size);
     }
 
     cout << "found cands\n";
@@ -84,12 +80,12 @@ void number_of_cands_hist(CandList cand_list) {
     }
 
     for (int i = 0; i < N; ++i) {
-        num_cands[i] /= ((double)max_size);
+        num_cands[i] /= (static_cast<double>(max_size));
     }
 
     for (int i = 0; i < n; ++i) {
-        double lower_bound = i / ((double)n);
-        double upper_bound = (i + 1) / ((double)n);
+        double lower_bound = i / (static_cast<double>(n));
+        double upper_bound = (i + 1) / (static_cast<double>(n));
         for (int j = 0; j < N;  ++j) {
             if (lower_bound <= num_cands[j] && num_cands[j] <= upper_bound) {
                 hist_bins[i]++;
@@ -108,7 +104,7 @@ void number_of_cands_hist(CandList cand_list) {
     cout << "\n";
 
     cout << "MAX: " << max_size << "\n";
-    cout << "MEAN: " << sum / ((double)N) << "\n";
+    cout << "MEAN: " << sum / (static_cast<double>(N)) << "\n";
 
 }
 
@@ -136,7 +132,7 @@ void number_of_frames_hist(const Hook & h) {
         cands(states[i], new CandSet);
         int size = count_frames(states[i], h.id);
         max_size = std::max(size, max_size);
-        num_frames[i] = (double)size;
+        num_frames[i] = static_cast<double>(size);
     }
 
     cout << "For " << h.name << ":\n";
@@ -154,12 +150,12 @@ void number_of_frames_hist(const Hook & h) {
     }
 
     for (int i = 0; i < N; ++i) {
-        num_frames[i] /= ((double)max_size);
+        num_frames[i] /= (static_cast<double>(max_size));
     }
 
     for (int i = 0; i < n; ++i) {
-        double lower_bound = i / ((double)n);
-        double upper_bound = (i + 1) / ((double)n);
+        double lower_bound = i / (static_cast<double>(n));
+        double upper_bound = (i + 1) / (static_cast<double>(n));
         for (int j = 0; j < N;  ++j) {
             if (lower_bound <= num_frames[j] && num_frames[j] <= upper_bound) {
                 hist_bins[i]++;
@@ -178,7 +174,7 @@ void number_of_frames_hist(const Hook & h) {
     cout << "\n";
 
     cout << "MAX: " << max_size << "\n";
-    cout << "MEAN: " << sum / ((double)N) << "\n";
+    cout << "MEAN: " << sum / (static_cast<double>(N)) << "\n";
 
 }
 
@@ -195,7 +191,7 @@ void number_of_cands(CandList cand_list) {
 
     int max_size = 0;
     for (int i = 0; i < N; ++i) {
-        int size;
+        int size = 0;
         switch (cand_list) {
             case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
@@ -207,7 +203,7 @@ void number_of_cands(CandList cand_list) {
                 abort();
         }
         max_size = max(size, max_size);
-        num_cands[i] = (double)size;
+        num_cands[i] = static_cast<double>(size);
     }
 
     cout << "found cands: " << name(cand_list) << "\n";
@@ -243,7 +239,7 @@ void number_of_cands(CandList cand_list) {
     cout << "\n";
 
     cout << "MAX: " << max_size << "\n";
-    cout << "MEAN: " << sum / ((double)N) << "\n";
+    cout << "MEAN: " << sum / (static_cast<double>(N)) << "\n";
 
 }
 
@@ -266,7 +262,7 @@ void q_scores() {
             exit(1);
         }
 
-        q_score[i] = (int) quiess(states[i]);
+        q_score[i] = static_cast<int>(quiess(states[i]));
         if (q_score[i] > max_size) {
             max_size = q_score[i];
         }
@@ -305,7 +301,7 @@ void q_scores() {
     cout << "\n";
 
     cout << "MAX: " << max_size << "\n";
-    cout << "MEAN: " << sum / ((double)N) << "\n";
+    cout << "MEAN: " << sum / (static_cast<double>(N)) << "\n";
 
 }
 
@@ -332,7 +328,7 @@ void find_cands_outliers(CandList cand_list) {
             continue;
         }
 
-        int size;
+        int size = 0;
         switch (cand_list) {
             case CRITICAL: size = cands(states[i], new CandSet)->critical.size(); break;
             case MEDIAL: size = cands(states[i], new CandSet)->medial.size(); break;
@@ -345,7 +341,7 @@ void find_cands_outliers(CandList cand_list) {
         }
 
         max_size = max(size, max_size);
-        num_cands[i] = (double)size;
+        num_cands[i] = static_cast<double>(size);
 
     }
 
@@ -488,7 +484,7 @@ void repl(const std::string & fen, const GamePhase game_phase) {
     std::cin >> input;
 
     SearchNode * root = nullptr;
-    while (!root) {
+    while (root == nullptr) {
         if (input == "s") {
             root = repl_seconds(fen, game_phase);
         } else if (input == "c") {
