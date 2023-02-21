@@ -43,7 +43,6 @@ set(SOURCE_FILES
         src/search/engine_client.h
         src/search/engine_client.cpp
         src/search/greedy.cpp
-        src/search/metrics.h
         src/search/metrics.cpp
         src/search/search_tools.h
         src/search/search_tools.cpp

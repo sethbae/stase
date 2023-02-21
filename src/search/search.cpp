@@ -2,7 +2,6 @@
 #include "search.h"
 #include "search_tools.h"
 #include "../game/gamestate.hpp"
-#include "metrics.h"
 
 #include <vector>
 using std::vector;

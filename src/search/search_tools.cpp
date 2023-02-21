@@ -1,6 +1,5 @@
 #include "search_tools.h"
 #include <pthread.h>
-#include "metrics.h"
 #include "../game/gamestate.hpp"
 
 /**

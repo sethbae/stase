@@ -5,7 +5,6 @@
 #include "engine.h"
 #include "search.h"
 #include "search_tools.h"
-#include "metrics.h"
 
 bool thread_has_stopped(pthread_t thread) {
     return pthread_kill(thread, 0) == ESRCH;

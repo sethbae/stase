@@ -90,4 +90,19 @@ void interrupt_execution(int);
 void print_line(std::vector<SearchNode *> & line);
 void record_tree_in_file(const std::string & filename, SearchNode * root);
 
+int node_count();
+void register_new_node();
+void reset_node_count();
+
+inline Move current_best_move(SearchNode * root) {
+
+    if (!root) { return MOVE_SENTINEL; }
+    if (root->children.size() == 0) { return MOVE_SENTINEL; }
+
+    update_score(root);
+
+    return root->best_trust_child->move;
+}
+
+
 #endif //STASE_SEARCH_TOOLS_H

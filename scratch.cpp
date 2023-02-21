@@ -6,6 +6,7 @@ using std::vector;
 #include <csignal>
 #include <unistd.h>
 #include <cstring>
+#include <string>
 #include <chrono>
 #include <thread>
 #include "src/utils/ptr_vec.h"
@@ -21,7 +22,6 @@ using std::ofstream;
 #include "src/game/cands/responder.hpp"
 #include "src/test/test.h"
 #include "src/search/search_tools.h"
-#include "src/search/metrics.h"
 #include "src/search/observers/observers.hpp"
 #include "src/search/engine.h"
 #include "src/search/engine_client.h"
