@@ -55,12 +55,12 @@ int material_balance(const Gamestate & gs) {
 
 }
 
-Eval heur(const Gamestate & gs) {
+Eval heur(const Gamestate & gs, const MetricWeights * weights) {
     
     Eval ev = zero();
     
     for (const Metric * metric : ALL_METRICS) {
-        float weight = (float) metric->weights[gs.phase];
+        float weight = (float) weights->weight(metric->id, gs.phase);
         if (weight != 0) {
             ev += (int) (metric->metric(gs) * weight);
         }
@@ -69,7 +69,7 @@ Eval heur(const Gamestate & gs) {
     return ev + material_balance(gs);
 }
 
-Eval heur_with_description(const Gamestate & gs) {
+Eval heur_with_description(const Gamestate & gs, const MetricWeights * weights) {
 
     cout << std::left << std::setprecision(3);
 
@@ -86,13 +86,13 @@ Eval heur_with_description(const Gamestate & gs) {
     Eval ev = zero();
     for (const Metric * metric : ALL_METRICS) {
         float score = metric->metric(gs);
-        int weighted_score = (int)(score * (float)metric->weights[gs.phase]);
+        int weighted_score = (int)(score * (float)weights->weight(metric->id, gs.phase));
         ev += weighted_score;
         
         cout << std::left << setw(20) << metric->name << ": "
              << std::right << setw(8) << score
              << " * "
-             << setw(6) << metric->weights[gs.phase]
+             << setw(6) <<  weights->weight(metric->id, gs.phase)
              << " = "
              << setw(6) << weighted_score
                 << "\n";

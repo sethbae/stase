@@ -19,8 +19,7 @@
  */
 struct Metric {
     const std::string name;
-    // [0]: OPENING [1]: MIDGAME [2]: ENDGAME
-    const int weights[3];
+    const int id;
     float (*metric)(const Gamestate &);
 };
 
@@ -116,92 +115,92 @@ namespace __metrics {
 
     const Metric piece_activity_alpha_metric{
         "piece-activity-alpha",
-        {600, 600, 600},
+        0,
         &__piece_activity_alpha_metric
     };
     const Metric piece_activity_beta_metric{
         "piece-activity-beta",
-        {600, 600, 600},
+        1,
         &__piece_activity_beta_metric
     };
     const Metric piece_activity_gamma_metric{
         "piece-activity-gamma",
-        {600, 600, 600},
+        2,
         &__piece_activity_gamma_metric
     };
     const Metric open_line_control_metric{
         "open-line-control",
-        {800, 1000, 800},
+        3,
         &__open_line_control_metric
     };
     const Metric centre_control_metric{
         "centre-control",
-        {2000, 1500, 750},
+        4,
         &__centre_control_metric
     };
     const Metric defended_pawns_metric{
         "defended-pawns",
-        {400, 500, 750},
+        5,
         &__defended_pawns_metric
     };
     const Metric isolated_pawns_metric{
         "isolated-pawns",
-        {300, 400, 600},
+        6,
         &__isolated_pawns_metric
     };
     const Metric central_pawns_metric{
         "central-pawns",
-        {600, 500, 400},
+        7,
         &__central_pawns_metric
     };
     const Metric far_advanced_pawns_metric{
         "far-advanced-pawns",
-        {100, 400, 1000},
+        8,
         &__far_advanced_pawns_metric
     };
     const Metric development_metric{
         "development",
-        {1000, 500, 0},
+        9,
         &__development_metric
     };
     const Metric castling_metric{
         "castling",
-        {300, 200, 0},
+        10,
         &__castling_metric
     };
     const Metric castling_rights_metric{
         "castling-rights",
-        {400, 300, 0},
+        11,
         &__castling_rights_metric
     };
     const Metric pawns_defend_king_metric{
         "pawns-defend-king",
-        {500, 1000, 400},
+        12,
         &__pawns_defend_king_metric
     };
     const Metric control_near_king_metric{
         "control-near-king",
-        {500, 1000, 400},
+        13,
         &__control_near_king_metric
     };
     const Metric king_exposure_metric{
         "king-exposure",
-        {500, 1000, 400},
+        14,
         &__king_exposure_metric
     };
     const Metric unconventional_king_metric{
         "unconventional-king",
-        {1000, 500, 0},
+        15,
         &__unconventional_king_metric
     };
     const Metric promotion_squares_metric{
         "promotion-squares",
-        {0, 1000, 2000},
+        16,
         &__promotion_squares
     };
     const Metric mating_net_metric{
         "mating-net",
-        {2000, 2000, 10000},
+        17,
         &__mating_net
     };
 }
