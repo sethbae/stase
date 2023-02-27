@@ -126,7 +126,11 @@ public:
  */
 extern Observer DEFAULT_OBSERVER;
 
-std::vector<Move> greedy_search(SearchNode *, int, const std::vector<Gamestate> *, Observer & = DEFAULT_OBSERVER);
+std::vector<Move> greedy_search(
+        SearchNode *, int,
+        const std::vector<Gamestate> *,
+        const MetricWeights * = &DEFAULT_METRIC_WEIGHTS,
+        Observer & = DEFAULT_OBSERVER);
 
 void delete_tree(SearchNode *);
 

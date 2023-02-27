@@ -21,6 +21,7 @@ private:
         Eval * score_out;
         double * secs_out;
         const std::vector<Gamestate> * game_history;
+        const MetricWeights * metric_weights;
     };
 
     const std::string fen;
@@ -40,6 +41,7 @@ private:
     double actual_seconds;
 
     const std::vector<Gamestate> * game_history;
+    const MetricWeights * metric_weights;
 
 public:
     Engine(
@@ -50,7 +52,8 @@ public:
             double timeout_seconds,
             bool cleanup,
             GamePhase game_phase,
-            const std::vector<Gamestate> * game_history):
+            const std::vector<Gamestate> * game_history,
+            const MetricWeights * metric_weights):
         fen(fen),
         obs(o),
         search_args(nullptr),
@@ -66,7 +69,8 @@ public:
         score(zero()),
         actual_seconds(timeout_seconds),
 
-        game_history(game_history)
+        game_history(game_history),
+        metric_weights(metric_weights)
     {
         root = new SearchNode(new Gamestate(fen, game_phase), new CandSet);
 #ifdef ENGINE_STACK_TRACE
@@ -116,6 +120,7 @@ private:
     bool cleanup;
     GamePhase game_phase;
     const std::vector<Gamestate> * game_history;
+    const MetricWeights * metric_weights;
 
     EngineBuilder(
             std::string & fen,
@@ -125,7 +130,8 @@ private:
             double timeout_seconds,
             bool cleanup,
             GamePhase game_phase,
-            const std::vector<Gamestate> * game_history) :
+            const std::vector<Gamestate> * game_history,
+            const MetricWeights * metric_weights) :
         fen(fen),
         obs(obs),
         nodes(node_limit),
@@ -133,13 +139,14 @@ private:
         seconds(timeout_seconds),
         cleanup(cleanup),
         game_phase(game_phase),
-        game_history(game_history)
+        game_history(game_history),
+        metric_weights(metric_weights)
     {}
 
 public:
 
     static EngineBuilder for_position(std::string fen_string) {
-        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true, OPENING, nullptr);
+        return EngineBuilder(fen_string, DEFAULT_OBSERVER, -1, -1, -1, true, OPENING, nullptr, &DEFAULT_METRIC_WEIGHTS);
     }
 
     static EngineBuilder for_starting_position() {
@@ -147,35 +154,39 @@ public:
     }
 
     EngineBuilder with_game_phase(GamePhase phase) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase, game_history);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, phase, game_history, metric_weights);
     }
 
     EngineBuilder with_obs(Observer & observer) {
-        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase, game_history);
+        return EngineBuilder(fen, observer, nodes, cycles, seconds, cleanup, game_phase, game_history, metric_weights);
     }
 
     EngineBuilder with_node_limit(int node_limit) {
-        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase, game_history);
+        return EngineBuilder(fen, obs, node_limit, cycles, seconds, cleanup, game_phase, game_history, metric_weights);
     }
 
     EngineBuilder with_cycle_limit(int cycle_limit) {
-        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase, game_history);
+        return EngineBuilder(fen, obs, nodes, cycle_limit, seconds, cleanup, game_phase, game_history, metric_weights);
     }
 
     EngineBuilder with_timeout(double secs) {
-        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase, game_history);
+        return EngineBuilder(fen, obs, nodes, cycles, secs, cleanup, game_phase, game_history, metric_weights);
     }
 
     EngineBuilder with_cleanup(bool auto_cleanup) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, game_history);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, auto_cleanup, game_phase, game_history, metric_weights);
     }
 
     EngineBuilder with_game_history(const std::vector<Gamestate> * _game_history) {
-        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, _game_history);
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, _game_history, metric_weights);
+    }
+
+    EngineBuilder with_metric_weights(const MetricWeights * _metric_weights) {
+        return EngineBuilder(fen, obs, nodes, cycles, seconds, cleanup, game_phase, game_history, _metric_weights);
     }
 
     Engine build() {
-        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, game_history);
+        return Engine(fen, obs, nodes, cycles, seconds, cleanup, game_phase, game_history, metric_weights);
     }
 };
 

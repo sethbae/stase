@@ -423,7 +423,7 @@ SearchNode * repl_cycles(const std::string & fen, const GamePhase game_phase) {
     SearchNode * root =
         new SearchNode(root_gs, cands(*root_gs, new CandSet), heur(*root_gs));
 
-    greedy_search(root, cycles, nullptr, DEFAULT_OBSERVER);
+    greedy_search(root, cycles, nullptr);
     cout << "done\n";
 
     return root;
